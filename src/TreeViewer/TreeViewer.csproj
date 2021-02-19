@@ -1,0 +1,106 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyName>TreeViewer</AssemblyName>
+    <Version>1.0.0</Version>
+    <ApplicationIcon>Assets\Program.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <AvaloniaResource Include="**\*.xaml">
+      <SubType>Designer</SubType>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\ActionTemplate.png" />
+    <EmbeddedResource Include="Assets\CoordinatesTemplate.png" />
+    <EmbeddedResource Include="Assets\FileTypeTemplate.png" />
+    <EmbeddedResource Include="Assets\FurtherTransformationTemplate.png" />
+    <EmbeddedResource Include="Assets\GenericFileType.png" />
+    <EmbeddedResource Include="Assets\LoadFileTemplate.png" />
+    <EmbeddedResource Include="Assets\MacOSPermissionsInstructions.md" />
+    <EmbeddedResource Include="Assets\MenuActionTemplate.png" />
+    <EmbeddedResource Include="Assets\PlotActionTemplate.png" />
+    <EmbeddedResource Include="Assets\Program.ico" />
+    <EmbeddedResource Include="Assets\SelectionActionTemplate.png" />
+    <EmbeddedResource Include="Assets\Shield.png" />
+    <EmbeddedResource Include="Assets\TransformerTemplate.png" />
+    <EmbeddedResource Include="Assets\Banner.png" />
+    <EmbeddedResource Include="Assets\ProgramIcon.png" />
+    <EmbeddedResource Include="Assets\ProgressWindowBackground.png" />
+    <EmbeddedResource Include="Assets\QuestionMark.png" />
+    <EmbeddedResource Include="Assets\Tick.png" />
+    <EmbeddedResource Include="Assets\Warning.png" />
+    <EmbeddedResource Include="Assets\WindowIcon.png" />
+    <EmbeddedResource Include="Templates\Action.cs" />
+    <EmbeddedResource Include="Templates\Coordinates.cs" />
+    <EmbeddedResource Include="Templates\FileType.cs" />
+    <EmbeddedResource Include="Templates\FurtherTransformation.cs" />
+    <EmbeddedResource Include="Templates\LoadFile.cs" />
+    <EmbeddedResource Include="Templates\MenuAction.cs" />
+    <EmbeddedResource Include="Templates\PlotAction.cs" />
+    <EmbeddedResource Include="Templates\SelectionAction.cs" />
+    <EmbeddedResource Include="Templates\Transformer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Templates\Action.cs" />
+    <Compile Remove="Templates\Coordinates.cs" />
+    <Compile Remove="Templates\FileType.cs" />
+    <Compile Remove="Templates\FurtherTransformation.cs" />
+    <Compile Remove="Templates\LoadFile.cs" />
+    <Compile Remove="Templates\MenuAction.cs" />
+    <Compile Remove="Templates\PlotAction.cs" />
+    <Compile Remove="Templates\SelectionAction.cs" />
+    <Compile Remove="Templates\Transformer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\MacOSPermissionsInstructions.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts\OpenSans-Bold.ttf" />
+    <EmbeddedResource Include="Fonts\OpenSans-BoldItalic.ttf" />
+    <EmbeddedResource Include="Fonts\OpenSans-Italic.ttf" />
+    <EmbeddedResource Include="Fonts\OpenSans-Regular.ttf" />
+    <EmbeddedResource Include="Fonts\RobotoMono-Italic.ttf" />
+    <EmbeddedResource Include="Fonts\RobotoMono-Regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.0" />
+    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="3.0.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
+    <PackageReference Include="AvaloniaColorPicker" Version="1.0.4" />
+    <PackageReference Include="CSharpEditor" Version="1.1.0-a7" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="Mono.Options" Version="6.6.0.161" />
+    <PackageReference Include="MuPDFCore" Version="1.2.5" />
+    <PackageReference Include="TreeNode" Version="1.0.4" />
+    <PackageReference Include="VectSharp" Version="1.7.0" />
+    <PackageReference Include="VectSharp.Canvas" Version="2.1.8" />
+    <PackageReference Include="VectSharp.Markdown" Version="1.0.3" />
+    <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.0.2-a3" />
+    <PackageReference Include="VectSharp.MuPDFUtils" Version="1.1.3" />
+    <PackageReference Include="VectSharp.PDF" Version="2.2.2" />
+    <PackageReference Include="VectSharp.SVG" Version="1.3.0" />
+  </ItemGroup>
+
+  <Target Name="_ResolveCopyLocalNuGetPkgXmls" AfterTargets="ResolveReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).xml')" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)'!='' and Exists('%(RootDir)%(Directory)%(Filename).xml')" />
+    </ItemGroup>
+  </Target>
+
+</Project>

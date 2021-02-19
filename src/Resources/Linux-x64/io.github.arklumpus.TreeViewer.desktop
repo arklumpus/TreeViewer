@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=TreeViewer
+Comment=View phylogenetic trees
+Icon=io.github.arklumpus.TreeViewer
+Exec=@PATHHERE@ %F
+Terminal=false
+MimeType=application/vnd.treeviewer.newick.tre
+MimeType=application/vnd.treeviewer.newick.tree
+MimeType=application/vnd.treeviewer.newick.treefile
+MimeType=application/vnd.treeviewer.newick.smap
+MimeType=application/vnd.treeviewer.newick.nwk
+MimeType=application/vnd.treeviewer.newick.nwka
+MimeType=application/vnd.treeviewer.binarytree.tbi
+MimeType=application/vnd.treeviewer.nexus.nex
+Categories=Education;Science;Biology;DataVisualization;Graphics;2DGraphics;VectorGraphics

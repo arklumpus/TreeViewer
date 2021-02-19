@@ -1,0 +1,76 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="400" Height="240"
+        x:Class="TreeViewer.NewAttributeWindow"
+        Title="New attribute..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        WindowStartupLocation="CenterOwner" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="1*" />
+      <RowDefinition Height="1*" />
+      <RowDefinition Height="1*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <TextBlock FontWeight="Bold" FontSize="18">New attribute</TextBlock>
+    <Grid Grid.Row="1" Margin="0,10,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock VerticalAlignment="Center">Attribute name:</TextBlock>
+      <TextBox Name="AttributeNameBox" Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center"></TextBox>
+    </Grid>
+    <Grid Grid.Row="2" Margin="0,10,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock VerticalAlignment="Center">Attribute type:</TextBlock>
+      <ComboBox Grid.Column="1" Name="AttributeTypeBox" Padding="5" Margin="5,0,0,0" SelectedIndex="0" VerticalAlignment="Center">
+        <ComboBox.Items>
+          <ComboBoxItem>String</ComboBoxItem>
+          <ComboBoxItem>Number</ComboBoxItem>
+        </ComboBox.Items>
+      </ComboBox>
+    </Grid>
+    <Grid Grid.Row="3" Margin="0,10,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock VerticalAlignment="Center">Attribute value:</TextBlock>
+      <TextBox Name="AttributeValueBox" Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center"></TextBox>
+    </Grid>
+    <Grid Grid.Row="4" Margin="0,10,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="1*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="1*"/>
+      </Grid.ColumnDefinitions>
+      <Button Grid.Column="1" Width="100" Click="OKClicked" HorizontalContentAlignment="Center">OK</Button>
+      <Button Grid.Column="3" Width="100" Click="CancelClicked" HorizontalContentAlignment="Center">Cancel</Button>
+    </Grid>
+  </Grid>
+</Window>

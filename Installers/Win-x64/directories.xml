@@ -1,0 +1,34 @@
+				<Directory Id="cs" Name="cs">
+				</Directory>
+				<Directory Id="de" Name="de">
+				</Directory>
+				<Directory Id="es" Name="es">
+				</Directory>
+				<Directory Id="fr" Name="fr">
+				</Directory>
+				<Directory Id="Icons" Name="Icons">
+					<Directory Id="Icons_test" Name="test">
+						<Directory Id="Icons_test_testNested2" Name="testNested2">
+						</Directory>
+					</Directory>
+				</Directory>
+				<Directory Id="it" Name="it">
+					<Directory Id="it_test" Name="test">
+					</Directory>
+				</Directory>
+				<Directory Id="ja" Name="ja">
+				</Directory>
+				<Directory Id="ko" Name="ko">
+				</Directory>
+				<Directory Id="pl" Name="pl">
+				</Directory>
+				<Directory Id="pt.BR" Name="pt-BR">
+				</Directory>
+				<Directory Id="ru" Name="ru">
+				</Directory>
+				<Directory Id="tr" Name="tr">
+				</Directory>
+				<Directory Id="zh.Hans" Name="zh-Hans">
+				</Directory>
+				<Directory Id="zh.Hant" Name="zh-Hant">
+				</Directory>

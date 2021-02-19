@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="TreeViewer" Language="1033" Manufacturer="G. Bianchini" Version="@@VersionHere@@" UpgradeCode="f08be33a-ecc3-4400-8a2f-17afd218d902">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+    <Upgrade Id='f08be33a-ecc3-4400-8a2f-17afd218d902'>
+      <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
+          Minimum='0.0.1' IncludeMinimum='yes'
+          Maximum='@@VersionHere@@' IncludeMaximum='no' />
+    </Upgrade>
+
+
+    <Media Id='1' Cabinet='TreeViewer.cab' EmbedCab='yes' />
+
+		<Feature Id="Complete" Title="TreeViewer @@VersionHere@@" Level="1" Description="The complete TreeViewer package." ConfigurableDirectory="INSTALLFOLDER" Display='expand' AllowAdvertise='no' InstallDefault='local' Absent='disallow'>
+      <Feature Id='MainProgram' Title='Program' Description='TreeViewer executables and libraries.' Level='1' AllowAdvertise='no' InstallDefault='local' Absent='disallow'>
+        <ComponentGroupRef Id="TreeViewerComponent" />
+      </Feature>
+      <Feature Id="ShortcutFeat" Title="Start Menu shortcut" Description="Add a shortcut to TreeViewer to the Start Menu." Level="1" AllowAdvertise='no' InstallDefault='local'>
+        <ComponentRef Id="ApplicationShortcut"/>
+      </Feature>
+      <Feature Id="EnvPath" Title="Environment variable" Description="Add the TreeViewer installation folder to the PATH environment variable." Level="1" AllowAdvertise='no' InstallDefault='local'>
+        <ComponentRef Id="EnvVars"/>
+      </Feature>
+      <Component Id="DummyComponent" Guid="a5670c1d-cae1-421c-bbf6-f9dc28f983dd" Directory="INSTALLFOLDER">
+      </Component>
+    </Feature>
+
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="Licence.rtf" />
+    <WixVariable Id="WixUIDialogBmp" Value="TreeViewerBanner.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="HeaderBanner.bmp" />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+	</Product>
+
+  <Fragment>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize" />
+    </InstallExecuteSequence>
+  </Fragment>
+
+  <Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="TreeViewer">
+<!-- Directories here -->
+				</Directory>
+			</Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="TreeViewer"/>
+      </Directory>
+		</Directory>
+	</Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+    <Component Id="ApplicationShortcut" Guid="9b4ed61a-f969-432a-80ee-66a2421a5c78">
+        <Shortcut Id="ApplicationStartMenuShortcut" 
+                  Name="TreeViewer"
+                  Description="TreeViewer"
+                  Target="[#TreeViewer.exe]"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="TreeViewerIcon.exe"
+                  IconIndex="0" />
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+    </Component>
+    </DirectoryRef>
+  </Fragment>
+  
+  <Fragment>
+    <Icon Id="TreeViewerIcon.exe" SourceFile="SourceDir/TreeViewer.exe" />
+    <Property Id='ARPPRODUCTICON' Value='TreeViewerIcon.exe' />
+  </Fragment>
+
+  <Fragment>
+    <Component Id='EnvVars' Guid='40a4c7b9-ff6b-45d0-a436-a1a914a33d4e' Directory="INSTALLFOLDER">
+      <CreateFolder />
+      <Environment Id='PathEnvVar' Action='set' System='yes' Name='PATH' Part='last' Value='[INSTALLFOLDER]' Permanent='no'/>
+    </Component>
+  </Fragment>
+  
+  <Fragment>
+    <ComponentGroup Id="TreeViewerComponent">
+<!-- Files here -->
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>

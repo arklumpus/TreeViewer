@@ -1,0 +1,59 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" Width="400" Height="450"
+        x:Class="TreeViewer.NodeChoiceWindow"
+        Title="Choose node..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        WindowStartupLocation="CenterOwner" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="1*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <TextBlock FontWeight="Bold" FontSize="24">Choose node:</TextBlock>
+    <TextBlock FontWeight="Bold" Grid.Row="1" FontSize="18" Margin="0,0,0,5">Last common ancestor of:</TextBlock>
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+      <StackPanel Margin="5,0,0,0">
+        <StackPanel Name="NodeContainer">
+          
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+          <local:AddRemoveButton PointerReleased="AddButtonClicked"></local:AddRemoveButton>
+          <TextBlock FontStyle="Italic" Foreground="#B4B4B4" VerticalAlignment="Center" Margin="5,0,0,0">Add node</TextBlock>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+    <Grid Grid.Row="3">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <Button Grid.Column="1" Width="100" Click="OKClicked" HorizontalContentAlignment="Center">OK</Button>
+      <Button Grid.Column="3" Width="100" Click="CancelClicked" HorizontalContentAlignment="Center">Cancel</Button>
+    </Grid>
+  </Grid>
+</Window>

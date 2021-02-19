@@ -1,0 +1,14 @@
+cs
+de
+es
+fr
+Icons
+it
+ja
+ko
+pl
+pt-BR
+ru
+tr
+zh-Hans
+zh-Hant

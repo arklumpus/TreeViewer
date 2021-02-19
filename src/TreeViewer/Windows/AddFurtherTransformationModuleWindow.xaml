@@ -1,0 +1,60 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="400" Height="450"
+        x:Class="TreeViewer.AddFurtherTransformationModuleWindow"
+        Title="Add transformation module..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        WindowStartupLocation="CenterOwner" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Window.Styles>
+    <Style Selector="Border.ModuleButton">
+      <Setter Property="Background" Value="#edf9fc" />
+      <Setter Property="BorderBrush" Value="#bbe4f0"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Margin" Value="0,0,10,10" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.ModuleButton:pointerover">
+      <Setter Property="Background" Value="#d9f3fa" />
+      <Setter Property="BorderBrush" Value="#9de0f2"/>
+    </Style>
+    <Style Selector="Border.DisabledModuleButton">
+      <Setter Property="Background" Value="#fceded" />
+      <Setter Property="BorderBrush" Value="#f0bbbb"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Margin" Value="0,0,10,10" />
+    </Style>
+  </Window.Styles>
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="1*" />
+    </Grid.RowDefinitions>
+    <TextBlock FontWeight="Bold" FontSize="24">Available modules:</TextBlock>
+    <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="1" Margin="0,10,0,0" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Name="TransformationModulesContainer">
+        
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+
+</Window>

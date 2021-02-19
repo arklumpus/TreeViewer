@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+rm -rf $HOME/.local/share/TreeViewer
+
+sudo mkdir -p /usr/local/bin/
+
+sudo rm -f /usr/local/bin/TreeViewer /usr/local/bin/TreeViewerCommandLine
+
+sudo ln -s /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewer /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewerCommandLine /usr/local/bin/

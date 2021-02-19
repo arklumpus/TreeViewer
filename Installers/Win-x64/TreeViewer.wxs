@@ -1,0 +1,1914 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="TreeViewer" Language="1033" Manufacturer="G. Bianchini" Version="1.0.0" UpgradeCode="f08be33a-ecc3-4400-8a2f-17afd218d902">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+    <Upgrade Id='f08be33a-ecc3-4400-8a2f-17afd218d902'>
+      <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
+          Minimum='0.0.1' IncludeMinimum='yes'
+          Maximum='1.0.0' IncludeMaximum='no' />
+    </Upgrade>
+
+
+    <Media Id='1' Cabinet='TreeViewer.cab' EmbedCab='yes' />
+
+		<Feature Id="Complete" Title="TreeViewer 1.0.0" Level="1" Description="The complete TreeViewer package." ConfigurableDirectory="INSTALLFOLDER" Display='expand' AllowAdvertise='no' InstallDefault='local' Absent='disallow'>
+      <Feature Id='MainProgram' Title='Program' Description='TreeViewer executables and libraries.' Level='1' AllowAdvertise='no' InstallDefault='local' Absent='disallow'>
+        <ComponentGroupRef Id="TreeViewerComponent" />
+      </Feature>
+      <Feature Id="ShortcutFeat" Title="Start Menu shortcut" Description="Add a shortcut to TreeViewer to the Start Menu." Level="1" AllowAdvertise='no' InstallDefault='local'>
+        <ComponentRef Id="ApplicationShortcut"/>
+      </Feature>
+      <Feature Id="EnvPath" Title="Environment variable" Description="Add the TreeViewer installation folder to the PATH environment variable." Level="1" AllowAdvertise='no' InstallDefault='local'>
+        <ComponentRef Id="EnvVars"/>
+      </Feature>
+      <Component Id="DummyComponent" Guid="a5670c1d-cae1-421c-bbf6-f9dc28f983dd" Directory="INSTALLFOLDER">
+      </Component>
+    </Feature>
+
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="Licence.rtf" />
+    <WixVariable Id="WixUIDialogBmp" Value="TreeViewerBanner.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="HeaderBanner.bmp" />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+	</Product>
+
+  <Fragment>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize" />
+    </InstallExecuteSequence>
+  </Fragment>
+
+  <Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="TreeViewer">
+				<Directory Id="cs" Name="cs">
+				</Directory>
+				<Directory Id="de" Name="de">
+				</Directory>
+				<Directory Id="es" Name="es">
+				</Directory>
+				<Directory Id="fr" Name="fr">
+				</Directory>
+				<Directory Id="Icons" Name="Icons">
+				</Directory>
+				<Directory Id="it" Name="it">
+				</Directory>
+				<Directory Id="ja" Name="ja">
+				</Directory>
+				<Directory Id="ko" Name="ko">
+				</Directory>
+				<Directory Id="pl" Name="pl">
+				</Directory>
+				<Directory Id="pt.BR" Name="pt-BR">
+				</Directory>
+				<Directory Id="ru" Name="ru">
+				</Directory>
+				<Directory Id="tr" Name="tr">
+				</Directory>
+				<Directory Id="zh.Hans" Name="zh-Hans">
+				</Directory>
+				<Directory Id="zh.Hant" Name="zh-Hant">
+				</Directory>
+				</Directory>
+			</Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="TreeViewer"/>
+      </Directory>
+		</Directory>
+	</Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+    <Component Id="ApplicationShortcut" Guid="9b4ed61a-f969-432a-80ee-66a2421a5c78">
+        <Shortcut Id="ApplicationStartMenuShortcut" 
+                  Name="TreeViewer"
+                  Description="TreeViewer"
+                  Target="[#TreeViewer.exe]"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="TreeViewerIcon.exe"
+                  IconIndex="0" />
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+    </Component>
+    </DirectoryRef>
+  </Fragment>
+  
+  <Fragment>
+    <Icon Id="TreeViewerIcon.exe" SourceFile="SourceDir/TreeViewer.exe" />
+    <Property Id='ARPPRODUCTICON' Value='TreeViewerIcon.exe' />
+  </Fragment>
+
+  <Fragment>
+    <Component Id='EnvVars' Guid='40a4c7b9-ff6b-45d0-a436-a1a914a33d4e' Directory="INSTALLFOLDER">
+      <CreateFolder />
+      <Environment Id='PathEnvVar' Action='set' System='yes' Name='PATH' Part='last' Value='[INSTALLFOLDER]' Permanent='no'/>
+    </Component>
+  </Fragment>
+  
+  <Fragment>
+    <ComponentGroup Id="TreeViewerComponent">
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.console.l1.1.0.dll" Guid="ed034143-dd05-4476-b05d-707a244312ea">
+			<CreateFolder />
+			<File Id="api.ms.win.core.console.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-console-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.console.l1.2.0.dll" Guid="d73af395-b16e-4cf4-9947-81b5d391b231">
+			<CreateFolder />
+			<File Id="api.ms.win.core.console.l1.2.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-console-l1-2-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.datetime.l1.1.0.dll" Guid="061074f4-15bc-4186-b86a-6ccd6572e0f8">
+			<CreateFolder />
+			<File Id="api.ms.win.core.datetime.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-datetime-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.debug.l1.1.0.dll" Guid="3bbc3cab-8917-4352-bda8-1d3fb1b8446a">
+			<CreateFolder />
+			<File Id="api.ms.win.core.debug.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-debug-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.errorhandling.l1.1.0.dll" Guid="f542ff88-b83a-43fc-9597-31caf85922ce">
+			<CreateFolder />
+			<File Id="api.ms.win.core.errorhandling.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-errorhandling-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.file.l1.1.0.dll" Guid="a2cf5641-6437-4540-af50-f1a2e1a58543">
+			<CreateFolder />
+			<File Id="api.ms.win.core.file.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-file-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.file.l1.2.0.dll" Guid="7de13dcd-ac6d-4953-b315-f4ff0f8fd0ba">
+			<CreateFolder />
+			<File Id="api.ms.win.core.file.l1.2.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-file-l1-2-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.file.l2.1.0.dll" Guid="de12918e-3bb7-4b12-81ca-3b7213ff6a5c">
+			<CreateFolder />
+			<File Id="api.ms.win.core.file.l2.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-file-l2-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.handle.l1.1.0.dll" Guid="94ed4b82-782b-4212-9bb2-41910a27ce77">
+			<CreateFolder />
+			<File Id="api.ms.win.core.handle.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-handle-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.heap.l1.1.0.dll" Guid="9f3e4e97-40c0-4456-b952-9791751c8d56">
+			<CreateFolder />
+			<File Id="api.ms.win.core.heap.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-heap-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.interlocked.l1.1.0.dll" Guid="18074bac-6423-41b5-acf6-14ab0100635b">
+			<CreateFolder />
+			<File Id="api.ms.win.core.interlocked.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-interlocked-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.libraryloader.l1.1.0.dll" Guid="c982ecea-c940-4fdc-b85d-faafbf89b5ec">
+			<CreateFolder />
+			<File Id="api.ms.win.core.libraryloader.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-libraryloader-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.localization.l1.2.0.dll" Guid="afa53723-0b33-4c58-8d5e-7a465186c2c6">
+			<CreateFolder />
+			<File Id="api.ms.win.core.localization.l1.2.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-localization-l1-2-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.memory.l1.1.0.dll" Guid="fe88e71f-5251-4f17-aee9-205d250c0fdf">
+			<CreateFolder />
+			<File Id="api.ms.win.core.memory.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-memory-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.namedpipe.l1.1.0.dll" Guid="c6738e87-4db0-4a9d-a402-db02ded5ad23">
+			<CreateFolder />
+			<File Id="api.ms.win.core.namedpipe.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-namedpipe-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.processenvironment.l1.1.0.dll" Guid="c5016963-7c6b-40aa-9a23-009693f8ecf1">
+			<CreateFolder />
+			<File Id="api.ms.win.core.processenvironment.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-processenvironment-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.processthreads.l1.1.0.dll" Guid="3645380d-5dd7-4a37-be99-8dc86acb83d0">
+			<CreateFolder />
+			<File Id="api.ms.win.core.processthreads.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-processthreads-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.processthreads.l1.1.1.dll" Guid="273f7a0e-4663-451b-ba6b-c22cdc93f62e">
+			<CreateFolder />
+			<File Id="api.ms.win.core.processthreads.l1.1.1.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-processthreads-l1-1-1.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.profile.l1.1.0.dll" Guid="d9e3c297-39e7-45f7-8a87-12e49b487608">
+			<CreateFolder />
+			<File Id="api.ms.win.core.profile.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-profile-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.rtlsupport.l1.1.0.dll" Guid="7f5bd365-06df-4709-93b7-dcfa96569396">
+			<CreateFolder />
+			<File Id="api.ms.win.core.rtlsupport.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-rtlsupport-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.string.l1.1.0.dll" Guid="f8e0dacd-c0de-4a44-b55f-346482a4a159">
+			<CreateFolder />
+			<File Id="api.ms.win.core.string.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-string-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.synch.l1.1.0.dll" Guid="4205b8a0-f7de-4b65-be60-376b61248bfc">
+			<CreateFolder />
+			<File Id="api.ms.win.core.synch.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-synch-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.synch.l1.2.0.dll" Guid="56adf2c7-aa82-4cfe-8f43-ad66247792b4">
+			<CreateFolder />
+			<File Id="api.ms.win.core.synch.l1.2.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-synch-l1-2-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.sysinfo.l1.1.0.dll" Guid="6c208fd2-15d6-46bc-8f1f-20e62220a1cf">
+			<CreateFolder />
+			<File Id="api.ms.win.core.sysinfo.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-sysinfo-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.timezone.l1.1.0.dll" Guid="1c4a329d-ffe8-4532-af2b-c6f7c000ad72">
+			<CreateFolder />
+			<File Id="api.ms.win.core.timezone.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-timezone-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.core.util.l1.1.0.dll" Guid="8cae6ddd-c5b1-4c1b-9f16-0abef095bbcd">
+			<CreateFolder />
+			<File Id="api.ms.win.core.util.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-core-util-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.conio.l1.1.0.dll" Guid="38cf5c64-3333-4e38-a85a-1e44aa0711d2">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.conio.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-conio-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.convert.l1.1.0.dll" Guid="d02986fc-8c6b-4fbc-9043-ada450fef6a6">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.convert.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-convert-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.environment.l1.1.0.dll" Guid="2b67b06a-5387-40af-b2ce-20dfff8af48e">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.environment.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-environment-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.filesystem.l1.1.0.dll" Guid="bfb7da9b-cbe1-4b20-8d95-c103c0f6cd63">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.filesystem.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-filesystem-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.heap.l1.1.0.dll" Guid="8803da66-b4d8-4ad1-9aac-12cccaea745b">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.heap.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-heap-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.locale.l1.1.0.dll" Guid="047b8b83-2771-4af4-bf5d-265c81771f70">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.locale.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-locale-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.math.l1.1.0.dll" Guid="49067d0b-294b-4c39-b318-3fc9a4aabf00">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.math.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-math-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.multibyte.l1.1.0.dll" Guid="d97517df-cfff-4752-bb4f-fb7f35f0986a">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.multibyte.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-multibyte-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.private.l1.1.0.dll" Guid="9efb3526-441f-475b-818f-a7d740504ddd">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.private.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-private-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.process.l1.1.0.dll" Guid="32e519a4-96aa-4207-9cdf-f924e8c8c1fd">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.process.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-process-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.runtime.l1.1.0.dll" Guid="b9f2fc59-99cf-4d34-9da0-9298af40be0f">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.runtime.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-runtime-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.stdio.l1.1.0.dll" Guid="acb3d6fc-56eb-4888-932c-98c649df73d6">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.stdio.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-stdio-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.string.l1.1.0.dll" Guid="e1406304-b64f-4a70-9bbe-90871bbb18ca">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.string.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-string-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.time.l1.1.0.dll" Guid="25449cb0-9de4-447d-ae01-05de3add1b84">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.time.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-time-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="api.ms.win.crt.utility.l1.1.0.dll" Guid="177460b9-c59e-4c11-abaf-92a7de3f3f39">
+			<CreateFolder />
+			<File Id="api.ms.win.crt.utility.l1.1.0.dll" KeyPath="yes" Source="SourceDir\api-ms-win-crt-utility-l1-1-0.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Animation.dll" Guid="4e55efc1-f8df-4b83-8b2b-3d02c7e93411">
+			<CreateFolder />
+			<File Id="Avalonia.Animation.dll" KeyPath="yes" Source="SourceDir\Avalonia.Animation.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Animation.xml" Guid="4e33f822-a781-4a44-b3a3-8ca2037bed71">
+			<CreateFolder />
+			<File Id="Avalonia.Animation.xml" KeyPath="yes" Source="SourceDir\Avalonia.Animation.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Base.dll" Guid="9484687b-fa35-4b8a-b3e2-d89aefc161c7">
+			<CreateFolder />
+			<File Id="Avalonia.Base.dll" KeyPath="yes" Source="SourceDir\Avalonia.Base.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Base.xml" Guid="0536fd3f-1b59-4762-a08c-0bd06f770205">
+			<CreateFolder />
+			<File Id="Avalonia.Base.xml" KeyPath="yes" Source="SourceDir\Avalonia.Base.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Controls.dll" Guid="44cdb11e-3a89-4005-a00b-2d4590ca2ab6">
+			<CreateFolder />
+			<File Id="Avalonia.Controls.dll" KeyPath="yes" Source="SourceDir\Avalonia.Controls.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Controls.PanAndZoom.dll" Guid="243052fd-5a91-4014-a6dc-f3aec3612b0b">
+			<CreateFolder />
+			<File Id="Avalonia.Controls.PanAndZoom.dll" KeyPath="yes" Source="SourceDir\Avalonia.Controls.PanAndZoom.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Controls.PanAndZoom.xml" Guid="c4fd8ba7-d3d3-4eca-8dc2-f7ce41c553eb">
+			<CreateFolder />
+			<File Id="Avalonia.Controls.PanAndZoom.xml" KeyPath="yes" Source="SourceDir\Avalonia.Controls.PanAndZoom.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Controls.xml" Guid="22cd7c65-3e79-416a-b65f-fa7d9ebc56c5">
+			<CreateFolder />
+			<File Id="Avalonia.Controls.xml" KeyPath="yes" Source="SourceDir\Avalonia.Controls.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.DesignerSupport.dll" Guid="ae0c2f29-3726-4a58-aa2a-ae3759587cc0">
+			<CreateFolder />
+			<File Id="Avalonia.DesignerSupport.dll" KeyPath="yes" Source="SourceDir\Avalonia.DesignerSupport.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.DesignerSupport.xml" Guid="59bf9026-f266-4309-bcbc-de571a397b5b">
+			<CreateFolder />
+			<File Id="Avalonia.DesignerSupport.xml" KeyPath="yes" Source="SourceDir\Avalonia.DesignerSupport.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Desktop.dll" Guid="45cfadaa-e125-4a82-8a51-495bd45429a1">
+			<CreateFolder />
+			<File Id="Avalonia.Desktop.dll" KeyPath="yes" Source="SourceDir\Avalonia.Desktop.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Desktop.xml" Guid="6fab9714-d0d2-4bdf-980a-2c8e4d50fe99">
+			<CreateFolder />
+			<File Id="Avalonia.Desktop.xml" KeyPath="yes" Source="SourceDir\Avalonia.Desktop.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.DesktopRuntime.dll" Guid="8376762b-3405-4ea2-9639-3f5587638ba3">
+			<CreateFolder />
+			<File Id="Avalonia.DesktopRuntime.dll" KeyPath="yes" Source="SourceDir\Avalonia.DesktopRuntime.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.DesktopRuntime.xml" Guid="d3189282-eb85-449c-b33c-95e96cf2bee8">
+			<CreateFolder />
+			<File Id="Avalonia.DesktopRuntime.xml" KeyPath="yes" Source="SourceDir\Avalonia.DesktopRuntime.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Dialogs.dll" Guid="d535694c-8fb7-491b-b59b-594f312ae452">
+			<CreateFolder />
+			<File Id="Avalonia.Dialogs.dll" KeyPath="yes" Source="SourceDir\Avalonia.Dialogs.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Dialogs.xml" Guid="e24bfa32-c7f4-459a-93f4-e36577566210">
+			<CreateFolder />
+			<File Id="Avalonia.Dialogs.xml" KeyPath="yes" Source="SourceDir\Avalonia.Dialogs.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.dll" Guid="35dcc435-4dc2-4e07-b0d5-8f10877e769c">
+			<CreateFolder />
+			<File Id="Avalonia.dll" KeyPath="yes" Source="SourceDir\Avalonia.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.FreeDesktop.dll" Guid="97816481-b9d2-41ad-91d3-321bce873a3e">
+			<CreateFolder />
+			<File Id="Avalonia.FreeDesktop.dll" KeyPath="yes" Source="SourceDir\Avalonia.FreeDesktop.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.FreeDesktop.xml" Guid="5c0d0ec6-a0ed-4a68-b2ed-a8a9f610d585">
+			<CreateFolder />
+			<File Id="Avalonia.FreeDesktop.xml" KeyPath="yes" Source="SourceDir\Avalonia.FreeDesktop.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Input.dll" Guid="d092bcd0-470d-43d9-9601-199b017fddee">
+			<CreateFolder />
+			<File Id="Avalonia.Input.dll" KeyPath="yes" Source="SourceDir\Avalonia.Input.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Input.xml" Guid="e0f00087-ac1a-4ab4-8ed5-220787097d2b">
+			<CreateFolder />
+			<File Id="Avalonia.Input.xml" KeyPath="yes" Source="SourceDir\Avalonia.Input.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Interactivity.dll" Guid="3d6f650e-2473-472e-bf80-bf1a23129426">
+			<CreateFolder />
+			<File Id="Avalonia.Interactivity.dll" KeyPath="yes" Source="SourceDir\Avalonia.Interactivity.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Interactivity.xml" Guid="ac6252eb-c46c-4240-9189-de5f46b02aa2">
+			<CreateFolder />
+			<File Id="Avalonia.Interactivity.xml" KeyPath="yes" Source="SourceDir\Avalonia.Interactivity.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Layout.dll" Guid="750dc107-17da-4eaf-a427-92accf3b80bc">
+			<CreateFolder />
+			<File Id="Avalonia.Layout.dll" KeyPath="yes" Source="SourceDir\Avalonia.Layout.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Layout.xml" Guid="8c1ded33-9cdf-42e0-93f8-9bd8b7f4a0ca">
+			<CreateFolder />
+			<File Id="Avalonia.Layout.xml" KeyPath="yes" Source="SourceDir\Avalonia.Layout.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Markup.dll" Guid="ddec6eb8-980c-4d8e-bd2a-f4940b52a427">
+			<CreateFolder />
+			<File Id="Avalonia.Markup.dll" KeyPath="yes" Source="SourceDir\Avalonia.Markup.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Markup.Xaml.dll" Guid="33dff566-b8b8-403c-a17e-a355c7cfe788">
+			<CreateFolder />
+			<File Id="Avalonia.Markup.Xaml.dll" KeyPath="yes" Source="SourceDir\Avalonia.Markup.Xaml.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Markup.Xaml.xml" Guid="d6bbd903-2bd6-4a01-a98c-10402c5fbdf8">
+			<CreateFolder />
+			<File Id="Avalonia.Markup.Xaml.xml" KeyPath="yes" Source="SourceDir\Avalonia.Markup.Xaml.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Markup.xml" Guid="2e13265a-4c35-42c5-9477-409aad42b9f0">
+			<CreateFolder />
+			<File Id="Avalonia.Markup.xml" KeyPath="yes" Source="SourceDir\Avalonia.Markup.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.MicroCom.dll" Guid="5c687bce-d7e3-4c00-9d96-a74b409a6366">
+			<CreateFolder />
+			<File Id="Avalonia.MicroCom.dll" KeyPath="yes" Source="SourceDir\Avalonia.MicroCom.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.MicroCom.xml" Guid="31de4ead-13af-42d6-9aa7-44b214e470df">
+			<CreateFolder />
+			<File Id="Avalonia.MicroCom.xml" KeyPath="yes" Source="SourceDir\Avalonia.MicroCom.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Native.dll" Guid="74a03f8a-c14e-4ea1-bb97-294fcef986cd">
+			<CreateFolder />
+			<File Id="Avalonia.Native.dll" KeyPath="yes" Source="SourceDir\Avalonia.Native.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Native.xml" Guid="70c11e39-3765-47aa-8ed5-89cccb90f7db">
+			<CreateFolder />
+			<File Id="Avalonia.Native.xml" KeyPath="yes" Source="SourceDir\Avalonia.Native.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.OpenGL.dll" Guid="c6242434-f78a-45f9-aa6b-6117b8e668a0">
+			<CreateFolder />
+			<File Id="Avalonia.OpenGL.dll" KeyPath="yes" Source="SourceDir\Avalonia.OpenGL.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.OpenGL.xml" Guid="04d50540-1f2e-4650-8e57-e897d6e12d72">
+			<CreateFolder />
+			<File Id="Avalonia.OpenGL.xml" KeyPath="yes" Source="SourceDir\Avalonia.OpenGL.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Remote.Protocol.dll" Guid="b548a40c-5ec8-49c1-8b2a-2e6125858a84">
+			<CreateFolder />
+			<File Id="Avalonia.Remote.Protocol.dll" KeyPath="yes" Source="SourceDir\Avalonia.Remote.Protocol.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Remote.Protocol.xml" Guid="897c7b7e-c6d7-489f-9577-5dd1d4cecea9">
+			<CreateFolder />
+			<File Id="Avalonia.Remote.Protocol.xml" KeyPath="yes" Source="SourceDir\Avalonia.Remote.Protocol.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Skia.dll" Guid="a4bf5207-e739-4f74-bfaa-2da275dfe1dc">
+			<CreateFolder />
+			<File Id="Avalonia.Skia.dll" KeyPath="yes" Source="SourceDir\Avalonia.Skia.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Skia.xml" Guid="30956c56-4120-48ea-a03c-581bcaaf32b1">
+			<CreateFolder />
+			<File Id="Avalonia.Skia.xml" KeyPath="yes" Source="SourceDir\Avalonia.Skia.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Styling.dll" Guid="fc552489-c3d3-4aac-9391-b7ba0d6c813e">
+			<CreateFolder />
+			<File Id="Avalonia.Styling.dll" KeyPath="yes" Source="SourceDir\Avalonia.Styling.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Styling.xml" Guid="0b374358-9943-402c-99b7-a5e8ee010e8f">
+			<CreateFolder />
+			<File Id="Avalonia.Styling.xml" KeyPath="yes" Source="SourceDir\Avalonia.Styling.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Themes.Default.dll" Guid="af7c3439-cb00-4f73-be22-cf5e6257d8e1">
+			<CreateFolder />
+			<File Id="Avalonia.Themes.Default.dll" KeyPath="yes" Source="SourceDir\Avalonia.Themes.Default.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Themes.Default.xml" Guid="90a40a4d-6424-45f4-bf35-84db1a13c140">
+			<CreateFolder />
+			<File Id="Avalonia.Themes.Default.xml" KeyPath="yes" Source="SourceDir\Avalonia.Themes.Default.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Themes.Fluent.dll" Guid="beccd03f-b9e2-4c09-91db-491a4248d5e9">
+			<CreateFolder />
+			<File Id="Avalonia.Themes.Fluent.dll" KeyPath="yes" Source="SourceDir\Avalonia.Themes.Fluent.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Themes.Fluent.xml" Guid="4e822011-02c6-403a-ba49-f21f46b9d5c2">
+			<CreateFolder />
+			<File Id="Avalonia.Themes.Fluent.xml" KeyPath="yes" Source="SourceDir\Avalonia.Themes.Fluent.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Visuals.dll" Guid="3954c71d-5122-48ce-9186-4491dfae232a">
+			<CreateFolder />
+			<File Id="Avalonia.Visuals.dll" KeyPath="yes" Source="SourceDir\Avalonia.Visuals.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Visuals.xml" Guid="1dadcec9-b08b-427d-b0b9-59d5825dc038">
+			<CreateFolder />
+			<File Id="Avalonia.Visuals.xml" KeyPath="yes" Source="SourceDir\Avalonia.Visuals.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Win32.dll" Guid="aa411165-6896-44bb-b139-2f5ea7792655">
+			<CreateFolder />
+			<File Id="Avalonia.Win32.dll" KeyPath="yes" Source="SourceDir\Avalonia.Win32.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.Win32.xml" Guid="a7153b65-d781-4b7b-8335-a53e736d17ee">
+			<CreateFolder />
+			<File Id="Avalonia.Win32.xml" KeyPath="yes" Source="SourceDir\Avalonia.Win32.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.X11.dll" Guid="6435506d-a731-44ab-9129-ce62b80cb785">
+			<CreateFolder />
+			<File Id="Avalonia.X11.dll" KeyPath="yes" Source="SourceDir\Avalonia.X11.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.X11.xml" Guid="9e8e3af4-260d-4441-bcf9-69bdfc7e9a6b">
+			<CreateFolder />
+			<File Id="Avalonia.X11.xml" KeyPath="yes" Source="SourceDir\Avalonia.X11.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Avalonia.xml" Guid="0dd8e759-dec6-4ac1-a8e9-c47008109cd2">
+			<CreateFolder />
+			<File Id="Avalonia.xml" KeyPath="yes" Source="SourceDir\Avalonia.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="AvaloniaColorPicker.dll" Guid="915f9242-75ee-40d2-aaee-8cba437431e8">
+			<CreateFolder />
+			<File Id="AvaloniaColorPicker.dll" KeyPath="yes" Source="SourceDir\AvaloniaColorPicker.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="AvaloniaColorPicker.xml" Guid="68dff57c-b8bf-4a0d-9717-5cacd40f3ff4">
+			<CreateFolder />
+			<File Id="AvaloniaColorPicker.xml" KeyPath="yes" Source="SourceDir\AvaloniaColorPicker.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="clrcompression.dll" Guid="ff120d7c-3965-4b1e-9b73-8578fa883e6e">
+			<CreateFolder />
+			<File Id="clrcompression.dll" KeyPath="yes" Source="SourceDir\clrcompression.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="clretwrc.dll" Guid="be50b4f3-84fa-4f38-8733-dc5c302d99af">
+			<CreateFolder />
+			<File Id="clretwrc.dll" KeyPath="yes" Source="SourceDir\clretwrc.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="clrjit.dll" Guid="f53ebc1c-c874-4bce-b499-ed28ecc2ebbb">
+			<CreateFolder />
+			<File Id="clrjit.dll" KeyPath="yes" Source="SourceDir\clrjit.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="coreclr.dll" Guid="b0bb90d5-c393-4179-9e4c-fb62479e1b35">
+			<CreateFolder />
+			<File Id="coreclr.dll" KeyPath="yes" Source="SourceDir\coreclr.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="createdump.exe" Guid="d5a42407-b7e3-41db-9b03-065afe48b6b1">
+			<CreateFolder />
+			<File Id="createdump.exe" KeyPath="yes" Source="SourceDir\createdump.exe" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="CSharpEditor.dll" Guid="2fe388ed-fe14-4add-a11a-0ad93101a2d5">
+			<CreateFolder />
+			<File Id="CSharpEditor.dll" KeyPath="yes" Source="SourceDir\CSharpEditor.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="CSharpEditor.xml" Guid="e2eb877b-e399-42bd-8c5a-7d162996cee1">
+			<CreateFolder />
+			<File Id="CSharpEditor.xml" KeyPath="yes" Source="SourceDir\CSharpEditor.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="dbgshim.dll" Guid="5a405c77-d6d5-4f87-b954-9ae03948fd65">
+			<CreateFolder />
+			<File Id="dbgshim.dll" KeyPath="yes" Source="SourceDir\dbgshim.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="DebuggerClient.deps.json" Guid="2f59d26a-243f-468c-87da-928d88c8cfa1">
+			<CreateFolder />
+			<File Id="DebuggerClient.deps.json" KeyPath="yes" Source="SourceDir\DebuggerClient.deps.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="DebuggerClient.dll" Guid="d2a7192d-f0d0-400f-a424-4f40fb8d65fc">
+			<CreateFolder />
+			<File Id="DebuggerClient.dll" KeyPath="yes" Source="SourceDir\DebuggerClient.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="DebuggerClient.exe" Guid="9004b924-7d5b-4f02-b451-fb779cc5e16e">
+			<CreateFolder />
+			<File Id="DebuggerClient.exe" KeyPath="yes" Source="SourceDir\DebuggerClient.exe" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="DebuggerClient.runtimeconfig.json" Guid="7df8758e-a3f9-46d8-b631-c77d40e9cd0e">
+			<CreateFolder />
+			<File Id="DebuggerClient.runtimeconfig.json" KeyPath="yes" Source="SourceDir\DebuggerClient.runtimeconfig.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="DiffPlex.dll" Guid="a9980fcb-cef6-4485-87c3-14db17490f44">
+			<CreateFolder />
+			<File Id="DiffPlex.dll" KeyPath="yes" Source="SourceDir\DiffPlex.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="DiffPlex.xml" Guid="7eae5329-6633-47d4-986c-b29294a3e66c">
+			<CreateFolder />
+			<File Id="DiffPlex.xml" KeyPath="yes" Source="SourceDir\DiffPlex.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Elevator.deps.json" Guid="1b8ec2a0-eae2-4bf9-bf48-304e233d9286">
+			<CreateFolder />
+			<File Id="Elevator.deps.json" KeyPath="yes" Source="SourceDir\Elevator.deps.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Elevator.dll" Guid="532bba1d-0d98-41a9-8147-c87e4985eae9">
+			<CreateFolder />
+			<File Id="Elevator.dll" KeyPath="yes" Source="SourceDir\Elevator.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Elevator.exe" Guid="71213f9a-2e20-4c0d-a1bf-0dec02282ac4">
+			<CreateFolder />
+			<File Id="Elevator.exe" KeyPath="yes" Source="SourceDir\Elevator.exe" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Elevator.runtimeconfig.json" Guid="74dd6a0c-d993-4715-8d76-5e75bd18c9e1">
+			<CreateFolder />
+			<File Id="Elevator.runtimeconfig.json" KeyPath="yes" Source="SourceDir\Elevator.runtimeconfig.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="ExCSS.dll" Guid="dd5a4524-ecbd-4af9-bd0e-8f527f1a8539">
+			<CreateFolder />
+			<File Id="ExCSS.dll" KeyPath="yes" Source="SourceDir\ExCSS.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="HarfBuzzSharp.dll" Guid="97781e5c-88de-4bd6-a6f0-7d08a92e51d2">
+			<CreateFolder />
+			<File Id="HarfBuzzSharp.dll" KeyPath="yes" Source="SourceDir\HarfBuzzSharp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="HarfBuzzSharp.xml" Guid="f3092296-8c8e-49c3-ab16-0897bd8f9ea6">
+			<CreateFolder />
+			<File Id="HarfBuzzSharp.xml" KeyPath="yes" Source="SourceDir\HarfBuzzSharp.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Highlight.dll" Guid="408b1467-7d4a-4c5a-bd05-6ddd89748a4a">
+			<CreateFolder />
+			<File Id="Highlight.dll" KeyPath="yes" Source="SourceDir\Highlight.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="hostfxr.dll" Guid="f021c5e6-69b8-461e-b2ab-a26463aa1c98">
+			<CreateFolder />
+			<File Id="hostfxr.dll" KeyPath="yes" Source="SourceDir\hostfxr.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="hostpolicy.dll" Guid="8c557220-fd7e-4347-bf20-5ccad93cfd10">
+			<CreateFolder />
+			<File Id="hostpolicy.dll" KeyPath="yes" Source="SourceDir\hostpolicy.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Humanizer.dll" Guid="dde51977-83f2-40ab-bd5e-758b2f6715da">
+			<CreateFolder />
+			<File Id="Humanizer.dll" KeyPath="yes" Source="SourceDir\Humanizer.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="IntellisenseIcon.dll" Guid="e9ccd0cd-9ca7-4db6-acb9-31959235a74b">
+			<CreateFolder />
+			<File Id="IntellisenseIcon.dll" KeyPath="yes" Source="SourceDir\IntellisenseIcon.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="JetBrains.Annotations.dll" Guid="aded9dcd-3366-4406-bf97-363a494f0768">
+			<CreateFolder />
+			<File Id="JetBrains.Annotations.dll" KeyPath="yes" Source="SourceDir\JetBrains.Annotations.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="JetBrains.Annotations.xml" Guid="49c6d527-86e7-43ab-8225-ba9f14caeaa6">
+			<CreateFolder />
+			<File Id="JetBrains.Annotations.xml" KeyPath="yes" Source="SourceDir\JetBrains.Annotations.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="libHarfBuzzSharp.dll" Guid="0aa3bd27-5efd-4a2a-b3ca-3bbc40298b9d">
+			<CreateFolder />
+			<File Id="libHarfBuzzSharp.dll" KeyPath="yes" Source="SourceDir\libHarfBuzzSharp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="libSkiaSharp.dll" Guid="a701a379-b9d4-4e2f-94bc-3e750e6fcbf5">
+			<CreateFolder />
+			<File Id="libSkiaSharp.dll" KeyPath="yes" Source="SourceDir\libSkiaSharp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Markdig.dll" Guid="f7404b1c-db56-4707-a2b5-0ec17dd693c8">
+			<CreateFolder />
+			<File Id="Markdig.dll" KeyPath="yes" Source="SourceDir\Markdig.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Markdig.xml" Guid="a3103108-b1c4-4acf-a261-d903caf4102e">
+			<CreateFolder />
+			<File Id="Markdig.xml" KeyPath="yes" Source="SourceDir\Markdig.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.Bcl.AsyncInterfaces.dll" Guid="55153f9f-0ddc-4084-91fb-015eed387437">
+			<CreateFolder />
+			<File Id="Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" Source="SourceDir\Microsoft.Bcl.AsyncInterfaces.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.Bcl.AsyncInterfaces.xml" Guid="f89bf61f-9108-48ba-a176-f4850a039972">
+			<CreateFolder />
+			<File Id="Microsoft.Bcl.AsyncInterfaces.xml" KeyPath="yes" Source="SourceDir\Microsoft.Bcl.AsyncInterfaces.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.AnalyzerUtilities.dll" Guid="8a37bed1-de47-419b-aaa5-c2827986a1cd">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.AnalyzerUtilities.dll" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.AnalyzerUtilities.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.AnalyzerUtilities.xml" Guid="6fcc6800-56ee-437b-91f0-7f740f5bef99">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.AnalyzerUtilities.xml" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.AnalyzerUtilities.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.CSharp.dll" Guid="5663b19f-ead1-4061-a032-d7b7b8b27d85">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.CSharp.dll" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.CSharp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.CSharp.Features.dll" Guid="d401eb0d-3bfe-481a-acba-a52f2d88dc1a">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.CSharp.Features.dll" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.CSharp.Features.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.CSharp.Features.xml" Guid="907993d6-5827-40ba-82ba-9ee5e2da684c">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.CSharp.Features.xml" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.CSharp.Features.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.CSharp.Workspaces.dll" Guid="875b3427-0a23-489c-b291-26200b12b2bc">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.CSharp.Workspaces.dll" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.CSharp.Workspaces.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.CSharp.Workspaces.xml" Guid="0b073931-0d36-4e8e-b500-25b4e055dfd9">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.CSharp.Workspaces.xml" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.CSharp.Workspaces.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.CSharp.xml" Guid="5564f75d-e9e0-4424-8893-76a71cb429e6">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.CSharp.xml" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.CSharp.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.dll" Guid="2422cbdb-531f-4b77-81ce-d2254b797b92">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.dll" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.Features.dll" Guid="146b4d52-0584-473e-a902-469b42ad8248">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.Features.dll" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.Features.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.Features.xml" Guid="e4937073-515b-4cf3-9a35-e944264b2dea">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.Features.xml" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.Features.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.Workspaces.dll" Guid="4fe38c70-fa73-4d39-a80a-677727a9b279">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.Workspaces.dll" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.Workspaces.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.Workspaces.xml" Guid="1f23b0b7-fb73-418f-9b56-c801ef434851">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.Workspaces.xml" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.Workspaces.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CodeAnalysis.xml" Guid="efac41b4-445c-4c63-931b-79da4ccf9a35">
+			<CreateFolder />
+			<File Id="Microsoft.CodeAnalysis.xml" KeyPath="yes" Source="SourceDir\Microsoft.CodeAnalysis.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.CSharp.dll" Guid="d4434a51-ae14-4776-a2cb-a2f1ce43b96c">
+			<CreateFolder />
+			<File Id="Microsoft.CSharp.dll" KeyPath="yes" Source="SourceDir\Microsoft.CSharp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.DiaSymReader.dll" Guid="509551d8-ac6b-4c63-9604-93d6d03418b6">
+			<CreateFolder />
+			<File Id="Microsoft.DiaSymReader.dll" KeyPath="yes" Source="SourceDir\Microsoft.DiaSymReader.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.DiaSymReader.Native.amd64.dll" Guid="4741bf4c-5dfd-46e3-b1b4-5b0ca48bea7f">
+			<CreateFolder />
+			<File Id="Microsoft.DiaSymReader.Native.amd64.dll" KeyPath="yes" Source="SourceDir\Microsoft.DiaSymReader.Native.amd64.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.DiaSymReader.xml" Guid="d017d7fe-1267-4f57-b356-52035e58498c">
+			<CreateFolder />
+			<File Id="Microsoft.DiaSymReader.xml" KeyPath="yes" Source="SourceDir\Microsoft.DiaSymReader.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.VisualBasic.Core.dll" Guid="867a5ff4-404e-4d6f-994b-8b320772ce2c">
+			<CreateFolder />
+			<File Id="Microsoft.VisualBasic.Core.dll" KeyPath="yes" Source="SourceDir\Microsoft.VisualBasic.Core.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.VisualBasic.dll" Guid="3e190060-a7ef-4765-820f-005bb058bfd7">
+			<CreateFolder />
+			<File Id="Microsoft.VisualBasic.dll" KeyPath="yes" Source="SourceDir\Microsoft.VisualBasic.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.Win32.Primitives.dll" Guid="2e0311e7-ac66-4fb7-9a7a-590c067f2d36">
+			<CreateFolder />
+			<File Id="Microsoft.Win32.Primitives.dll" KeyPath="yes" Source="SourceDir\Microsoft.Win32.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.Win32.Registry.dll" Guid="1abbe249-0708-440d-9260-2712772672f9">
+			<CreateFolder />
+			<File Id="Microsoft.Win32.Registry.dll" KeyPath="yes" Source="SourceDir\Microsoft.Win32.Registry.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Microsoft.Win32.SystemEvents.dll" Guid="6d00819f-c10c-408e-9643-f715be897f18">
+			<CreateFolder />
+			<File Id="Microsoft.Win32.SystemEvents.dll" KeyPath="yes" Source="SourceDir\Microsoft.Win32.SystemEvents.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Mono.Options.dll" Guid="8f908a55-17f8-4015-aadf-3d6aeb7d7f5b">
+			<CreateFolder />
+			<File Id="Mono.Options.dll" KeyPath="yes" Source="SourceDir\Mono.Options.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="mscordaccore.dll" Guid="03bcdb5b-0dc4-4908-95bb-bd2887cb5ab1">
+			<CreateFolder />
+			<File Id="mscordaccore.dll" KeyPath="yes" Source="SourceDir\mscordaccore.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="mscordaccore_amd64_amd64_5.0.321.7212.dll" Guid="7482446a-6c72-4489-9e32-602f04fca2e7">
+			<CreateFolder />
+			<File Id="mscordaccore_amd64_amd64_5.0.321.7212.dll" KeyPath="yes" Source="SourceDir\mscordaccore_amd64_amd64_5.0.321.7212.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="mscordbi.dll" Guid="ceb760a9-46c3-4e17-89c7-cf76de71824a">
+			<CreateFolder />
+			<File Id="mscordbi.dll" KeyPath="yes" Source="SourceDir\mscordbi.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="mscorlib.dll" Guid="093a0cec-77b6-4ad6-a584-a447c1db0deb">
+			<CreateFolder />
+			<File Id="mscorlib.dll" KeyPath="yes" Source="SourceDir\mscorlib.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="mscorrc.dll" Guid="291dc8be-0551-4937-b4f4-23f4ba35974b">
+			<CreateFolder />
+			<File Id="mscorrc.dll" KeyPath="yes" Source="SourceDir\mscorrc.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="MuPDFCore.dll" Guid="7b93469e-9658-4fda-9ccd-0d768de3e224">
+			<CreateFolder />
+			<File Id="MuPDFCore.dll" KeyPath="yes" Source="SourceDir\MuPDFCore.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="MuPDFCore.xml" Guid="582adec5-25fb-47c9-9082-db66d35e314a">
+			<CreateFolder />
+			<File Id="MuPDFCore.xml" KeyPath="yes" Source="SourceDir\MuPDFCore.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="MuPDFWrapper.dll" Guid="daa4e2b5-87b4-418c-8dc7-844b24fc1ba7">
+			<CreateFolder />
+			<File Id="MuPDFWrapper.dll" KeyPath="yes" Source="SourceDir\MuPDFWrapper.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="nano.exe" Guid="f58dc1f4-8ec5-44b0-86ee-441c3bea65dd">
+			<CreateFolder />
+			<File Id="nano.exe" KeyPath="yes" Source="SourceDir\nano.exe" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="netstandard.dll" Guid="443917c6-ae93-47df-b925-f156017dacd1">
+			<CreateFolder />
+			<File Id="netstandard.dll" KeyPath="yes" Source="SourceDir\netstandard.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="PhyloTree.TreeNode.dll" Guid="481b8177-c036-48a2-9090-1ea4ebe4974d">
+			<CreateFolder />
+			<File Id="PhyloTree.TreeNode.dll" KeyPath="yes" Source="SourceDir\PhyloTree.TreeNode.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="PhyloTree.TreeNode.xml" Guid="95eee931-0492-44fc-9b3d-994a6c639b28">
+			<CreateFolder />
+			<File Id="PhyloTree.TreeNode.xml" KeyPath="yes" Source="SourceDir\PhyloTree.TreeNode.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="SkiaSharp.dll" Guid="988846bc-acd5-4e0c-ab9e-021fc5f3c119">
+			<CreateFolder />
+			<File Id="SkiaSharp.dll" KeyPath="yes" Source="SourceDir\SkiaSharp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="SkiaSharp.xml" Guid="0f8faa80-bdc8-456a-a128-c54c4ac1246a">
+			<CreateFolder />
+			<File Id="SkiaSharp.xml" KeyPath="yes" Source="SourceDir\SkiaSharp.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Stairs.deps.json" Guid="55563f7a-fecb-4376-bc60-c6b60d94b3d1">
+			<CreateFolder />
+			<File Id="Stairs.deps.json" KeyPath="yes" Source="SourceDir\Stairs.deps.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Stairs.dll" Guid="e8e4a1d7-f673-4676-a1c9-e59e9b799781">
+			<CreateFolder />
+			<File Id="Stairs.dll" KeyPath="yes" Source="SourceDir\Stairs.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Stairs.exe" Guid="119280b9-046e-4c11-979a-9201a39fb61f">
+			<CreateFolder />
+			<File Id="Stairs.exe" KeyPath="yes" Source="SourceDir\Stairs.exe" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Stairs.runtimeconfig.json" Guid="7546da0f-16a8-425c-aede-dd0d8b4d7ae8">
+			<CreateFolder />
+			<File Id="Stairs.runtimeconfig.json" KeyPath="yes" Source="SourceDir\Stairs.runtimeconfig.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.AppContext.dll" Guid="f2ffba48-31d5-46ad-aaa7-e472c7e62b55">
+			<CreateFolder />
+			<File Id="System.AppContext.dll" KeyPath="yes" Source="SourceDir\System.AppContext.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Buffers.dll" Guid="4205cd37-b3f4-4226-954c-fa64ca339375">
+			<CreateFolder />
+			<File Id="System.Buffers.dll" KeyPath="yes" Source="SourceDir\System.Buffers.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.CodeDom.dll" Guid="ca189309-762f-4bc9-85a9-51cc2e861209">
+			<CreateFolder />
+			<File Id="System.CodeDom.dll" KeyPath="yes" Source="SourceDir\System.CodeDom.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.CodeDom.xml" Guid="b977894e-7a88-4404-bc91-875110c96d3d">
+			<CreateFolder />
+			<File Id="System.CodeDom.xml" KeyPath="yes" Source="SourceDir\System.CodeDom.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Collections.Concurrent.dll" Guid="825e31fe-77b3-46f3-89e8-8f8b2f444d50">
+			<CreateFolder />
+			<File Id="System.Collections.Concurrent.dll" KeyPath="yes" Source="SourceDir\System.Collections.Concurrent.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Collections.dll" Guid="1fda284c-7de5-4308-90dd-fea549cbd7fc">
+			<CreateFolder />
+			<File Id="System.Collections.dll" KeyPath="yes" Source="SourceDir\System.Collections.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Collections.Immutable.dll" Guid="4b6e1f7a-6341-4754-99fd-f7befac19778">
+			<CreateFolder />
+			<File Id="System.Collections.Immutable.dll" KeyPath="yes" Source="SourceDir\System.Collections.Immutable.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Collections.NonGeneric.dll" Guid="b45348e6-d3a3-4867-9638-fccee72f0493">
+			<CreateFolder />
+			<File Id="System.Collections.NonGeneric.dll" KeyPath="yes" Source="SourceDir\System.Collections.NonGeneric.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Collections.Specialized.dll" Guid="ef5dfd5b-4a7a-40b9-9c1d-66242c2d4d06">
+			<CreateFolder />
+			<File Id="System.Collections.Specialized.dll" KeyPath="yes" Source="SourceDir\System.Collections.Specialized.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ComponentModel.Annotations.dll" Guid="68d79cfe-0da4-475a-a3bc-450be5d31adb">
+			<CreateFolder />
+			<File Id="System.ComponentModel.Annotations.dll" KeyPath="yes" Source="SourceDir\System.ComponentModel.Annotations.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ComponentModel.DataAnnotations.dll" Guid="3c9c5312-c8c2-4024-9f45-22caf0a1d109">
+			<CreateFolder />
+			<File Id="System.ComponentModel.DataAnnotations.dll" KeyPath="yes" Source="SourceDir\System.ComponentModel.DataAnnotations.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ComponentModel.dll" Guid="4c8e35fb-26bf-4760-8554-db712b60dc03">
+			<CreateFolder />
+			<File Id="System.ComponentModel.dll" KeyPath="yes" Source="SourceDir\System.ComponentModel.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ComponentModel.EventBasedAsync.dll" Guid="6df8e930-7c3b-48aa-9e3f-e349ace7155c">
+			<CreateFolder />
+			<File Id="System.ComponentModel.EventBasedAsync.dll" KeyPath="yes" Source="SourceDir\System.ComponentModel.EventBasedAsync.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ComponentModel.Primitives.dll" Guid="371ee89b-6be7-4e36-8eea-77fbd74b317d">
+			<CreateFolder />
+			<File Id="System.ComponentModel.Primitives.dll" KeyPath="yes" Source="SourceDir\System.ComponentModel.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ComponentModel.TypeConverter.dll" Guid="353f520a-5967-4b82-97c1-e59ef37ee68d">
+			<CreateFolder />
+			<File Id="System.ComponentModel.TypeConverter.dll" KeyPath="yes" Source="SourceDir\System.ComponentModel.TypeConverter.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Composition.AttributedModel.dll" Guid="d37dae8d-bb18-4deb-8c07-63ec2d9af1d1">
+			<CreateFolder />
+			<File Id="System.Composition.AttributedModel.dll" KeyPath="yes" Source="SourceDir\System.Composition.AttributedModel.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Composition.Convention.dll" Guid="6c3df1e9-68b8-4dde-9479-336a9a35b0e8">
+			<CreateFolder />
+			<File Id="System.Composition.Convention.dll" KeyPath="yes" Source="SourceDir\System.Composition.Convention.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Composition.Hosting.dll" Guid="ac110d8d-38f4-4607-8f8a-b0f471805f19">
+			<CreateFolder />
+			<File Id="System.Composition.Hosting.dll" KeyPath="yes" Source="SourceDir\System.Composition.Hosting.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Composition.Runtime.dll" Guid="3ba2d18d-f6a2-4186-aab1-f168461494c5">
+			<CreateFolder />
+			<File Id="System.Composition.Runtime.dll" KeyPath="yes" Source="SourceDir\System.Composition.Runtime.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Composition.TypedParts.dll" Guid="c320816f-2c35-47ac-a876-01cb8ddbd0ca">
+			<CreateFolder />
+			<File Id="System.Composition.TypedParts.dll" KeyPath="yes" Source="SourceDir\System.Composition.TypedParts.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Configuration.dll" Guid="747c0a56-c5eb-4f81-8b0d-bcb14bf7b69c">
+			<CreateFolder />
+			<File Id="System.Configuration.dll" KeyPath="yes" Source="SourceDir\System.Configuration.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Console.dll" Guid="873e82d0-a2be-41b8-b96c-9d08fc413a8f">
+			<CreateFolder />
+			<File Id="System.Console.dll" KeyPath="yes" Source="SourceDir\System.Console.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Core.dll" Guid="f079ad53-0772-43db-8075-2d3aca1dfca5">
+			<CreateFolder />
+			<File Id="System.Core.dll" KeyPath="yes" Source="SourceDir\System.Core.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Data.Common.dll" Guid="ba8840f2-baad-4334-a57d-98343e61ff88">
+			<CreateFolder />
+			<File Id="System.Data.Common.dll" KeyPath="yes" Source="SourceDir\System.Data.Common.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Data.DataSetExtensions.dll" Guid="128365cb-3556-43d2-8abc-37f0594192cd">
+			<CreateFolder />
+			<File Id="System.Data.DataSetExtensions.dll" KeyPath="yes" Source="SourceDir\System.Data.DataSetExtensions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Data.dll" Guid="43921071-f5e0-4a6c-9305-ee911f0cdb72">
+			<CreateFolder />
+			<File Id="System.Data.dll" KeyPath="yes" Source="SourceDir\System.Data.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.Contracts.dll" Guid="4ac5e188-5d58-4cbf-baa5-34f0538a7cfe">
+			<CreateFolder />
+			<File Id="System.Diagnostics.Contracts.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.Contracts.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.Debug.dll" Guid="0caf8ffd-cfa1-4dcf-b8fb-0132a848c881">
+			<CreateFolder />
+			<File Id="System.Diagnostics.Debug.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.Debug.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.DiagnosticSource.dll" Guid="07428e76-4e35-4367-baad-04a520661cec">
+			<CreateFolder />
+			<File Id="System.Diagnostics.DiagnosticSource.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.DiagnosticSource.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.FileVersionInfo.dll" Guid="55f07940-491e-4779-946f-40571d7b8081">
+			<CreateFolder />
+			<File Id="System.Diagnostics.FileVersionInfo.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.FileVersionInfo.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.Process.dll" Guid="77dddbbf-0441-4a0f-bf7f-88bb42ea2374">
+			<CreateFolder />
+			<File Id="System.Diagnostics.Process.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.Process.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.StackTrace.dll" Guid="5bb37214-e839-4d29-8966-2ab55f668b69">
+			<CreateFolder />
+			<File Id="System.Diagnostics.StackTrace.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.StackTrace.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.TextWriterTraceListener.dll" Guid="0b32f213-c092-4947-94f2-eaee0d3ec470">
+			<CreateFolder />
+			<File Id="System.Diagnostics.TextWriterTraceListener.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.TextWriterTraceListener.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.Tools.dll" Guid="2520d3b3-5a4a-4997-b2dc-4c2f6e45e7ec">
+			<CreateFolder />
+			<File Id="System.Diagnostics.Tools.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.Tools.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.TraceSource.dll" Guid="96c09340-d06d-422d-989a-e12faa7a469a">
+			<CreateFolder />
+			<File Id="System.Diagnostics.TraceSource.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.TraceSource.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Diagnostics.Tracing.dll" Guid="17c92a4e-625b-470b-bd44-5a178c06356d">
+			<CreateFolder />
+			<File Id="System.Diagnostics.Tracing.dll" KeyPath="yes" Source="SourceDir\System.Diagnostics.Tracing.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.dll" Guid="1e22b56d-d50f-42f5-b816-670b139f6ba8">
+			<CreateFolder />
+			<File Id="System.dll" KeyPath="yes" Source="SourceDir\System.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Drawing.Common.dll" Guid="7166288b-2ebc-40b1-bb79-053be6749620">
+			<CreateFolder />
+			<File Id="System.Drawing.Common.dll" KeyPath="yes" Source="SourceDir\System.Drawing.Common.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Drawing.dll" Guid="fea6d378-d927-401a-b150-41a8aa3c98d6">
+			<CreateFolder />
+			<File Id="System.Drawing.dll" KeyPath="yes" Source="SourceDir\System.Drawing.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Drawing.Primitives.dll" Guid="e79a67ab-17a3-4176-aadf-eb68ac94cf53">
+			<CreateFolder />
+			<File Id="System.Drawing.Primitives.dll" KeyPath="yes" Source="SourceDir\System.Drawing.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Dynamic.Runtime.dll" Guid="3148db2c-85bc-449c-8c37-3bca54ce6e78">
+			<CreateFolder />
+			<File Id="System.Dynamic.Runtime.dll" KeyPath="yes" Source="SourceDir\System.Dynamic.Runtime.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Formats.Asn1.dll" Guid="acf85684-5946-4eef-9053-41dcc380fb32">
+			<CreateFolder />
+			<File Id="System.Formats.Asn1.dll" KeyPath="yes" Source="SourceDir\System.Formats.Asn1.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Globalization.Calendars.dll" Guid="f4c7cec3-4961-4a3a-b1f8-e759673a0c30">
+			<CreateFolder />
+			<File Id="System.Globalization.Calendars.dll" KeyPath="yes" Source="SourceDir\System.Globalization.Calendars.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Globalization.dll" Guid="fc9b9b86-b372-44bc-a3df-f935fcad2b34">
+			<CreateFolder />
+			<File Id="System.Globalization.dll" KeyPath="yes" Source="SourceDir\System.Globalization.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Globalization.Extensions.dll" Guid="6b9aa22b-82f5-4839-8de7-35348c67dbcf">
+			<CreateFolder />
+			<File Id="System.Globalization.Extensions.dll" KeyPath="yes" Source="SourceDir\System.Globalization.Extensions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.Compression.Brotli.dll" Guid="25055bd8-bd85-485f-925f-d4b229900046">
+			<CreateFolder />
+			<File Id="System.IO.Compression.Brotli.dll" KeyPath="yes" Source="SourceDir\System.IO.Compression.Brotli.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.Compression.dll" Guid="192b1702-5a45-40b1-82fb-0c68f488c734">
+			<CreateFolder />
+			<File Id="System.IO.Compression.dll" KeyPath="yes" Source="SourceDir\System.IO.Compression.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.Compression.FileSystem.dll" Guid="fe67a85c-72e6-4c7b-9021-3ac52aef988a">
+			<CreateFolder />
+			<File Id="System.IO.Compression.FileSystem.dll" KeyPath="yes" Source="SourceDir\System.IO.Compression.FileSystem.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.Compression.ZipFile.dll" Guid="db3b0a91-4716-4349-8618-fb2ac1f58061">
+			<CreateFolder />
+			<File Id="System.IO.Compression.ZipFile.dll" KeyPath="yes" Source="SourceDir\System.IO.Compression.ZipFile.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.dll" Guid="deacd528-e20e-4fe9-aef4-91fdb65c97ec">
+			<CreateFolder />
+			<File Id="System.IO.dll" KeyPath="yes" Source="SourceDir\System.IO.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.FileSystem.AccessControl.dll" Guid="125d0e3c-68d7-4d4d-933e-dd1e37c30ce8">
+			<CreateFolder />
+			<File Id="System.IO.FileSystem.AccessControl.dll" KeyPath="yes" Source="SourceDir\System.IO.FileSystem.AccessControl.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.FileSystem.dll" Guid="a0d68d66-541a-43d8-9d67-3c5f3aac0231">
+			<CreateFolder />
+			<File Id="System.IO.FileSystem.dll" KeyPath="yes" Source="SourceDir\System.IO.FileSystem.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.FileSystem.DriveInfo.dll" Guid="9236121c-13e5-491b-b7f6-35bfc44a5021">
+			<CreateFolder />
+			<File Id="System.IO.FileSystem.DriveInfo.dll" KeyPath="yes" Source="SourceDir\System.IO.FileSystem.DriveInfo.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.FileSystem.Primitives.dll" Guid="5bb92ac6-ae5c-499e-a6e2-34460e4410ba">
+			<CreateFolder />
+			<File Id="System.IO.FileSystem.Primitives.dll" KeyPath="yes" Source="SourceDir\System.IO.FileSystem.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.FileSystem.Watcher.dll" Guid="1a23f605-df9a-4079-86ed-c690895e3c2f">
+			<CreateFolder />
+			<File Id="System.IO.FileSystem.Watcher.dll" KeyPath="yes" Source="SourceDir\System.IO.FileSystem.Watcher.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.IsolatedStorage.dll" Guid="d8a666ab-80b5-4362-9f95-cedfdd990cef">
+			<CreateFolder />
+			<File Id="System.IO.IsolatedStorage.dll" KeyPath="yes" Source="SourceDir\System.IO.IsolatedStorage.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.MemoryMappedFiles.dll" Guid="d3706b26-870c-4e01-b5a7-1d9618603bb8">
+			<CreateFolder />
+			<File Id="System.IO.MemoryMappedFiles.dll" KeyPath="yes" Source="SourceDir\System.IO.MemoryMappedFiles.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.Pipes.AccessControl.dll" Guid="7ddf6839-9d12-42d9-98f0-8010265c8b73">
+			<CreateFolder />
+			<File Id="System.IO.Pipes.AccessControl.dll" KeyPath="yes" Source="SourceDir\System.IO.Pipes.AccessControl.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.Pipes.dll" Guid="35f4436f-4760-47b3-a248-5c7c0c1a6828">
+			<CreateFolder />
+			<File Id="System.IO.Pipes.dll" KeyPath="yes" Source="SourceDir\System.IO.Pipes.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.IO.UnmanagedMemoryStream.dll" Guid="e1634152-24d5-4a85-a770-f6037076758a">
+			<CreateFolder />
+			<File Id="System.IO.UnmanagedMemoryStream.dll" KeyPath="yes" Source="SourceDir\System.IO.UnmanagedMemoryStream.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Linq.dll" Guid="5d1f3080-717b-4c50-8b2e-110f1a4f52a6">
+			<CreateFolder />
+			<File Id="System.Linq.dll" KeyPath="yes" Source="SourceDir\System.Linq.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Linq.Expressions.dll" Guid="3c4c93f9-1383-40cf-a211-8da79bda813d">
+			<CreateFolder />
+			<File Id="System.Linq.Expressions.dll" KeyPath="yes" Source="SourceDir\System.Linq.Expressions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Linq.Parallel.dll" Guid="a215a23b-e097-47bb-96a8-11aeca3509e1">
+			<CreateFolder />
+			<File Id="System.Linq.Parallel.dll" KeyPath="yes" Source="SourceDir\System.Linq.Parallel.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Linq.Queryable.dll" Guid="db5152f1-42ab-4cb8-9650-fa7a29fd3ba2">
+			<CreateFolder />
+			<File Id="System.Linq.Queryable.dll" KeyPath="yes" Source="SourceDir\System.Linq.Queryable.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Memory.dll" Guid="db28a518-5884-429f-9a66-5663c6453cd1">
+			<CreateFolder />
+			<File Id="System.Memory.dll" KeyPath="yes" Source="SourceDir\System.Memory.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.dll" Guid="d2c1d152-0445-46ad-9afb-7be074be4b25">
+			<CreateFolder />
+			<File Id="System.Net.dll" KeyPath="yes" Source="SourceDir\System.Net.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Http.dll" Guid="6c767a62-ae9e-4831-b69c-c22667915feb">
+			<CreateFolder />
+			<File Id="System.Net.Http.dll" KeyPath="yes" Source="SourceDir\System.Net.Http.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Http.Json.dll" Guid="a642bd52-242c-4efb-ba58-7316566fbd87">
+			<CreateFolder />
+			<File Id="System.Net.Http.Json.dll" KeyPath="yes" Source="SourceDir\System.Net.Http.Json.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.HttpListener.dll" Guid="694c3d07-4ba2-4529-a2ce-c4b632231a28">
+			<CreateFolder />
+			<File Id="System.Net.HttpListener.dll" KeyPath="yes" Source="SourceDir\System.Net.HttpListener.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Mail.dll" Guid="d1f1bfe8-b145-4407-ba85-061b5ae3b042">
+			<CreateFolder />
+			<File Id="System.Net.Mail.dll" KeyPath="yes" Source="SourceDir\System.Net.Mail.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.NameResolution.dll" Guid="196cc764-4d9f-4565-ac06-c124e1d524d5">
+			<CreateFolder />
+			<File Id="System.Net.NameResolution.dll" KeyPath="yes" Source="SourceDir\System.Net.NameResolution.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.NetworkInformation.dll" Guid="680f14b5-8c22-4741-95fd-541b2964395e">
+			<CreateFolder />
+			<File Id="System.Net.NetworkInformation.dll" KeyPath="yes" Source="SourceDir\System.Net.NetworkInformation.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Ping.dll" Guid="d2b952f1-fb9f-4364-be2d-a6a7aa787638">
+			<CreateFolder />
+			<File Id="System.Net.Ping.dll" KeyPath="yes" Source="SourceDir\System.Net.Ping.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Primitives.dll" Guid="1e981325-41d1-4508-adb1-10ecbc131d11">
+			<CreateFolder />
+			<File Id="System.Net.Primitives.dll" KeyPath="yes" Source="SourceDir\System.Net.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Requests.dll" Guid="ff39a4a5-a628-4f83-a15b-660b7fe4edf1">
+			<CreateFolder />
+			<File Id="System.Net.Requests.dll" KeyPath="yes" Source="SourceDir\System.Net.Requests.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Security.dll" Guid="4a92ba76-4c70-41db-b1ed-d1e7c7b50805">
+			<CreateFolder />
+			<File Id="System.Net.Security.dll" KeyPath="yes" Source="SourceDir\System.Net.Security.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.ServicePoint.dll" Guid="c7981d47-d2e2-4205-9966-59ff81b5f6d2">
+			<CreateFolder />
+			<File Id="System.Net.ServicePoint.dll" KeyPath="yes" Source="SourceDir\System.Net.ServicePoint.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.Sockets.dll" Guid="f73f9658-9035-4813-ac25-8da406b11944">
+			<CreateFolder />
+			<File Id="System.Net.Sockets.dll" KeyPath="yes" Source="SourceDir\System.Net.Sockets.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.WebClient.dll" Guid="61a987ea-2496-4279-8635-a8e62934d1a9">
+			<CreateFolder />
+			<File Id="System.Net.WebClient.dll" KeyPath="yes" Source="SourceDir\System.Net.WebClient.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.WebHeaderCollection.dll" Guid="0f62b749-b356-48f0-bd46-38989ed93bae">
+			<CreateFolder />
+			<File Id="System.Net.WebHeaderCollection.dll" KeyPath="yes" Source="SourceDir\System.Net.WebHeaderCollection.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.WebProxy.dll" Guid="dd766c1b-d4df-4e2b-b12b-fb22353de710">
+			<CreateFolder />
+			<File Id="System.Net.WebProxy.dll" KeyPath="yes" Source="SourceDir\System.Net.WebProxy.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.WebSockets.Client.dll" Guid="7363a777-f766-4ed3-892a-37dc47afe56a">
+			<CreateFolder />
+			<File Id="System.Net.WebSockets.Client.dll" KeyPath="yes" Source="SourceDir\System.Net.WebSockets.Client.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Net.WebSockets.dll" Guid="c47b8021-e283-49e8-adae-e8f7a3158503">
+			<CreateFolder />
+			<File Id="System.Net.WebSockets.dll" KeyPath="yes" Source="SourceDir\System.Net.WebSockets.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Numerics.dll" Guid="38538912-e6bf-47cd-b281-a044455b9aac">
+			<CreateFolder />
+			<File Id="System.Numerics.dll" KeyPath="yes" Source="SourceDir\System.Numerics.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Numerics.Vectors.dll" Guid="50d1ad80-e2fa-4a5d-bcc2-e01214266040">
+			<CreateFolder />
+			<File Id="System.Numerics.Vectors.dll" KeyPath="yes" Source="SourceDir\System.Numerics.Vectors.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ObjectModel.dll" Guid="fbcaed5d-a18f-4055-8fc7-fc820f65db04">
+			<CreateFolder />
+			<File Id="System.ObjectModel.dll" KeyPath="yes" Source="SourceDir\System.ObjectModel.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Private.CoreLib.dll" Guid="22445fe5-ffbe-4031-82cd-4804171f81d0">
+			<CreateFolder />
+			<File Id="System.Private.CoreLib.dll" KeyPath="yes" Source="SourceDir\System.Private.CoreLib.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Private.DataContractSerialization.dll" Guid="92a79fe5-cb30-43b1-9236-d0924692a205">
+			<CreateFolder />
+			<File Id="System.Private.DataContractSerialization.dll" KeyPath="yes" Source="SourceDir\System.Private.DataContractSerialization.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Private.Uri.dll" Guid="8ee5f2d8-1d19-4d81-a2d7-aedc893544f0">
+			<CreateFolder />
+			<File Id="System.Private.Uri.dll" KeyPath="yes" Source="SourceDir\System.Private.Uri.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Private.Xml.dll" Guid="6677c153-7e14-481f-9da2-927d4c3e6cb5">
+			<CreateFolder />
+			<File Id="System.Private.Xml.dll" KeyPath="yes" Source="SourceDir\System.Private.Xml.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Private.Xml.Linq.dll" Guid="a995c9d6-ee8b-4647-a390-1399579a7cc9">
+			<CreateFolder />
+			<File Id="System.Private.Xml.Linq.dll" KeyPath="yes" Source="SourceDir\System.Private.Xml.Linq.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reactive.dll" Guid="3ba89640-6c05-45a2-9573-20725fb1ce04">
+			<CreateFolder />
+			<File Id="System.Reactive.dll" KeyPath="yes" Source="SourceDir\System.Reactive.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reactive.xml" Guid="e1a8bf96-0164-418e-b8fe-9d93f08d1980">
+			<CreateFolder />
+			<File Id="System.Reactive.xml" KeyPath="yes" Source="SourceDir\System.Reactive.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.DispatchProxy.dll" Guid="76c7ff6e-24a8-45dc-85c1-835328e16e5d">
+			<CreateFolder />
+			<File Id="System.Reflection.DispatchProxy.dll" KeyPath="yes" Source="SourceDir\System.Reflection.DispatchProxy.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.dll" Guid="fcc6fcf4-a502-4bb8-9c77-03237367173f">
+			<CreateFolder />
+			<File Id="System.Reflection.dll" KeyPath="yes" Source="SourceDir\System.Reflection.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.Emit.dll" Guid="32eac566-73c7-48fb-985c-726c60ca192c">
+			<CreateFolder />
+			<File Id="System.Reflection.Emit.dll" KeyPath="yes" Source="SourceDir\System.Reflection.Emit.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.Emit.ILGeneration.dll" Guid="4a278288-6a47-460e-bbf7-35fa683d7305">
+			<CreateFolder />
+			<File Id="System.Reflection.Emit.ILGeneration.dll" KeyPath="yes" Source="SourceDir\System.Reflection.Emit.ILGeneration.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.Emit.Lightweight.dll" Guid="7975f364-54ee-4217-a591-3686b9554f59">
+			<CreateFolder />
+			<File Id="System.Reflection.Emit.Lightweight.dll" KeyPath="yes" Source="SourceDir\System.Reflection.Emit.Lightweight.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.Extensions.dll" Guid="a72eee70-c03b-49b0-9639-92121c94c24a">
+			<CreateFolder />
+			<File Id="System.Reflection.Extensions.dll" KeyPath="yes" Source="SourceDir\System.Reflection.Extensions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.Metadata.dll" Guid="1adfc448-5909-4294-8da3-fe4fc1d1c694">
+			<CreateFolder />
+			<File Id="System.Reflection.Metadata.dll" KeyPath="yes" Source="SourceDir\System.Reflection.Metadata.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.MetadataLoadContext.dll" Guid="e765f48c-f350-4ebe-8f7d-5de71859b421">
+			<CreateFolder />
+			<File Id="System.Reflection.MetadataLoadContext.dll" KeyPath="yes" Source="SourceDir\System.Reflection.MetadataLoadContext.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.MetadataLoadContext.xml" Guid="f165a3c2-cbe7-4039-b048-7bca966a8c97">
+			<CreateFolder />
+			<File Id="System.Reflection.MetadataLoadContext.xml" KeyPath="yes" Source="SourceDir\System.Reflection.MetadataLoadContext.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.Primitives.dll" Guid="1e6e846c-a842-490b-82df-732ac7e93a86">
+			<CreateFolder />
+			<File Id="System.Reflection.Primitives.dll" KeyPath="yes" Source="SourceDir\System.Reflection.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Reflection.TypeExtensions.dll" Guid="fe794c53-75cc-49b8-9ec9-816a2982b1fe">
+			<CreateFolder />
+			<File Id="System.Reflection.TypeExtensions.dll" KeyPath="yes" Source="SourceDir\System.Reflection.TypeExtensions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Resources.Reader.dll" Guid="1197ae72-2de1-4c52-a2b5-8b9eccbe4ecc">
+			<CreateFolder />
+			<File Id="System.Resources.Reader.dll" KeyPath="yes" Source="SourceDir\System.Resources.Reader.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Resources.ResourceManager.dll" Guid="08a7eeee-be89-4bf8-83d9-6e80817b87bd">
+			<CreateFolder />
+			<File Id="System.Resources.ResourceManager.dll" KeyPath="yes" Source="SourceDir\System.Resources.ResourceManager.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Resources.Writer.dll" Guid="0733739e-6f7c-4e15-95e8-97b3e0cc2807">
+			<CreateFolder />
+			<File Id="System.Resources.Writer.dll" KeyPath="yes" Source="SourceDir\System.Resources.Writer.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.CompilerServices.Unsafe.dll" Guid="48ce55bc-12f1-4342-aff2-4386b1f35a9a">
+			<CreateFolder />
+			<File Id="System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" Source="SourceDir\System.Runtime.CompilerServices.Unsafe.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.CompilerServices.VisualC.dll" Guid="c5b723af-8bc6-432b-bb55-ce7fcb1fd52f">
+			<CreateFolder />
+			<File Id="System.Runtime.CompilerServices.VisualC.dll" KeyPath="yes" Source="SourceDir\System.Runtime.CompilerServices.VisualC.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.dll" Guid="952825ff-a1b6-4150-b1cd-716c430704c7">
+			<CreateFolder />
+			<File Id="System.Runtime.dll" KeyPath="yes" Source="SourceDir\System.Runtime.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Extensions.dll" Guid="033996ba-5bc7-4c69-8445-615f9b32a9bd">
+			<CreateFolder />
+			<File Id="System.Runtime.Extensions.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Extensions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Handles.dll" Guid="6b97b2e2-6426-4dd6-9b34-84b364128a6f">
+			<CreateFolder />
+			<File Id="System.Runtime.Handles.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Handles.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.InteropServices.dll" Guid="ed4f1f43-246f-45b8-b663-5877c817bf3a">
+			<CreateFolder />
+			<File Id="System.Runtime.InteropServices.dll" KeyPath="yes" Source="SourceDir\System.Runtime.InteropServices.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="02082ad3-74b1-4c46-aa42-f6f60ec0d98b">
+			<CreateFolder />
+			<File Id="System.Runtime.InteropServices.RuntimeInformation.dll" KeyPath="yes" Source="SourceDir\System.Runtime.InteropServices.RuntimeInformation.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Intrinsics.dll" Guid="7f740344-fdda-4734-945f-a7d1fbe9c2ce">
+			<CreateFolder />
+			<File Id="System.Runtime.Intrinsics.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Intrinsics.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Loader.dll" Guid="8e3f6ccc-beeb-47e1-a458-81bce5f27ad6">
+			<CreateFolder />
+			<File Id="System.Runtime.Loader.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Loader.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Numerics.dll" Guid="62b851f3-c3b4-4c23-901f-3f4dc58bd36e">
+			<CreateFolder />
+			<File Id="System.Runtime.Numerics.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Numerics.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Serialization.dll" Guid="afa10dc9-1586-4c20-8e72-86d8edd17c16">
+			<CreateFolder />
+			<File Id="System.Runtime.Serialization.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Serialization.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Serialization.Formatters.dll" Guid="a1883c18-59f2-4dc7-9112-95dde2f82b2b">
+			<CreateFolder />
+			<File Id="System.Runtime.Serialization.Formatters.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Serialization.Formatters.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Serialization.Json.dll" Guid="b9947c35-1ae6-4236-b516-7e1fb8743b24">
+			<CreateFolder />
+			<File Id="System.Runtime.Serialization.Json.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Serialization.Json.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Serialization.Primitives.dll" Guid="69541285-4481-4eaa-859f-91eefd6ed0e6">
+			<CreateFolder />
+			<File Id="System.Runtime.Serialization.Primitives.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Serialization.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Runtime.Serialization.Xml.dll" Guid="b88fab86-8af3-44ab-ac27-5cdbcdd05618">
+			<CreateFolder />
+			<File Id="System.Runtime.Serialization.Xml.dll" KeyPath="yes" Source="SourceDir\System.Runtime.Serialization.Xml.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.AccessControl.dll" Guid="fba91fb5-20b6-414b-9fee-22a1bd7aebd4">
+			<CreateFolder />
+			<File Id="System.Security.AccessControl.dll" KeyPath="yes" Source="SourceDir\System.Security.AccessControl.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Claims.dll" Guid="66ad2f9a-3a7f-423f-b2bf-978106330a65">
+			<CreateFolder />
+			<File Id="System.Security.Claims.dll" KeyPath="yes" Source="SourceDir\System.Security.Claims.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Cryptography.Algorithms.dll" Guid="601d9b84-f56a-4e48-a013-62161a2ab6f4">
+			<CreateFolder />
+			<File Id="System.Security.Cryptography.Algorithms.dll" KeyPath="yes" Source="SourceDir\System.Security.Cryptography.Algorithms.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Cryptography.Cng.dll" Guid="7087d76d-fab0-4b1d-ad3d-ed92274ef432">
+			<CreateFolder />
+			<File Id="System.Security.Cryptography.Cng.dll" KeyPath="yes" Source="SourceDir\System.Security.Cryptography.Cng.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Cryptography.Csp.dll" Guid="f28c3bdb-0503-40ec-9daa-e36fe5ab92c0">
+			<CreateFolder />
+			<File Id="System.Security.Cryptography.Csp.dll" KeyPath="yes" Source="SourceDir\System.Security.Cryptography.Csp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Cryptography.Encoding.dll" Guid="8ded5ac8-f76e-4d66-9dbf-447b34ec411b">
+			<CreateFolder />
+			<File Id="System.Security.Cryptography.Encoding.dll" KeyPath="yes" Source="SourceDir\System.Security.Cryptography.Encoding.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Cryptography.OpenSsl.dll" Guid="53ffec52-02be-4453-b1af-848292946b08">
+			<CreateFolder />
+			<File Id="System.Security.Cryptography.OpenSsl.dll" KeyPath="yes" Source="SourceDir\System.Security.Cryptography.OpenSsl.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Cryptography.Primitives.dll" Guid="50f50ab6-0100-451e-b779-abca9b1cdb4e">
+			<CreateFolder />
+			<File Id="System.Security.Cryptography.Primitives.dll" KeyPath="yes" Source="SourceDir\System.Security.Cryptography.Primitives.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Cryptography.X509Certificates.dll" Guid="7ed731f5-2c2f-4f92-8836-462e5f785412">
+			<CreateFolder />
+			<File Id="System.Security.Cryptography.X509Certificates.dll" KeyPath="yes" Source="SourceDir\System.Security.Cryptography.X509Certificates.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.dll" Guid="1238b26f-3e23-43ff-8b1c-8019e3d58a60">
+			<CreateFolder />
+			<File Id="System.Security.dll" KeyPath="yes" Source="SourceDir\System.Security.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Principal.dll" Guid="ea674ffb-0900-4150-8258-deb26708f741">
+			<CreateFolder />
+			<File Id="System.Security.Principal.dll" KeyPath="yes" Source="SourceDir\System.Security.Principal.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.Principal.Windows.dll" Guid="5cdfe25f-8117-4490-b807-ee29b74419af">
+			<CreateFolder />
+			<File Id="System.Security.Principal.Windows.dll" KeyPath="yes" Source="SourceDir\System.Security.Principal.Windows.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Security.SecureString.dll" Guid="9ce4c7e9-77d2-4873-8ba7-ae777d2ccf4d">
+			<CreateFolder />
+			<File Id="System.Security.SecureString.dll" KeyPath="yes" Source="SourceDir\System.Security.SecureString.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ServiceModel.Web.dll" Guid="fe7eb394-e866-4396-8483-dbe686a01697">
+			<CreateFolder />
+			<File Id="System.ServiceModel.Web.dll" KeyPath="yes" Source="SourceDir\System.ServiceModel.Web.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ServiceProcess.dll" Guid="703b68d9-678f-4d75-b57e-741eba5b0858">
+			<CreateFolder />
+			<File Id="System.ServiceProcess.dll" KeyPath="yes" Source="SourceDir\System.ServiceProcess.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Text.Encoding.CodePages.dll" Guid="cbce4cbc-8377-4cbc-9879-04d45a106480">
+			<CreateFolder />
+			<File Id="System.Text.Encoding.CodePages.dll" KeyPath="yes" Source="SourceDir\System.Text.Encoding.CodePages.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Text.Encoding.dll" Guid="2830a4be-bad7-41eb-ac25-37d80ba184d9">
+			<CreateFolder />
+			<File Id="System.Text.Encoding.dll" KeyPath="yes" Source="SourceDir\System.Text.Encoding.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Text.Encoding.Extensions.dll" Guid="8651ead6-4cbc-42a6-91c8-24f1e6ef56f3">
+			<CreateFolder />
+			<File Id="System.Text.Encoding.Extensions.dll" KeyPath="yes" Source="SourceDir\System.Text.Encoding.Extensions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Text.Encodings.Web.dll" Guid="c2f66c93-83f9-415c-94bf-424bc05a07f8">
+			<CreateFolder />
+			<File Id="System.Text.Encodings.Web.dll" KeyPath="yes" Source="SourceDir\System.Text.Encodings.Web.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Text.Json.dll" Guid="fa09d398-8b80-4b28-a91f-8b45625881e6">
+			<CreateFolder />
+			<File Id="System.Text.Json.dll" KeyPath="yes" Source="SourceDir\System.Text.Json.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Text.RegularExpressions.dll" Guid="ecff2a95-5f44-4291-b0fe-03f2336660b9">
+			<CreateFolder />
+			<File Id="System.Text.RegularExpressions.dll" KeyPath="yes" Source="SourceDir\System.Text.RegularExpressions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Channels.dll" Guid="0e27f009-87b6-4a3c-86f6-81cbbe255c44">
+			<CreateFolder />
+			<File Id="System.Threading.Channels.dll" KeyPath="yes" Source="SourceDir\System.Threading.Channels.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.dll" Guid="74190fba-baac-42bd-8afb-ff7bd2e7e580">
+			<CreateFolder />
+			<File Id="System.Threading.dll" KeyPath="yes" Source="SourceDir\System.Threading.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Overlapped.dll" Guid="104d36f4-7552-44e7-9f29-bcbc204b24ba">
+			<CreateFolder />
+			<File Id="System.Threading.Overlapped.dll" KeyPath="yes" Source="SourceDir\System.Threading.Overlapped.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Tasks.Dataflow.dll" Guid="fb61e98f-de48-491d-9dc6-7367ab1757ac">
+			<CreateFolder />
+			<File Id="System.Threading.Tasks.Dataflow.dll" KeyPath="yes" Source="SourceDir\System.Threading.Tasks.Dataflow.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Tasks.dll" Guid="c2358f50-2743-42fa-abe2-731b0fbff167">
+			<CreateFolder />
+			<File Id="System.Threading.Tasks.dll" KeyPath="yes" Source="SourceDir\System.Threading.Tasks.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Tasks.Extensions.dll" Guid="fe791fdc-0fea-494d-aa2e-81169ade7866">
+			<CreateFolder />
+			<File Id="System.Threading.Tasks.Extensions.dll" KeyPath="yes" Source="SourceDir\System.Threading.Tasks.Extensions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Tasks.Parallel.dll" Guid="1c5ab88f-bd49-4c56-9aa8-14fc38926fde">
+			<CreateFolder />
+			<File Id="System.Threading.Tasks.Parallel.dll" KeyPath="yes" Source="SourceDir\System.Threading.Tasks.Parallel.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Thread.dll" Guid="475a95d9-9fe8-472e-8e46-95902bed043d">
+			<CreateFolder />
+			<File Id="System.Threading.Thread.dll" KeyPath="yes" Source="SourceDir\System.Threading.Thread.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.ThreadPool.dll" Guid="7bb118f2-cf57-47f7-ab87-b0f9a4297493">
+			<CreateFolder />
+			<File Id="System.Threading.ThreadPool.dll" KeyPath="yes" Source="SourceDir\System.Threading.ThreadPool.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Threading.Timer.dll" Guid="ff059713-9145-4eeb-88e4-668a9ea3636c">
+			<CreateFolder />
+			<File Id="System.Threading.Timer.dll" KeyPath="yes" Source="SourceDir\System.Threading.Timer.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Transactions.dll" Guid="e15a36c3-5026-4dc3-9525-93030153d507">
+			<CreateFolder />
+			<File Id="System.Transactions.dll" KeyPath="yes" Source="SourceDir\System.Transactions.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Transactions.Local.dll" Guid="bbe48b4f-87d6-4c48-9e0a-1cc30ae5215b">
+			<CreateFolder />
+			<File Id="System.Transactions.Local.dll" KeyPath="yes" Source="SourceDir\System.Transactions.Local.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.ValueTuple.dll" Guid="41faa38a-17b3-41b7-a92d-d8c6371c4e79">
+			<CreateFolder />
+			<File Id="System.ValueTuple.dll" KeyPath="yes" Source="SourceDir\System.ValueTuple.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Web.dll" Guid="a57efd3f-965a-4e68-a7c0-519f5dbbbc48">
+			<CreateFolder />
+			<File Id="System.Web.dll" KeyPath="yes" Source="SourceDir\System.Web.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Web.HttpUtility.dll" Guid="f501a1ae-26bf-44bd-a380-d3d2b7ccd7d8">
+			<CreateFolder />
+			<File Id="System.Web.HttpUtility.dll" KeyPath="yes" Source="SourceDir\System.Web.HttpUtility.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Windows.dll" Guid="bb799af2-ded0-4dd3-bbc0-4715ab576af9">
+			<CreateFolder />
+			<File Id="System.Windows.dll" KeyPath="yes" Source="SourceDir\System.Windows.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.dll" Guid="99f3a314-92a2-4ea4-b76e-c6807a7b3a38">
+			<CreateFolder />
+			<File Id="System.Xml.dll" KeyPath="yes" Source="SourceDir\System.Xml.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.Linq.dll" Guid="b3d4ad0d-4daf-41ca-b3db-58a47cbd4618">
+			<CreateFolder />
+			<File Id="System.Xml.Linq.dll" KeyPath="yes" Source="SourceDir\System.Xml.Linq.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.ReaderWriter.dll" Guid="47f05d0a-2dde-485f-8487-15ddd1d9b20f">
+			<CreateFolder />
+			<File Id="System.Xml.ReaderWriter.dll" KeyPath="yes" Source="SourceDir\System.Xml.ReaderWriter.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.Serialization.dll" Guid="54edf219-5720-4930-81e0-3063adda57da">
+			<CreateFolder />
+			<File Id="System.Xml.Serialization.dll" KeyPath="yes" Source="SourceDir\System.Xml.Serialization.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.XDocument.dll" Guid="02ff58f6-ebf0-4883-8935-1663fc2fec35">
+			<CreateFolder />
+			<File Id="System.Xml.XDocument.dll" KeyPath="yes" Source="SourceDir\System.Xml.XDocument.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.XmlDocument.dll" Guid="a5c06e6c-8f2e-46e9-8133-42259f8acf43">
+			<CreateFolder />
+			<File Id="System.Xml.XmlDocument.dll" KeyPath="yes" Source="SourceDir\System.Xml.XmlDocument.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.XmlSerializer.dll" Guid="eac5dd33-bc29-4892-8c14-c8a166e92362">
+			<CreateFolder />
+			<File Id="System.Xml.XmlSerializer.dll" KeyPath="yes" Source="SourceDir\System.Xml.XmlSerializer.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.XPath.dll" Guid="ed622a31-528c-4285-8e04-8020a785b165">
+			<CreateFolder />
+			<File Id="System.Xml.XPath.dll" KeyPath="yes" Source="SourceDir\System.Xml.XPath.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="System.Xml.XPath.XDocument.dll" Guid="33bec9c2-06ef-4190-a436-06a06138f15b">
+			<CreateFolder />
+			<File Id="System.Xml.XPath.XDocument.dll" KeyPath="yes" Source="SourceDir\System.Xml.XPath.XDocument.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Tmds.DBus.dll" Guid="8a41f9ef-8d06-4a74-8222-c027d11e4b65">
+			<CreateFolder />
+			<File Id="Tmds.DBus.dll" KeyPath="yes" Source="SourceDir\Tmds.DBus.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="Tmds.DBus.xml" Guid="4dfb9293-a535-4fc6-9238-bfdd06feb21e">
+			<CreateFolder />
+			<File Id="Tmds.DBus.xml" KeyPath="yes" Source="SourceDir\Tmds.DBus.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewer.deps.json" Guid="bdadc86f-71e4-42dd-bd07-57e8bef176c1">
+			<CreateFolder />
+			<File Id="TreeViewer.deps.json" KeyPath="yes" Source="SourceDir\TreeViewer.deps.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewer.dll" Guid="1dc54f5f-113e-45e4-9aa6-fbb4d9944abb">
+			<CreateFolder />
+			<File Id="TreeViewer.dll" KeyPath="yes" Source="SourceDir\TreeViewer.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewer.exe" Guid="68cfebc8-dac1-4523-8f22-7565a6d58792">
+			<CreateFolder />
+			<File Id="TreeViewer.exe" KeyPath="yes" Source="SourceDir\TreeViewer.exe" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewer.runtimeconfig.json" Guid="3de2b6a6-a881-4799-ab29-f88ef675ec08">
+			<CreateFolder />
+			<File Id="TreeViewer.runtimeconfig.json" KeyPath="yes" Source="SourceDir\TreeViewer.runtimeconfig.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewerCommandLine.deps.json" Guid="37252da2-8f0e-4353-89d8-671729c642ac">
+			<CreateFolder />
+			<File Id="TreeViewerCommandLine.deps.json" KeyPath="yes" Source="SourceDir\TreeViewerCommandLine.deps.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewerCommandLine.dll" Guid="4f06bdc2-fbbe-4383-9fff-11de92699830">
+			<CreateFolder />
+			<File Id="TreeViewerCommandLine.dll" KeyPath="yes" Source="SourceDir\TreeViewerCommandLine.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewerCommandLine.exe" Guid="bb3b8fd4-0d48-4525-a0d9-73ddb5a37c79">
+			<CreateFolder />
+			<File Id="TreeViewerCommandLine.exe" KeyPath="yes" Source="SourceDir\TreeViewerCommandLine.exe" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="TreeViewerCommandLine.runtimeconfig.json" Guid="fdefae6a-3939-48f7-ab22-a623e9a44f13">
+			<CreateFolder />
+			<File Id="TreeViewerCommandLine.runtimeconfig.json" KeyPath="yes" Source="SourceDir\TreeViewerCommandLine.runtimeconfig.json" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="ucrtbase.dll" Guid="bf42e04a-7849-4ddd-8382-b679b09bdb4b">
+			<CreateFolder />
+			<File Id="ucrtbase.dll" KeyPath="yes" Source="SourceDir\ucrtbase.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.Canvas.dll" Guid="0877a8d0-56a5-4a34-80cb-68ef60644262">
+			<CreateFolder />
+			<File Id="VectSharp.Canvas.dll" KeyPath="yes" Source="SourceDir\VectSharp.Canvas.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.Canvas.xml" Guid="f8f7a53a-1e27-477b-9b2f-89373e913165">
+			<CreateFolder />
+			<File Id="VectSharp.Canvas.xml" KeyPath="yes" Source="SourceDir\VectSharp.Canvas.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.dll" Guid="d2c316ac-cd47-473f-9fe5-5c7f7637a9d9">
+			<CreateFolder />
+			<File Id="VectSharp.dll" KeyPath="yes" Source="SourceDir\VectSharp.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.Markdown.dll" Guid="b9f99c6b-126f-4a4a-ae48-27aa6efafc72">
+			<CreateFolder />
+			<File Id="VectSharp.Markdown.dll" KeyPath="yes" Source="SourceDir\VectSharp.Markdown.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.Markdown.xml" Guid="999c31b6-c822-4f84-b4c7-51a1d56c238b">
+			<CreateFolder />
+			<File Id="VectSharp.Markdown.xml" KeyPath="yes" Source="SourceDir\VectSharp.Markdown.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.MarkdownCanvas.dll" Guid="fc555c70-5d1f-4c09-91a9-e049f36d331a">
+			<CreateFolder />
+			<File Id="VectSharp.MarkdownCanvas.dll" KeyPath="yes" Source="SourceDir\VectSharp.MarkdownCanvas.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.MarkdownCanvas.xml" Guid="c310d0c2-5f65-4854-91ad-6e6c7393e50e">
+			<CreateFolder />
+			<File Id="VectSharp.MarkdownCanvas.xml" KeyPath="yes" Source="SourceDir\VectSharp.MarkdownCanvas.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.MuPDFUtils.dll" Guid="fff10cf4-ecbf-4b97-9fe7-dee65e7cda18">
+			<CreateFolder />
+			<File Id="VectSharp.MuPDFUtils.dll" KeyPath="yes" Source="SourceDir\VectSharp.MuPDFUtils.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.MuPDFUtils.xml" Guid="b543053c-fae5-4627-ac86-710af5c3f277">
+			<CreateFolder />
+			<File Id="VectSharp.MuPDFUtils.xml" KeyPath="yes" Source="SourceDir\VectSharp.MuPDFUtils.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.PDF.dll" Guid="6ad83ce0-21f4-490e-9bbb-e6545be4c527">
+			<CreateFolder />
+			<File Id="VectSharp.PDF.dll" KeyPath="yes" Source="SourceDir\VectSharp.PDF.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.PDF.xml" Guid="871e6ad6-3a77-468b-a182-0a9097ba17e1">
+			<CreateFolder />
+			<File Id="VectSharp.PDF.xml" KeyPath="yes" Source="SourceDir\VectSharp.PDF.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.SVG.dll" Guid="f3276892-a42e-48fe-82c5-6f27b74db1d9">
+			<CreateFolder />
+			<File Id="VectSharp.SVG.dll" KeyPath="yes" Source="SourceDir\VectSharp.SVG.dll" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.SVG.xml" Guid="e18d08d7-fee3-41b0-a94d-fbe3a39031f5">
+			<CreateFolder />
+			<File Id="VectSharp.SVG.xml" KeyPath="yes" Source="SourceDir\VectSharp.SVG.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="VectSharp.xml" Guid="c0d40333-6acb-4931-8d4b-dfddce3f0fdd">
+			<CreateFolder />
+			<File Id="VectSharp.xml" KeyPath="yes" Source="SourceDir\VectSharp.xml" />
+		</Component>
+		<Component Directory="INSTALLFOLDER" Id="WindowsBase.dll" Guid="6fe16506-5891-4f95-be8b-bb38e4f77846">
+			<CreateFolder />
+			<File Id="WindowsBase.dll" KeyPath="yes" Source="SourceDir\WindowsBase.dll" />
+		</Component>
+		<Component Directory="cs" Id="cs_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="ed1dae0c-09a2-4199-b8d6-66283675feb5">
+			<CreateFolder />
+			<File Id="cs_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\cs\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="cs" Id="cs_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="a8ff6df2-dde4-4b05-a7f0-88df4a3ac410">
+			<CreateFolder />
+			<File Id="cs_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\cs\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="cs" Id="cs_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="124917d6-087d-4260-bc18-63a9a26f89b4">
+			<CreateFolder />
+			<File Id="cs_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="cs" Id="cs_Microsoft.CodeAnalysis.Features.resources.dll" Guid="1a0d91a2-c2d0-4acc-ba23-974eff692dac">
+			<CreateFolder />
+			<File Id="cs_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\cs\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="cs" Id="cs_Microsoft.CodeAnalysis.resources.dll" Guid="79e225a6-ce1c-4d34-bbf6-e922870b1181">
+			<CreateFolder />
+			<File Id="cs_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\cs\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="cs" Id="cs_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="a84adf70-cd39-4e3a-93e6-9dcd804fdde7">
+			<CreateFolder />
+			<File Id="cs_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="de" Id="de_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="c9225b07-1756-4f6b-8e0b-9cb909be3995">
+			<CreateFolder />
+			<File Id="de_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\de\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="de" Id="de_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="48a2025d-de05-4b46-849b-ed0adef8a03d">
+			<CreateFolder />
+			<File Id="de_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\de\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="de" Id="de_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="ca63fa25-15c1-4ed6-9c9b-88fd1df577f4">
+			<CreateFolder />
+			<File Id="de_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="de" Id="de_Microsoft.CodeAnalysis.Features.resources.dll" Guid="cd7ced7b-140f-4b2f-946d-4d362ad5767b">
+			<CreateFolder />
+			<File Id="de_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\de\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="de" Id="de_Microsoft.CodeAnalysis.resources.dll" Guid="b3fbc2c7-fdec-490d-9fd1-73032fc83aa8">
+			<CreateFolder />
+			<File Id="de_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\de\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="de" Id="de_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="511a1eed-d2c2-4bcd-bb14-02b7719257b3">
+			<CreateFolder />
+			<File Id="de_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\de\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="es" Id="es_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="d17938a3-19a4-4e7b-a941-493fbd542685">
+			<CreateFolder />
+			<File Id="es_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\es\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="es" Id="es_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="dbd25d4f-b05e-48a6-9986-ed3656d635e5">
+			<CreateFolder />
+			<File Id="es_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\es\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="es" Id="es_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="428168ad-3771-42de-b85d-c84320fbdce8">
+			<CreateFolder />
+			<File Id="es_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="es" Id="es_Microsoft.CodeAnalysis.Features.resources.dll" Guid="bfea4a83-acb1-4749-8b29-090fc9851c9e">
+			<CreateFolder />
+			<File Id="es_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\es\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="es" Id="es_Microsoft.CodeAnalysis.resources.dll" Guid="5ebc79db-5dab-4298-ac0f-06a9ab96965a">
+			<CreateFolder />
+			<File Id="es_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\es\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="es" Id="es_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="049f101e-3d13-42a4-a830-cd1b2c87a5df">
+			<CreateFolder />
+			<File Id="es_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\es\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="fr" Id="fr_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="f3a5de6f-37a4-43ff-8a22-aad580fe3083">
+			<CreateFolder />
+			<File Id="fr_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\fr\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="fr" Id="fr_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="c3ecd08a-66b7-4abd-9167-aec15aff8467">
+			<CreateFolder />
+			<File Id="fr_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\fr\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="fr" Id="fr_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="f6e1f1c1-0bbd-4b5a-b34d-1d61431561f8">
+			<CreateFolder />
+			<File Id="fr_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="fr" Id="fr_Microsoft.CodeAnalysis.Features.resources.dll" Guid="69667724-0eed-4a54-aaa4-193a36f95cf5">
+			<CreateFolder />
+			<File Id="fr_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\fr\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="fr" Id="fr_Microsoft.CodeAnalysis.resources.dll" Guid="b9d60682-17f8-45d8-8585-218eabfe2d46">
+			<CreateFolder />
+			<File Id="fr_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\fr\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="fr" Id="fr_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="d56d2644-2121-4e71-ae1e-cf9f7ce96b35">
+			<CreateFolder />
+			<File Id="fr_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="Icons" Id="Icons_nex.ico" Guid="f986df6e-317a-4424-9157-7fb7d6c3ec95">
+			<CreateFolder />
+			<File Id="Icons_nex.ico" KeyPath="yes" Source="SourceDir\Icons\nex.ico" />
+		</Component>
+		<Component Directory="Icons" Id="Icons_nwk.ico" Guid="6883025d-937c-4a21-8ecd-33c8bd6afbbd">
+			<CreateFolder />
+			<File Id="Icons_nwk.ico" KeyPath="yes" Source="SourceDir\Icons\nwk.ico" />
+		</Component>
+		<Component Directory="Icons" Id="Icons_nwka.ico" Guid="e9ec1090-dd45-4ea1-9efe-482fbdece1a2">
+			<CreateFolder />
+			<File Id="Icons_nwka.ico" KeyPath="yes" Source="SourceDir\Icons\nwka.ico" />
+		</Component>
+		<Component Directory="Icons" Id="Icons_tbi.ico" Guid="59984727-5c8f-4f3c-b84c-f9b06db94720">
+			<CreateFolder />
+			<File Id="Icons_tbi.ico" KeyPath="yes" Source="SourceDir\Icons\tbi.ico" />
+		</Component>
+		<Component Directory="Icons" Id="Icons_tre.ico" Guid="a595d8ed-caeb-4e89-ab3a-0e30fcaec648">
+			<CreateFolder />
+			<File Id="Icons_tre.ico" KeyPath="yes" Source="SourceDir\Icons\tre.ico" />
+		</Component>
+		<Component Directory="Icons" Id="Icons_tree.ico" Guid="090d4ca1-9eb2-4bd9-9259-c05f06d8a68b">
+			<CreateFolder />
+			<File Id="Icons_tree.ico" KeyPath="yes" Source="SourceDir\Icons\tree.ico" />
+		</Component>
+		<Component Directory="it" Id="it_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="ec58a25f-5020-4e6a-a5e7-4939ee082e1b">
+			<CreateFolder />
+			<File Id="it_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\it\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="it" Id="it_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="d495fd87-1af0-46e9-b52e-8e56cf3fbe4b">
+			<CreateFolder />
+			<File Id="it_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\it\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="it" Id="it_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="35c19ee5-2b6c-413a-b6c0-e2c90e310688">
+			<CreateFolder />
+			<File Id="it_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="it" Id="it_Microsoft.CodeAnalysis.Features.resources.dll" Guid="21141de9-f545-4803-bfe0-bceb5d090dcf">
+			<CreateFolder />
+			<File Id="it_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\it\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="it" Id="it_Microsoft.CodeAnalysis.resources.dll" Guid="f94fcd05-511c-4363-8d13-b6ff4dbbaf0c">
+			<CreateFolder />
+			<File Id="it_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\it\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="it" Id="it_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="aa887bae-82eb-4aba-a819-1cf18af1c1c8">
+			<CreateFolder />
+			<File Id="it_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\it\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="ja" Id="ja_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="72ce8b04-7c86-429a-b4f1-9edd4d06712e">
+			<CreateFolder />
+			<File Id="ja_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\ja\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="ja" Id="ja_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="dd1f5af2-44c8-4fc7-ab59-714f6fdaefdc">
+			<CreateFolder />
+			<File Id="ja_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\ja\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="ja" Id="ja_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="45e3ed11-6731-4032-a5d4-79e5da7009fa">
+			<CreateFolder />
+			<File Id="ja_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="ja" Id="ja_Microsoft.CodeAnalysis.Features.resources.dll" Guid="9f5eb1c5-a9c1-4497-8f7b-d9b397da0630">
+			<CreateFolder />
+			<File Id="ja_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\ja\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="ja" Id="ja_Microsoft.CodeAnalysis.resources.dll" Guid="d8bd756d-8181-4742-b1e1-c18b3f98c8ad">
+			<CreateFolder />
+			<File Id="ja_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\ja\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="ja" Id="ja_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="539b2b0d-6b43-4c80-96ed-920e92bdd70a">
+			<CreateFolder />
+			<File Id="ja_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="ko" Id="ko_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="53bf5f2e-17a0-457c-943c-6905b6a036a1">
+			<CreateFolder />
+			<File Id="ko_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\ko\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="ko" Id="ko_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="8b400935-21e9-4a04-8154-1aeaf7287c40">
+			<CreateFolder />
+			<File Id="ko_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\ko\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="ko" Id="ko_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="88407716-7ae9-4a8f-a784-0edef3e8c52f">
+			<CreateFolder />
+			<File Id="ko_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="ko" Id="ko_Microsoft.CodeAnalysis.Features.resources.dll" Guid="9cf33370-7739-4801-a0c7-ee9090624f1a">
+			<CreateFolder />
+			<File Id="ko_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\ko\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="ko" Id="ko_Microsoft.CodeAnalysis.resources.dll" Guid="6442cd6e-146c-4a3b-a024-440d700da28b">
+			<CreateFolder />
+			<File Id="ko_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\ko\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="ko" Id="ko_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="57c87e27-d5e2-4610-ac89-1ab1eea0cbe2">
+			<CreateFolder />
+			<File Id="ko_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="pl" Id="pl_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="80e624c8-c960-4349-bf8c-7bb43ec75554">
+			<CreateFolder />
+			<File Id="pl_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\pl\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="pl" Id="pl_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="51cf4f13-c65f-4e9a-9b84-924612cec0f4">
+			<CreateFolder />
+			<File Id="pl_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\pl\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="pl" Id="pl_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="6b3f1874-89d8-479a-bae8-6514026f712b">
+			<CreateFolder />
+			<File Id="pl_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="pl" Id="pl_Microsoft.CodeAnalysis.Features.resources.dll" Guid="d3077760-9fe2-45ca-8513-a3007c756878">
+			<CreateFolder />
+			<File Id="pl_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\pl\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="pl" Id="pl_Microsoft.CodeAnalysis.resources.dll" Guid="8a1f5a21-10fb-4cca-88df-d2596f55736a">
+			<CreateFolder />
+			<File Id="pl_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\pl\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="pl" Id="pl_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="bf91b899-9d01-4c31-81f0-7c4d3f4ee2e7">
+			<CreateFolder />
+			<File Id="pl_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="pt.BR" Id="pt.BR_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="4c6c2107-34cb-4b64-9229-501896ffc158">
+			<CreateFolder />
+			<File Id="pt.BR_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\pt-BR\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="pt.BR" Id="pt.BR_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="2f28b712-0016-40f9-827d-5b7563dc3bed">
+			<CreateFolder />
+			<File Id="pt.BR_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="pt.BR" Id="pt.BR_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="98bc7448-eaa3-47ec-952d-fcc83f83a7f5">
+			<CreateFolder />
+			<File Id="pt.BR_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="pt.BR" Id="pt.BR_Microsoft.CodeAnalysis.Features.resources.dll" Guid="a2dad7f1-cf46-4b60-b878-a0c30eb157d3">
+			<CreateFolder />
+			<File Id="pt.BR_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\pt-BR\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="pt.BR" Id="pt.BR_Microsoft.CodeAnalysis.resources.dll" Guid="b9eb1e81-9af9-41b6-bebe-759c57f65e63">
+			<CreateFolder />
+			<File Id="pt.BR_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\pt-BR\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="pt.BR" Id="pt.BR_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="d24c264a-d912-4557-bd91-0a5a60281f6b">
+			<CreateFolder />
+			<File Id="pt.BR_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="ru" Id="ru_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="868b4f61-5fdb-4f97-b35e-b80158823f0b">
+			<CreateFolder />
+			<File Id="ru_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\ru\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="ru" Id="ru_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="bcd6ce27-5d60-415e-9da8-16db9dfa47ac">
+			<CreateFolder />
+			<File Id="ru_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\ru\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="ru" Id="ru_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="e12915a4-6bf1-4409-9726-1dcb2d255998">
+			<CreateFolder />
+			<File Id="ru_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="ru" Id="ru_Microsoft.CodeAnalysis.Features.resources.dll" Guid="4232b1c6-5f8e-4d50-bad5-6993c353c5b4">
+			<CreateFolder />
+			<File Id="ru_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\ru\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="ru" Id="ru_Microsoft.CodeAnalysis.resources.dll" Guid="fc4f1132-6e2e-495d-aa53-92b20c0b5851">
+			<CreateFolder />
+			<File Id="ru_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\ru\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="ru" Id="ru_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="25b8f70d-c6fe-4ea1-bd38-11ca56816757">
+			<CreateFolder />
+			<File Id="ru_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="tr" Id="tr_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="40f9df7a-e95f-412e-adbe-958d50ee6420">
+			<CreateFolder />
+			<File Id="tr_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\tr\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="tr" Id="tr_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="6d4ad934-3044-4b2f-9da6-59585486fd77">
+			<CreateFolder />
+			<File Id="tr_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\tr\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="tr" Id="tr_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="2068a242-7b08-4ad9-8a84-4ddb8eec2291">
+			<CreateFolder />
+			<File Id="tr_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="tr" Id="tr_Microsoft.CodeAnalysis.Features.resources.dll" Guid="e36f2ed5-0532-45e5-b1fa-a2731e9200f9">
+			<CreateFolder />
+			<File Id="tr_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\tr\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="tr" Id="tr_Microsoft.CodeAnalysis.resources.dll" Guid="fd44eafa-39aa-409c-b9b5-b5bb5f050e3d">
+			<CreateFolder />
+			<File Id="tr_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\tr\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="tr" Id="tr_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="0bb92179-40ad-4de8-88ec-d6e4fbda3b1e">
+			<CreateFolder />
+			<File Id="tr_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hans" Id="zh.Hans_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="c51a222a-eaa3-4ae1-8766-74c512cdb9b4">
+			<CreateFolder />
+			<File Id="zh.Hans_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hans\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hans" Id="zh.Hans_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="4e928a2d-9976-4ed3-ba33-da250ea94f45">
+			<CreateFolder />
+			<File Id="zh.Hans_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hans" Id="zh.Hans_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="7518f5ff-0d90-4e73-93a6-47c7059f93ff">
+			<CreateFolder />
+			<File Id="zh.Hans_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hans" Id="zh.Hans_Microsoft.CodeAnalysis.Features.resources.dll" Guid="f2511e0e-a45a-4aa7-8d34-4d6b7832b7e5">
+			<CreateFolder />
+			<File Id="zh.Hans_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hans\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hans" Id="zh.Hans_Microsoft.CodeAnalysis.resources.dll" Guid="9ab10f9d-3269-4ff1-a586-b4d06f7cf055">
+			<CreateFolder />
+			<File Id="zh.Hans_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hans\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hans" Id="zh.Hans_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="04151908-2470-426f-b442-f3d85b72d37b">
+			<CreateFolder />
+			<File Id="zh.Hans_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hant" Id="zh.Hant_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" Guid="cc03cb8d-284a-47b3-9488-8526ca669823">
+			<CreateFolder />
+			<File Id="zh.Hant_Microsoft.CodeAnalysis.CSharp.Features.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hant\Microsoft.CodeAnalysis.CSharp.Features.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hant" Id="zh.Hant_Microsoft.CodeAnalysis.CSharp.resources.dll" Guid="c7086d39-8503-4f11-a499-fdfbf4f63ced">
+			<CreateFolder />
+			<File Id="zh.Hant_Microsoft.CodeAnalysis.CSharp.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hant" Id="zh.Hant_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" Guid="65a36bf2-da71-448b-9bd7-f9e1e80396f5">
+			<CreateFolder />
+			<File Id="zh.Hant_Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hant" Id="zh.Hant_Microsoft.CodeAnalysis.Features.resources.dll" Guid="7fb914ad-fffd-4791-8606-7cf0b9062d3c">
+			<CreateFolder />
+			<File Id="zh.Hant_Microsoft.CodeAnalysis.Features.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hant\Microsoft.CodeAnalysis.Features.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hant" Id="zh.Hant_Microsoft.CodeAnalysis.resources.dll" Guid="1f14bb90-4ac0-468d-96f3-efe61b94cc05">
+			<CreateFolder />
+			<File Id="zh.Hant_Microsoft.CodeAnalysis.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hant\Microsoft.CodeAnalysis.resources.dll" />
+		</Component>
+		<Component Directory="zh.Hant" Id="zh.Hant_Microsoft.CodeAnalysis.Workspaces.resources.dll" Guid="326cae79-d38c-41f1-ab06-d45b7b60ecab">
+			<CreateFolder />
+			<File Id="zh.Hant_Microsoft.CodeAnalysis.Workspaces.resources.dll" KeyPath="yes" Source="SourceDir\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
+		</Component>
+
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>

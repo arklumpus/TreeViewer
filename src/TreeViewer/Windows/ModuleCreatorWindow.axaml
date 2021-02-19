@@ -1,0 +1,262 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        xmlns:mdc="clr-namespace:VectSharp.MarkdownCanvas;assembly=VectSharp.MarkdownCanvas"
+        mc:Ignorable="d" Width="800" Height="600"
+        x:Class="TreeViewer.ModuleCreatorWindow"
+        Title="Module creator" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Window.Styles>
+    <Style Selector="TabControl">
+      <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+    <Style Selector="TabControl WrapPanel">
+      <Setter Property="Background" Value="#2B579A"/>
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="Height" Value="25"/>
+      <Setter Property="MinHeight" Value="25"/>
+      <Setter Property="FontSize" Value="17"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="#2B579A"/>
+      <Setter Property="Foreground" Value="#F5F5F5"/>
+      <Setter Property="Margin" Value="0 0 0 0"/>
+      <Setter Property="Padding" Value="10 0"/>
+    </Style>
+
+    <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#124078"/>
+      <Setter Property="TextBlock.Foreground" Value="#F5F5F5" />
+    </Style>
+
+    <Style Selector="TabItem:focus">
+      <Setter Property="Foreground" Value="#2B579A"/>
+      <Setter Property="Margin" Value="0 0 0 0"/>
+      <Setter Property="Padding" Value="10 0"/>
+    </Style>
+    <Style Selector="TabItem:focus /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+
+    <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="TextBlock.Foreground" Value="#2B579A" />
+    </Style>
+
+
+    <Style Selector="TabItem:selected">
+      <Setter Property="Foreground" Value="#2B579A"/>
+      <Setter Property="Margin" Value="0 0 0 0"/>
+      <Setter Property="Padding" Value="10 0"/>
+    </Style>
+    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+
+  </Window.Styles>
+  <Window.Resources>
+    <SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill"></SolidColorBrush>
+  </Window.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="2" />
+      <RowDefinition Height="1*" />
+    </Grid.RowDefinitions>
+    <DockPanel>
+      <NativeMenuBar DockPanel.Dock="Top"></NativeMenuBar>
+    </DockPanel>
+    <Canvas Background="#f0f0f0" Grid.Row="1"></Canvas>
+    <Grid Margin="10" Grid.Row="2">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="1*"/>
+      </Grid.RowDefinitions>
+      <TextBlock FontSize="24" FontWeight="Bold" HorizontalAlignment="Center">Module creator</TextBlock>
+      <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Name="TemplateScrollViewer">
+        <StackPanel Margin="0,0,18,0">
+          <local:Expander Name="RecentFilesExpander">
+            <local:Expander.Label>
+              <TextBlock>Recent Files</TextBlock>
+            </local:Expander.Label>
+            <local:Expander.Child>
+              <Grid Margin="0,10,0,0" Name="RecentFilesGrid">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="1*"/>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock FontWeight="Bold">Template</TextBlock>
+                <TextBlock Grid.Column="1" FontWeight="Bold">Latest save</TextBlock>
+                <Button Grid.Column="2" Grid.ColumnSpan="2" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Name="DeleteAllButton" Margin="5">Delete all</Button>
+                <Canvas Grid.Row="1" Background="#808080" Grid.ColumnSpan="4" Height="1" Margin="0,5,0,0" />
+              </Grid>
+            </local:Expander.Child>
+          </local:Expander>
+          <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0" FontSize="18" FontWeight="Bold">Templates</TextBlock>
+          <Grid HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="128"/>
+              <ColumnDefinition Width="128"/>
+              <ColumnDefinition Width="128"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="128"/>
+              <RowDefinition Height="128"/>
+              <RowDefinition Height="128"/>
+            </Grid.RowDefinitions>
+            <Button Name="FileTypeModuleButton" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.FileTypeTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">File type</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="LoadFileModuleButton" Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.LoadFileTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">Load file</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="TransformerModuleButton" Margin="5" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.TransformerTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1">Transformer</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="FurtherTransformationModuleButton" Margin="5" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.FurtherTransformationTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">Further transformation</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="CoordinatesModuleButton" Margin="5" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.CoordinatesTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">Coordinates</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="PlotActionModuleButton" Margin="5" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.PlotActionTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">Plot action</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="SelectionActionModuleButton" Margin="5" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.SelectionActionTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">Selection action</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="ActionModuleButton" Margin="5" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.ActionTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">Action</TextBlock>
+              </Grid>
+            </Button>
+            <Button Name="MenuActionModuleButton" Margin="5" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
+              <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="resm:TreeViewer.Assets.MenuActionTemplate.png" VerticalAlignment="Center"></Image>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Grid.Row="1" TextWrapping="Wrap" TextAlignment="Center">Menu action</TextBlock>
+              </Grid>
+            </Button>
+          </Grid>
+        </StackPanel>
+      </ScrollViewer>
+      <Grid Grid.Row="1" IsVisible="False" Name="EditorContainerGrid">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="1*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <TabControl Grid.ColumnSpan="5" Name="EditorContainerTabControl">
+          <TabControl.Items>
+            <TabItem Name="EditorContainer">
+              <TabItem.Header>
+                <TextBlock>Source code</TextBlock>
+              </TabItem.Header>
+            </TabItem>
+            <TabItem>
+              <TabItem.Header>
+                <TextBlock>Manual preview</TextBlock>
+              </TabItem.Header>
+              <TabItem.Content>
+                <mdc:MarkdownCanvasControl Name="ManualCanvas" FontSize="18" MaxRenderWidth="1000" />
+              </TabItem.Content>
+            </TabItem>
+          </TabControl.Items>
+        </TabControl>
+
+        <Button Width="100" HorizontalContentAlignment="Center" Grid.Column="1" Grid.Row="1" Name="OKButton" Margin="0,5,0,0">OK</Button>
+        <Button Width="100" HorizontalContentAlignment="Center" Grid.Column="3" Grid.Row="1" Name="CancelButton" Margin="0,5,0,0">Cancel</Button>
+      </Grid>
+    </Grid>
+  </Grid>
+</Window>

@@ -1,0 +1,68 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="8" d:DesignHeight="32"
+             x:Class="TreeViewer.VerticalButton" Background="Transparent">
+  <UserControl.Styles>
+    <Style Selector="Canvas">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="RenderTransform" Value="none" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
+        </Transitions>
+      </Setter>
+    </Style>
+
+    <Style Selector="Canvas#MainCanvas > Ellipse">
+      <Setter Property="Fill" Value="#33000000" />
+    </Style>
+
+    <Style Selector="Canvas#MainCanvas:pointerover > Ellipse">
+      <Setter Property="Fill" Value="#19000000" />
+    </Style>
+
+    <Style Selector="Canvas#MainCanvas.pressed > Ellipse">
+      <Setter Property="Fill" Value="#66000000" />
+    </Style>
+
+    <Style Selector="Canvas#MainCanvas.pressed">
+      <Setter Property="RenderTransform" Value="scale(0.9)" />
+    </Style>
+  </UserControl.Styles>
+  <Viewbox>
+    <Canvas Width="8" Height="32">
+      <Canvas Width="8" Height="32" Name="MainCanvas">
+        <Ellipse Width="8" Height="8"></Ellipse>
+        <Ellipse Width="8" Height="8">
+          <Ellipse.RenderTransform>
+            <TranslateTransform Y="12"></TranslateTransform>
+          </Ellipse.RenderTransform>
+        </Ellipse>
+        <Ellipse Width="8" Height="8">
+          <Ellipse.RenderTransform>
+            <TranslateTransform Y="24"></TranslateTransform>
+          </Ellipse.RenderTransform>
+        </Ellipse>
+      </Canvas>
+    </Canvas>
+  </Viewbox>
+</UserControl>
