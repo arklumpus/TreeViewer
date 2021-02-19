@@ -1,0 +1,53 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="24" d:DesignHeight="24"
+             x:Class="TreeViewer.HelpButton" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15">
+  <UserControl.Styles>
+    <Style Selector="Ellipse#buttonEllipse">
+      <Setter Property="Stroke" Value="#2B579A" />
+      <Setter Property="Fill" Value="#2B579A" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style Selector="Canvas#buttonCanvas.Active">
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="TextBlock#questionMark">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Canvas#buttonCanvas.Active:pointerover Ellipse#buttonEllipse">
+      <Setter Property="Stroke" Value="#2B579A" />
+      <Setter Property="Fill" Value="#f3f9ff" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style Selector="Canvas#buttonCanvas.Active:pointerover TextBlock#questionMark">
+      <Setter Property="Foreground" Value="#2B579A" />
+    </Style>
+  </UserControl.Styles>
+  <Canvas Width="18" Height="18" Margin="3,3,3,3" Name="buttonCanvas" Classes="Active">
+    <Ellipse Name="buttonEllipse" Width="18" Height="18" />
+    <TextBlock Name="questionMark" Text="?" FontWeight="Bold" IsHitTestVisible="False">
+      <TextBlock.RenderTransform>
+        <TranslateTransform X="5.5" Y="-1.5"></TranslateTransform>
+      </TextBlock.RenderTransform>
+    </TextBlock>
+  </Canvas>
+</UserControl>

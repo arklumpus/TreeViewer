@@ -1,0 +1,54 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+             mc:Ignorable="d" d:DesignWidth="64" d:DesignHeight="64"
+             x:Class="TreeViewer.AttachmentItem" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15">
+  <UserControl.Styles>
+    <Style Selector="StackPanel.Attachment Ellipse">
+      <Setter Property="Fill" Value="{x:Null}" />
+    </Style>
+    <Style Selector="StackPanel.Attachment:pointerover Ellipse">
+      <Setter Property="Fill" Value="#D9D9D9" />
+    </Style>
+  </UserControl.Styles>
+  <UserControl.Resources>
+    <ContextMenu x:Key="ContextMenu" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15">
+      <MenuItem Header="Export attachment..." Click="ExportClicked">
+        <MenuItem.Icon>
+          <local:AddRemoveButton ButtonType="Download" IsEnabled="False"></local:AddRemoveButton>
+        </MenuItem.Icon>
+      </MenuItem>
+      <MenuItem Header="Delete attachment" Click="DeleteClicked">
+        <MenuItem.Icon>
+          <local:AddRemoveButton ButtonType="Remove" IsEnabled="False"></local:AddRemoveButton>
+        </MenuItem.Icon>
+      </MenuItem>
+    </ContextMenu>
+  </UserControl.Resources>
+  <StackPanel Width="64" Cursor="Hand" Classes="Attachment">
+    <Canvas Width="32" Height="32">
+      <Ellipse Width="32" Height="32"></Ellipse>
+      <Path Stroke="Black" StrokeThickness="1.5" Data="M-8,0 L1,-9 A3.5,3.5 0 0 1 8,-2 L-4,10 A2.5,2.5 0 0 1 -9,5 L0,-4 A1.5,1.5 0 0 1 3,-1 L-3,5" Margin="16,16,0,0"></Path>
+    </Canvas>
+    <local:TrimmedTextBox MaxTextWidth="64" Name="AttachmentNameBox" HorizontalAlignment="Center"></local:TrimmedTextBox>
+  </StackPanel>
+</UserControl>

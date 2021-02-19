@@ -1,0 +1,11 @@
+Binary/*
+Release/*
+src/.vs
+*.pubxml.user
+*.csproj.user
+*/*/bin/*
+*/*/obj/*
+*/*/nuget.config
+*.wxs
+*.wixobj
+*.wixpdb

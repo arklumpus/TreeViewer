@@ -1,0 +1,76 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="450" Height="250"
+        x:Class="TreeViewer.CustomDashWindow"
+        Title="Custom dash..."  FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="1*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="1*" />
+      <ColumnDefinition Width="1*" />
+    </Grid.ColumnDefinitions>
+    <Grid Margin="0,0,0,10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock VerticalAlignment="Center">Units on:</TextBlock>
+      <NumericUpDown Grid.Column="1" Margin="5,0,0,0" Name="UnitsOnBox" ValueChanged="DashChanged" Minimum="0" VerticalContentAlignment="Center"></NumericUpDown>
+    </Grid>
+    <Grid Grid.Row="1" Margin="0,0,0,10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock VerticalAlignment="Center">Units off:</TextBlock>
+      <NumericUpDown Grid.Column="1" Margin="5,0,0,0" Name="UnitsOffBox" ValueChanged="DashChanged" Minimum="0" VerticalContentAlignment="Center"></NumericUpDown>
+    </Grid>
+    <Grid Grid.RowSpan="2" Grid.Column="2" Margin="10,0,0,10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock VerticalAlignment="Center">Phase:</TextBlock>
+      <NumericUpDown Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" Name="PhaseBox" ValueChanged="DashChanged" VerticalContentAlignment="Center"></NumericUpDown>
+    </Grid>
+    <Grid Grid.ColumnSpan="2" Grid.Row="2">
+      <Viewbox Name="PreviewContainer"></Viewbox>
+    </Grid>
+    <Grid Grid.ColumnSpan="2" Grid.Row="3">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <Button Grid.Column="1" Width="100" Click="OKClicked" HorizontalContentAlignment="Center">OK</Button>
+      <Button Grid.Column="3" Width="100" Click="CancelClicked" HorizontalContentAlignment="Center">Cancel</Button>
+    </Grid>
+  </Grid>
+</Window>

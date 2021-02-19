@@ -1,0 +1,54 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+             mc:Ignorable="d" Width="24" Height="24"
+             x:Class="TreeViewer.AddRemoveButton">
+  <UserControl.Styles>
+    <Style Selector="Ellipse#buttonEllipse">
+      <Setter Property="Stroke" Value="Black" />
+      <Setter Property="Fill" Value="White" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style Selector="Ellipse#buttonEllipse:pointerover">
+      <Setter Property="Stroke" Value="#79aaff" />
+      <Setter Property="Fill" Value="#f3f9ff" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+  </UserControl.Styles>
+  <Canvas Width="18" Height="18" Margin="3,3,3,3">
+    <Ellipse Name="buttonEllipse" Cursor="Hand" Width="18" Height="18" />
+    <Path Name="Add" IsVisible="True" IsHitTestVisible="False" Stroke="#22b14c" StrokeThickness="2" Data="M5,9 L13,9 M9,5 L9,13" StrokeLineCap="Round" />
+    <Path Name="Remove" IsVisible="False" IsHitTestVisible="False" Stroke="#ea1c23" StrokeThickness="2" Data="M5,9 L13,9" StrokeLineCap="Round" />
+    <Path Name="Down" IsVisible="False" IsHitTestVisible="False" Stroke="#00a2e8" StrokeThickness="2" Data="M6,7.5 L9,11.5 L12,7.5" StrokeLineCap="Round" />
+    <Path Name="Up" IsVisible="False" IsHitTestVisible="False" Stroke="#00a2e8" StrokeThickness="2" Data="M6,10.5 L9,6.5 L12,10.5" StrokeLineCap="Round" />
+    <Canvas Name="Edit" IsVisible="False" IsHitTestVisible="False">
+      <Path Stroke="#d74214" StrokeThickness="3.5" Data="M12,6 L12,6" StrokeLineCap="Round" />
+      <Path Stroke="#000000" StrokeThickness="2" Data="M6,12 L6,12" StrokeLineCap="Round" />
+      <Path Fill="#f5b673" Data="M5.5,12.5 L5.5,9.5 L8.5,12.5" />
+      <Path Stroke="#d6a322" StrokeThickness="4" Data="M12,6 L7,11" />
+      <Path Stroke="#fbd734" StrokeThickness="2" Data="M11,6 L6,11" />
+    </Canvas>
+    <Path Name="Cancel" IsVisible="False" IsHitTestVisible="False" Stroke="#ea1c23" StrokeThickness="2" Data="M6,6 L12,12 M12,6 L6,12" StrokeLineCap="Round" />
+    <Path Name="OK" IsVisible="False" IsHitTestVisible="False" Stroke="#22b14c" StrokeThickness="2" Data="M6,9 L9,12 L12,6" StrokeLineCap="Round" />
+    <Path Name="Download" IsVisible="False" IsHitTestVisible="False" Fill="#22b14c" Data="M9,15 L15,9 L11,9 L11,3 L7,3 L7,9 L3,9 Z" ></Path>
+  </Canvas>
+</UserControl>

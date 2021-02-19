@@ -1,0 +1,122 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        xmlns:colorpicker="clr-namespace:AvaloniaColorPicker;assembly=AvaloniaColorPicker"
+        mc:Ignorable="d" Width="800" Height="450"
+        x:Class="TreeViewer.ColourFormatterWindow"
+        Title="Format colour..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="1*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <StackPanel>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+          <TextBlock FontWeight="Bold" FontSize="18" Margin="0,10,0,0" VerticalAlignment="Center">Attribute name:</TextBlock>
+          <TextBox Margin="5,10,0,0" Name="AttributeNameContainer" Grid.Column="1">Colour</TextBox>
+        </Grid>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+          <TextBlock FontWeight="Bold" FontSize="18" Margin="0,10,0,0" VerticalAlignment="Center">Attribute type:</TextBlock>
+          <ComboBox Margin="5,10,0,0" Name="AttributeTypeContainer" SelectedIndex="0" Grid.Column="1" SelectionChanged="AttributeTypeChanged">
+            <ComboBox.Items>
+              <ComboBoxItem>String</ComboBoxItem>
+              <ComboBoxItem>Number</ComboBoxItem>
+            </ComboBox.Items>
+          </ComboBox>
+        </Grid>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+          <TextBlock FontWeight="Bold" FontSize="18" Margin="0,10,0,0" VerticalAlignment="Center">Default colour:</TextBlock>
+          <colorpicker:ColorButton Grid.Column="1" Margin="5,10,0,0" Name="DefaultColourButton" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"></colorpicker:ColorButton>
+        </Grid>
+
+      </StackPanel>
+      <StackPanel Grid.Column="1" Margin="10,0,0,0">
+        <TextBlock FontWeight="Bold" Margin="0,10,0,0" FontSize="18">Options:</TextBlock>
+        <Grid Name="StringOptions" Margin="24,5,0,0" IsVisible="False">
+          <TextBlock FontStyle="Italic">No options available (parse hex string)</TextBlock>
+        </Grid>
+        <Grid Name="NumberOptions" Margin="24,5,0,0" IsVisible="False">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+          <TextBlock VerticalAlignment="Center">Minimum:</TextBlock>
+          <NumericUpDown Grid.Column="1" Margin="5,0,0,0" Name="NumberOptionsMinimumBox" Value="0"></NumericUpDown>
+          <TextBlock VerticalAlignment="Center" Grid.Row="1" Margin="0,10,0,0">Maximum:</TextBlock>
+          <NumericUpDown Grid.Column="1" Margin="5,10,0,0" Name="NumberOptionsMaximumBox" Value="1" Grid.Row="1"></NumericUpDown>
+          <Button Name="GradientButton" Grid.ColumnSpan="2" Grid.Row="2" Height="34" Padding="5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="0,10,0,0" HorizontalAlignment="Stretch">
+            <local:GradientControl Name="GradientButtonControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></local:GradientControl>
+          </Button>
+        </Grid>
+      </StackPanel>
+    </Grid>
+    <StackPanel Name="AlertContainer" Margin="24,5,0,0" Orientation="Horizontal" IsVisible="False" Grid.Row="1">
+
+    </StackPanel>
+    <local:Expander Grid.Row="2" Margin="0,10,0,10" Name="CustomFormatterExpander">
+      <local:Expander.Label>
+        <TextBlock FontWeight="Bold" FontSize="18" VerticalAlignment="Center">Custom formatter</TextBlock>
+      </local:Expander.Label>
+      <!--
+      <local:Expander.Child>
+        <TextBox AcceptsReturn="True" AcceptsTab="True" Name="ConverterCodeBox" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono" ></TextBox>
+      </local:Expander.Child>-->
+    </local:Expander>
+    <Grid Grid.Row="3">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+
+      <Button Grid.Column="1" Width="100" Click="OKButtonClicked" HorizontalContentAlignment="Center">OK</Button>
+      <Button Grid.Column="3" Width="100" Click="CancelButtonClicked" HorizontalContentAlignment="Center">Cancel</Button>
+    </Grid>
+  </Grid>
+</Window>

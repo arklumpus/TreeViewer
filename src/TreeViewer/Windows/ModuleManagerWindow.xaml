@@ -1,0 +1,119 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" Width="800" Height="600"
+        x:Class="TreeViewer.ModuleManagerWindow"
+        Title="Module manager" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Window.Styles>
+    <Style Selector="Button.OpenWindowButton">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="TabControl">
+      <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+    <Style Selector="TabControl WrapPanel">
+      <Setter Property="Background" Value="#2B579A"/>
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="Height" Value="34"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="#2B579A"/>
+      <Setter Property="Foreground" Value="#F5F5F5"/>
+      <Setter Property="Margin" Value="0 0 0 0"/>
+      <Setter Property="Padding" Value="10 0"/>
+    </Style>
+
+    <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#124078"/>
+      <Setter Property="TextBlock.Foreground" Value="#F5F5F5" />
+    </Style>
+
+    <Style Selector="TabItem:focus">
+      <Setter Property="Foreground" Value="#2B579A"/>
+      <Setter Property="Margin" Value="0 0 0 0"/>
+      <Setter Property="Padding" Value="10 0"/>
+    </Style>
+    <Style Selector="TabItem:focus /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+
+    <Style Selector="TabItem TabItem:focus /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#FFFFFF"/>
+    </Style>
+
+    <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="TextBlock.Foreground" Value="#2B579A" />
+    </Style>
+
+
+    <Style Selector="TabItem:selected">
+      <Setter Property="Foreground" Value="#2B579A"/>
+      <Setter Property="Margin" Value="0 0 0 0"/>
+      <Setter Property="Padding" Value="10 0"/>
+    </Style>
+    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+
+    <Style Selector="TabItem TabItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#FFFFFF"/>
+    </Style>
+
+    <Style Selector="TabItem:selected TabItem:selected Button.OpenWindowButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <Style Selector="Border.ModuleButton">
+      <Setter Property="Background" Value="#edf3fc" />
+      <Setter Property="BorderBrush" Value="#bbd0f0"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Margin" Value="5" />
+      <Setter Property="Padding" Value="10" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.ModuleButton:pointerover">
+      <Setter Property="Background" Value="#d9e6fa" />
+      <Setter Property="BorderBrush" Value="#9dbff2"/>
+    </Style>
+  </Window.Styles>
+  <Window.Resources>
+    <SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill"></SolidColorBrush>
+  </Window.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="2" />
+      <RowDefinition Height="1*" />
+    </Grid.RowDefinitions>
+    <DockPanel>
+      <NativeMenuBar DockPanel.Dock="Top"></NativeMenuBar>
+    </DockPanel>
+    <Canvas Background="#f0f0f0" Grid.Row="1"></Canvas>
+    <TabControl Grid.Row="2" Margin="5" Name="MainTabControl">
+    
+    </TabControl>
+  </Grid>
+</Window>

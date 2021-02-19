@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29230.61
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TreeViewer", "TreeViewer\TreeViewer.csproj", "{2D833CF8-10B4-431B-A2A5-27DFFA5A9B41}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TreeViewerCommandLine", "TreeViewerCommandLine\TreeViewerCommandLine.csproj", "{C12A5381-07B8-4607-98AB-888D2E4DB7AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebuggerClient", "DebuggerClient\DebuggerClient.csproj", "{0FDDCF7C-726A-4AAC-8411-842C3467BE6E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildRepositoryModuleDatabase", "BuildRepositoryModuleDatabase\BuildRepositoryModuleDatabase.csproj", "{F2628D05-2AE0-405D-A26A-4AF36192DB3E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elevator", "Elevator\Elevator.csproj", "{559FF9DA-BDF9-44D2-98FF-630B447A0317}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stairs", "Stairs\Stairs.csproj", "{1F889F95-5CEB-40A3-8EEE-D296A1816C26}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D833CF8-10B4-431B-A2A5-27DFFA5A9B41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D833CF8-10B4-431B-A2A5-27DFFA5A9B41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D833CF8-10B4-431B-A2A5-27DFFA5A9B41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D833CF8-10B4-431B-A2A5-27DFFA5A9B41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C12A5381-07B8-4607-98AB-888D2E4DB7AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C12A5381-07B8-4607-98AB-888D2E4DB7AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C12A5381-07B8-4607-98AB-888D2E4DB7AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C12A5381-07B8-4607-98AB-888D2E4DB7AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FDDCF7C-726A-4AAC-8411-842C3467BE6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FDDCF7C-726A-4AAC-8411-842C3467BE6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FDDCF7C-726A-4AAC-8411-842C3467BE6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FDDCF7C-726A-4AAC-8411-842C3467BE6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2628D05-2AE0-405D-A26A-4AF36192DB3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2628D05-2AE0-405D-A26A-4AF36192DB3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2628D05-2AE0-405D-A26A-4AF36192DB3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2628D05-2AE0-405D-A26A-4AF36192DB3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{559FF9DA-BDF9-44D2-98FF-630B447A0317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{559FF9DA-BDF9-44D2-98FF-630B447A0317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{559FF9DA-BDF9-44D2-98FF-630B447A0317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{559FF9DA-BDF9-44D2-98FF-630B447A0317}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F889F95-5CEB-40A3-8EEE-D296A1816C26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F889F95-5CEB-40A3-8EEE-D296A1816C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F889F95-5CEB-40A3-8EEE-D296A1816C26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F889F95-5CEB-40A3-8EEE-D296A1816C26}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {540BC1C4-2FB0-46A8-B223-E854C9864DAD}
+	EndGlobalSection
+EndGlobal

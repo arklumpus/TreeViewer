@@ -1,0 +1,32 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="24" d:DesignHeight="24"
+             x:Class="TreeViewer.OpenWindowButton" Margin="0" Padding="2" Background="Transparent" Cursor="Hand" Classes="OpenWindowButton">
+  <Viewbox>
+    <Canvas Width="24" Height="24" ClipToBounds="True">
+      <!--
+      <Path Data="M16,0 L24,0 L24,8 Z" Fill="Orange" />-->
+      <Path Data="M10,14 L23,1 M16,1 L23,1 L23,8" Stroke="#0072B2" StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round" />
+      <Path Data="M12,6 L1.25,6 L1.25,22.75 L18,22.75 L18,12" StrokeThickness="2.5" Stroke="#009E73" StrokeLineCap="Round" StrokeJoin="Round"/>
+    </Canvas>
+  </Viewbox>
+</UserControl>

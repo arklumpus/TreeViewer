@@ -1,0 +1,90 @@
+﻿<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="950" Height="300"
+        x:Class="TreeViewer.AdvancedOpenWindow"
+        WindowStartupLocation="CenterOwner"
+        Title="Advanced open..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="1*" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="1*" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="1*" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="1*" />
+    </Grid.ColumnDefinitions>
+    <Grid Grid.ColumnSpan="5">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+
+      <CheckBox Grid.Column="1" IsChecked="False" Name="CompileCodePermission" HorizontalAlignment="Center" Checked="CompileCodePermissionChecked" Unchecked="CompileCodePermissionUnchecked">Compile and load source code</CheckBox>
+      <CheckBox Grid.Column="3" IsChecked="False" Name="AddKeyPermission" HorizontalAlignment="Center" Checked="AddKeyPermissionChecked">Store public key</CheckBox>
+    </Grid>
+
+    <Grid Grid.ColumnSpan="5" Grid.Row="1">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="82" />
+        <RowDefinition Height="1*" MinHeight="20" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="150"/>
+        <ColumnDefinition Width="1*"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Center" Text="File type&#10;module" />
+      <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Grid.Column="1" Grid.RowSpan="2">
+        <Grid Name="OpenModuleContainer">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" MinHeight="20" />
+          </Grid.RowDefinitions>
+        </Grid>
+      </ScrollViewer>
+    </Grid>
+
+    <Grid Grid.ColumnSpan="5" Margin="0,0,0,10" Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="150"/>
+        <ColumnDefinition Width="1*"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Center" Text="Load file&#10;module" />
+
+      <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Grid.Column="1">
+        <Grid Name="LoadModuleContainer">
+
+        </Grid>
+      </ScrollViewer>
+    </Grid>
+    <Button Grid.Column="1" Grid.Row="3" Width="100" IsEnabled="False" Name="OKButton" Click="OKButtonClicked" HorizontalContentAlignment="Center">OK</Button>
+    <Button Grid.Column="3" Grid.Row="3" Width="100" Click="CancelButtonClicked" HorizontalContentAlignment="Center">Cancel</Button>
+  </Grid>
+</Window>
