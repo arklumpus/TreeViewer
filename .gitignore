@@ -6,3 +6,6 @@ src/.vs
 */*/bin/*
 */*/obj/*
 */*/nuget.config
+*.wxs
+*.wixobj
+*.wixpdb

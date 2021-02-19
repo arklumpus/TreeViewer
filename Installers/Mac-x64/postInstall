@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-rm -rf $HOME/.local/share/TreeViewer
+rm -rf $HOME/.local/share/TreeViewer/modules*
 
 sudo mkdir -p /usr/local/bin/
 

@@ -13,8 +13,8 @@ del SourceDir\*.pdb
 
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\Roslyn\csi.exe" GenerateFileGuids.csx
 
-candle TreeViewer.wxs
+candle TreeViewer.wxs -ext WixUtilExtension
 
-light -ext WixUIExtension TreeViewer.wixobj
+light -ext WixUIExtension -ext WixUtilExtension TreeViewer.wixobj
 
 ren TreeViewer.msi TreeViewer-Win-x64.msi

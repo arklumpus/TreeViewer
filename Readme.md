@@ -18,10 +18,10 @@ The easiest way to start using TreeViewer is to install the program using the in
 
 ### Windows
 
-Dowload [`TreeViewer-Win-x64.msi`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Win-x64.msi) and double-click it. The installer will guide you through the process, and will do four main things:
+Download [`TreeViewer-Win-x64.msi`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Win-x64.msi) and double-click it (if you get a Windows Defender SmartScreen warning, click on `More info` and choose `Run anyway`). The installer will guide you through the process, and will do four main things:
 
 1. Copy the program files (by default in C:\Program Files).
-2. Delete any settings/downloaded modules from previous versions of TreeVIewer.
+2. Delete any downloaded modules from previous versions of TreeVIewer.
 3. Add the installation path to the PATH environment variable (so that you can recall TreeViewer from the command line, wherever you are located).
 4. Add a shortcut to TreeViewer to the Start Menu.
 
@@ -36,7 +36,7 @@ Installing TreeViewer on macOS is slightly more complicated, due to the draconia
 Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg). Right-click/Ctrl+click it and select `Open`. You should get a warning dialog about the developer not being identified; ignore it and click `Open` in the dialog. The installer should open and guide you through the process. It will do three main things:
 
 1. Copy the TreeViewer app to the `/Applications` folder.
-2. Delete any settings/downloaded modules from previous versions of TreeVIewer.
+2. Delete any downloaded modules from previous versions of TreeVIewer.
 3. Create symlinks to the TreeViewer executables (`TreeViewer` and `TreeViewerCommandLine`) in the `/usr/local/bin` folder.
 
 **Note**: after downloading the installer, you _have to_ right-click or ctrl+click it, otherwise (as per the Apple security policy above), macOS will refuse to let you open it.
@@ -47,7 +47,7 @@ TreeViewer has been tested on macOS Catalina and Big Sur.
 
 ### Linux
 
-sMap has been tested on Debian buster, Ubuntu 20.04 and 20.10, Linux Mint 20.1, openSUSE Leap 15.2, Fedora 33, and CentOS 7 and 8.
+TreeViewer has been tested on Debian buster, Ubuntu 20.04 and 20.10, Linux Mint 20.1, openSUSE Leap 15.2, Fedora 33, and CentOS 7 and 8.
 
 Open a terminal window and download the installer using `wget` or `curl` (whichever you prefer/have available):
 
@@ -58,14 +58,14 @@ wget https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer
 (To use `curl`, replace `wget` with `curl -LO`). Make the downloaded file executable and execute it as root:
 
 ```bash
-chmod +x sMap-linux-x64.run
-su -c "./sMap-linux-x64.run"
+chmod +x TreeViewer-linux-x64.run
+sudo "./TreeViewer-linux-x64.run"
 ```
 
-You should be prompted for the super-user password. The installer will:
+Depending on your system, you may have to replace `sudo` with `su -c`. You should be prompted for the super-user password. The installer will:
 
 1. Copy the TreeViewer files to `/usr/lib/TreeViewer` (this can be changed)
-2. Delete any settings/downloaded modules from previous versions of TreeVIewer.
+2. Delete any downloaded modules from previous versions of TreeViewer.
 3. Create symlinks to the `TreeViewer` and `TreeViewerCommandLine` executables in `/usr/bin` (this step can be skipped).
 4. Add TreeViewer to the Desktop menu (this step can be skipped, but it is highly advised not to skip it, unless you are installing TreeViewer on a headless server without a desktop environment).
 
@@ -120,7 +120,7 @@ Download the [`TreeViewer-Mac-x64.dmg`](https://github.com/arklumpus/TreeViewer/
 
 To start TreeViewer for the first time, you need to go to the `Applications` folder and right-click/ctrl+click on it and choose `Open`; then, confirm that you really want to open the app. This should only be necessary the first time you open the program; afterwards, you should be able to open TreeViewer normally.
 
-You can also create symlinks to the sMap executables in a folder that is included in your `PATH` (such as `/usr/local/bin`): open a terminal and type:
+You can also create symlinks to the TreeViewer executables in a folder that is included in your `PATH` (such as `/usr/local/bin`): open a terminal and type:
 
 ```bash
 ln -s /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewer /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewerCommandLine /usr/local/bin/

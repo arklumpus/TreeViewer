@@ -43,7 +43,9 @@ rm -rf $prefix/TreeViewer
 mv TreeViewer-Linux-x64 $prefix/TreeViewer
 chmod +x $prefix/TreeViewer/TreeViewer $prefix/TreeViewer/TreeViewerCommandLine $prefix/TreeViewer/DebuggerClient
 sed -i "s;@PATHHERE@;$prefix/TreeViewer/TreeViewer;g" $prefix/TreeViewer/io.github.arklumpus.TreeViewer.desktop
-rm -rf $HOME/.local/share/TreeViewer
+
+USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
+rm -rf $USER_HOME/.local/share/TreeViewer/modules*
 
 printf "\nWe will now add TreeViewer to the desktop menu. You\nshould only skip this step if you are installing TreeViewer\non a system without a desktop enviroment.\n"
 

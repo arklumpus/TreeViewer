@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Id="*" Name="TreeViewer" Language="1033" Manufacturer="G. Bianchini" Version="@@VersionHere@@" UpgradeCode="f08be33a-ecc3-4400-8a2f-17afd218d902">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+		<Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" Platform="x64" />
 
     <Upgrade Id='f08be33a-ecc3-4400-8a2f-17afd218d902'>
       <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
@@ -12,7 +12,7 @@
 
     <Media Id='1' Cabinet='TreeViewer.cab' EmbedCab='yes' />
 
-		<Feature Id="Complete" Title="TreeViewer @@VersionHere@@" Level="1" Description="The complete TreeViewer package." ConfigurableDirectory="INSTALLFOLDER" Display='expand' AllowAdvertise='no' InstallDefault='local' Absent='disallow'>
+	<Feature Id="Complete" Title="TreeViewer @@VersionHere@@" Level="1" Description="The complete TreeViewer package." ConfigurableDirectory="INSTALLFOLDER" Display='expand' AllowAdvertise='no' InstallDefault='local' Absent='disallow'>
       <Feature Id='MainProgram' Title='Program' Description='TreeViewer executables and libraries.' Level='1' AllowAdvertise='no' InstallDefault='local' Absent='disallow'>
         <ComponentGroupRef Id="TreeViewerComponent" />
       </Feature>
@@ -25,6 +25,29 @@
       <Component Id="DummyComponent" Guid="a5670c1d-cae1-421c-bbf6-f9dc28f983dd" Directory="INSTALLFOLDER">
       </Component>
     </Feature>
+	
+	<DirectoryRef Id="TARGETDIR">
+		<Merge Id="VCRedist" SourceFile="Microsoft_VC142_CRT_x64.msm" DiskId="1" Language="0"/>
+	</DirectoryRef>
+	
+	<Feature Id="VCRedist" Title="Visual C++ 14.2 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+		<MergeRef Id="VCRedist"/>
+	</Feature>
+	
+	<Property Id="DataFolder" Value="%LocalAppData%\\TreeViewer\\modules" />
+	
+	<!--<Property Id="DataParentFolder" Value="[LocalAppDataFolder]TreeViewer" />-->
+	
+	<DirectoryRef Id="TARGETDIR">
+		<Component Id="DataCleanup" Guid="f639f26d-f657-4699-8ac9-19dc4144fa8c">
+			<RemoveFile Id="RemoveModulesJSON" Name="modules.json" On="both" Directory="DataParentFolder" />
+			<util:RemoveFolderEx On="both" Property="DataFolder" />
+		</Component>
+	</DirectoryRef>
+
+	<Feature Id="DeleteData" Title="Delete application data" AllowAdvertise="no" Display="hidden" Level="1">
+		<ComponentRef Id="DataCleanup" />
+	</Feature>
 
     <UIRef Id="WixUI_FeatureTree" />
     <UIRef Id="WixUI_ErrorProgressText" />
@@ -52,6 +75,10 @@
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ApplicationProgramsFolder" Name="TreeViewer"/>
       </Directory>
+	  <Directory Id="LocalAppDataFolder">
+			<Directory Id="DataParentFolder" Name="TreeViewer">
+			</Directory>
+		</Directory>
 		</Directory>
 	</Fragment>
 
