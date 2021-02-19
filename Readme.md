@@ -18,7 +18,7 @@ The easiest way to start using TreeViewer is to install the program using the in
 
 ### Windows
 
-Dowload [`TreeViewer-Win-x64.msi`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Win-x64.msi) and double-click it. The installer will guide you through the process, and will do three main things:
+Dowload [`TreeViewer-Win-x64.msi`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Win-x64.msi) and double-click it. The installer will guide you through the process, and will do four main things:
 
 1. Copy the program files (by default in C:\Program Files).
 2. Delete any settings/downloaded modules from previous versions of TreeVIewer.
@@ -33,7 +33,7 @@ You can now run TreeViewer using the shortcut that has been created. Alternative
 
 Installing TreeViewer on macOS is slightly more complicated, due to the draconian security policies enforced by Apple (essentially, unless developers pay 99$ to Apple every year, macOS will refuse to trust them).
 
-Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg). Right-click/Ctrl+click it and select `Open`. You should get a warning dialog about the developer not being identified; ignore it and click `Open` in the dialog. The installer should open and guide you through the process. It will do two main things:
+Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg). Right-click/Ctrl+click it and select `Open`. You should get a warning dialog about the developer not being identified; ignore it and click `Open` in the dialog. The installer should open and guide you through the process. It will do three main things:
 
 1. Copy the TreeViewer app to the `/Applications` folder.
 2. Delete any settings/downloaded modules from previous versions of TreeVIewer.
