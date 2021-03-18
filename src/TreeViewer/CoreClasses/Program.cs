@@ -94,7 +94,7 @@ namespace TreeViewer
                 { "welcome", "Show the welcome window.", v => { showWelcome = v != null; } },
                 { "file-associations", "Show the file associations window.", v => { showFileAssociations = v != null; } },
                 { "module-creator", "Start with the module creator window.", v => { moduleCreator = v != null; } },
-                { "set-global={:}{/}{=}", "Set the value of a global setting.", (n, v) => { globalSettingName = n; globalSettingValue = v; } },
+                { "set-global={/}{=}", "Set the value of a global setting.", (n, v) => { globalSettingName = n; globalSettingValue = v; } },
                 { "new-process", "Start a new process, even if another instance of TreeViewer is already running.", (v) => { startNewProcess = v != null; } },
             };
 
