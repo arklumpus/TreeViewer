@@ -135,7 +135,7 @@ namespace Labels
                 ( "Attribute:", "AttributeSelector:Name" ),
 
                 /// <param name="Attribute type:">
-                /// This parameter specifies the type of the attribute used to determine the text of the labels. By default this is `String` of each node is drawn. If the type chosen here does not correspond to the actual type of the attribute
+                /// This parameter specifies the type of the attribute used to determine the text of the labels. By default this is `String`. If the type chosen here does not correspond to the actual type of the attribute
                 /// (e.g. is `Number` is chosen for the `Name` attribute, or `String` is chosen for the `Length` attribute), no label is drawn. If the attribute has values with different types for different nodes, the label is only shown on nodes
                 /// whose attribute type corresponds to the one chosen here.
                 /// </param>

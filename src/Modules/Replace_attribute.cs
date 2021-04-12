@@ -105,6 +105,10 @@ namespace ReplaceAttribute
                 /// the regex).
                 /// </param>
                 ( "Value: ", "TextBox:"),
+				
+				/// <param name="Apply">
+				/// Applies the changes to the other parameter values and triggers an update of the tree.
+				/// </param>
                 ( "Apply", "Button:" )
             };
         }
