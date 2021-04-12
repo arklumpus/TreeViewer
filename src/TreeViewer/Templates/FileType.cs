@@ -65,7 +65,7 @@ namespace @NamespaceHere
         //
         // moduleSuggestions: a list of suggested modules that can be enabled after the file is opened. The first two elements
         //                    are, respectively, the suggested Transformer module and the suggested Coordinates module. The
-        //                    The program intializes the list with default values, and File type and Load files modules can
+        //                    program intialises the list with default values, and File type and Load files modules can
         //                    modify the default suggestions or add additional modules (e.g. plot actions).
         //
         // progressAction: if you can, invoke this Action with an argument corresponding the the progress in opening the file
