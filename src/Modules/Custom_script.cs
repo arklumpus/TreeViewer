@@ -37,7 +37,7 @@ namespace CustomScript
         public const string Name = "Custom script";
         public const string HelpText = "Executes custom code.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "a76d00d2-95e0-4274-a77d-1439a013e3d9";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -94,7 +94,7 @@ namespace CustomScript
         {
             controlStatus = new Dictionary<string, ControlStatus>();
             parametersToChange = new Dictionary<string, object>();
-            return true;
+            return previousParameterValues["Source code:"] != currentParameterValues["Source code:"];
         }
 
         public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
