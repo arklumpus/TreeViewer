@@ -21,6 +21,7 @@ using System.IO;
 using System.Text;
 using PhyloTree;
 using PhyloTree.Formats;
+using TreeViewer;
 
 namespace TreeViewerCommandLine
 {

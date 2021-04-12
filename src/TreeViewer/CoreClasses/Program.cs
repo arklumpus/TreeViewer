@@ -129,31 +129,31 @@ namespace TreeViewer
 
                 if (reallyUnrecognised.Count > 0)
                 {
-                    ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine("Unrecognised argument" + (reallyUnrecognised.Count > 1 ? "s" : "") + ": " + reallyUnrecognised.Aggregate((a, b) => a + " " + b));
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("Unrecognised argument" + (reallyUnrecognised.Count > 1 ? "s" : "") + ": " + reallyUnrecognised.Aggregate((a, b) => a + " " + b));
                     showUsage = true;
                 }
             }
 
             if (showUsage || showHelp)
             {
-                ConsoleWrapper.WriteLine();
-                ConsoleWrapper.WriteLine();
-                ConsoleWrapper.WriteLine("TreeViewer version {0}", Version);
-                ConsoleWrapper.WriteLine();
-                ConsoleWrapper.WriteLine("Usage:");
-                ConsoleWrapper.WriteLine();
-                ConsoleWrapper.WriteLine("  TreeViewer {-h|--help}");
-                ConsoleWrapper.WriteLine("  TreeViewer [options...] [tree_file, [tree_file_2, ...]]");
-                ConsoleWrapper.WriteLine("  TreeViewer [-b] -i <module_file.json.zip> [-i <module_file_2.json.zip> ...]");
-                ConsoleWrapper.WriteLine("  TreeViewer [-b] -u <module_ID> [-u <module_ID_2> ...]");
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("TreeViewer version {0}", Version);
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("Usage:");
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("  TreeViewer {-h|--help}");
+                ConsoleWrapperUI.WriteLine("  TreeViewer [options...] [tree_file, [tree_file_2, ...]]");
+                ConsoleWrapperUI.WriteLine("  TreeViewer [-b] -i <module_file.json.zip> [-i <module_file_2.json.zip> ...]");
+                ConsoleWrapperUI.WriteLine("  TreeViewer [-b] -u <module_ID> [-u <module_ID_2> ...]");
             }
 
             if (showHelp)
             {
-                ConsoleWrapper.WriteLine();
-                ConsoleWrapper.WriteLine("Options:");
-                ConsoleWrapper.WriteLine();
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("Options:");
+                ConsoleWrapperUI.WriteLine();
                 argParser.WriteOptionDescriptions(Console.Out);
                 return 0;
             }
@@ -165,7 +165,7 @@ namespace TreeViewer
 
             if (delay > 0)
             {
-                ConsoleWrapper.EnableConsole();
+                ConsoleWrapperUI.EnableConsole();
                 System.Threading.Thread.Sleep(delay);
             }
 
@@ -186,10 +186,10 @@ namespace TreeViewer
             {
                 if (!startNewProcess)
                 {
-                    ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine("Another instance of TreeViewer is already running. That instance has been signalled.");
-                    ConsoleWrapper.WriteLine("Run TreeViewer with the --new-process switch to force a new process to spawn.");
-                    ConsoleWrapper.WriteLine();
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("Another instance of TreeViewer is already running. That instance has been signalled.");
+                    ConsoleWrapperUI.WriteLine("Run TreeViewer with the --new-process switch to force a new process to spawn.");
+                    ConsoleWrapperUI.WriteLine();
 
                     return 0;
                 }
@@ -208,10 +208,10 @@ namespace TreeViewer
                 }
                 catch (Exception ex)
                 {
-                    ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine("\tAn error has occurred while generating the RSA key pair!");
-                    ConsoleWrapper.WriteLine("\t\t" + ex.Message);
-                    ConsoleWrapper.WriteLine();
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("\tAn error has occurred while generating the RSA key pair!");
+                    ConsoleWrapperUI.WriteLine("\t\t" + ex.Message);
+                    ConsoleWrapperUI.WriteLine();
 
                     return 1;
                 }
@@ -224,7 +224,7 @@ namespace TreeViewer
 
             if (!string.IsNullOrEmpty(globalSettingName))
             {
-                ConsoleWrapper.WriteLine();
+                ConsoleWrapperUI.WriteLine();
 
                 _ = Modules.LoadInstalledModules(true);
 
@@ -236,22 +236,22 @@ namespace TreeViewer
 
                     if (!string.IsNullOrEmpty(globalSettingValue))
                     {
-                        ConsoleWrapper.WriteLine("\tGlobal setting \"" + globalSettingName + "\" has been successfully changed to \"" + globalSettingValue + "\"!");
-                        ConsoleWrapper.WriteLine();
+                        ConsoleWrapperUI.WriteLine("\tGlobal setting \"" + globalSettingName + "\" has been successfully changed to \"" + globalSettingValue + "\"!");
+                        ConsoleWrapperUI.WriteLine();
                     }
                     else
                     {
-                        ConsoleWrapper.WriteLine("\tGlobal setting \"" + globalSettingName + "\" has been reset to the default value!");
-                        ConsoleWrapper.WriteLine();
+                        ConsoleWrapperUI.WriteLine("\tGlobal setting \"" + globalSettingName + "\" has been reset to the default value!");
+                        ConsoleWrapperUI.WriteLine();
                     }
 
                     return 0;
                 }
                 catch (Exception ex)
                 {
-                    ConsoleWrapper.WriteLine("\tAn error has occurred while setting the global setting!");
-                    ConsoleWrapper.WriteLine("\t\t" + ex.Message);
-                    ConsoleWrapper.WriteLine();
+                    ConsoleWrapperUI.WriteLine("\tAn error has occurred while setting the global setting!");
+                    ConsoleWrapperUI.WriteLine("\t\t" + ex.Message);
+                    ConsoleWrapperUI.WriteLine();
 
                     return 1;
                 }
@@ -266,19 +266,19 @@ namespace TreeViewer
             {
                 _ = Modules.LoadInstalledModules(false);
 
-                ConsoleWrapper.WriteLine();
-                ConsoleWrapper.WriteLine("\tExporting all currently installed modules...");
-                ConsoleWrapper.WriteLine();
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("\tExporting all currently installed modules...");
+                ConsoleWrapperUI.WriteLine();
 
                 List<string> exportedModules = ExportAllModules(fetchAssets);
 
-                ConsoleWrapper.WriteLine("\tResetting installed module database...");
+                ConsoleWrapperUI.WriteLine("\tResetting installed module database...");
                 System.IO.File.WriteAllText(Modules.ModuleListPath, "[]");
 
 
-                ConsoleWrapper.WriteLine();
-                ConsoleWrapper.WriteLine("\tRebooting...");
-                ConsoleWrapper.WriteLine();
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("\tRebooting...");
+                ConsoleWrapperUI.WriteLine();
 
                 List<string> newArgs = new List<string>();
 
@@ -326,22 +326,22 @@ namespace TreeViewer
             if (modulesToUninstall.Count > 0)
             {
                 _ = Modules.LoadInstalledModules(false);
-                ConsoleWrapper.WriteLine();
+                ConsoleWrapperUI.WriteLine();
                 for (int i = 0; i < modulesToUninstall.Count; i++)
                 {
                     try
                     {
                         ModuleMetadata.Uninstall(modulesToUninstall[i]);
-                        ConsoleWrapper.WriteLine();
-                        ConsoleWrapper.WriteLine("\tModule {0} uninstalled successfully!", modulesToUninstall[i]);
-                        ConsoleWrapper.WriteLine();
+                        ConsoleWrapperUI.WriteLine();
+                        ConsoleWrapperUI.WriteLine("\tModule {0} uninstalled successfully!", modulesToUninstall[i]);
+                        ConsoleWrapperUI.WriteLine();
                     }
                     catch (Exception ex)
                     {
-                        ConsoleWrapper.WriteLine();
-                        ConsoleWrapper.WriteLine("\tCould not uninstall module {0}!", modulesToUninstall[i]);
-                        ConsoleWrapper.WriteLine("\t\t" + ex.Message);
-                        ConsoleWrapper.WriteLine();
+                        ConsoleWrapperUI.WriteLine();
+                        ConsoleWrapperUI.WriteLine("\tCould not uninstall module {0}!", modulesToUninstall[i]);
+                        ConsoleWrapperUI.WriteLine("\t\t" + ex.Message);
+                        ConsoleWrapperUI.WriteLine();
 
                         return 1;
                     }
@@ -349,9 +349,9 @@ namespace TreeViewer
 
                 if (reboot || modulesToInstall.Count > 0 || cleanCache)
                 {
-                    ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine("\tRebooting...");
-                    ConsoleWrapper.WriteLine();
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("\tRebooting...");
+                    ConsoleWrapperUI.WriteLine();
 
                     List<string> newArgs = new List<string>();
 
@@ -416,9 +416,9 @@ namespace TreeViewer
                     System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Modules.ModulePath, "assets"));
                     System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Modules.ModulePath, "libraries"));
 
-                    ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine("\tModule cache cleaned!");
-                    ConsoleWrapper.WriteLine();
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("\tModule cache cleaned!");
+                    ConsoleWrapperUI.WriteLine();
 
                     if (!reboot && modulesToInstall.Count == 0)
                     {
@@ -427,10 +427,10 @@ namespace TreeViewer
                 }
                 catch (Exception ex)
                 {
-                    ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine("\tCould not clean the module cache!");
-                    ConsoleWrapper.WriteLine("\t\t" + ex.Message);
-                    ConsoleWrapper.WriteLine();
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("\tCould not clean the module cache!");
+                    ConsoleWrapperUI.WriteLine("\t\t" + ex.Message);
+                    ConsoleWrapperUI.WriteLine();
 
                     return 1;
                 }
@@ -439,15 +439,15 @@ namespace TreeViewer
             if (modulesToInstall.Count > 0)
             {
                 _ = Modules.LoadInstalledModules(false);
-                ConsoleWrapper.WriteLine();
+                ConsoleWrapperUI.WriteLine();
                 for (int i = 0; i < modulesToInstall.Count; i++)
                 {
                     try
                     {
                         ModuleMetadata.Install(modulesToInstall[i], installUnsigned, installReferences);
-                        ConsoleWrapper.WriteLine();
-                        ConsoleWrapper.WriteLine("\tModule {0} installed successfully!", modulesToInstall[i]);
-                        ConsoleWrapper.WriteLine();
+                        ConsoleWrapperUI.WriteLine();
+                        ConsoleWrapperUI.WriteLine("\tModule {0} installed successfully!", modulesToInstall[i]);
+                        ConsoleWrapperUI.WriteLine();
 
                         if (deleteModules)
                         {
@@ -460,19 +460,19 @@ namespace TreeViewer
                     }
                     catch (Exception ex)
                     {
-                        ConsoleWrapper.WriteLine();
-                        ConsoleWrapper.WriteLine("\tCould not install module {0}!", modulesToInstall[i]);
-                        ConsoleWrapper.WriteLine("\t\t" + ex.Message);
-                        ConsoleWrapper.WriteLine();
+                        ConsoleWrapperUI.WriteLine();
+                        ConsoleWrapperUI.WriteLine("\tCould not install module {0}!", modulesToInstall[i]);
+                        ConsoleWrapperUI.WriteLine("\t\t" + ex.Message);
+                        ConsoleWrapperUI.WriteLine();
                         return 1;
                     }
                 }
 
                 if (reboot)
                 {
-                    ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine("\tRebooting...");
-                    ConsoleWrapper.WriteLine();
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("\tRebooting...");
+                    ConsoleWrapperUI.WriteLine();
 
                     List<string> newArgs = new List<string>();
 

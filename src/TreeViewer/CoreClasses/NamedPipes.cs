@@ -98,7 +98,7 @@ namespace TreeViewer
                             }
                             catch (Exception ex)
                             {
-                                ConsoleWrapper.WriteLine("The pipe server generated an error and it will be restarted!\n" + ex.Message);
+                                ConsoleWrapperUI.WriteLine("The pipe server generated an error and it will be restarted!\n" + ex.Message);
                             }
                         }
                     }

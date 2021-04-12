@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VectSharp;
+using TreeViewer;
 
 namespace TreeViewerCommandLine
 {
