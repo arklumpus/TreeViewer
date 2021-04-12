@@ -20,7 +20,7 @@ namespace RerootSelectionAction
         public const string Name = "Root tree on selection";
         public const string HelpText = "Re-roots the tree using the selection as outgroup.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "77f387fb-c843-4164-aed2-bd5b8f325809";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
@@ -96,7 +96,7 @@ namespace RerootSelectionAction
             if (index < 0)
             {
                 Action<Dictionary<string, object>> changeParameter = stateData.AddFurtherTransformationModule(module);
-                changeParameter(new Dictionary<string, object>() { { "Outgroup:", selection.GetNodeNames().ToArray() } });
+                changeParameter(new Dictionary<string, object>() { { "Outgroup:", selection.GetNodeNames().ToArray() }, { "Rooting mode:", 1 } });
                 if (InstanceStateData.IsUIAvailable)
                 {
                     _ = window.UpdateFurtherTransformations(index);
@@ -104,7 +104,7 @@ namespace RerootSelectionAction
             }
             else
             {
-                stateData.FurtherTransformationModulesParameterUpdater(index)(new Dictionary<string, object>() { { "Outgroup:", selection.GetNodeNames().ToArray() } });
+                stateData.FurtherTransformationModulesParameterUpdater(index)(new Dictionary<string, object>() { { "Outgroup:", selection.GetNodeNames().ToArray() }, { "Rooting mode:", 1 } });
 
                 if (InstanceStateData.IsUIAvailable)
                 {
