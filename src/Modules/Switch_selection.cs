@@ -19,7 +19,7 @@ namespace SwitchSelectionAction
         public const string Name = "Switch selection";
         public const string HelpText = "Switches the order of the children of the selection.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "0b27abb2-0d48-40c0-9d1e-cfc7ffb7284c";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
@@ -61,7 +61,7 @@ namespace SwitchSelectionAction
 
         public static bool IsAvailable(TreeNode selection, MainWindow window, InstanceStateData stateData)
         {
-            return selection != null;
+            return selection != null && selection.Children.Count > 1;
         }
 
         public static void PerformAction(TreeNode selection, MainWindow window, InstanceStateData stateData)
