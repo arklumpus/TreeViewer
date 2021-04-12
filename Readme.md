@@ -169,7 +169,7 @@ You can use [Microsoft Visual Studio](https://visualstudio.microsoft.com/vs/) to
 
 To fully compile TreeViewer for Windows, macOS and Linux, you will need a computer with Windows 10 with the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) installed and a computer with a recent release of macOS.
 
-First of all, you will need to download the TreeViewer source code: [TreeViewer-1.0.0.tar.gz](https://github.com/arklumpus/TreeViewer/archive/v1.0.0.tar.gz) and extract it somewhere on both the Windows machine and the macOS machine.
+First of all, you will need to download the TreeViewer source code: [TreeViewer-1.0.1.tar.gz](https://github.com/arklumpus/TreeViewer/archive/v1.0.1.tar.gz) and extract it somewhere on both the Windows machine and the macOS machine.
 
 Then, on the Windows machine, open a command-line window in the folder where you have extracted the source code, and type:
 
