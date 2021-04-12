@@ -33,7 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     </Grid.RowDefinitions>
     <TextBlock FontWeight="Bold" FontSize="24">Choose node:</TextBlock>
     <TextBlock FontWeight="Bold" Grid.Row="1" FontSize="18" Margin="0,0,0,5">Last common ancestor of:</TextBlock>
-    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
       <StackPanel Margin="5,0,0,0">
         <StackPanel Name="NodeContainer">
           

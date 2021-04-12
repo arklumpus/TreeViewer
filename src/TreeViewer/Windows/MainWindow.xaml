@@ -75,12 +75,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           <TextBlock FontWeight="Bold" FontSize="18" Margin="0,0,0,5">Attachments</TextBlock>
           <local:AddRemoveButton Grid.Column="1" PointerReleased="AddAttachmentClicked" Name="AddAttachmentButton" IsVisible="False"></local:AddRemoveButton>
         </Grid>
-        <Canvas Grid.Row="3" Background="#B4B4B4" Height="1" Margin="0,5,0,5"></Canvas>
-        <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+        <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
           <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
             <StackPanel Name="AttachmentContainerPanel" Orientation="Horizontal"></StackPanel>
           </StackPanel>
         </ScrollViewer>
+        <Canvas Grid.Row="4" Background="#B4B4B4" Height="1" Margin="0,5,0,5"></Canvas>
         <ScrollViewer Grid.Row="5" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="0,0,17,0" Margin="0,0,-17,0">
           <StackPanel Name="ParameterContainerPanel"></StackPanel>
         </ScrollViewer>

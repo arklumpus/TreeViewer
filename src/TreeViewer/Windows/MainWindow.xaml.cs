@@ -1895,7 +1895,7 @@ namespace TreeViewer
 
                             paramPanel.Children.Add(exp);
 
-                            ScrollViewer valueScroller = new ScrollViewer() { VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto };
+                            ScrollViewer valueScroller = new ScrollViewer() { VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, Padding = new Thickness(0, 0, 0, 16) };
 
                             StackPanel valueContainer = new StackPanel();
 
@@ -3779,7 +3779,7 @@ namespace TreeViewer
             }
         }
 
-        private void BuildAttachmentList()
+        public void BuildAttachmentList()
         {
             this.FindControl<StackPanel>("AttachmentContainerPanel").Children.Clear();
 

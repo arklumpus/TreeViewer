@@ -513,32 +513,6 @@ namespace TreeViewer
                         List<string> originalReferences = new List<string>();
                         string fullSource = editor.FullSource;
 
-                        /*foreach (Assembly ass in AppDomain.CurrentDomain.GetAssemblies())
-                        {
-                            string location = null;
-
-                            try
-                            {
-                                location = ass.Location;
-                            }
-                            catch (NotSupportedException) { };
-
-                            if (!string.IsNullOrEmpty(location))
-                            {
-                                originalReferences.Add(Path.GetFileName(location));
-                            }
-                        }
-
-                        if (!originalReferences.Contains("PhyloTree.TreeNode.dll"))
-                        {
-                            originalReferences.Add("PhyloTree.TreeNode.dll");
-                        }
-
-                        if (!originalReferences.Contains("MuPDFCore.dll"))
-                        {
-                            originalReferences.Add("MuPDFCore.dll");
-                        }*/
-
                         foreach (Microsoft.CodeAnalysis.MetadataReference reference in editor.References)
                         {
                             try
@@ -577,32 +551,6 @@ namespace TreeViewer
                 {
                     handle.WaitOne();
 
-                    /*foreach (Assembly ass in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        string location = null;
-
-                        try
-                        {
-                            location = ass.Location;
-                        }
-                        catch (NotSupportedException) { };
-
-                        if (!string.IsNullOrEmpty(location))
-                        {
-                            originalReferences.Add(Path.GetFileName(location));
-                        }
-                    }
-
-                    if (!originalReferences.Contains("PhyloTree.TreeNode.dll"))
-                    {
-                        originalReferences.Add("PhyloTree.TreeNode.dll");
-                    }
-
-                    if (!originalReferences.Contains("MuPDFCore.dll"))
-                    {
-                        originalReferences.Add("MuPDFCore.dll");
-                    }*/
-
                     foreach (Microsoft.CodeAnalysis.MetadataReference reference in editor.References)
                     {
                         try
@@ -613,16 +561,18 @@ namespace TreeViewer
                     }
 
                     List<string> toBeRemoved = new List<string>();
+                    List<string> newReferences = new List<string>(originalReferences);
 
                     for (int j = 0; j < originalReferences.Count; j++)
                     {
-                        List<string> currentReferences = new List<string>(originalReferences);
+                        List<string> currentReferences = new List<string>(newReferences);
                         currentReferences.Remove(originalReferences[j]);
 
                         try
                         {
                             ModuleMetadata.CreateFromSource(fullSource, currentReferences.ToArray());
                             toBeRemoved.Add(originalReferences[j]);
+                            newReferences = currentReferences;
                         }
                         catch
                         {
@@ -675,7 +625,7 @@ namespace TreeViewer
                 }
                 catch (Exception ex)
                 {
-                    MessageBox box = new MessageBox("Attention", "An error occurred while compiling module!\n" + ex.Message);
+                    MessageBox box = new MessageBox("Attention", "An error occurred while compiling the module!\n" + ex.Message);
                     await box.ShowDialog(this);
                 }
             };

@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using PhyloTree;
 using VectSharp.Canvas;
+using Avalonia.Styling;
 
 namespace TreeViewer
 {
@@ -318,7 +319,14 @@ namespace TreeViewer
                 nodeString.Children.Add(new TextBlock() { Text = "Node:", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, FontWeight = Avalonia.Media.FontWeight.Bold });
                 ScrollViewer nodeStringSV = new ScrollViewer() { VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto };
 
-                nodeStringSV.Content = new TextBlock() { Text = node.ToString(), Margin = new Avalonia.Thickness(5, 0, 0, 0) };
+                string nodeToString = node.ToString();
+
+                if (AvaloniaBugFixes.MeasureTextWidth(nodeToString, FontFamily, Avalonia.Media.FontStyle.Normal, Avalonia.Media.FontWeight.Normal, 15) > 241)
+                {
+                    nodeStringSV.Padding = new Avalonia.Thickness(0, 0, 0, 16);
+                }
+
+                nodeStringSV.Content = new TextBlock() { Text = nodeToString, Margin = new Avalonia.Thickness(5, 0, 0, 0) };
                 Grid.SetColumn(nodeStringSV, 1);
                 nodeString.Children.Add(nodeStringSV);
 
@@ -344,6 +352,10 @@ namespace TreeViewer
 
 
                 TextBox leavesSV = new TextBox() { Margin = new Avalonia.Thickness(5, 0, 0, 0), AcceptsReturn = true, BorderBrush = null, BorderThickness = new Avalonia.Thickness(0), MaxHeight = 150, IsReadOnly = true };
+
+                Style style = new Style(x => x.OfType<ScrollViewer>());
+                style.Setters.Add(new Setter(ScrollViewer.PaddingProperty, new Avalonia.Thickness(0, 0, 0, 16)));
+                leavesSV.Styles.Add(style);
 
                 StringBuilder text = new StringBuilder();
                 for (int i = 0; i < names.Count; i++)

@@ -253,10 +253,10 @@ namespace TreeViewer
                 Grid grd = new Grid();
 
                 grd.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                grd.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                grd.ColumnDefinitions.Add(new ColumnDefinition(64, GridUnitType.Pixel));
                 grd.ColumnDefinitions.Add(new ColumnDefinition(24, GridUnitType.Pixel));
 
-                NumericUpDown nud = new NumericUpDown() { Minimum = 0, Maximum = 1, Margin = new Thickness(5), FormatString = "0.###", Increment = 0.01, Padding = new Thickness(5, 0, 5, 0), Value = stop.Position };
+                NumericUpDown nud = new NumericUpDown() { Minimum = 0, Maximum = 1, Margin = new Thickness(5), FormatString = "0.###", Increment = 0.01, Value = stop.Position, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
                 nud.ValueChanged += (s, e) =>
                 {
                     stop.Position = nud.Value;

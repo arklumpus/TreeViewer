@@ -131,7 +131,7 @@ namespace TreeViewer
             {
                 return "0";
             }
-            else if (val >= 1)
+            else if (Math.Abs(val) >= 1)
             {
                 return "0";
             }

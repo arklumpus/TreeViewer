@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="600" Height="450"
         x:Class="TreeViewer.EditGradientWindow"
-        Title="EditGradientWindow" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Title="Gradient editor" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
         Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
   <Grid Margin="10">
     <Grid.RowDefinitions>
