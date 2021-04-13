@@ -3,4 +3,6 @@ System.Private.CoreLib.dll
 netstandard.dll
 System.Collections.dll
 TreeViewer.dll
+System.Text.RegularExpressions.dll
 PhyloTree.TreeNode.dll
+System.Text.Json.dll
