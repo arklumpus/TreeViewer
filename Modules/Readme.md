@@ -84,6 +84,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Branch score style](10bbbbe1-c634-4582-9073-11f067a54081)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Sets the plot actions to display node scores using the branch colours.
+
+**Module type**: Action
+
+**Module ID**: `10bbbbe1-c634-4582-9073-11f067a54081`
+
+<br />
+
 ### [Cartoon node](0c3400fd-8872-4395-83bc-a5dc5f4967fe)
 
 _Version 1.0.0, by Giorgio Bianchini_
@@ -243,7 +255,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Custom script](a76d00d2-95e0-4274-a77d-1439a013e3d9)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Executes custom code.
 
@@ -255,7 +267,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Custom script](cdb74bfb-8a90-48b3-815a-8f908d2a1ff5)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Executes custom code.
 
@@ -462,6 +474,42 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Polytomise node](19d9a555-07e6-4dac-afc1-d5ffcef35f76)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Transforms nodes into politomies.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `19d9a555-07e6-4dac-afc1-d5ffcef35f76`
+
+<br />
+
+### [Polytomise selection](8202afa4-c9a6-47ac-98d5-dd0190c23f63)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Transforms the selected node into a polytomy.
+
+**Module type**: SelectionAction
+
+**Module ID**: `8202afa4-c9a6-47ac-98d5-dd0190c23f63`
+
+<br />
+
+### [Propagate attribute](85eee26d-29b6-4470-8184-f42ebe9a2567)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Propagates an attribute on the tree.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `85eee26d-29b6-4470-8184-f42ebe9a2567`
+
+<br />
+
 ### [Prune node](ffc97742-4cf5-44ef-81aa-d5b51708a003)
 
 _Version 1.0.0, by Giorgio Bianchini_
@@ -524,7 +572,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Reroot tree](c6f96861-11c0-4853-9738-6a90cc81d660)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Re-roots the tree using the specified outgroup.
 
@@ -536,13 +584,25 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Root tree on selection](77f387fb-c843-4164-aed2-bd5b8f325809)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Re-roots the tree using the selection as outgroup.
 
 **Module type**: SelectionAction
 
 **Module ID**: `77f387fb-c843-4164-aed2-bd5b8f325809`
+
+<br />
+
+### [Resolve polytomy](45e08b70-0852-4141-ac67-8c8cd574926d)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Resolves a polytomy in the tree.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `45e08b70-0852-4141-ac67-8c8cd574926d`
 
 <br />
 
@@ -657,7 +717,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Switch selection](0b27abb2-0d48-40c0-9d1e-cfc7ffb7284c)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Switches the order of the children of the selection.
 
