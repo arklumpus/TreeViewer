@@ -15,7 +15,7 @@ namespace ColorPickerMenuAction
         public const string Name = "Color picker";
         public const string HelpText = "Opens a color picker window.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "5c99fbfb-a6c6-4e07-915d-670b07d255c8";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -36,7 +36,7 @@ namespace ColorPickerMenuAction
         {
             if (Avalonia.Input.KeyboardDevice.Instance.FocusedElement is Avalonia.Controls.TextBox box && box.IsEffectivelyVisible)
             {
-                AvaloniaColorPicker.ColorPickerWindow win = new AvaloniaColorPicker.ColorPickerWindow() { FontFamily = window.FontFamily, FontSize = window.FontSize };
+                AvaloniaColorPicker.ColorPickerWindow win = new AvaloniaColorPicker.ColorPickerWindow() { FontFamily = window.FontFamily, FontSize = window.FontSize, Icon = window.Icon };
                 Avalonia.Media.Color? col = await win.ShowDialog(window);
 
                 if (col != null)
@@ -47,7 +47,7 @@ namespace ColorPickerMenuAction
             }
             else
             {
-                Avalonia.Controls.Window win = new Avalonia.Controls.Window() { FontFamily = window.FontFamily, FontSize = window.FontSize, Title = "Color picker", SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight };
+                Avalonia.Controls.Window win = new Avalonia.Controls.Window() { FontFamily = window.FontFamily, FontSize = window.FontSize, Title = "Color picker", SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight, Icon = window.Icon };
                 win.Content = new AvaloniaColorPicker.ColorPicker() { FontFamily = window.FontFamily };
                 await win.ShowDialog(window);
             }
