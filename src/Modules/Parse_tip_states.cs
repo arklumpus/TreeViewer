@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -39,7 +40,7 @@ namespace ParseTipStates
         public const string Name = "Parse tip states";
         public const string HelpText = "Loads tip state data from an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "716b55a3-02d9-4007-a830-8326d407b24c";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -154,7 +155,7 @@ namespace ParseTipStates
                     separator = new Regex(Regex.Escape(separatorString));
                 }
 
-                string[] attributeNames = (from el in separator.Split(attributeName) where !string.IsNullOrEmpty(el) select el).ToArray();
+                string[] attributeNames = (from el in separator.Split(Regex.Unescape(attributeName)) where !string.IsNullOrEmpty(el) select el).ToArray();
 
                 string[] lines = attachment.GetLines();
 
@@ -209,3 +210,4 @@ namespace ParseTipStates
 
     }
 }
+
