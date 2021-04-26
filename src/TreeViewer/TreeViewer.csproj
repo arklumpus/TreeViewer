@@ -7,8 +7,12 @@
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
     <AssemblyName>TreeViewer</AssemblyName>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <ApplicationIcon>Assets\Program.ico</ApplicationIcon>
+    <Authors>Giorgio Bianchini</Authors>
+    <Company>University of Bristol</Company>
+    <Description>Cross-platform software to draw phylogenetic trees.</Description>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
@@ -27,9 +31,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\ActionTemplate.png" />
     <EmbeddedResource Include="Assets\CoordinatesTemplate.png" />
+    <EmbeddedResource Include="Assets\DarkArrow.png" />
     <EmbeddedResource Include="Assets\FileTypeTemplate.png" />
     <EmbeddedResource Include="Assets\FurtherTransformationTemplate.png" />
     <EmbeddedResource Include="Assets\GenericFileType.png" />
+    <EmbeddedResource Include="Assets\LightArrow.png" />
     <EmbeddedResource Include="Assets\LoadFileTemplate.png" />
     <EmbeddedResource Include="Assets\MacOSPermissionsInstructions.md" />
     <EmbeddedResource Include="Assets\MenuActionTemplate.png" />
@@ -67,6 +73,8 @@
     <Compile Remove="Templates\Transformer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\DarkArrow.png" />
+    <None Remove="Assets\LightArrow.png" />
     <None Remove="Assets\MacOSPermissionsInstructions.md" />
   </ItemGroup>
   <ItemGroup>
@@ -78,20 +86,20 @@
     <EmbeddedResource Include="Fonts\RobotoMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.0" />
+    <PackageReference Include="Avalonia" Version="0.10.2" />
     <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="3.0.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.2" />
     <PackageReference Include="AvaloniaColorPicker" Version="1.0.4" />
     <PackageReference Include="CSharpEditor" Version="1.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
+    <PackageReference Include="MDEdit" Version="0.9.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Mono.Options" Version="6.6.0.161" />
-    <PackageReference Include="MuPDFCore" Version="1.2.6" />
+    <PackageReference Include="MuPDFCore" Version="1.2.7" />
     <PackageReference Include="TreeNode" Version="1.0.4" />
     <PackageReference Include="VectSharp" Version="1.7.0" />
     <PackageReference Include="VectSharp.Canvas" Version="2.1.8" />
-    <PackageReference Include="VectSharp.Markdown" Version="1.0.3" />
-    <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.0.2" />
+    <PackageReference Include="VectSharp.Markdown" Version="1.0.5" />
+    <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.0.5" />
     <PackageReference Include="VectSharp.MuPDFUtils" Version="1.1.3" />
     <PackageReference Include="VectSharp.PDF" Version="2.2.2" />
     <PackageReference Include="VectSharp.SVG" Version="1.3.0" />
