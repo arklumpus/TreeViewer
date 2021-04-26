@@ -219,8 +219,11 @@ namespace NodeBars
             double minY = double.MaxValue;
             double maxY = double.MinValue;
 
+            bool anyPoint = false;
+
             void updateMaxMin(Point pt)
             {
+                anyPoint = true;
                 minX = Math.Min(minX, pt.X);
                 maxX = Math.Max(maxX, pt.X);
                 minY = Math.Min(minY, pt.Y);
@@ -377,6 +380,10 @@ namespace NodeBars
                 }
             }
 
+            if (!anyPoint)
+            {
+                minX = minY = maxX = maxY = 0;
+            }
 
             return new Point[] { new Point(minX, minY), new Point(maxX, maxY) };
         }
