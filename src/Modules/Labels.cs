@@ -26,7 +26,7 @@ namespace Labels
         public const string Name = "Labels";
         public const string HelpText = "Draws labels on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "ac496677-2650-4d92-8646-0812918bab03";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -45,7 +45,7 @@ namespace Labels
                 /// </param>
                 ( "Exclude cartoon nodes", "CheckBox:true" ),
 
-                ( "Position", "Group:2"),
+                ( "Position", "Group:3"),
 
                 //( "Anchor:", "ComboBox:0[\"Node\",\"Mid-branch (rectangular)\",\"Mid-branch (radial)\",\"Mid-branch (circular)\",\"Centre of leaves\"]" ),
 
@@ -82,6 +82,12 @@ namespace Labels
                 /// the `Y` coordinate corresponds to the line perpendicular to this.
                 /// </param>
                 ( "Position:", "Point:[5,0]" ),
+
+                /// <param name="Alignment">
+                /// This parameter determines the alignment of the labels with respect ot the anchor point. If the selected value is `Default`, the label extends outwards when the selected [Anchor](#anchor) is `Node`, `Centre of leaves`
+                /// or `Origin`, and is centered on the anchor when it is `Mid-branch`.
+                /// </param>
+                ( "Alignment:", "ComboBox:0[\"Default\",\"Outwards\",\"Center\",\"Inwards\"]" ),
 
                 ( "Orientation", "Group:3"),
 
@@ -136,7 +142,7 @@ namespace Labels
 
                 /// <param name="Attribute type:">
                 /// This parameter specifies the type of the attribute used to determine the text of the labels. By default this is `String`. If the type chosen here does not correspond to the actual type of the attribute
-                /// (e.g. is `Number` is chosen for the `Name` attribute, or `String` is chosen for the `Length` attribute), no label is drawn. If the attribute has values with different types for different nodes, the label is only shown on nodes
+                /// (e.g. `Number` is chosen for the `Name` attribute, or `String` is chosen for the `Length` attribute), no label is drawn. If the attribute has values with different types for different nodes, the label is only shown on nodes
                 /// whose attribute type corresponds to the one chosen here.
                 /// </param>
                 ( "Attribute type:", "AttributeType:String"),
@@ -247,6 +253,8 @@ namespace Labels
 
             int showOn = (int)parameterValues["Show on:"];
             int anchor = (int)parameterValues["Anchor:"];
+
+            int alignment = (int)parameterValues["Alignment:"];
 
             Point delta = (Point)parameterValues["Position:"];
 
@@ -441,7 +449,7 @@ namespace Labels
 
 
 
-                        double rotationAngle = orientation;
+                        double rotationAngle = 0;
 
                         if (orientationReference > 0 && node.Parent != null)
                         {
@@ -497,6 +505,11 @@ namespace Labels
                         {
                             double referenceAngle = rotationAngle;
 
+                            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out Point coordinateReference))
+                            {
+                                referenceAngle = Math.Atan2(coordinateReference.Y, coordinateReference.X);
+                            }
+
                             if (branchReference == 0)
                             {
                                 point = coordinates[node.Id];
@@ -522,51 +535,148 @@ namespace Labels
                         graphics.Save();
 
                         graphics.Translate(point.X, point.Y);
-
                         graphics.Rotate(rotationAngle);
+
+                        graphics.Translate(delta.X, delta.Y);
+                        graphics.Rotate(orientation);
+
+                        double totalAngle = rotationAngle + orientation;
+
+                        while (totalAngle > Math.PI)
+                        {
+                            totalAngle -= 2 * Math.PI;
+                        }
+
+                        while (totalAngle < -Math.PI)
+                        {
+                            totalAngle += 2 * Math.PI;
+                        }
 
                         if (anchor == 0 || anchor == 4 || anchor == 5)
                         {
                             if (fillColour.A > 0)
                             {
-                                if (Math.Abs(rotationAngle) < Math.PI / 2)
+                                if (Math.Abs(totalAngle) < Math.PI / 2)
                                 {
-                                    graphics.FillText(delta.X, delta.Y, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    if (alignment == 0 || alignment == 1)
+                                    {
+                                        graphics.FillText(0, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 2)
+                                    {
+                                        graphics.FillText(-textSize.Width * 0.5, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 3)
+                                    {
+                                        graphics.FillText(-textSize.Width, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+
                                 }
                                 else
                                 {
                                     graphics.Save();
                                     graphics.Rotate(Math.PI);
-                                    graphics.FillText(-delta.X - textSize.Width, delta.Y, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+
+                                    if (alignment == 0 || alignment == 1)
+                                    {
+                                        graphics.FillText(-textSize.Width, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 2)
+                                    {
+                                        graphics.FillText(-textSize.Width * 0.5, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 3)
+                                    {
+                                        graphics.FillText(0, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+
                                     graphics.Restore();
                                 }
                             }
 
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X, delta.Y - textSize.Height * 0.5), rotationAngle)));
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X, delta.Y + textSize.Height * 0.5), rotationAngle)));
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X + textSize.Width, delta.Y - textSize.Height * 0.5), rotationAngle)));
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X + textSize.Width, delta.Y + textSize.Height * 0.5), rotationAngle)));
+                            if (alignment == 0 || alignment == 1)
+                            {
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width, textSize.Height * 0.5), orientation)), rotationAngle)));
+                            }
+                            else if (alignment == 2)
+                            {
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width * 0.5, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width * 0.5, textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width * 0.5, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width * 0.5, textSize.Height * 0.5), orientation)), rotationAngle)));
+                            }
+                            else if (alignment == 3)
+                            {
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width, textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, textSize.Height * 0.5), orientation)), rotationAngle)));
+                            }
                         }
                         else if (anchor == 1 || anchor == 2 || anchor == 3)
                         {
                             if (fillColour.A > 0)
                             {
-                                if (Math.Abs(rotationAngle) < Math.PI / 2)
+                                if (Math.Abs(totalAngle) < Math.PI / 2)
                                 {
-                                    graphics.FillText(delta.X - textSize.Width * 0.5, delta.Y, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    if (alignment == 0 || alignment == 2)
+                                    {
+                                        graphics.FillText(-textSize.Width * 0.5, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 1)
+                                    {
+                                        graphics.FillText(0, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 3)
+                                    {
+                                        graphics.FillText(-textSize.Width, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
                                 }
                                 else
                                 {
                                     graphics.Save();
                                     graphics.Rotate(Math.PI);
-                                    graphics.FillText(-delta.X - textSize.Width * 0.5, delta.Y, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    if (alignment == 0 || alignment == 2)
+                                    {
+                                        graphics.FillText(-textSize.Width * 0.5, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 1)
+                                    {
+                                        graphics.FillText(-textSize.Width, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+                                    else if (alignment == 3)
+                                    {
+                                        graphics.FillText(0, 0, attributeValue, fnt, fillColour, TextBaselines.Middle, tag: node.Id);
+                                    }
+
                                     graphics.Restore();
                                 }
                             }
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X - textSize.Width * 0.5, delta.Y - textSize.Height * 0.5), rotationAngle)));
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X - textSize.Width * 0.5, delta.Y + textSize.Height * 0.5), rotationAngle)));
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X + textSize.Width * 0.5, delta.Y - textSize.Height * 0.5), rotationAngle)));
-                            updateMaxMin(sumPoint(point, rotatePoint(new Point(delta.X + textSize.Width * 0.5, delta.Y + textSize.Height * 0.5), rotationAngle)));
+
+                            if (alignment == 0 || alignment == 2)
+                            {
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width * 0.5, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width * 0.5, textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width * 0.5, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width * 0.5, textSize.Height * 0.5), orientation)), rotationAngle)));
+                            }
+                            else if (alignment == 1)
+                            {
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(textSize.Width, textSize.Height * 0.5), orientation)), rotationAngle)));
+                            }
+                            else if (alignment == 3)
+                            {
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(-textSize.Width, textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, -textSize.Height * 0.5), orientation)), rotationAngle)));
+                                updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, textSize.Height * 0.5), orientation)), rotationAngle)));
+                            }
                         }
 
                         graphics.Restore();
