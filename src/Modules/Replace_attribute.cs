@@ -26,7 +26,7 @@ namespace ReplaceAttribute
         public const string Name = "Replace attribute";
         public const string HelpText = "Changes the value of an attribute of a node that matches a criterion.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "f17160ad-0462-449a-8a57-e1af775c92ba";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -105,10 +105,10 @@ namespace ReplaceAttribute
                 /// the regex).
                 /// </param>
                 ( "Value: ", "TextBox:"),
-				
-				/// <param name="Apply">
-				/// Applies the changes to the other parameter values and triggers an update of the tree.
-				/// </param>
+                
+                /// <param name="Apply">
+                /// Applies the changes to the other parameter values and triggers an update of the tree.
+                /// </param>
                 ( "Apply", "Button:" )
             };
         }
@@ -272,7 +272,7 @@ namespace ReplaceAttribute
                 {
                     string currentReplacementValue = replacementValue;
 
-                    if (attributeName.Equals(replacementName, StringComparison.OrdinalIgnoreCase) && attrType == "String" && replacementType == "String")
+                    if (attrType == "String" && replacementType == "String" && (attributeName.Equals(replacementName, StringComparison.OrdinalIgnoreCase) || regex))
                     {
                         if (!regex)
                         {
