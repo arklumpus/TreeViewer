@@ -32,26 +32,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <Setter Property="Background" Value="#F5F5F5"/>
     </Style>
     <Style Selector="TabControl WrapPanel">
-      <Setter Property="Background" Value="#2B579A"/>
+      <Setter Property="Background" Value="#0072b2"/>
     </Style>
 
     <Style Selector="TabItem">
       <Setter Property="Height" Value="34"/>
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Background" Value="#2B579A"/>
+      <Setter Property="Background" Value="#0072b2"/>
       <Setter Property="Foreground" Value="#F5F5F5"/>
       <Setter Property="Margin" Value="0 0 0 0"/>
       <Setter Property="Padding" Value="10 0"/>
     </Style>
 
     <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
-      <Setter Property="Background" Value="#124078"/>
+      <Setter Property="Background" Value="#005591"/>
       <Setter Property="TextBlock.Foreground" Value="#F5F5F5" />
     </Style>
 
     <Style Selector="TabItem:focus">
-      <Setter Property="Foreground" Value="#2B579A"/>
+      <Setter Property="Foreground" Value="#0072b2"/>
       <Setter Property="Margin" Value="0 0 0 0"/>
       <Setter Property="Padding" Value="10 0"/>
     </Style>
@@ -64,12 +64,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     </Style>
 
     <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
-      <Setter Property="TextBlock.Foreground" Value="#2B579A" />
+      <Setter Property="TextBlock.Foreground" Value="#0072b2" />
     </Style>
 
 
     <Style Selector="TabItem:selected">
-      <Setter Property="Foreground" Value="#2B579A"/>
+      <Setter Property="Foreground" Value="#0072b2"/>
       <Setter Property="Margin" Value="0 0 0 0"/>
       <Setter Property="Padding" Value="10 0"/>
     </Style>

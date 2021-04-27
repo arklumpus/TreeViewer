@@ -148,8 +148,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           </Slider.Resources>
         </Slider>
         <NumericUpDown Grid.Column="3" Width="140" FormatString="\{0:P0\}" Value="1" Minimum="0" Padding="5,5,5,5" Margin="5,0,5,0" ValueChanged="ZoomNudChanged" Name="ZoomNud" VerticalAlignment="Center"></NumericUpDown>
-        <Button Grid.Column="4" Padding="10,5,10,5" Margin="5,0,5,0" Click="FitZoomButtonClicked" Content="Fit">
-        </Button>
+        <Button Grid.Column="4" Padding="10,5,10,5" Margin="5,0,5,0" Click="FitZoomButtonClicked" Content="Fit" />        
       </Grid>
       <Canvas Grid.Column="3" Grid.RowSpan="3" Background="White" RenderTransform="{Binding #ShowHideSelectionButton.RenderTransform }" />
       <Button Grid.Column="3" Grid.RowSpan="3" Click="ShowHideSelectionClicked" Name="ShowHideSelectionButton" IsEnabled="{Binding Path=$parent[2].IsSelectionAvailable}" VerticalAlignment="Stretch" Padding="5,0,5,0">
@@ -213,7 +212,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           <TextBlock FontWeight="Bold" FontSize="24" Margin="0,0,0,5" Grid.Row="1">Selection actions</TextBlock>
           <Canvas Background="#B4B4B4" Height="1" Margin="0,5,0,5"  Grid.Row="2"></Canvas>
           <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible" Grid.Row="3">
-            <Grid Name="SelectionActionsContainerGrid">
+            <Grid Name="SelectionActionsContainerGrid" Margin="0,0,15,0">
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />

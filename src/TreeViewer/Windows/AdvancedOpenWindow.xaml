@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="950" Height="300"
+        mc:Ignorable="d" Width="950" Height="320"
         x:Class="TreeViewer.AdvancedOpenWindow"
         WindowStartupLocation="CenterOwner"
         Title="Advanced open..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
@@ -54,14 +54,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <Grid Grid.ColumnSpan="5" Grid.Row="1">
       <Grid.RowDefinitions>
         <RowDefinition Height="82" />
-        <RowDefinition Height="1*" MinHeight="20" />
+        <RowDefinition Height="1*" MinHeight="64" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="150"/>
         <ColumnDefinition Width="1*"/>
       </Grid.ColumnDefinitions>
       <TextBlock FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Center" Text="File type&#10;module" />
-      <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Grid.Column="1" Grid.RowSpan="2">
+      <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Grid.Column="1" Margin="7,0,0,0" Padding="0,0,5,0">
         <Grid Name="OpenModuleContainer">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -69,6 +69,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           </Grid.RowDefinitions>
         </Grid>
       </ScrollViewer>
+      <Image Source="resm:TreeViewer.Assets.LightArrow.png" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="64" Height="64" />
     </Grid>
 
     <Grid Grid.ColumnSpan="5" Margin="0,0,0,10" Grid.Row="2">
@@ -78,7 +79,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       </Grid.ColumnDefinitions>
       <TextBlock FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Center" Text="Load file&#10;module" />
 
-      <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Grid.Column="1">
+      <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Grid.Column="1" Margin="7,0,0,0" Padding="0,0,5,0">
         <Grid Name="LoadModuleContainer">
 
         </Grid>

@@ -27,7 +27,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
-
+using Avalonia.Media;
 
 namespace TreeViewer
 {
@@ -119,7 +119,7 @@ namespace TreeViewer
                 content.ColumnDefinitions.Add(new ColumnDefinition(250, GridUnitType.Pixel));
                 content.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
 
-                ScrollViewer scr = new ScrollViewer() { Margin = new Thickness(0, 5, 10, 5), VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
+                ScrollViewer scr = new ScrollViewer() { Margin = new Thickness(0, 5, 10, 5), VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, Padding = new Thickness(0, 0, 10, 0) };
 
                 StackPanel moduleContainer = new StackPanel();
                 moduleContainers[i] = moduleContainer;
@@ -327,20 +327,24 @@ namespace TreeViewer
             progressWindow.Close();
         }
 
-        Dictionary<string, Border> ModuleButtons = new Dictionary<string, Border>();
+        //Dictionary<string, Border> ModuleButtons = new Dictionary<string, Border>();
+        Dictionary<string, CoolButton> ModuleButtons = new Dictionary<string, CoolButton>();
 
         private async Task BuildModuleButton(ModuleHeader header)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                Border brd = new Border() { Classes = new Classes("ModuleButton") };
-                StackPanel pnl = new StackPanel();
-                pnl.Children.Add(new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = header.Name });
+                CoolButton button = new CoolButton() { CornerRadius = new CornerRadius(10), Margin = new Thickness(-5, 0, 0, 0), Hue = 0.98 };
+
+                button.Title = new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = header.Name, Foreground = Brushes.White, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Thickness(10, 5), TextWrapping = TextWrapping.Wrap, TextAlignment = TextAlignment.Center };
+
+                StackPanel pnl = new StackPanel() { Margin = new Thickness(10, 5) };
+                //pnl.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = header.Id.Substring(header.Id.Length - 22) });
+
                 StackPanel idPanel = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
                 idPanel.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = header.Id.Substring(header.Id.Length - 22) });
                 Avalonia.Controls.Shapes.Ellipse notification = new Avalonia.Controls.Shapes.Ellipse() { Width = 10, Height = 10, Margin = new Thickness(5, 0, 0, 0) };
                 notification.Classes.Add("Notification");
-
                 if (!Modules.LoadedModulesMetadata.ContainsKey(header.Id))
                 {
                     notification.Classes.Add("NewModules");
@@ -352,10 +356,11 @@ namespace TreeViewer
 
                 idPanel.Children.Add(notification);
                 pnl.Children.Add(idPanel);
-                pnl.Children.Add(new TextBlock() { Text = header.Author });
-                brd.Child = pnl;
 
-                brd.PointerReleased += async (s, e) =>
+                pnl.Children.Add(new TextBlock() { Text = header.Author });
+                button.ButtonContent = pnl;
+
+                button.Click += async (s, e) =>
                 {
                     ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Downloading module file..." };
                     _ = progressWindow.ShowDialog(this);
@@ -365,9 +370,9 @@ namespace TreeViewer
                     progressWindow.Close();
                 };
 
-                moduleContainers[(int)header.ModuleType].Children.Add(brd);
+                moduleContainers[(int)header.ModuleType].Children.Add(button);
 
-                ModuleButtons[header.Id] = brd;
+                ModuleButtons[header.Id] = button;
             });
 
             if (string.IsNullOrEmpty(selectedModules[(int)header.ModuleType]))

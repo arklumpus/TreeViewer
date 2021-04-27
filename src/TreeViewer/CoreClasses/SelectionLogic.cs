@@ -575,7 +575,7 @@ namespace TreeViewer
                 for (int i = 0; i < Modules.SelectionActionModules.Count; i++)
                 {
                     int index = i;
-                    ((Button)this.FindControl<Grid>("SelectionActionsContainerGrid").Children[i]).IsEnabled = Modules.SelectionActionModules[i].IsAvailable(node, this, this.StateData);
+                    ((Control)this.FindControl<Grid>("SelectionActionsContainerGrid").Children[i]).IsEnabled = Modules.SelectionActionModules[i].IsAvailable(node, this, this.StateData);
                     SelectionActionActions[i] = () =>
                     {
                         Modules.SelectionActionModules[index].PerformAction(node, this, this.StateData);

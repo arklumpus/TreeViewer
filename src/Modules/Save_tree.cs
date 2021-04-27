@@ -10,6 +10,7 @@ using PhyloTree;
 using TreeViewer;
 using VectSharp;
 using PhyloTree.Formats;
+using Avalonia.Media.Imaging;
 
 namespace SaveTree
 {
@@ -57,7 +58,7 @@ namespace SaveTree
         public const string Name = "Save tree";
         public const string HelpText = "Saves the tree file.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "a8f25c08-4935-4fd5-80ea-1d29ada66f1e";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -81,7 +82,10 @@ namespace SaveTree
                 return;
             }
 
-            Window targetChoiceWindow = new Window() { Width = 360, Height = 400, FontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"), FontSize = 15, Title = "Save tree...", WindowStartupLocation = WindowStartupLocation.CenterOwner };
+            Bitmap lightArrowBitmap = new Bitmap(typeof(Modules).Assembly.GetManifestResourceStream("TreeViewer.Assets.LightArrow.png"));
+            Bitmap darkArrowBitmap = new Bitmap(typeof(Modules).Assembly.GetManifestResourceStream("TreeViewer.Assets.DarkArrow.png"));
+
+            Window targetChoiceWindow = new Window() { Width = 600, Height = 600, FontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"), FontSize = 15, Title = "Save tree...", WindowStartupLocation = WindowStartupLocation.CenterOwner, Icon = window.Icon };
 
             Grid targetChoiceGrid = new Grid() { Margin = new Avalonia.Thickness(10) };
             targetChoiceWindow.Content = targetChoiceGrid;
@@ -96,120 +100,147 @@ namespace SaveTree
             targetChoiceGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             targetChoiceGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-            targetChoiceGrid.Children.Add(new TextBlock() { Text = "Choose which tree(s) to save:", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Margin = new Avalonia.Thickness(0, 0, 0, 10) });
+            {
+                Grid headerGrid = new Grid();
+                headerGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                headerGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
 
-            Border originalFileBorder = new Border() { BorderThickness = new Avalonia.Thickness(2), BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(210, 210, 210)), Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240)), CornerRadius = new Avalonia.CornerRadius(10), Width = 180, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Avalonia.Thickness(10) };
-            Grid.SetRow(originalFileBorder, 1);
-            originalFileBorder.Child = new TextBlock() { Text = "Original file", FontStyle = Avalonia.Media.FontStyle.Italic, TextAlignment = Avalonia.Media.TextAlignment.Center, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)) };
-            targetChoiceGrid.Children.Add(originalFileBorder);
+                headerGrid.Children.Add(new TextBlock() { Text = "Choose which tree(s) to save:", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Margin = new Avalonia.Thickness(10, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
+
+                HelpButton moduleHelpButton = new HelpButton() { Margin = new Avalonia.Thickness(10, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                Grid.SetColumn(moduleHelpButton, 1);
+                headerGrid.Children.Add(moduleHelpButton);
+
+                moduleHelpButton.Click += async (s, e) =>
+                {
+                    HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[Id].BuildReadmeMarkdown(), Id);
+
+                    await win.ShowDialog(targetChoiceWindow);
+                };
+
+                targetChoiceGrid.Children.Add(headerGrid);
+            }
+
+            CoolButton originalFileButton = new CoolButton() { CornerRadius = new Avalonia.CornerRadius(10), IsEnabled = false };
+            originalFileButton.Opacity = 0.65;
+            Grid.SetRow(originalFileButton, 1);
 
             {
-                Canvas arrowBody = new Canvas() { Width = 2, Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), Margin = new Avalonia.Thickness(0, 0, 0, 5) };
-                Grid.SetRow(arrowBody, 2);
-                targetChoiceGrid.Children.Add(arrowBody);
+                originalFileButton.Title = new TextBlock() { Text = "Original file", FontWeight = Avalonia.Media.FontWeight.Bold, TextAlignment = Avalonia.Media.TextAlignment.Center, Margin = new Avalonia.Thickness(10, 5), Foreground = Avalonia.Media.Brushes.White };
+                originalFileButton.ButtonContent = new TextBlock() { Text = "The original tree file that has been opened.", Margin = new Avalonia.Thickness(10), TextWrapping = Avalonia.Media.TextWrapping.Wrap, FontSize = 13, TextAlignment = Avalonia.Media.TextAlignment.Center };
+            }
 
-                Canvas arrowPointerCanvas = new Canvas() { Width = 8, Height = 12, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom };
-                Path arrowPointer = new Path() { Fill = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), Data = Avalonia.Media.Geometry.Parse("M0,0 L8,0 L4,12 Z") };
-                arrowPointerCanvas.Children.Add(arrowPointer);
-                Grid.SetRow(arrowPointerCanvas, 2);
-                targetChoiceGrid.Children.Add(arrowPointerCanvas);
+            targetChoiceGrid.Children.Add(originalFileButton);
 
-                Grid actionGrid = new Grid() { Margin = new Avalonia.Thickness(0, 0, 0, 12) };
-                actionGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                actionGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            {
+                Grid arrowGrid = new Grid();
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
 
-                TextBlock actionBlock = new TextBlock() { Text = "Open and load", Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), FontStyle = Avalonia.Media.FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(10, 0, 0, 0) };
-                Grid.SetColumn(actionBlock, 1);
-                actionGrid.Children.Add(actionBlock);
-                Grid.SetRow(actionGrid, 2);
-                targetChoiceGrid.Children.Add(actionGrid);
+                Bitmap fileTypeIcon = new Bitmap(typeof(Modules).Assembly.GetManifestResourceStream("TreeViewer.Assets.FileTypeTemplate.png"));
+                Bitmap openFileIcon = new Bitmap(typeof(Modules).Assembly.GetManifestResourceStream("TreeViewer.Assets.LoadFileTemplate.png"));
+
+                StackPanel moduleIcons = new StackPanel() { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right, Orientation = Avalonia.Layout.Orientation.Horizontal };
+                moduleIcons.Children.Add(new Image() { Source = fileTypeIcon, Height = 32, Margin = new Avalonia.Thickness(0, 0, 5, 0) });
+                moduleIcons.Children.Add(new Image() { Source = openFileIcon, Height = 32 });
+
+                arrowGrid.Children.Add(moduleIcons);
+
+                Image arrow = new Image() { Source = lightArrowBitmap, Width = 48, Height = 48 };
+
+                Grid.SetColumn(arrow, 1);
+
+                arrowGrid.Children.Add(arrow);
+
+
+                TextBlock actionBlock = new TextBlock() { Text = "File type and Load file modules", Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), FontStyle = Avalonia.Media.FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(10, 0, 0, 0) };
+                Grid.SetColumn(actionBlock, 2);
+                arrowGrid.Children.Add(actionBlock);
+                Grid.SetRow(arrowGrid, 2);
+                targetChoiceGrid.Children.Add(arrowGrid);
+            }
+
+            CoolButton loadedTreesButton = new CoolButton() { CornerRadius = new Avalonia.CornerRadius(10) };
+            Grid.SetRow(loadedTreesButton, 3);
+
+            {
+                loadedTreesButton.Title = new TextBlock() { Text = window.Trees.Count > 1 ? (window.Trees.Count.ToString() + " loaded trees") : "Loaded tree", FontWeight = Avalonia.Media.FontWeight.Bold, TextAlignment = Avalonia.Media.TextAlignment.Center, Margin = new Avalonia.Thickness(10, 5), Foreground = Avalonia.Media.Brushes.White };
+                loadedTreesButton.ButtonContent = new TextBlock() { Text = "Saves all the trees that have been loaded, possibly including all the active Transformer, Further transformations, Coordinates and Plot action modules.", Margin = new Avalonia.Thickness(10), TextWrapping = Avalonia.Media.TextWrapping.Wrap, FontSize = 13, TextAlignment = Avalonia.Media.TextAlignment.Center };
+            }
+
+            targetChoiceGrid.Children.Add(loadedTreesButton);
+
+            {
+                Grid arrowGrid = new Grid();
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+                Bitmap transformerIcon = new Bitmap(typeof(Modules).Assembly.GetManifestResourceStream("TreeViewer.Assets.TransformerTemplate.png"));
+                arrowGrid.Children.Add(new Image() { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right, Height = 32, Source = transformerIcon });
+
+                Image arrow = new Image() { Source = darkArrowBitmap, Width = 48, Height = 48 };
+
+                Grid.SetColumn(arrow, 1);
+
+                arrowGrid.Children.Add(arrow);
+
+
+                TextBlock actionBlock = new TextBlock() { Text = "Transformer module", Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), FontStyle = Avalonia.Media.FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(10, 0, 0, 0) };
+                Grid.SetColumn(actionBlock, 2);
+                arrowGrid.Children.Add(actionBlock);
+                Grid.SetRow(arrowGrid, 4);
+                targetChoiceGrid.Children.Add(arrowGrid);
+            }
+
+            CoolButton transformedTreeButton = new CoolButton() { CornerRadius = new Avalonia.CornerRadius(10) };
+            Grid.SetRow(transformedTreeButton, 5);
+
+            {
+                transformedTreeButton.Title = new TextBlock() { Text = "Transformed tree", FontWeight = Avalonia.Media.FontWeight.Bold, TextAlignment = Avalonia.Media.TextAlignment.Center, Margin = new Avalonia.Thickness(10, 5), Foreground = Avalonia.Media.Brushes.White };
+                transformedTreeButton.ButtonContent = new TextBlock() { Text = "Saves the first transformed tree, possibly including all the active Further transformations, Coordinates and Plot action modules.", Margin = new Avalonia.Thickness(10), TextWrapping = Avalonia.Media.TextWrapping.Wrap, FontSize = 13, TextAlignment = Avalonia.Media.TextAlignment.Center };
+            }
+
+            targetChoiceGrid.Children.Add(transformedTreeButton);
+
+            {
+                Grid arrowGrid = new Grid();
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                arrowGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+                Bitmap transformerIcon = new Bitmap(typeof(Modules).Assembly.GetManifestResourceStream("TreeViewer.Assets.FurtherTransformationTemplate.png"));
+                arrowGrid.Children.Add(new Image() { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right, Height = 32, Source = transformerIcon });
+
+                Image arrow = new Image() { Source = darkArrowBitmap, Width = 48, Height = 48 };
+
+                Grid.SetColumn(arrow, 1);
+
+                arrowGrid.Children.Add(arrow);
+
+
+                TextBlock actionBlock = new TextBlock() { Text = "Further transformation modules", Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), FontStyle = Avalonia.Media.FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(10, 0, 0, 0) };
+                Grid.SetColumn(actionBlock, 2);
+                arrowGrid.Children.Add(actionBlock);
+                Grid.SetRow(arrowGrid, 6);
+                targetChoiceGrid.Children.Add(arrowGrid);
+            }
+
+            CoolButton finalTreeButton = new CoolButton() { CornerRadius = new Avalonia.CornerRadius(10) };
+            Grid.SetRow(finalTreeButton, 7);
+
+            {
+                finalTreeButton.Title = new TextBlock() { Text = "Final tree", FontWeight = Avalonia.Media.FontWeight.Bold, TextAlignment = Avalonia.Media.TextAlignment.Center, Margin = new Avalonia.Thickness(10, 5), Foreground = Avalonia.Media.Brushes.White };
+                finalTreeButton.ButtonContent = new TextBlock() { Text = "Saves the final transformed tree, possibly including all the active Coordinates and Plot action modules.", Margin = new Avalonia.Thickness(10), TextWrapping = Avalonia.Media.TextWrapping.Wrap, FontSize = 13, TextAlignment = Avalonia.Media.TextAlignment.Center };
             }
 
 
-            Border loadedTreesBorder = new Border() { Cursor = new Cursor(StandardCursorType.Hand), BorderThickness = new Avalonia.Thickness(2), BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(187, 228, 240)), Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(237, 249, 252)), CornerRadius = new Avalonia.CornerRadius(10), Width = 180, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Avalonia.Thickness(10) };
-            Grid.SetRow(loadedTreesBorder, 3);
-            loadedTreesBorder.Child = new TextBlock() { Text = window.Trees.Count > 1 ? (window.Trees.Count.ToString() + " loaded trees") : "Loaded tree", FontWeight = Avalonia.Media.FontWeight.Bold, TextAlignment = Avalonia.Media.TextAlignment.Center };
-            targetChoiceGrid.Children.Add(loadedTreesBorder);
-
-            {
-                Canvas arrowBody = new Canvas() { Width = 2, Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), Margin = new Avalonia.Thickness(0, 0, 0, 5) };
-                Grid.SetRow(arrowBody, 4);
-                targetChoiceGrid.Children.Add(arrowBody);
-
-                Canvas arrowPointerCanvas = new Canvas() { Width = 8, Height = 12, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom };
-                Path arrowPointer = new Path() { Fill = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), Data = Avalonia.Media.Geometry.Parse("M0,0 L8,0 L4,12 Z") };
-                arrowPointerCanvas.Children.Add(arrowPointer);
-                Grid.SetRow(arrowPointerCanvas, 4);
-                targetChoiceGrid.Children.Add(arrowPointerCanvas);
-
-                Grid actionGrid = new Grid() { Margin = new Avalonia.Thickness(0, 0, 0, 12) };
-                actionGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                actionGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-
-                TextBlock actionBlock = new TextBlock() { Text = "Transformer", Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), FontStyle = Avalonia.Media.FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(10, 0, 0, 0) };
-                Grid.SetColumn(actionBlock, 1);
-                actionGrid.Children.Add(actionBlock);
-                Grid.SetRow(actionGrid, 4);
-                targetChoiceGrid.Children.Add(actionGrid);
-            }
-
-
-            Border transformedTreeBorder = new Border() { Cursor = new Cursor(StandardCursorType.Hand), BorderThickness = new Avalonia.Thickness(2), BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(187, 228, 240)), Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(237, 249, 252)), CornerRadius = new Avalonia.CornerRadius(10), Width = 180, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Avalonia.Thickness(10) };
-            Grid.SetRow(transformedTreeBorder, 5);
-            transformedTreeBorder.Child = new TextBlock() { Text = "Transformed tree", FontWeight = Avalonia.Media.FontWeight.Bold, TextAlignment = Avalonia.Media.TextAlignment.Center };
-            targetChoiceGrid.Children.Add(transformedTreeBorder);
-
-            {
-                Canvas arrowBody = new Canvas() { Width = 2, Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), Margin = new Avalonia.Thickness(0, 0, 0, 5) };
-                Grid.SetRow(arrowBody, 6);
-                targetChoiceGrid.Children.Add(arrowBody);
-
-                Canvas arrowPointerCanvas = new Canvas() { Width = 8, Height = 12, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom };
-                Path arrowPointer = new Path() { Fill = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), Data = Avalonia.Media.Geometry.Parse("M0,0 L8,0 L4,12 Z") };
-                arrowPointerCanvas.Children.Add(arrowPointer);
-                Grid.SetRow(arrowPointerCanvas, 6);
-                targetChoiceGrid.Children.Add(arrowPointerCanvas);
-
-                Grid actionGrid = new Grid() { Margin = new Avalonia.Thickness(0, 0, 0, 12) };
-                actionGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                actionGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-
-                TextBlock actionBlock = new TextBlock() { Text = "Further transformations", Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), FontStyle = Avalonia.Media.FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(10, 0, 0, 0) };
-                Grid.SetColumn(actionBlock, 1);
-                actionGrid.Children.Add(actionBlock);
-                Grid.SetRow(actionGrid, 6);
-                targetChoiceGrid.Children.Add(actionGrid);
-            }
-
-            Border finalTreeBorder = new Border() { Cursor = new Cursor(StandardCursorType.Hand), BorderThickness = new Avalonia.Thickness(2), BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(187, 228, 240)), Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(237, 249, 252)), CornerRadius = new Avalonia.CornerRadius(10), Width = 180, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Avalonia.Thickness(10) };
-            Grid.SetRow(finalTreeBorder, 7);
-            finalTreeBorder.Child = new TextBlock() { Text = "Final tree", FontWeight = Avalonia.Media.FontWeight.Bold, TextAlignment = Avalonia.Media.TextAlignment.Center };
-            targetChoiceGrid.Children.Add(finalTreeBorder);
+            targetChoiceGrid.Children.Add(finalTreeButton);
 
             Button cancelButton = new Button() { Content = "Cancel", Width = 100, Margin = new Avalonia.Thickness(0, 10, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
             Grid.SetRow(cancelButton, 8);
             targetChoiceGrid.Children.Add(cancelButton);
-
-            static void pointerEnter(object sender, PointerEventArgs e)
-            {
-                ((Border)sender).Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(217, 243, 250));
-                ((Border)sender).BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(157, 224, 242));
-            }
-
-            static void pointerLeave(object sender, PointerEventArgs e)
-            {
-                ((Border)sender).Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(237, 249, 252));
-                ((Border)sender).BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(187, 228, 240));
-            }
-
-            loadedTreesBorder.PointerEnter += pointerEnter;
-            transformedTreeBorder.PointerEnter += pointerEnter;
-            finalTreeBorder.PointerEnter += pointerEnter;
-
-            loadedTreesBorder.PointerLeave += pointerLeave;
-            transformedTreeBorder.PointerLeave += pointerLeave;
-            finalTreeBorder.PointerLeave += pointerLeave;
-
 
             int targetChoice = -1;
             cancelButton.Click += (s, e) =>
@@ -218,19 +249,19 @@ namespace SaveTree
                 targetChoiceWindow.Close();
             };
 
-            loadedTreesBorder.PointerReleased += (s, e) =>
+            loadedTreesButton.Click += (s, e) =>
             {
                 targetChoice = 0;
                 targetChoiceWindow.Close();
             };
 
-            transformedTreeBorder.PointerReleased += (s, e) =>
+            transformedTreeButton.Click += (s, e) =>
             {
                 targetChoice = 1;
                 targetChoiceWindow.Close();
             };
 
-            finalTreeBorder.PointerReleased += (s, e) =>
+            finalTreeButton.Click += (s, e) =>
             {
                 targetChoice = 2;
                 targetChoiceWindow.Close();

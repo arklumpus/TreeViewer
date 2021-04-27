@@ -17,7 +17,9 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using System.Collections.Generic;
 
 namespace TreeViewer
 {
@@ -30,19 +32,18 @@ namespace TreeViewer
 
         public PlottingModule Result { get; private set; } = null;
 
+        private List<(CoolButton, Module)> moduleButtons = new List<(CoolButton, Module)>();
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
 
             for (int i = 0; i < Modules.PlottingModules.Count; i++)
             {
-                Border border = new Border() { Classes = new Classes("ModuleButton") };
-                StackPanel panel = new StackPanel() { Margin = new Thickness(10) };
-                border.Child = panel;
+                CoolButton button = new CoolButton() { MinHeight = 60, CornerRadius = new CornerRadius(10) };
+                button.Title = new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, Text = Modules.PlottingModules[i].Name, FontSize = 18, IsHitTestVisible = false, Foreground = Avalonia.Media.Brushes.White, TextAlignment = Avalonia.Media.TextAlignment.Center, Margin = new Thickness(10, 5) };
 
-                panel.Children.Add(new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, Text = Modules.PlottingModules[i].Name, FontSize = 18, IsHitTestVisible = false });
-
-                Grid helpPanel = new Grid();
+                Grid helpPanel = new Grid() { Margin = new Thickness(10) };
                 helpPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
                 helpPanel.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                 helpPanel.Children.Add(new TextBlock() { Text = Modules.PlottingModules[i].HelpText, TextWrapping = Avalonia.Media.TextWrapping.Wrap, IsHitTestVisible = false, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
@@ -53,24 +54,71 @@ namespace TreeViewer
 
                 string moduleId = Modules.PlottingModules[i].Id;
 
-                help.PointerPressed += async (s, e) =>
+                help.PointerPressed += (s, e) =>
                 {
+                    e.Handled = true;
+                };
+
+                help.Click += async (s, e) =>
+                {
+                    e.Handled = true;
                     HelpWindow helpWindow = new HelpWindow(Modules.LoadedModulesMetadata[moduleId].BuildReadmeMarkdown(), moduleId);
                     await helpWindow.ShowDialog(this);
                 };
 
-                panel.Children.Add(helpPanel);
+                button.ButtonContent = helpPanel;
 
                 int j = i;
 
-                border.PointerReleased += (s, e) =>
+                button.Click += (s, e) =>
                 {
                     Result = Modules.PlottingModules[j];
                     this.Close();
                 };
 
-                this.FindControl<StackPanel>("PlottingModulesContainer").Children.Add(border);
+                this.FindControl<StackPanel>("PlottingModulesContainer").Children.Add(button);
+                moduleButtons.Add((button, Modules.PlottingModules[i]));
             }
+
+            this.FindControl<AddRemoveButton>("ClearFilterButton").PointerPressed += (s, e) =>
+            {
+                this.FindControl<TextBox>("FilterBox").Text = "";
+            };
+
+            this.FindControl<TextBox>("FilterBox").PropertyChanged += (s, e) =>
+            {
+                if (e.Property == TextBox.TextProperty)
+                {
+                    string filterText = this.FindControl<TextBox>("FilterBox").Text;
+
+                    if (string.IsNullOrEmpty(filterText))
+                    {
+                        for (int i = 0; i < moduleButtons.Count; i++)
+                        {
+                            moduleButtons[i].Item1.IsVisible = true;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < moduleButtons.Count; i++)
+                        {
+                            if (moduleButtons[i].Item2.Name.Contains(filterText, System.StringComparison.OrdinalIgnoreCase) || moduleButtons[i].Item2.HelpText.Contains(filterText, System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                moduleButtons[i].Item1.IsVisible = true;
+                            }
+                            else
+                            {
+                                moduleButtons[i].Item1.IsVisible = false;
+                            }
+                        }
+                    }
+                }
+            };
+
+            this.Opened += (s, e) =>
+            {
+                this.FindControl<TextBox>("FilterBox").Focus();
+            };
         }
     }
 }

@@ -18,6 +18,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -85,15 +86,15 @@ namespace TreeViewer
             moduleSubMenu.Add(loadItem);
             NativeMenuItem loadRepositoryItem = new NativeMenuItem() { Header = "Load from repository...", Command = new SimpleCommand(win => true, async a => { await LoadFromRepositoryClicked(); }, null, null) };
             moduleSubMenu.Add(loadRepositoryItem);
-            moduleSubMenu.Add(new NativeMenuItemSeperator());
+            moduleSubMenu.Add(new NativeMenuItemSeparator());
             NativeMenuItem installItem = new NativeMenuItem() { Header = "Install...", Command = new SimpleCommand(win => true, a => InstallClicked(null, new EventArgs()), null, null) };
             moduleSubMenu.Add(installItem);
             NativeMenuItem installRepositoryItem = new NativeMenuItem() { Header = "Install from repository...", Command = new SimpleCommand(win => true, async a => { await InstallFromRepositoryClicked(); }, null, null) };
             moduleSubMenu.Add(installRepositoryItem);
-            moduleSubMenu.Add(new NativeMenuItemSeperator());
+            moduleSubMenu.Add(new NativeMenuItemSeparator());
             NativeMenuItem exportItem = new NativeMenuItem() { Header = "Export...", Command = new SimpleCommand(win => true, a => ExportClicked(null, new EventArgs()), null, null) };
             moduleSubMenu.Add(exportItem);
-            moduleSubMenu.Add(new NativeMenuItemSeperator());
+            moduleSubMenu.Add(new NativeMenuItemSeparator());
             NativeMenuItem uninstallItem = new NativeMenuItem() { Header = "Uninstall...", Command = new SimpleCommand(win => true, a => UninstallClicked(null, new EventArgs()), null, null) };
             moduleSubMenu.Add(uninstallItem);
 
@@ -128,7 +129,7 @@ namespace TreeViewer
                 content.ColumnDefinitions.Add(new ColumnDefinition(250, GridUnitType.Pixel));
                 content.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
 
-                ScrollViewer scr = new ScrollViewer() { Margin = new Thickness(0, 5, 10, 5), VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
+                ScrollViewer scr = new ScrollViewer() { Margin = new Thickness(0, 5, 0, 5), VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, Padding = new Thickness(0, 0, 10, 0) };
 
                 StackPanel moduleContainer = new StackPanel();
                 moduleContainers[i] = moduleContainer;
@@ -256,27 +257,29 @@ namespace TreeViewer
             await window.ShowDialog2(this);
         }
 
-        Dictionary<string, Border> ModuleButtons = new Dictionary<string, Border>();
+        Dictionary<string, CoolButton> ModuleButtons = new Dictionary<string, CoolButton>();
 
         internal void BuildModuleButton(KeyValuePair<string, ModuleMetadata> module)
         {
-            Border brd = new Border() { Classes = new Classes("ModuleButton") };
-            StackPanel pnl = new StackPanel();
-            pnl.Children.Add(new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = module.Value.Name });
+            CoolButton button = new CoolButton() { CornerRadius = new CornerRadius(10), Margin = new Thickness(-5, 0, 0, 0) };
+
+            button.Title = new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = module.Value.Name, Foreground = Brushes.White, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Thickness(10, 5), TextWrapping = TextWrapping.Wrap, TextAlignment = TextAlignment.Center };
+
+            StackPanel pnl = new StackPanel() { Margin = new Thickness(10, 5) };
             pnl.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = module.Value.Id.Substring(Math.Max(0, module.Value.Id.Length - 22)) });
             pnl.Children.Add(new TextBlock() { Text = module.Value.Author });
-            brd.Child = pnl;
+            button.ButtonContent = pnl;
 
-            brd.PointerReleased += (s, e) => { SelectModule(module.Key); };
+            button.Click += (s, e) => { SelectModule(module.Key); };
 
-            moduleContainers[(int)module.Value.ModuleType].Children.Add(brd);
+            moduleContainers[(int)module.Value.ModuleType].Children.Add(button);
 
             if (string.IsNullOrEmpty(selectedModules[(int)module.Value.ModuleType]))
             {
                 SelectModule(module.Key);
             }
 
-            ModuleButtons[module.Key] = brd;
+            ModuleButtons[module.Key] = button; 
         }
 
         private void SelectModule(string moduleId)
