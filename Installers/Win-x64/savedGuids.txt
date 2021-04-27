@@ -452,3 +452,6 @@ BuildRepositoryModuleDatabase.deps.json	7cfda201-aaa1-4cfa-84a5-3e4f59912d26
 BuildRepositoryModuleDatabase.dll	9d1fbc06-67f6-4be4-9854-f3fa59a1474a
 BuildRepositoryModuleDatabase.exe	300599cd-7a11-4c9a-917c-3670c4d4f12b
 BuildRepositoryModuleDatabase.runtimeconfig.json	70a29561-71bf-4282-8b14-582ac239c656
+MDEdit.dll	4221eeea-ce61-44a4-b132-848892c8fb00
+MDEdit.xml	25eb1797-5731-44ae-b6fd-695bb150f35a
+System.Text.Json.xml	7f8e4675-f747-429a-a580-c1407b0b8a03
