@@ -12,7 +12,7 @@ cd ../Resources/TreeViewer.app/Contents/MacOs/
 
 chmod +x TreeViewer TreeViewerCommandLine DebuggerClient
 
-version=$(strings TreeViewer.dll | grep -A3 "TreeViewer" | grep -v "TreeViewer" | grep -A2 "Release" | tail -n1)
+version=$(strings TreeViewer.dll | grep -A3 "Cross-platform software to draw phylogenetic trees" | grep -v "TreeViewer" | tail -n1)
 
 echo -e "\033[104m\033[97m Setting version number $version \033[0m"
 echo
