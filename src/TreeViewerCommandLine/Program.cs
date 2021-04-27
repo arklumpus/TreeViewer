@@ -212,6 +212,33 @@ namespace TreeViewerCommandLine
             StateData.GetFurtherTransformationModulesParamters = (index) => FurtherTransformations[index].Item2.Parameters;
             StateData.GetPlottingModulesParameters = (index) => PlotActions[index].Item2.Parameters;
 
+            StateData.OpenFile = (fileName, deleteAfter) =>
+                {
+                    try
+                    {
+                        Program.InputFileName = fileName;
+                        OpenCommand.OpenFile(Program.InputFileName, null);
+                        LoadCommand.LoadFile(null);
+
+                        if (deleteAfter)
+                        {
+                            try
+                            {
+                                File.Delete(fileName);
+                            }
+                            catch { }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ConsoleWrapper.WriteLine();
+                        ConsoleWrapper.WriteLine(new ConsoleTextSpan("    An error occurred while opening the file!\n" + ex.Message, 4, ConsoleColor.Red));
+                        ConsoleWrapper.WriteLine();
+                    }
+                };
+
+            StateData.SerializeAllModules = Program.SerializeAllModules;
+
             ConsoleWrapper.TreatControlCAsInput = true;
 
             Console.OutputEncoding = Encoding.UTF8;
