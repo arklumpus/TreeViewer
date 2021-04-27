@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeViewer.CodeEditorWindow"
-        Title="CodeEditorWindow" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Title="Code editor" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
         Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
   <Grid Margin="10" Name="MainGrid">
     <Grid.RowDefinitions>

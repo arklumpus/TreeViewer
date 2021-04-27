@@ -24,7 +24,7 @@ namespace @NamespaceHere
 
         // This property determines whether the shortcut keys should trigger this module's action even if a text box
         // is focused when they are pressed (e.g. you would not want to hook to the CTRL+A combination if a text box
-        // is focused, because that is used to select all text in the text box.
+        // is focused, because that is used to select all text in the text box).
         public static bool TriggerInTextBox { get; } = false;
 
         // The text of the menu item that triggers this action.

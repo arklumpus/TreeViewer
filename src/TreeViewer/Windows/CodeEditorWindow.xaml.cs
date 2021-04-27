@@ -231,11 +231,6 @@ namespace a" + Guid.NewGuid().ToString().Replace("-", "") + @"
             }
         }
 
-        void SynchronousBreak(CSharpEditor.BreakpointInfo info)
-        {
-            System.Diagnostics.Debug.WriteLine("Hit breakpoint: {0}", info.BreakpointSpan.ToString());
-        }
-
         private void CancelClicked(object sender, RoutedEventArgs e)
         {
             Result = null;

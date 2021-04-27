@@ -32,7 +32,7 @@ namespace @NamespaceHere
         public static bool TriggerInTextBox { get; } = false;
 
         // A short label that will appear on the button for the action. The label can span two lines (use "\n" to enter
-        // a line break, but the text it contains must be very short, in order not to overflow the button's client area.
+        // a line break), but the text it contains must be very short, in order not to overflow the button's client area.
         public static string ButtonText { get; } = "Short\ntext";
 
         // This method returns the icon for the button, as a Page object. The maximum available space is 75x42
