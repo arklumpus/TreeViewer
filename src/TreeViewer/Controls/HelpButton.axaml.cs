@@ -17,7 +17,9 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using System;
 
 namespace TreeViewer
 {
@@ -30,6 +32,24 @@ namespace TreeViewer
             get { return GetValue(IsActiveProperty); }
             set { SetValue(IsActiveProperty, value); }
         }
+
+        public event EventHandler<PointerReleasedEventArgs> Click;
+
+        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        {
+            base.OnPointerReleased(e);
+
+            if (this.IsActive && !e.Handled)
+            {
+                PointerPoint point = e.GetCurrentPoint(this);
+
+                if (point.Position.X >= 0 && point.Position.Y >= 0 && point.Position.X < this.Bounds.Width && point.Position.Y < this.Bounds.Height)
+                {
+                    Click?.Invoke(this, e);
+                }
+            }
+        }
+
 
 
         public HelpButton()
