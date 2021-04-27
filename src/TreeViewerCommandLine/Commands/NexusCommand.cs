@@ -129,14 +129,14 @@ namespace TreeViewerCommandLine
                     {
                         using (Stream sr = Console.OpenStandardOutput())
                         {
-                            ExportToStream(sr, 2, false, false);
+                            ExportToStream(sr, 2, false, false, false);
                         }
                     }
                     else
                     {
                         using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                         {
-                            ExportToStream(fs, 2, false, false);
+                            ExportToStream(fs, 2, false, false, false);
                         }
                     }
                 }
@@ -270,14 +270,14 @@ namespace TreeViewerCommandLine
                         {
                             using (Stream sr = Console.OpenStandardOutput())
                             {
-                                ExportToStream(sr, treeIndex, modules, modules && AskIfShouldAddSignature());
+                                ExportToStream(sr, treeIndex, modules, modules && AskIfShouldAddSignature(), AskIfShouldAddAttachments());
                             }
                         }
                         else
                         {
                             using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                             {
-                                ExportToStream(fs, treeIndex, modules, modules && AskIfShouldAddSignature());
+                                ExportToStream(fs, treeIndex, modules, modules && AskIfShouldAddSignature(), AskIfShouldAddAttachments());
                             }
                         }
                     }
@@ -297,14 +297,14 @@ namespace TreeViewerCommandLine
                         {
                             using (Stream sr = Console.OpenStandardOutput())
                             {
-                                ExportToStream(sr, treeIndex, modules, modules && AskIfShouldAddSignature());
+                                ExportToStream(sr, treeIndex, modules, modules && AskIfShouldAddSignature(), AskIfShouldAddAttachments());
                             }
                         }
                         else
                         {
                             using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                             {
-                                ExportToStream(fs, treeIndex, modules, modules && AskIfShouldAddSignature());
+                                ExportToStream(fs, treeIndex, modules, modules && AskIfShouldAddSignature(), AskIfShouldAddAttachments());
                             }
                         }
                     }
@@ -325,14 +325,14 @@ namespace TreeViewerCommandLine
                         {
                             using (Stream sr = Console.OpenStandardOutput())
                             {
-                                ExportToStream(sr, treeIndex, modules, modules && AskIfShouldAddSignature());
+                                ExportToStream(sr, treeIndex, modules, modules && AskIfShouldAddSignature(), AskIfShouldAddAttachments());
                             }
                         }
                         else
                         {
                             using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                             {
-                                ExportToStream(fs, treeIndex, modules, modules && AskIfShouldAddSignature());
+                                ExportToStream(fs, treeIndex, modules, modules && AskIfShouldAddSignature(), AskIfShouldAddAttachments());
                             }
                         }
                     }
@@ -351,7 +351,7 @@ namespace TreeViewerCommandLine
         {
             ConsoleWrapper.Write(new ConsoleTextSpan[]
             {
-                            new ConsoleTextSpan("Would you like to sign the file? [Y(es)/N(o)] ", ConsoleColor.Yellow)
+                 new ConsoleTextSpan("Would you like to sign the file? [Y(es)/N(o)] ", ConsoleColor.Yellow)
             });
 
             char key2 = '?';
@@ -374,7 +374,41 @@ namespace TreeViewerCommandLine
             }
         }
 
-        void ExportToStream(Stream stream, int subject, bool modules, bool addSignature)
+        public static bool AskIfShouldAddAttachments()
+        {
+            if (Program.StateData.Attachments.Count > 0)
+            {
+                ConsoleWrapper.Write(new ConsoleTextSpan[]
+                {
+                 new ConsoleTextSpan("Would you like to include the attachments? [Y(es)/N(o)] ", ConsoleColor.Yellow)
+                });
+
+                char key2 = '?';
+
+                while (key2 != 'y' && key2 != 'Y' && key2 != 'n' && key2 != 'N')
+                {
+                    key2 = ConsoleWrapper.ReadKey(true).KeyChar;
+                }
+
+                ConsoleWrapper.Write(key2);
+                ConsoleWrapper.WriteLine();
+
+                if (key2 == 'y' || key2 == 'Y')
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        void ExportToStream(Stream stream, int subject, bool modules, bool addSignature, bool includeAttachments)
         {
             using (StreamWriter sw = new StreamWriter(stream))
             {
@@ -464,6 +498,23 @@ namespace TreeViewerCommandLine
                         string serializedModules = Program.SerializeAllModules(TreeViewer.MainWindow.ModuleTarget.ExcludeFurtherTransformation, addSignature);
                         sw.WriteLine("\tLength: " + serializedModules.Length + ";");
                         sw.WriteLine(serializedModules);
+                        sw.WriteLine("End;");
+                    }
+                }
+
+                if (includeAttachments)
+                {
+                    foreach (KeyValuePair<string, Attachment> kvp in Program.StateData.Attachments)
+                    {
+                        sw.WriteLine();
+
+                        sw.WriteLine("Begin Attachment;");
+
+                        sw.WriteLine("\tName: " + kvp.Key + ";");
+                        sw.WriteLine("\tFlags: " + (kvp.Value.StoreInMemory ? "1" : "0") + (kvp.Value.CacheResults ? "1" : "0") + ";");
+                        sw.WriteLine("\tLength: " + kvp.Value.StreamLength + ";");
+                        kvp.Value.WriteBase64Encoded(sw);
+                        sw.WriteLine();
                         sw.WriteLine("End;");
                     }
                 }

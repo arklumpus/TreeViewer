@@ -129,14 +129,14 @@ namespace TreeViewerCommandLine
                     {
                         using (Stream sr = Console.OpenStandardOutput())
                         {
-                            ExportToStream(sr, 2, false, false);
+                            ExportToStream(sr, 2, false, false, false);
                         }
                     }
                     else
                     {
                         using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                         {
-                            ExportToStream(fs, 2, false, false);
+                            ExportToStream(fs, 2, false, false, false);
                         }
                     }
                 }
@@ -270,14 +270,14 @@ namespace TreeViewerCommandLine
                         {
                             using (Stream sr = Console.OpenStandardOutput())
                             {
-                                ExportToStream(sr, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature());
+                                ExportToStream(sr, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature(), NexusCommand.AskIfShouldAddAttachments());
                             }
                         }
                         else
                         {
                             using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                             {
-                                ExportToStream(fs, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature());
+                                ExportToStream(fs, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature(), NexusCommand.AskIfShouldAddAttachments());
                             }
                         }
                     }
@@ -297,14 +297,14 @@ namespace TreeViewerCommandLine
                         {
                             using (Stream sr = Console.OpenStandardOutput())
                             {
-                                ExportToStream(sr, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature());
+                                ExportToStream(sr, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature(), NexusCommand.AskIfShouldAddAttachments());
                             }
                         }
                         else
                         {
                             using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                             {
-                                ExportToStream(fs, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature());
+                                ExportToStream(fs, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature(), NexusCommand.AskIfShouldAddAttachments());
                             }
                         }
                     }
@@ -325,14 +325,14 @@ namespace TreeViewerCommandLine
                         {
                             using (Stream sr = Console.OpenStandardOutput())
                             {
-                                ExportToStream(sr, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature());
+                                ExportToStream(sr, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature(), NexusCommand.AskIfShouldAddAttachments());
                             }
                         }
                         else
                         {
                             using (FileStream fs = new FileStream(lastFileName, FileMode.Create))
                             {
-                                ExportToStream(fs, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature());
+                                ExportToStream(fs, treeIndex, modules, modules && NexusCommand.AskIfShouldAddSignature(), NexusCommand.AskIfShouldAddAttachments());
                             }
                         }
                     }
@@ -347,78 +347,271 @@ namespace TreeViewerCommandLine
 
         }
 
-        void ExportToStream(Stream stream, int subject, bool modules, bool addSignature)
+        void ExportToStream(Stream stream, int subject, bool modules, bool addSignature, bool includeAttachments)
         {
             if (subject == 0)
             {
                 if (modules)
                 {
-                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                    string tempFile = System.IO.Path.GetTempFileName();
+                    using (System.IO.FileStream ms = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite))
                     {
                         using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true))
                         {
+                            bw.Write((byte)0);
+                            bw.Write((byte)0);
+                            bw.Write((byte)0);
                             bw.Write("#TreeViewer");
-                            bw.Write(Program.SerializeAllModules(TreeViewer.MainWindow.ModuleTarget.AllModules, addSignature));
+                            bw.Write(Program.SerializeAllModules(MainWindow.ModuleTarget.AllModules, addSignature));
+
+                            if (includeAttachments)
+                            {
+                                bw.Write("#Attachments");
+                                bw.Write(Program.StateData.Attachments.Count);
+
+                                foreach (KeyValuePair<string, Attachment> kvp in Program.StateData.Attachments)
+                                {
+                                    bw.Write(kvp.Key);
+                                    bw.Write(2);
+                                    bw.Write(kvp.Value.StoreInMemory);
+                                    bw.Write(kvp.Value.CacheResults);
+                                    bw.Write(kvp.Value.StreamLength);
+                                    bw.Flush();
+
+                                    kvp.Value.WriteToStream(ms);
+                                }
+                            }
+
                             bw.Flush();
-                            bw.Write(ms.Position);
+                            bw.Write(ms.Position - 3);
                         }
 
                         ms.Seek(0, System.IO.SeekOrigin.Begin);
 
                         BinaryTree.WriteAllTrees(Program.Trees, stream, additionalDataToCopy: ms);
                     }
+
+                    System.IO.File.Delete(tempFile);
                 }
                 else
                 {
-                    BinaryTree.WriteAllTrees(Program.Trees, stream);
+                    if (!includeAttachments)
+                    {
+                        BinaryTree.WriteAllTrees(Program.Trees, stream);
+                    }
+                    else
+                    {
+                        string tempFile = System.IO.Path.GetTempFileName();
+                        using (System.IO.FileStream ms = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite))
+                        {
+                            using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true))
+                            {
+                                bw.Write((byte)0);
+                                bw.Write((byte)0);
+                                bw.Write((byte)0);
+                                bw.Write("#Attachments");
+                                bw.Write(Program.StateData.Attachments.Count);
+
+                                foreach (KeyValuePair<string, Attachment> kvp in Program.StateData.Attachments)
+                                {
+                                    bw.Write(kvp.Key);
+                                    bw.Write(2);
+                                    bw.Write(kvp.Value.StoreInMemory);
+                                    bw.Write(kvp.Value.CacheResults);
+                                    bw.Write(kvp.Value.StreamLength);
+                                    bw.Flush();
+
+                                    kvp.Value.WriteToStream(ms);
+                                }
+
+                                bw.Flush();
+                                bw.Write(ms.Position - 3);
+                            }
+
+                            ms.Seek(0, System.IO.SeekOrigin.Begin);
+
+                            BinaryTree.WriteAllTrees(Program.Trees, stream, additionalDataToCopy: ms);
+                        }
+
+                        System.IO.File.Delete(tempFile);
+                    }
                 }
             }
             else if (subject == 1)
             {
                 if (modules)
                 {
-                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                    string tempFile = System.IO.Path.GetTempFileName();
+                    using (System.IO.FileStream ms = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite))
                     {
                         using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true))
                         {
+                            bw.Write((byte)0);
+                            bw.Write((byte)0);
+                            bw.Write((byte)0);
                             bw.Write("#TreeViewer");
-                            bw.Write(Program.SerializeAllModules(TreeViewer.MainWindow.ModuleTarget.ExcludeTransform, addSignature));
+                            bw.Write(Program.SerializeAllModules(MainWindow.ModuleTarget.ExcludeTransform, addSignature));
+
+                            if (includeAttachments)
+                            {
+                                bw.Write("#Attachments");
+                                bw.Write(Program.StateData.Attachments.Count);
+
+                                foreach (KeyValuePair<string, Attachment> kvp in Program.StateData.Attachments)
+                                {
+                                    bw.Write(kvp.Key);
+                                    bw.Write(2);
+                                    bw.Write(kvp.Value.StoreInMemory);
+                                    bw.Write(kvp.Value.CacheResults);
+                                    bw.Write(kvp.Value.StreamLength);
+                                    bw.Flush();
+
+                                    kvp.Value.WriteToStream(ms);
+                                }
+                            }
+
                             bw.Flush();
-                            bw.Write(ms.Position);
+                            bw.Write(ms.Position - 3);
                         }
 
                         ms.Seek(0, System.IO.SeekOrigin.Begin);
 
                         BinaryTree.WriteAllTrees(new TreeNode[] { Program.FirstTransformedTree }, stream, additionalDataToCopy: ms);
                     }
+                    System.IO.File.Delete(tempFile);
                 }
                 else
                 {
-                    BinaryTree.WriteAllTrees(new TreeNode[] { Program.FirstTransformedTree }, stream);
+                    if (!includeAttachments)
+                    {
+                        BinaryTree.WriteAllTrees(new TreeNode[] { Program.FirstTransformedTree }, stream);
+                    }
+                    else
+                    {
+
+                        string tempFile = System.IO.Path.GetTempFileName();
+                        using (System.IO.FileStream ms = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite))
+                        {
+                            using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true))
+                            {
+                                bw.Write((byte)0);
+                                bw.Write((byte)0);
+                                bw.Write((byte)0);
+                                bw.Write("#Attachments");
+                                bw.Write(Program.StateData.Attachments.Count);
+
+                                foreach (KeyValuePair<string, Attachment> kvp in Program.StateData.Attachments)
+                                {
+                                    bw.Write(kvp.Key);
+                                    bw.Write(2);
+                                    bw.Write(kvp.Value.StoreInMemory);
+                                    bw.Write(kvp.Value.CacheResults);
+                                    bw.Write(kvp.Value.StreamLength);
+                                    bw.Flush();
+
+                                    kvp.Value.WriteToStream(ms);
+                                }
+
+                                bw.Flush();
+                                bw.Write(ms.Position - 3);
+                            }
+
+                            ms.Seek(0, System.IO.SeekOrigin.Begin);
+
+                            BinaryTree.WriteAllTrees(new TreeNode[] { Program.FirstTransformedTree }, stream, additionalDataToCopy: ms);
+                        }
+
+                        System.IO.File.Delete(tempFile);
+                    }
                 }
             }
             else if (subject == 2)
             {
                 if (modules)
                 {
-                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                    string tempFile = System.IO.Path.GetTempFileName();
+                    using (System.IO.FileStream ms = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite))
                     {
                         using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true))
                         {
+                            bw.Write((byte)0);
+                            bw.Write((byte)0);
+                            bw.Write((byte)0);
                             bw.Write("#TreeViewer");
-                            bw.Write(Program.SerializeAllModules(TreeViewer.MainWindow.ModuleTarget.ExcludeFurtherTransformation, addSignature));
+                            bw.Write(Program.SerializeAllModules(MainWindow.ModuleTarget.ExcludeFurtherTransformation, addSignature));
+
+                            if (includeAttachments)
+                            {
+                                bw.Write("#Attachments");
+                                bw.Write(Program.StateData.Attachments.Count);
+
+                                foreach (KeyValuePair<string, Attachment> kvp in Program.StateData.Attachments)
+                                {
+                                    bw.Write(kvp.Key);
+                                    bw.Write(2);
+                                    bw.Write(kvp.Value.StoreInMemory);
+                                    bw.Write(kvp.Value.CacheResults);
+                                    bw.Write(kvp.Value.StreamLength);
+                                    bw.Flush();
+
+                                    kvp.Value.WriteToStream(ms);
+                                }
+                            }
+
                             bw.Flush();
-                            bw.Write(ms.Position);
+                            bw.Write(ms.Position - 3);
                         }
 
                         ms.Seek(0, System.IO.SeekOrigin.Begin);
 
                         BinaryTree.WriteAllTrees(new TreeNode[] { Program.TransformedTree }, stream, additionalDataToCopy: ms);
                     }
+
+                    System.IO.File.Delete(tempFile);
                 }
                 else
                 {
-                    BinaryTree.WriteAllTrees(new TreeNode[] { Program.TransformedTree }, stream);
+                    if (!includeAttachments)
+                    {
+                        BinaryTree.WriteAllTrees(new TreeNode[] { Program.TransformedTree }, stream);
+                    }
+                    else
+                    {
+
+                        string tempFile = System.IO.Path.GetTempFileName();
+                        using (System.IO.FileStream ms = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite))
+                        {
+                            using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms, System.Text.Encoding.UTF8, true))
+                            {
+                                bw.Write((byte)0);
+                                bw.Write((byte)0);
+                                bw.Write((byte)0);
+                                bw.Write("#Attachments");
+                                bw.Write(Program.StateData.Attachments.Count);
+
+                                foreach (KeyValuePair<string, Attachment> kvp in Program.StateData.Attachments)
+                                {
+                                    bw.Write(kvp.Key);
+                                    bw.Write(2);
+                                    bw.Write(kvp.Value.StoreInMemory);
+                                    bw.Write(kvp.Value.CacheResults);
+                                    bw.Write(kvp.Value.StreamLength);
+                                    bw.Flush();
+
+                                    kvp.Value.WriteToStream(ms);
+                                }
+
+                                bw.Flush();
+                                bw.Write(ms.Position - 3);
+                            }
+
+                            ms.Seek(0, System.IO.SeekOrigin.Begin);
+
+                            BinaryTree.WriteAllTrees(new TreeNode[] { Program.TransformedTree }, stream, additionalDataToCopy: ms);
+                        }
+
+                        System.IO.File.Delete(tempFile);
+                    }
                 }
             }
         }
