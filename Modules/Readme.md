@@ -35,6 +35,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Add index](d46f9715-7453-4d3a-a498-caf69e7808bc)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Adds the index of each leaf as an attribute on the tree.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `d46f9715-7453-4d3a-a498-caf69e7808bc`
+
+<br />
+
 ### [Open file (advanced)](98804064-922f-4395-8a96-216d4b3ff259)
 
 _Version 1.0.0, by Giorgio Bianchini_
@@ -44,6 +56,54 @@ _Version 1.0.0, by Giorgio Bianchini_
 **Module type**: MenuAction
 
 **Module ID**: `98804064-922f-4395-8a96-216d4b3ff259`
+
+<br />
+
+### [Apply Further transformations](9b49587c-3d02-4fbe-859f-feed56dca92d)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Applies the actions performed by the Further transformation modules.
+
+**Module type**: MenuAction
+
+**Module ID**: `9b49587c-3d02-4fbe-859f-feed56dca92d`
+
+<br />
+
+### [Apply modules to other tree](bb4eb8d4-1925-4f08-8881-c8dd6531e5c4)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Applies the modules that are currently enabled to another tree.
+
+**Module type**: MenuAction
+
+**Module ID**: `bb4eb8d4-1925-4f08-8881-c8dd6531e5c4`
+
+<br />
+
+### [Apply modules to other tree (command-line)](7476c9e4-05b1-4a92-8d36-aa878d22cceb)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Applies the modules that are currently enabled to another tree.
+
+**Module type**: Action
+
+**Module ID**: `7476c9e4-05b1-4a92-8d36-aa878d22cceb`
+
+<br />
+
+### [Apply Transformer action](cdd01933-9e17-438a-ae45-57178e3d30cd)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Applies the action performed by the Transformer module.
+
+**Module type**: MenuAction
+
+**Module ID**: `cdd01933-9e17-438a-ae45-57178e3d30cd`
 
 <br />
 
@@ -182,7 +242,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Color picker](5c99fbfb-a6c6-4e07-915d-670b07d255c8)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Opens a color picker window.
 
@@ -327,9 +387,21 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
-### [Labels](ac496677-2650-4d92-8646-0812918bab03)
+### [Group labels](7ef15916-4383-4ee7-b4bd-bd44a7be1849)
 
 _Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Highlights monophyletic groups with a label.
+
+**Module type**: Plotting
+
+**Module ID**: `7ef15916-4383-4ee7-b4bd-bd44a7be1849`
+
+<br />
+
+### [Labels](ac496677-2650-4d92-8646-0812918bab03)
+
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Draws labels on nodes, tips or branches.
 
@@ -348,6 +420,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 **Module type**: Action
 
 **Module ID**: `a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6`
+
+<br />
+
+### [Legend](06888353-e930-4d08-ab24-5727bced8cd6)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Draws a Markdown legend.
+
+**Module type**: Plotting
+
+**Module ID**: `06888353-e930-4d08-ab24-5727bced8cd6`
 
 <br />
 
@@ -440,7 +524,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Parse tip states](716b55a3-02d9-4007-a830-8326d407b24c)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Loads tip state data from an attachment.
 
@@ -471,6 +555,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 **Module type**: Plotting
 
 **Module ID**: `5dbe1f3c-dbea-49b3-8f04-f319aefca534`
+
+<br />
+
+### [Plot alignment](ea7e246b-e93f-4d0d-a67a-88af05479b48)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Adds the plot of an alignment to the tree.
+
+**Module type**: Plotting
+
+**Module ID**: `ea7e246b-e93f-4d0d-a67a-88af05479b48`
 
 <br />
 
@@ -560,7 +656,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Replace attribute](f17160ad-0462-449a-8a57-e1af775c92ba)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Changes the value of an attribute of a node that matches a criterion.
 
@@ -620,7 +716,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Save tree](a8f25c08-4935-4fd5-80ea-1d29ada66f1e)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Saves the tree file.
 
@@ -663,6 +759,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 **Module type**: Action
 
 **Module ID**: `5f3a7147-f706-43dc-9f57-18ade0c7b15d`
+
+<br />
+
+### [Select root node](c0459ddc-8d6b-4614-bc8f-c824d63959f6)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Selects the root node of the tree.
+
+**Module type**: MenuAction
+
+**Module ID**: `c0459ddc-8d6b-4614-bc8f-c824d63959f6`
 
 <br />
 
