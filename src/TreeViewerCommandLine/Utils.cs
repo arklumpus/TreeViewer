@@ -285,7 +285,7 @@ namespace TreeViewerCommandLine
                         string parameterName = parameters[i].Item1;
                         tbr.Add(parameterName, Program.StateData);
                     }
-                    else if (controlType == "Group")
+                    else if (controlType == "Group" || controlType == "Expander")
                     {
                         string parameterName = parameters[i].Item1;
 
@@ -1028,6 +1028,40 @@ namespace TreeViewerCommandLine
                                 else if (status[parameterName] == ControlStatus.Disabled)
                                 {
                                     return new ConsoleTextSpan[] { new ConsoleTextSpan(new string(ConsoleWrapper.Whitespace, 5), ConsoleColor.Yellow), new ConsoleTextSpan(parameterName, ConsoleColor.DarkGray), new ConsoleTextSpan("    [Source code]", ConsoleColor.DarkGray) };
+                                }
+                                else
+                                {
+                                    return null;
+                                }
+                            }
+                                , -1));
+                        }
+                        else if (controlType == "Markdown")
+                        {
+                            string defaultSource = controlParameters;
+
+                            tbr.Add(parameters[i].Item1, defaultSource);
+
+                            parameterUpdaters.Add(parameterName, value =>
+                            {
+                                tbr[parameterName] = value;
+                            });
+
+                            keys.Add(parameterName);
+                            possibleValues.Add(parameterName, new string[] { ConsoleWrapper.Whitespace + "Markdown" });
+                            controlTypes.Add(parameterName, "Markdown");
+
+                            int ind = keys.Count;
+
+                            printParameterLines.Add(((status) =>
+                            {
+                                if (status[parameterName] == ControlStatus.Enabled)
+                                {
+                                    return new ConsoleTextSpan[] { new ConsoleTextSpan("#" + ind.ToString() + new string(ConsoleWrapper.Whitespace, 4 - ind.ToString().Length), ConsoleColor.Yellow), new ConsoleTextSpan(parameterName), new ConsoleTextSpan("    [Markdown]", ConsoleColor.Blue) };
+                                }
+                                else if (status[parameterName] == ControlStatus.Disabled)
+                                {
+                                    return new ConsoleTextSpan[] { new ConsoleTextSpan(new string(ConsoleWrapper.Whitespace, 5), ConsoleColor.Yellow), new ConsoleTextSpan(parameterName, ConsoleColor.DarkGray), new ConsoleTextSpan("    [Markdown]", ConsoleColor.DarkGray) };
                                 }
                                 else
                                 {

@@ -285,7 +285,7 @@ namespace TreeViewerCommandLine
 
                             ConsoleWrapper.WriteLine();
                         }
-                        else if (Program.SelectedModuleParameters.PossibleValues[selectedOptions[0]][0] == ConsoleWrapper.Whitespace + "Formatter" || Program.SelectedModuleParameters.PossibleValues[selectedOptions[0]][0] == ConsoleWrapper.Whitespace + "SourceCode")
+                        else if (Program.SelectedModuleParameters.PossibleValues[selectedOptions[0]][0] == ConsoleWrapper.Whitespace + "Formatter" || Program.SelectedModuleParameters.PossibleValues[selectedOptions[0]][0] == ConsoleWrapper.Whitespace + "SourceCode" || Program.SelectedModuleParameters.PossibleValues[selectedOptions[0]][0] == ConsoleWrapper.Whitespace + "Markdown")
                         {
                             ConsoleWrapper.WriteLine(new ConsoleTextSpan[]
                             {
@@ -1247,6 +1247,61 @@ namespace TreeViewerCommandLine
                                 ConsoleWrapper.WriteLine();
                             }
                         }
+                        else if (Program.SelectedModuleParameters.ControlTypes[Program.SelectedOption] == "Markdown")
+                        {
+                            StringBuilder firstWordBuilder = new StringBuilder();
+
+                            foreach (char c in argument)
+                            {
+                                if (!char.IsWhiteSpace(c))
+                                {
+                                    firstWordBuilder.Append(c);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+
+                            string firstWord = firstWordBuilder.ToString();
+
+                            if (firstWord.Equals("source", StringComparison.OrdinalIgnoreCase))
+                            {
+                                argument = argument.Substring(6).Trim();
+
+                                if (string.IsNullOrWhiteSpace(argument))
+                                {
+                                    string prevValue = (string)Program.SelectedModuleParameters.Parameters[Program.SelectedOption];
+
+                                    string newSourceCode = prevValue;
+
+                                    string tempFileName = Path.GetTempFileName();
+
+                                    File.WriteAllText(tempFileName, newSourceCode);
+
+                                    Utils.RunNano(tempFileName);
+
+                                    newSourceCode = File.ReadAllText(tempFileName);
+
+                                    File.Delete(tempFileName);
+
+                                    Program.SelectedModuleParameters.UpdateParameterAction(new Dictionary<string, object>() { { Program.SelectedOption, newSourceCode } });
+                                }
+                                else
+                                {
+                                    string prevValue = (string)Program.SelectedModuleParameters.Parameters[Program.SelectedOption];
+                                    string newSourceCode = File.ReadAllText(argument.Trim('\"'));
+
+                                    Program.SelectedModuleParameters.UpdateParameterAction(new Dictionary<string, object>() { { Program.SelectedOption, newSourceCode } });
+                                }
+                            }
+                            else
+                            {
+                                ConsoleWrapper.WriteLine();
+                                ConsoleWrapper.WriteLine(new ConsoleTextSpan[] { new ConsoleTextSpan(argument, ConsoleColor.Blue), new ConsoleTextSpan(" is not a valid value for option ", ConsoleColor.Red), new ConsoleTextSpan(Program.SelectedOption.Trim(' ', '\t', ':'), ConsoleColor.Cyan), new ConsoleTextSpan("!", ConsoleColor.Red) });
+                                ConsoleWrapper.WriteLine();
+                            }
+                        }
                         else if (Program.SelectedModuleParameters.ControlTypes[Program.SelectedOption] == "NumericUpDownByNode")
                         {
                             StringBuilder firstWordBuilder = new StringBuilder();
@@ -1795,7 +1850,7 @@ namespace TreeViewerCommandLine
                                     }
                                 }
                             }
-                            else if (Program.SelectedModuleParameters.PossibleValues[Program.SelectedOption][0] == ConsoleWrapper.Whitespace + "Formatter" || Program.SelectedModuleParameters.PossibleValues[Program.SelectedOption][0] == ConsoleWrapper.Whitespace + "SourceCode")
+                            else if (Program.SelectedModuleParameters.PossibleValues[Program.SelectedOption][0] == ConsoleWrapper.Whitespace + "Formatter" || Program.SelectedModuleParameters.PossibleValues[Program.SelectedOption][0] == ConsoleWrapper.Whitespace + "SourceCode" || Program.SelectedModuleParameters.PossibleValues[Program.SelectedOption][0] == ConsoleWrapper.Whitespace + "Markdown")
                             {
                                 if (string.IsNullOrWhiteSpace(partialCommand))
                                 {

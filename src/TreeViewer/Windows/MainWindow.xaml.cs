@@ -440,6 +440,9 @@ namespace TreeViewer
             StateData.GetFurtherTransformationModulesParamters = (index) => this.FurtherTransformationsParameters[index];
             StateData.GetPlottingModulesParameters = (index) => this.PlottingParameters[index];
 
+            StateData.OpenFile = (fileName, deleteAfter) => { _ = this.LoadFile(fileName, deleteAfter); };
+
+            StateData.SerializeAllModules = this.SerializeAllModules;
 
             /* if (Modules.MissingModules == null)
              {
@@ -592,7 +595,7 @@ namespace TreeViewer
 
                     subMenu.Menu.Items.Add(autosavesItem);
 
-                    subMenu.Menu.Items.Add(new NativeMenuItemSeperator());
+                    subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
                 }
 
                 List<Func<MainWindow, bool>> enabledActions = new List<Func<MainWindow, bool>>();
@@ -616,13 +619,13 @@ namespace TreeViewer
                     }
                     if (j < menuItems[i].Item2.Count - 1)
                     {
-                        subMenu.Menu.Items.Add(new NativeMenuItemSeperator());
+                        subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
                     }
                 }
 
                 if (menuItems[i].Item1 == "File")
                 {
-                    subMenu.Menu.Items.Add(new NativeMenuItemSeperator());
+                    subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
 
                     NativeMenuItem exitItem = new NativeMenuItem("Exit");
                     exitItem.Command = new SimpleCommand((win) => true, (win) => { this.Close(); }, this, null);
@@ -644,7 +647,7 @@ namespace TreeViewer
                 {
                     if (subMenu.Menu.Items.Count > 0)
                     {
-                        subMenu.Menu.Items.Add(new NativeMenuItemSeperator());
+                        subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
                     }
 
                     NativeMenuItem aboutItem = new NativeMenuItem("About...");
@@ -663,7 +666,7 @@ namespace TreeViewer
                 {
                     if (subMenu.Menu.Items.Count > 0)
                     {
-                        subMenu.Menu.Items.Add(new NativeMenuItemSeperator());
+                        subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
                     }
 
                     NativeMenuItem preferencesItem = new NativeMenuItem("Preferences...");
@@ -718,11 +721,11 @@ namespace TreeViewer
             content.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
             content.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             content.Children.Add(new Viewbox() { Child = module.GetIcon().PaintToCanvas(), Height = 42 });
-            TextBlock blk = new TextBlock() { Text = module.ButtonText, Margin = new Thickness(0, 5, 0, 0), TextAlignment = TextAlignment.Center };
+            TextBlock blk = new TextBlock() { Text = module.ButtonText, Margin = new Thickness(0, 5, 0, 5), TextAlignment = TextAlignment.Center, FontSize = 13.5 };
             Grid.SetRow(blk, 1);
-            content.Children.Add(blk);
+            content.Children.Add(blk);            
 
-            Button btn = new Button() { Content = content, Padding = new Thickness(5), Width = 80, Height = 100, Margin = new Thickness(0, 5, 0, 5) };
+            CoolButton btn = new CoolButton() { ButtonContent = content, Width = 105, Height = 120, CornerRadius = new CornerRadius(5), Margin = new Thickness(-7, -10, -7, 0), Padding = new Thickness(12) };
 
             ToolTip.SetTip(btn, module.HelpText);
 
@@ -759,11 +762,13 @@ namespace TreeViewer
                 content.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
                 content.Children.Add(new Viewbox() { Child = module.GetIcon().PaintToCanvas(), Height = 42 });
-                TextBlock blk = new TextBlock() { Text = module.ButtonText, Margin = new Thickness(0, 5, 0, 0), TextAlignment = TextAlignment.Center };
+                TextBlock blk = new TextBlock() { Text = module.ButtonText, Margin = new Thickness(0, 5, 0, 5), TextAlignment = TextAlignment.Center, FontSize = 13.5 };
                 Grid.SetRow(blk, 1);
                 content.Children.Add(blk);
 
-                Button btn = new Button() { Content = content, Padding = new Thickness(5), Width = 80, Height = 100, Margin = new Thickness(5) };
+                //Button btn = new Button() { Content = content, Padding = new Thickness(5), Width = 80, Height = 100, Margin = new Thickness(5) };
+
+                CoolButton btn = new CoolButton() { ButtonContent = content, Width = 105, Height = 120, CornerRadius = new CornerRadius(5), Margin = new Thickness(-7, -10, -7, 0) };
 
                 ToolTip.SetTip(btn, module.HelpText);
 
@@ -1259,6 +1264,42 @@ namespace TreeViewer
                         parents.Peek().Add(brd);
 
                         parameterControls.Add(parameterName, brd);
+
+                        int popping = childrenTillPop.Pop();
+                        if (popping > 0)
+                        {
+                            popping--;
+                            if (popping == 0)
+                            {
+                                parents.Pop();
+                            }
+                            else
+                            {
+                                childrenTillPop.Push(popping);
+                            }
+                        }
+                        else
+                        {
+                            childrenTillPop.Push(popping);
+                        }
+
+                        parents.Push(pnl.Children);
+                        childrenTillPop.Push(numChildren);
+                    }
+                    else if (controlType == "Expander")
+                    {
+                        string parameterName = parameters[i].Item1;
+
+                        int numChildren = int.Parse(controlParameters);
+
+                        Expander exp = new Expander() { Margin = new Thickness(0, 12, 0, 5) };
+                        exp.Label = new TextBlock() { Text = parameterName };
+                        StackPanel pnl = new StackPanel();
+                        exp.Child = pnl;
+
+                        parents.Peek().Add(exp);
+
+                        parameterControls.Add(parameterName, exp);
 
                         int popping = childrenTillPop.Pop();
                         if (popping > 0)
@@ -2468,6 +2509,55 @@ namespace TreeViewer
                                 }
                             };
                         }
+                        else if (controlType == "Markdown")
+                        {
+                            string defaultSource = controlParameters;
+
+                            Button but = new Button() { Content = "Edit...", Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+
+                            Grid.SetColumn(but, 1);
+
+                            paramPanel.Children.Add(but);
+
+                            tbr.Add(parameters[i].Item1, defaultSource);
+
+                            parameterUpdaters.Add(parameterName, value =>
+                            {
+                                programmaticUpdate = true;
+                                tbr[parameterName] = value;
+                                programmaticUpdate = false;
+
+                            });
+
+                            but.Click += async (s, e) =>
+                            {
+                                if (!programmaticUpdate)
+                                {
+                                    MarkdownEditorWindow win = new MarkdownEditorWindow();
+
+                                    string editorId = "MarkdownEditor_" + parameterName.CoerceValidFileName() + "_" + (string)tbr[Modules.ModuleIDKey];
+                                    await win.FinishInitialization((string)tbr[parameterName], editorId, this.StateData);
+
+                                    await win.ShowDialog2(this);
+
+                                    if (win.Result != null)
+                                    {
+                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
+
+                                        tbr[parameterName] = win.Result;
+
+                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
+                                        UpdateControls(controlStatus, parameterControls);
+                                        UpdateParameters(parametersToChange, parameterUpdaters);
+
+                                        if (needsUpdate)
+                                        {
+                                            updateAction();
+                                        }
+                                    }
+                                }
+                            };
+                        }
                         else if (controlType == "Dash")
                         {
                             double[] dash = System.Text.Json.JsonSerializer.Deserialize<double[]>(controlParameters, Modules.DefaultSerializationOptions);
@@ -2733,7 +2823,7 @@ namespace TreeViewer
 
             ToolTip.SetTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
 
-            helpButton.PointerReleased += (s, e) =>
+            helpButton.Click += (s, e) =>
             {
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[Modules.TransformerModules[TransformerComboBox.SelectedIndex].Id].BuildReadmeMarkdown(), Modules.TransformerModules[TransformerComboBox.SelectedIndex].Id);
 
@@ -2968,7 +3058,7 @@ namespace TreeViewer
 
             ToolTip.SetTip(helpButton, module.HelpText);
 
-            helpButton.PointerReleased += (s, e) =>
+            helpButton.Click += (s, e) =>
             {
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[module.Id].BuildReadmeMarkdown(), module.Id);
 
@@ -3060,7 +3150,7 @@ namespace TreeViewer
 
             ToolTip.SetTip(helpButton, Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].HelpText);
 
-            helpButton.PointerReleased += (s, e) =>
+            helpButton.Click += (s, e) =>
             {
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].Id].BuildReadmeMarkdown(), Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].Id);
 
@@ -3245,7 +3335,7 @@ namespace TreeViewer
 
             ToolTip.SetTip(helpButton, module.HelpText);
 
-            helpButton.PointerReleased += (s, e) =>
+            helpButton.Click += (s, e) =>
             {
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[module.Id].BuildReadmeMarkdown(), module.Id);
 

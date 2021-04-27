@@ -2281,6 +2281,14 @@ public static Colour? Format(object attribute)
                             possibleValuesHeader = null;
                             displayParameter = true;
                         }
+                        else if (controlType == "Markdown")
+                        {
+                            parameterType = "Markdown";
+                            possibleValues = null;
+                            defaultValue = Environment.NewLine + Environment.NewLine + "```Markdown" + Environment.NewLine + controlParameters + (!controlParameters.EndsWith("\n") ? Environment.NewLine : "") + "```";
+                            possibleValuesHeader = null;
+                            displayParameter = true;
+                        }
                         else if (controlType == "Dash")
                         {
                             double[] dash = System.Text.Json.JsonSerializer.Deserialize<double[]>(controlParameters, Modules.DefaultSerializationOptions);
@@ -2538,6 +2546,10 @@ public static Colour? Format(object attribute)
         public Action<TreeNode> SetSelectedNode { get; set; }
 
         public Colour GraphBackgroundColour { get; set; } = Colour.FromRgb(255, 255, 255);
+
+        public Action<string, bool> OpenFile { get; set; }
+
+        public Func<MainWindow.ModuleTarget, bool, string> SerializeAllModules { get; set; }
 
         public InstanceStateData()
         {
