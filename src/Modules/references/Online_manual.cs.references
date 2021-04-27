@@ -1,0 +1,8 @@
+System.Runtime.dll
+System.Private.CoreLib.dll
+netstandard.dll
+TreeViewer.dll
+System.Diagnostics.Process.dll
+System.ComponentModel.Primitives.dll
+Avalonia.Base.dll
+Avalonia.Input.dll
