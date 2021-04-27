@@ -510,6 +510,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Online manual](bc943abb-66d9-4425-be78-6ff7fb4148f0)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Opens a web browser window at the TreeViewer manual homepage.
+
+**Module type**: MenuAction
+
+**Module ID**: `bc943abb-66d9-4425-be78-6ff7fb4148f0`
+
+<br />
+
 ### [Open file](078318bc-907f-4ada-b1e5-171799957b2a)
 
 _Version 1.0.0, by Giorgio Bianchini_
