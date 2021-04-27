@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" Width="24" Height="24"
+             x:Class="TreeViewer.FilterIcon">
+    <Canvas Width="24" Height="24">
+      <Path Data="M3,3 L21,3 L14,14 L14,18 L10,21 L10,14 Z" Fill="#0072b2"></Path>
+      <Path Data="M3,3 L21,3 L14,14 L10,14 Z">
+        <Path.Fill>
+          <LinearGradientBrush StartPoint="-4,0" EndPoint="14,18">
+            <LinearGradientBrush.GradientStops>
+              <GradientStop Offset="0" Color="#00000000"></GradientStop>
+              <GradientStop Offset="0.5" Color="#00000000"></GradientStop>
+              <GradientStop Offset="1" Color="#80000000"></GradientStop>
+            </LinearGradientBrush.GradientStops>
+          </LinearGradientBrush>
+        </Path.Fill>
+      </Path>
+      <Path Data="M14,14 L14,18 L10,21 L10,14 Z">
+        <Path.Fill>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="14,0">
+            <LinearGradientBrush.GradientStops>
+              <GradientStop Offset="0" Color="#00000000"></GradientStop>
+              <GradientStop Offset="0.5" Color="#00000000"></GradientStop>
+              <GradientStop Offset="1" Color="#70000000"></GradientStop>
+            </LinearGradientBrush.GradientStops>
+          </LinearGradientBrush>
+        </Path.Fill>
+      </Path>
+      <Path Data="M3,3 L21,3 L14,14 L10,14 Z">
+        <Path.Fill>
+          <LinearGradientBrush StartPoint="10,14" EndPoint="24,4">
+            <LinearGradientBrush.GradientStops>
+              <GradientStop Offset="0" Color="#50FFFFFF"></GradientStop>
+              <GradientStop Offset="0.5" Color="#00FFFFFF"></GradientStop>
+              <GradientStop Offset="1" Color="#00FFFFFF"></GradientStop>
+            </LinearGradientBrush.GradientStops>
+          </LinearGradientBrush>
+        </Path.Fill>
+      </Path>
+      <Path Data="M14,14 L14,18 L10,21 L10,14 Z">
+        <Path.Fill>
+          <LinearGradientBrush StartPoint="10,0" EndPoint="24,0">
+            <LinearGradientBrush.GradientStops>
+              <GradientStop Offset="0" Color="#50FFFFFF"></GradientStop>
+              <GradientStop Offset="0.5" Color="#00FFFFFF"></GradientStop>
+              <GradientStop Offset="1" Color="#00FFFFFF"></GradientStop>
+            </LinearGradientBrush.GradientStops>
+          </LinearGradientBrush>
+        </Path.Fill>
+      </Path>
+    </Canvas>
+</UserControl>
