@@ -1,0 +1,12 @@
+System.Runtime.dll
+System.Private.CoreLib.dll
+netstandard.dll
+System.Collections.dll
+TreeViewer.dll
+System.Console.dll
+PhyloTree.TreeNode.dll
+System.IO.FileSystem.dll
+System.Security.Cryptography.Algorithms.dll
+Avalonia.Controls.dll
+VectSharp.dll
+Avalonia.Input.dll
