@@ -330,7 +330,7 @@ namespace TreeViewer
 
             this.FindControl<Expander>("RecentFilesExpander").IsVisible = recentItems.Count > 0;
 
-            this.FindControl<Button>("FileTypeModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("FileTypeModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.FileType.cs")))
@@ -346,7 +346,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_FileType_" + guid.ToString());
             };
 
-            this.FindControl<Button>("PlotActionModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("PlotActionModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.PlotAction.cs")))
@@ -362,7 +362,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_PlotAction_" + guid.ToString());
             };
 
-            this.FindControl<Button>("LoadFileModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("LoadFileModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.LoadFile.cs")))
@@ -378,7 +378,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_LoadFile_" + guid.ToString());
             };
 
-            this.FindControl<Button>("TransformerModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("TransformerModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.Transformer.cs")))
@@ -394,7 +394,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_Transformer_" + guid.ToString());
             };
 
-            this.FindControl<Button>("FurtherTransformationModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("FurtherTransformationModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.FurtherTransformation.cs")))
@@ -410,7 +410,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_FurtherTransformation_" + guid.ToString());
             };
 
-            this.FindControl<Button>("CoordinatesModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("CoordinatesModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.Coordinates.cs")))
@@ -426,7 +426,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_Coordinates_" + guid.ToString());
             };
 
-            this.FindControl<Button>("SelectionActionModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("SelectionActionModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.SelectionAction.cs")))
@@ -442,7 +442,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_SelectionAction_" + guid.ToString());
             };
 
-            this.FindControl<Button>("ActionModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("ActionModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.Action.cs")))
@@ -458,7 +458,7 @@ namespace TreeViewer
                 await InitializeEditor(moduleSource, "ModuleCreator_Action_" + guid.ToString());
             };
 
-            this.FindControl<Button>("MenuActionModuleButton").Click += async (s, e) =>
+            this.FindControl<CoolButton>("MenuActionModuleButton").Click += async (s, e) =>
             {
                 string moduleSource;
                 using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Templates.MenuAction.cs")))
@@ -547,18 +547,20 @@ namespace TreeViewer
                 List<string> originalReferences = new List<string>();
                 string fullSource = editor.FullSource;
 
+                foreach (Microsoft.CodeAnalysis.MetadataReference reference in editor.References)
+                {
+                    try
+                    {
+                        originalReferences.Add(reference.Display);
+                    }
+                    catch { }
+                }
+
+                ModuleMetadata.CreateFromSource(fullSource, originalReferences.ToArray());
+
                 Thread thr = new Thread(async () =>
                 {
                     handle.WaitOne();
-
-                    foreach (Microsoft.CodeAnalysis.MetadataReference reference in editor.References)
-                    {
-                        try
-                        {
-                            originalReferences.Add(reference.Display);
-                        }
-                        catch { }
-                    }
 
                     List<string> toBeRemoved = new List<string>();
                     List<string> newReferences = new List<string>(originalReferences);
