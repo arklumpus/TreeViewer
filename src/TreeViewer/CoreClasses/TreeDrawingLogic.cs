@@ -193,110 +193,124 @@ namespace TreeViewer
 
         TreeNode[] AllTransformedTrees = null;
 
-        private async Task UpdateOnlyFurtherTransformations(int minIndex, ProgressWindow progressWindow)
+        object FurtherTransformationLock = new object();
+
+        private Task UpdateOnlyFurtherTransformations(int minIndex, ProgressWindow progressWindow)
         {
-            TreeNode[] prevTransformedTrees = AllTransformedTrees;
-
-            AllTransformedTrees = new TreeNode[FurtherTransformations.Count];
-
-            for (int i = 0; i < minIndex; i++)
+            lock (FurtherTransformationLock)
             {
-                AllTransformedTrees[i] = prevTransformedTrees[i];
-            }
+                TreeNode[] prevTransformedTrees = AllTransformedTrees;
 
-            if (minIndex > 0)
-            {
-                if (minIndex < prevTransformedTrees.Length)
+                AllTransformedTrees = new TreeNode[FurtherTransformations.Count];
+
+                for (int i = 0; i < minIndex; i++)
                 {
-                    TransformedTree = prevTransformedTrees[minIndex];
+                    AllTransformedTrees[i] = prevTransformedTrees[i];
+                }
+
+                if (minIndex > 0)
+                {
+                    if (minIndex < prevTransformedTrees.Length)
+                    {
+                        TransformedTree = prevTransformedTrees[minIndex];
+                    }
+                    else
+                    {
+                        TransformedTree = TransformedTree.Clone();
+                    }
                 }
                 else
                 {
-                    TransformedTree = TransformedTree.Clone();
+                    TransformedTree = FirstTransformedTree.Clone();
                 }
+
+                for (int i = minIndex; i < FurtherTransformations.Count; i++)
+                {
+                    AllTransformedTrees[i] = TransformedTree.Clone();
+                    try
+                    {
+                        FurtherTransformations[i].Transform(ref StateData.TransformedTree, FurtherTransformationsParameters[i]);
+                        double progress = (double)(i + 1) / (FurtherTransformations.Count - minIndex);
+                        _ = Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            FurtherTransformationsAlerts[i].IsVisible = false;
+                            progressWindow.Progress = progress;
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _ = Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            FurtherTransformationsAlerts[i].IsVisible = true;
+                            ToolTip.SetTip(FurtherTransformationsAlerts[i], ex.Message);
+                        });
+                    }
+                }
+
+                SemaphoreSlim semaphore = new SemaphoreSlim(0, 1);
+
+                _ = Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    string[] selectedAttributes = new string[AttributeSelectors.Count];
+
+                    for (int i = 0; i < AttributeSelectors.Count; i++)
+                    {
+                        if (AttributeSelectors[i].SelectedIndex >= 0 && AttributeSelectors[i].SelectedIndex < AttributeList.Count)
+                        {
+                            selectedAttributes[i] = AttributeList[AttributeSelectors[i].SelectedIndex];
+                        }
+                        else
+                        {
+                            selectedAttributes[i] = AttributeList[0];
+                        }
+                    }
+
+                    List<TreeNode> nodes = TransformedTree.GetChildrenRecursive();
+
+                    HashSet<string> allAttributes = new HashSet<string>();
+                    foreach (TreeNode node in nodes)
+                    {
+                        foreach (KeyValuePair<string, object> kvp in node.Attributes)
+                        {
+                            allAttributes.Add(kvp.Key);
+                        }
+                    }
+
+                    AttributeList = new List<string>(allAttributes);
+                    AttributeList.Sort();
+
+
+                    List<ComboBox> selectorsToRemove = new List<ComboBox>();
+
+                    for (int i = 0; i < AttributeSelectors.Count; i++)
+                    {
+                        if (AttributeSelectors[i].FindAncestorOfType<MainWindow>() == this)
+                        {
+                            AttributeSelectors[i].Tag = true;
+                            AttributeSelectors[i].Items = AttributeList;
+                            AttributeSelectors[i].Tag = false;
+                            int ind = AttributeList.IndexOf(selectedAttributes[i]);
+                            AttributeSelectors[i].SelectedIndex = Math.Max(0, ind);
+                        }
+                        else
+                        {
+                            selectorsToRemove.Add(AttributeSelectors[i]);
+                        }
+                    }
+
+                    foreach (ComboBox box in selectorsToRemove)
+                    {
+                        AttributeSelectors.Remove(box);
+                    }
+
+                    semaphore.Release();
+                });
+
+                semaphore.Wait();
+                semaphore.Release();
             }
-            else
-            {
-                TransformedTree = FirstTransformedTree.Clone();
-            }
 
-            for (int i = minIndex; i < FurtherTransformations.Count; i++)
-            {
-                AllTransformedTrees[i] = TransformedTree.Clone();
-                try
-                {
-                    FurtherTransformations[i].Transform(ref StateData.TransformedTree, FurtherTransformationsParameters[i]);
-                    double progress = (double)(i + 1) / (FurtherTransformations.Count - minIndex);
-                    await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        FurtherTransformationsAlerts[i].IsVisible = false;
-                        progressWindow.Progress = progress;
-                    });
-                }
-                catch (Exception ex)
-                {
-                    await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        FurtherTransformationsAlerts[i].IsVisible = true;
-                        ToolTip.SetTip(FurtherTransformationsAlerts[i], ex.Message);
-                    });
-                }
-            }
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                string[] selectedAttributes = new string[AttributeSelectors.Count];
-
-                for (int i = 0; i < AttributeSelectors.Count; i++)
-                {
-                    if (AttributeSelectors[i].SelectedIndex >= 0 && AttributeSelectors[i].SelectedIndex < AttributeList.Count)
-                    {
-                        selectedAttributes[i] = AttributeList[AttributeSelectors[i].SelectedIndex];
-                    }
-                    else
-                    {
-                        selectedAttributes[i] = AttributeList[0];
-                    }
-                }
-
-                List<TreeNode> nodes = TransformedTree.GetChildrenRecursive();
-
-                HashSet<string> allAttributes = new HashSet<string>();
-                foreach (TreeNode node in nodes)
-                {
-                    foreach (KeyValuePair<string, object> kvp in node.Attributes)
-                    {
-                        allAttributes.Add(kvp.Key);
-                    }
-                }
-
-                AttributeList = new List<string>(allAttributes);
-                AttributeList.Sort();
-
-
-                List<ComboBox> selectorsToRemove = new List<ComboBox>();
-
-                for (int i = 0; i < AttributeSelectors.Count; i++)
-                {
-                    if (AttributeSelectors[i].FindAncestorOfType<MainWindow>() == this)
-                    {
-                        AttributeSelectors[i].Tag = true;
-                        AttributeSelectors[i].Items = AttributeList;
-                        AttributeSelectors[i].Tag = false;
-                        int ind = AttributeList.IndexOf(selectedAttributes[i]);
-                        AttributeSelectors[i].SelectedIndex = Math.Max(0, ind);
-                    }
-                    else
-                    {
-                        selectorsToRemove.Add(AttributeSelectors[i]);
-                    }
-                }
-
-                foreach (ComboBox box in selectorsToRemove)
-                {
-                    AttributeSelectors.Remove(box);
-                }
-            });
+            return Task.CompletedTask;
         }
 
         public async Task UpdateFurtherTransformations(int minIndex)
