@@ -146,7 +146,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Branch score style](10bbbbe1-c634-4582-9073-11f067a54081)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display node scores using the branch colours.
 
@@ -620,9 +620,9 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Prune node](ffc97742-4cf5-44ef-81aa-d5b51708a003)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
-**Description**: Prunes a node off the tree.
+**Description**: Prunes nodes off the tree.
 
 **Module type**: FurtherTransformation
 

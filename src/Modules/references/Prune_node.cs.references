@@ -5,3 +5,4 @@ System.Collections.dll
 TreeViewer.dll
 PhyloTree.TreeNode.dll
 System.Linq.dll
+System.Text.RegularExpressions.dll
