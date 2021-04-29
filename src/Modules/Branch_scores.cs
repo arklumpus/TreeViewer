@@ -49,7 +49,7 @@ namespace a10bbbbe1c6344582907311f067a54081
         public const string Name = "Branch score style";
         public const string HelpText = "Sets the plot actions to display node scores using the branch colours.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public const string Id = "10bbbbe1-c634-4582-9073-11f067a54081";
@@ -833,17 +833,20 @@ public static Colour? Format(object attribute)
                     maxY = Math.Max(kvp.Value.Y, maxY);
                 }
 
-                updater2 = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "a26abc43-1b12-40c9-9e23-bd3de2718829"));
-                updater2(new Dictionary<string, object>() { { "Image:", attachment }, { "Width:", defaultHeight * 0.2 }, { "Height:", defaultHeight * 0.02 }, { "Anchor:", 3 }, { "Branch reference:", 1 }, { "Position:", new Point((minX + maxX) * 0.5 - rootNode.X, maxY + maxBranchWidth * 2 + defaultHeight * 0.01 - rootNode.Y) } });
+                Font legendFont = new Font(new FontFamily(FontFamily.StandardFontFamilies.HelveticaBold), maxBranchWidth * 4 / 3);
+                double totalWidth = 100 * maxBranchWidth / 10.5 + legendFont.MeasureText(attributeName + "_").Width + 10;
+
+                updater2 = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "06888353-e930-4d08-ab24-5727bced8cd6"));
+                updater2(new Dictionary<string, object>() { { "Markdown source:", "### **" + attributeName + "** ![](attachment://" + currName + ")" }, { "Font size:", maxBranchWidth }, { "Width:", totalWidth }, { "Position:", new Point(0, maxBranchWidth * 2) } });
 
             }
 
             if (InstanceStateData.IsUIAvailable)
-            {
-                window.BuildAttachmentList();
-                window.UpdateCoordinates();
-                window.AutoFit();
-            }
-        }
-    }
+			{
+				window.BuildAttachmentList();
+				window.UpdateCoordinates();
+				window.AutoFit();
+			}
+		}
+	}
 }
