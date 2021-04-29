@@ -78,13 +78,13 @@ namespace a19d9a55507e64dacafc1d5ffcef35f76
                 ("Value:", "TextBox:"),
                 
                 /// <param name="Comparison type: " display="Comparison type (`Number`)">
-                /// If the [Attribute type](#attribute-type-search-attribute) of the attribute that is being matched is `Number`,
+                /// If the [Attribute type](#attribute-type) of the attribute that is being matched is `Number`,
                 /// the module can match attributes that are equal, smaller than or greather than the specified [Value](#value).
                 /// </param>
                 ("Comparison type: ", "ComboBox:0[\"Equal\", \"Smaller than\", \"Greater than\"]"),
                 
                 /// <param name="Comparison type:" display="Comparison type (`String`)">
-                /// If the [Attribute type](#attribute-type-search-attribute) of the attribute that is being matched is `String`,
+                /// If the [Attribute type](#attribute-type) of the attribute that is being matched is `String`,
                 /// this parameter determines how the strings are compared. If the value is `Normal`, the strings need to match
                 /// exactly. If the value is `Case insensitive`, the case of the strings does not matter (e.g. `AaBbCc` matches
                 /// both `aabbcc` and `AABBCC`). If the value is `Culture-aware`, the comparison takes into account culture-specific
