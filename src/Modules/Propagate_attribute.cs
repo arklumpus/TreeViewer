@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using PhyloTree;
@@ -15,7 +16,7 @@ namespace a85eee26d29b644708184f42ebe9a2567
         public const string Name = "Propagate attribute";
         public const string HelpText = "Propagates an attribute on the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public const string Id = "85eee26d-29b6-4470-8184-f42ebe9a2567";
@@ -110,17 +111,7 @@ namespace a85eee26d29b644708184f42ebe9a2567
             controlStatus = new Dictionary<string, ControlStatus>();
             parametersToChange = new Dictionary<string, object>() { { "Apply", false } };
 
-            if ((string)previousParameterValues["Attribute:"] != (string)currentParameterValues["Attribute:"])
-            {
-                string attributeName = (string)currentParameterValues["Attribute:"];
 
-                string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
-
-                if (!string.IsNullOrEmpty(attrType))
-                {
-                    parametersToChange.Add("Attribute type:", attrType);
-                }
-            }
 
             if ((string)currentParameterValues["Attribute type:"] == "Number")
             {
@@ -149,6 +140,47 @@ namespace a85eee26d29b644708184f42ebe9a2567
                 controlStatus.Add("Propagation mode:", ControlStatus.Hidden);
                 controlStatus.Add("Propagation mode: ", ControlStatus.Hidden);
                 controlStatus.Add("Subtract value:", ControlStatus.Hidden);
+            }
+
+            if ((string)previousParameterValues["Attribute:"] != (string)currentParameterValues["Attribute:"])
+            {
+                string attributeName = (string)currentParameterValues["Attribute:"];
+
+                string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
+
+                if (!string.IsNullOrEmpty(attrType))
+                {
+                    parametersToChange.Add("Attribute type:", attrType);
+
+                    if (attrType == "Number")
+                    {
+                        if ((int)currentParameterValues["Direction:"] == 0)
+                        {
+                            controlStatus["Propagation mode:"] = ControlStatus.Enabled;
+                            controlStatus["Propagation mode: "] = ControlStatus.Hidden;
+                            controlStatus["Subtract value:"] = ControlStatus.Hidden;
+                        }
+                        else
+                        {
+                            controlStatus["Propagation mode:"] = ControlStatus.Hidden;
+                            controlStatus["Propagation mode: "] = ControlStatus.Enabled;
+                            if ((int)currentParameterValues["Propagation mode: "] == 2)
+                            {
+                                controlStatus["Subtract value:"] = ControlStatus.Enabled;
+                            }
+                            else
+                            {
+                                controlStatus["Subtract value:"] = ControlStatus.Hidden;
+                            }
+                        }
+                    }
+                    else if (attrType == "String")
+                    {
+                        controlStatus["Propagation mode:"] = ControlStatus.Hidden;
+                        controlStatus["Propagation mode: "] = ControlStatus.Hidden;
+                        controlStatus["Subtract value:"] = ControlStatus.Hidden;
+                    }
+                }
             }
 
             return (bool)currentParameterValues["Apply"];
@@ -221,20 +253,33 @@ namespace a85eee26d29b644708184f42ebe9a2567
                             if (attributeType == "String")
                             {
                                 bool found = false;
+                                bool allEqual = true;
+                                string currVal = null;
 
                                 for (int j = 0; j < nodes[i].Children.Count; j++)
                                 {
                                     if (nodes[i].Children[j].Attributes.TryGetValue(attribute, out object attributeValue) && attributeValue is string attributeStringValue && !string.IsNullOrEmpty(attributeStringValue))
                                     {
                                         found = true;
-                                        nodes[i].Attributes[attribute] = attributeStringValue;
-                                        break;
+
+                                        if (string.IsNullOrEmpty(currVal))
+                                        {
+                                            currVal = attributeStringValue;
+                                        }
+                                        else
+                                        {
+                                            allEqual = allEqual && (attributeStringValue == currVal);
+                                        }
                                     }
                                 }
 
-                                if (!found)
+                                if (!found || !allEqual)
                                 {
                                     nodes[i].Attributes[attribute] = defaultValue;
+                                }
+                                else
+                                {
+                                    nodes[i].Attributes[attribute] = currVal;
                                 }
                             }
                             else if (attributeType == "Number")
@@ -358,3 +403,4 @@ namespace a85eee26d29b644708184f42ebe9a2567
         }
     }
 }
+
