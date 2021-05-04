@@ -184,7 +184,7 @@ namespace TreeViewer
             catch (Exception ex)
             {
                 TransformerAlert.IsVisible = true;
-                Avalonia.Controls.ToolTip.SetTip(TransformerAlert, ex.Message);
+                Avalonia.Controls.ToolTip.SetTip(TransformerAlert, GetExceptionMessage(ex));
                 return;
             }
 
@@ -227,13 +227,15 @@ namespace TreeViewer
                 for (int i = minIndex; i < FurtherTransformations.Count; i++)
                 {
                     AllTransformedTrees[i] = TransformedTree.Clone();
+                    int j = i;
                     try
                     {
                         FurtherTransformations[i].Transform(ref StateData.TransformedTree, FurtherTransformationsParameters[i]);
                         double progress = (double)(i + 1) / (FurtherTransformations.Count - minIndex);
+
                         _ = Dispatcher.UIThread.InvokeAsync(() =>
                         {
-                            FurtherTransformationsAlerts[i].IsVisible = false;
+                            FurtherTransformationsAlerts[j].IsVisible = false;
                             progressWindow.Progress = progress;
                         });
                     }
@@ -241,8 +243,8 @@ namespace TreeViewer
                     {
                         _ = Dispatcher.UIThread.InvokeAsync(() =>
                         {
-                            FurtherTransformationsAlerts[i].IsVisible = true;
-                            ToolTip.SetTip(FurtherTransformationsAlerts[i], ex.Message);
+                            FurtherTransformationsAlerts[j].IsVisible = true;
+                            ToolTip.SetTip(FurtherTransformationsAlerts[j], GetExceptionMessage(ex));
                         });
                     }
                 }
@@ -313,6 +315,22 @@ namespace TreeViewer
             return Task.CompletedTask;
         }
 
+        private static string GetExceptionMessage(Exception exception)
+        {
+
+            string message = exception.Message;
+
+            Exception currEx = exception;
+
+            while (currEx.InnerException != null)
+            {
+                currEx = currEx.InnerException;
+                message += "\n" + currEx.Message;
+            }
+
+            return message;
+        }
+
         public async Task UpdateFurtherTransformations(int minIndex)
         {
             minIndex = Math.Max(minIndex, 0);
@@ -352,7 +370,7 @@ namespace TreeViewer
             catch (Exception ex)
             {
                 CoordinatesAlert.IsVisible = true;
-                Avalonia.Controls.ToolTip.SetTip(CoordinatesAlert, ex.Message);
+                Avalonia.Controls.ToolTip.SetTip(CoordinatesAlert, GetExceptionMessage(ex));
                 return;
             }
 
@@ -667,7 +685,7 @@ namespace TreeViewer
                     try
                     {
                         PlottingAlerts[layer].IsVisible = true;
-                        ToolTip.SetTip(PlottingAlerts[layer], ex.Message);
+                        ToolTip.SetTip(PlottingAlerts[layer], GetExceptionMessage(ex));
                         //PlottingTimings[layer].Text = "?ms";
                     }
                     catch { }
