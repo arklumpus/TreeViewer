@@ -27,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <ColumnDefinition Width="Auto" />
     </Grid.ColumnDefinitions>
     <TextBlock Name="TextContainer">
-      Very long text
+      
     </TextBlock>
     <TextBlock Name="Ellipsis" Grid.Column="1" Text="..." IsVisible="False" Margin="5,0,0,0"></TextBlock>
   </Grid>
