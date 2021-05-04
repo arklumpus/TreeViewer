@@ -108,6 +108,30 @@
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
 			<array>
+				<string>io.github.arklumpus.TreeViewer.asnb</string>
+			</array>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>asnb.icns</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>io.github.arklumpus.TreeViewer.asn</string>
+			</array>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>asn.icns</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
 				<string>io.github.arklumpus.TreeViewer.smap</string>
 			</array>
 			<key>LSHandlerRank</key>
@@ -282,6 +306,44 @@
 			<string>NEXUS file</string>
 			<key>UTTypeIconFile</key>
 			<string>nex.icns</string>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>io.github.arklumpus.TreeViewer.asnb</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>asnb</string>
+				</array>
+			</dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>NCBI ASN.1 file</string>
+			<key>UTTypeIconFile</key>
+			<string>asnb.icns</string>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>io.github.arklumpus.TreeViewer.asn</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>asn</string>
+				</array>
+			</dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>NCBI ASN.1 file</string>
+			<key>UTTypeIconFile</key>
+			<string>asn.icns</string>
 		</dict>
     </array>
 </dict>

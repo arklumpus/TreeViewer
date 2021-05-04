@@ -15,7 +15,7 @@ using Avalonia.Media.Imaging;
 namespace SaveTree
 {
     /// <summary>
-    /// This module is used to save the currently opened tree to a file on disk. The tree can be saved in Newick, NEXUS or Binary format.
+    /// This module is used to save the currently opened tree to a file on disk. The tree can be saved in Newick, NEXUS Binary or NCBI ASN.1 format.
     /// </summary>
     /// 
     /// <description>
@@ -27,7 +27,7 @@ namespace SaveTree
     /// 2. The transformed tree that was produced by the Transformer module (e.g. a consensus tree).
     /// 3. The final transformed tree that was produced after all the Further transformation modules acted on the transformed tree.
     /// 
-    /// If the tree(s) is/are saved in Newick or Newick-with-attributes format, only the tree itself is saved, without including any
+    /// If the tree(s) is/are saved in Newick, Newick-with-attributes, or NCBI ASN.1 format, only the tree itself is saved, without including any
     /// information about the modules that are currently active in the plot. This means that if the file is later opened again in
     /// TreeViewer, all information about the active modules will be lost.
     /// 
@@ -58,7 +58,7 @@ namespace SaveTree
         public const string Name = "Save tree";
         public const string HelpText = "Saves the tree file.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "a8f25c08-4935-4fd5-80ea-1d29ada66f1e";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -304,6 +304,12 @@ namespace SaveTree
                 {
                     filters.Add(new FileDialogFilter() { Name = "Newick format", Extensions = new List<string>() { "tre", "nwk" } });
                     filters.Add(new FileDialogFilter() { Name = "Newick-with-attributes format", Extensions = new List<string>() { "nwka" } });
+
+                    if (targetChoice > 0 || window.Trees.Count == 1)
+                    {
+                        filters.Add(new FileDialogFilter() { Name = "NCBI ASN.1 text", Extensions = new List<string>() { "asn" } });
+                        filters.Add(new FileDialogFilter() { Name = "NCBI ASN.1 binary", Extensions = new List<string>() { "asnb" } });
+                    }
                 }
 
                 SaveFileDialog dialog = new SaveFileDialog() { Filters = filters, Title = "Save tree(s)" };
@@ -503,6 +509,28 @@ namespace SaveTree
                                     }
                                 }
                             }
+                            else if (extension == ".asn")
+                            {
+                                if (window.Trees.Count > 1)
+                                {
+                                    await new MessageBox("Attention", "NCBI ASN.1 files can only contain one tree!").ShowDialog2(window);
+                                }
+                                else
+                                {
+                                    NcbiAsnText.WriteTree(window.Trees[0], result, null, null);
+                                }
+                            }
+                            else if (extension == ".asnb")
+                            {
+                                if (window.Trees.Count > 1)
+                                {
+                                    await new MessageBox("Attention", "NCBI ASN.1 files can only contain one tree!").ShowDialog2(window);
+                                }
+                                else
+                                {
+                                    NcbiAsnBer.WriteTree(window.Trees[0], result, null, null);
+                                }
+                            }
                         }
                         else if (targetChoice == 1)
                         {
@@ -659,6 +687,14 @@ namespace SaveTree
                                 {
                                     sw.WriteLine(NWKA.WriteTree(window.FirstTransformedTree, true));
                                 }
+                            }
+                            else if (extension == ".asn")
+                            {
+                                NcbiAsnText.WriteTree(window.FirstTransformedTree, result, null, null);
+                            }
+                            else if (extension == ".asnb")
+                            {
+                                NcbiAsnBer.WriteTree(window.FirstTransformedTree, result, null, null);
                             }
                         }
                         else if (targetChoice == 2)
@@ -817,6 +853,14 @@ namespace SaveTree
                                 {
                                     sw.WriteLine(NWKA.WriteTree(window.TransformedTree, true));
                                 }
+                            }
+                            else if (extension == ".asn")
+                            {
+                                NcbiAsnText.WriteTree(window.TransformedTree, result, null, null);
+                            }
+                            else if (extension == ".asnb")
+                            {
+                                NcbiAsnBer.WriteTree(window.TransformedTree, result, null, null);
                             }
                         }
                     }
