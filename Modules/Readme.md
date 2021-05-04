@@ -25,7 +25,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Add attribute](f71a5e60-5e40-4a5e-9795-e5259fb283ab)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Adds an attribute based on an attachment.
 
@@ -389,7 +389,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Group labels](7ef15916-4383-4ee7-b4bd-bd44a7be1849)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Highlights monophyletic groups with a label.
 
@@ -445,6 +445,18 @@ Huge files may cause the program to run out of memory.
 **Module type**: LoadFile
 
 **Module ID**: `a22ff194-c486-4215-a4bf-7a006d6f88fa`
+
+<br />
+
+### [NCBI ASN.1](27d3b548-0bfe-4c8d-99f6-e8111a20f019)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Opens a file containing a tree in the NCBI ASN.1 text and binary format.
+
+**Module type**: FileType
+
+**Module ID**: `27d3b548-0bfe-4c8d-99f6-e8111a20f019`
 
 <br />
 
@@ -534,11 +546,11 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
-### [Parse tip states](716b55a3-02d9-4007-a830-8326d407b24c)
+### [Parse node states](716b55a3-02d9-4007-a830-8326d407b24c)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 2.0.0, by Giorgio Bianchini_
 
-**Description**: Loads tip state data from an attachment.
+**Description**: Loads node state data from an attachment.
 
 **Module type**: FurtherTransformation
 
@@ -608,7 +620,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Propagate attribute](85eee26d-29b6-4470-8184-f42ebe9a2567)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Propagates an attribute on the tree.
 
@@ -728,7 +740,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Save tree](a8f25c08-4935-4fd5-80ea-1d29ada66f1e)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Saves the tree file.
 
