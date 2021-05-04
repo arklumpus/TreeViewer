@@ -7,7 +7,7 @@
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
     <AssemblyName>TreeViewer</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <ApplicationIcon>Assets\Program.ico</ApplicationIcon>
     <Authors>Giorgio Bianchini</Authors>
     <Company>University of Bristol</Company>
@@ -86,16 +86,16 @@
     <EmbeddedResource Include="Fonts\RobotoMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.2" />
-    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="3.0.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.2" />
-    <PackageReference Include="AvaloniaColorPicker" Version="1.0.4" />
-    <PackageReference Include="CSharpEditor" Version="1.1.0" />
-    <PackageReference Include="MDEdit" Version="0.9.0" />
+    <PackageReference Include="Avalonia" Version="0.10.3" />
+    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="3.3.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.3" />
+    <PackageReference Include="AvaloniaColorPicker" Version="1.0.5" />
+    <PackageReference Include="CSharpEditor" Version="1.1.1" />
+    <PackageReference Include="MDEdit" Version="1.0.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Mono.Options" Version="6.6.0.161" />
     <PackageReference Include="MuPDFCore" Version="1.2.7" />
-    <PackageReference Include="TreeNode" Version="1.0.4" />
+    <PackageReference Include="TreeNode" Version="1.1.0" />
     <PackageReference Include="VectSharp" Version="1.7.0" />
     <PackageReference Include="VectSharp.Canvas" Version="2.1.8" />
     <PackageReference Include="VectSharp.Markdown" Version="1.0.5" />
