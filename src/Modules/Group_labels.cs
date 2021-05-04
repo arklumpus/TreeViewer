@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using PhyloTree;
@@ -36,7 +37,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
@@ -45,7 +46,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         {
             return new List<(string, string)>()
             {
-                ( "Attribute", "Group:3" ),
+                ( "Attribute", "Group:4" ),
 
                 /// <param name="Attribute:">
                 /// This parameter specifies the attribute used to determine the text of the labels.
@@ -64,6 +65,13 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// while if the [Attribute type](#attribute-type) is `Number` the text of the label corresponds to the number rounded to 2 significant digits.
                 /// </param>
                 ( "Attribute format...", "Formatter:[\"Attribute type:\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConverters[0]) + ",\"true\"]" ),
+                
+                /// <param name="Only on last ancestor">
+                /// If this check box is checked, the label is only shown for nodes that have a value for the specified [attribute](#attribute) that differs from their ancestor's value. For example, this makes it possible to
+                /// use the Propagate attribute module to propagate an attribute (e.g. a gene name or a phylum) to the last common ancestor of all taxa that have that attribute (i.e. all orthologs of that gene or all members
+                /// of that phylum), and then show a group label for that LCA.
+                /// </param>
+                ( "Only on last ancestor", "CheckBox:false" ),
 
                 ( "Layout", "Group:5" ),
                 
@@ -212,6 +220,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             double textMargin = (double)parameterValues["Margin: "];
             double height = (double)parameterValues["Height:"];
 
+            bool onlyOnLastAncestor = (bool)parameterValues["Only on last ancestor"];
+
             ColourFormatterOptions Fill = (ColourFormatterOptions)parameterValues["Fill colour:"];
             Colour defaultFill = Fill.DefaultColour;
             Func<object, Colour?> fillFormatter = Fill.Formatter;
@@ -270,7 +280,10 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                     if (nodes[nodeIndex].Attributes.TryGetValue(attributeName, out object attributeObject) && attributeObject != null)
                     {
-                        attributeValue = attributeFormatter(attributeObject);
+                        if (!onlyOnLastAncestor || nodes[nodeIndex].Parent == null || !nodes[nodeIndex].Parent.Attributes.TryGetValue(attributeName, out object attributeObjectParent) || attributeObjectParent == null || !attributeObjectParent.Equals(attributeObject))
+                        {
+                            attributeValue = attributeFormatter(attributeObject);
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(attributeValue))
@@ -455,7 +468,10 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                     if (nodes[nodeIndex].Attributes.TryGetValue(attributeName, out object attributeObject) && attributeObject != null)
                     {
-                        attributeValue = attributeFormatter(attributeObject);
+                        if (!onlyOnLastAncestor || nodes[nodeIndex].Parent == null || !nodes[nodeIndex].Parent.Attributes.TryGetValue(attributeName, out object attributeObjectParent) || attributeObjectParent == null || !attributeObjectParent.Equals(attributeObject))
+                        {
+                            attributeValue = attributeFormatter(attributeObject);
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(attributeValue))
