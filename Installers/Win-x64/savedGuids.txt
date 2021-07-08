@@ -457,3 +457,5 @@ MDEdit.xml	25eb1797-5731-44ae-b6fd-695bb150f35a
 System.Text.Json.xml	7f8e4675-f747-429a-a580-c1407b0b8a03
 Icons\asn.ico	55f8d9f5-b401-4c9c-af50-06abd4ab5e2d
 Icons\asnb.ico	9ce6be2c-f79d-40a6-b9fb-f564ad102eda
+MathNet.Numerics.dll	17749cc3-3065-420d-aef3-07ecc318dc95
+MathNet.Numerics.xml	ff3e581e-fafe-41c2-8103-b8e6f859284c
