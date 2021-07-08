@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace SetUpAgeDistributions
         public const string Name = "Set up age distributions";
         public const string HelpText = "Computes node age distributions.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "a1ccf05a-cf3c-4ca4-83be-af56f501c2a6";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -97,6 +98,16 @@ namespace SetUpAgeDistributions
             return (bool)currentParameterValues["Apply"];
         }
 
+        private static bool Compare(List<string> list1, List<string> list2)
+        {
+            if (list1.Count != list2.Count)
+            {
+                return false;
+            }
+
+            return !list1.Except(list2).Any();
+        }
+
         public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
         {
             bool fromLeft = (int)parameterValues["Age type:"] == 1;
@@ -127,14 +138,18 @@ namespace SetUpAgeDistributions
                 foreach (TreeNode node in sampledTree.GetChildrenRecursiveLazy())
                 {
                     TreeNode LCA = tree.GetLastCommonAncestor(node.GetLeafNames());
-                    double age = node.UpstreamLength();
 
-                    if (!fromLeft)
+                    if (Compare(LCA.GetLeafNames(), node.GetLeafNames()))
                     {
-                        age = treeHeight - age;
-                    }
+                        double age = node.UpstreamLength();
 
-                    ageSamples[LCA.Id].Add(age);
+                        if (!fromLeft)
+                        {
+                            age = treeHeight - age;
+                        }
+
+                        ageSamples[LCA.Id].Add(age);
+                    }
                 }
             }
 
@@ -142,20 +157,23 @@ namespace SetUpAgeDistributions
             {
                 for (int i = 0; i < nodes.Count; i++)
                 {
-                    if (computeMean)
+                    if (ageSamples[nodes[i].Id].Count > 0)
                     {
-                        nodes[i].Attributes["Mean age"] = ageSamples[nodes[i].Id].Average();
-                    }
+                        if (computeMean)
+                        {
+                            nodes[i].Attributes["Mean age"] = ageSamples[nodes[i].Id].Average();
+                        }
 
-                    if (ciType == 1)
-                    {
-                        double[] hdi = BayesStats.HighestDensityInterval(ageSamples[nodes[i].Id], threshold);
-                        nodes[i].Attributes[threshold.ToString("0%") + "_HDI"] = "[ " + hdi[0].ToString() + ", " + hdi[1].ToString() + "]";
-                    }
-                    else if (ciType == 2)
-                    {
-                        double[] eti = BayesStats.EqualTailedInterval(ageSamples[nodes[i].Id], threshold);
-                        nodes[i].Attributes[threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
+                        if (ciType == 1)
+                        {
+                            double[] hdi = BayesStats.HighestDensityInterval(ageSamples[nodes[i].Id], threshold);
+                            nodes[i].Attributes[threshold.ToString("0%") + "_HDI"] = "[ " + hdi[0].ToString() + ", " + hdi[1].ToString() + "]";
+                        }
+                        else if (ciType == 2)
+                        {
+                            double[] eti = BayesStats.EqualTailedInterval(ageSamples[nodes[i].Id], threshold);
+                            nodes[i].Attributes[threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
+                        }
                     }
                 }
             }
@@ -165,3 +183,4 @@ namespace SetUpAgeDistributions
         }
     }
 }
+
