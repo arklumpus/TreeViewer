@@ -66,9 +66,13 @@ namespace TreeViewer
             };
         }
 
-        public AddAttachmentWindow(string defaultName, bool loadInMemory, bool cacheResults) : this()
+        public AddAttachmentWindow(string defaultName, bool loadInMemory, bool cacheResults, bool canRename = true) : this()
         {
             this.FindControl<TextBox>("NameBox").Text = defaultName;
+            if (!canRename)
+            {
+                this.FindControl<TextBox>("NameBox").IsEnabled = false;
+            }
             this.FindControl<CheckBox>("LoadInMemoryBox").IsChecked = loadInMemory;
             this.FindControl<CheckBox>("CacheResultsBox").IsChecked = cacheResults;
         }

@@ -50,5 +50,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <Path Name="Cancel" IsVisible="False" IsHitTestVisible="False" Stroke="#ea1c23" StrokeThickness="2" Data="M6,6 L12,12 M12,6 L6,12" StrokeLineCap="Round" />
     <Path Name="OK" IsVisible="False" IsHitTestVisible="False" Stroke="#22b14c" StrokeThickness="2" Data="M6,9 L9,12 L12,6" StrokeLineCap="Round" />
     <Path Name="Download" IsVisible="False" IsHitTestVisible="False" Fill="#22b14c" Data="M9,15 L15,9 L11,9 L11,3 L7,3 L7,9 L3,9 Z" ></Path>
+    <Canvas Name="Replace" IsVisible="False" IsHitTestVisible="False">
+      <Path Stroke="#00a2e8" StrokeThickness="2" Data="M12,6 L6,6 M12,12 L6,12" StrokeLineCap="Round" StrokeJoin="Round" />
+      <Path Fill="#00a2e8" Data="M8,3.5 L4,6 L8,8.5 Z M10,9.5 L14,12 L10,14.5 Z" />
+    </Canvas>
   </Canvas>
 </UserControl>

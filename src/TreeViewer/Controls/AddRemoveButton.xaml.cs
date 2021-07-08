@@ -24,7 +24,7 @@ namespace TreeViewer
 {
     public class AddRemoveButton : UserControl
     {
-        public enum ButtonTypes { Add, Remove, Up, Down, Edit, OK, Cancel, Download }
+        public enum ButtonTypes { Add, Remove, Up, Down, Edit, OK, Cancel, Download, Replace }
 
         public static readonly StyledProperty<ButtonTypes> ButtonTypeProperty = AvaloniaProperty.Register<AddRemoveButton, ButtonTypes>(nameof(ButtonType), ButtonTypes.Add);
 
@@ -45,6 +45,7 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = false;
                         this.FindControl<Path>("OK").IsVisible = false;
                         this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
                         break;
                     case ButtonTypes.Remove:
                         this.FindControl<Path>("Add").IsVisible = false;
@@ -55,6 +56,7 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = false;
                         this.FindControl<Path>("OK").IsVisible = false;
                         this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
                         break;
                     case ButtonTypes.Down:
                         this.FindControl<Path>("Add").IsVisible = false;
@@ -65,6 +67,7 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = false;
                         this.FindControl<Path>("OK").IsVisible = false;
                         this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
                         break;
                     case ButtonTypes.Up:
                         this.FindControl<Path>("Add").IsVisible = false;
@@ -75,6 +78,7 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = false;
                         this.FindControl<Path>("OK").IsVisible = false;
                         this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
                         break;
                     case ButtonTypes.Edit:
                         this.FindControl<Path>("Add").IsVisible = false;
@@ -85,6 +89,7 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = false;
                         this.FindControl<Path>("OK").IsVisible = false;
                         this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
                         break;
                     case ButtonTypes.Cancel:
                         this.FindControl<Path>("Add").IsVisible = false;
@@ -95,6 +100,7 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = true;
                         this.FindControl<Path>("OK").IsVisible = false;
                         this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
                         break;
                     case ButtonTypes.OK:
                         this.FindControl<Path>("Add").IsVisible = false;
@@ -105,6 +111,7 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = false;
                         this.FindControl<Path>("OK").IsVisible = true;
                         this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
                         break;
                     case ButtonTypes.Download:
                         this.FindControl<Path>("Add").IsVisible = false;
@@ -115,6 +122,18 @@ namespace TreeViewer
                         this.FindControl<Path>("Cancel").IsVisible = false;
                         this.FindControl<Path>("OK").IsVisible = false;
                         this.FindControl<Path>("Download").IsVisible = true;
+                        this.FindControl<Canvas>("Replace").IsVisible = false;
+                        break;
+                    case ButtonTypes.Replace:
+                        this.FindControl<Path>("Add").IsVisible = false;
+                        this.FindControl<Path>("Remove").IsVisible = false;
+                        this.FindControl<Path>("Down").IsVisible = false;
+                        this.FindControl<Path>("Up").IsVisible = false;
+                        this.FindControl<Canvas>("Edit").IsVisible = false;
+                        this.FindControl<Path>("Cancel").IsVisible = false;
+                        this.FindControl<Path>("OK").IsVisible = false;
+                        this.FindControl<Path>("Download").IsVisible = false;
+                        this.FindControl<Canvas>("Replace").IsVisible = true;
                         break;
                 }
             }

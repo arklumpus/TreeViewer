@@ -28,6 +28,7 @@ namespace TreeViewer
     public class AttachmentItem : UserControl
     {
         public event EventHandler ItemDeleted;
+        public event EventHandler<ItemReplacedEventArgs> ItemReplaced;
 
         private string attachmentName;
 
@@ -66,6 +67,62 @@ namespace TreeViewer
             ItemDeleted?.Invoke(this, new EventArgs());
         }
 
+        private async void ReplaceClicked(object sender, RoutedEventArgs e)
+        {
+            MainWindow window = this.FindAncestorOfType<MainWindow>();
+            Attachment att = window.StateData.Attachments[attachmentName];
+
+            OpenFileDialog dialog;
+
+            if (!Modules.IsMac)
+            {
+                dialog = new OpenFileDialog()
+                {
+                    Title = "Add attachment",
+                    AllowMultiple = false,
+                    Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string>() { "*" }, Name = "All files" } }
+                };
+            }
+            else
+            {
+                dialog = new OpenFileDialog()
+                {
+                    Title = "Add attachment",
+                    AllowMultiple = false
+                };
+            }
+
+            string[] result = await dialog.ShowAsync(window);
+
+            if (result != null && result.Length == 1)
+            {
+                bool validResult = false;
+
+                string defaultName = att.Name;
+                bool loadInMemory = att.StoreInMemory;
+                bool cacheResults = att.CacheResults;
+
+                while (!validResult)
+                {
+                    AddAttachmentWindow win = new AddAttachmentWindow(defaultName, loadInMemory, cacheResults, false);
+                    await (win.ShowDialog(window));
+
+                    if (win.Result)
+                    {
+                        validResult = true;
+                        Attachment attachment = new Attachment(win.AttachmentName, win.CacheResults, win.LoadInMemory, result[0]);
+                        window.StateData.Attachments[attachment.Name] = attachment;
+                        att.Dispose();
+                        ItemReplaced?.Invoke(this, new ItemReplacedEventArgs(attachment.Name));
+                    }
+                    else
+                    {
+                        validResult = true;
+                    }
+                }
+            }
+        }
+
         private async void ExportClicked(object sender, RoutedEventArgs e)
         {
             SaveFileDialog dialog = new SaveFileDialog() { Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string>() { "*" }, Name = "All files" } }, Title = "Export attachment" };
@@ -81,6 +138,16 @@ namespace TreeViewer
                     window.StateData.Attachments[this.attachmentName].WriteToStream(fs);
                 }
             }
+        }
+    }
+
+    public class ItemReplacedEventArgs : EventArgs
+    {
+        public string ItemName { get; }
+
+        public ItemReplacedEventArgs(string itemName)
+        {
+            this.ItemName = itemName;
         }
     }
 }

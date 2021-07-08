@@ -37,6 +37,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           <local:AddRemoveButton ButtonType="Download" IsEnabled="False"></local:AddRemoveButton>
         </MenuItem.Icon>
       </MenuItem>
+      <MenuItem Header="Replace attachment..." Click="ReplaceClicked">
+        <MenuItem.Icon>
+          <local:AddRemoveButton ButtonType="Replace" IsEnabled="False"></local:AddRemoveButton>
+        </MenuItem.Icon>
+      </MenuItem>
       <MenuItem Header="Delete attachment" Click="DeleteClicked">
         <MenuItem.Icon>
           <local:AddRemoveButton ButtonType="Remove" IsEnabled="False"></local:AddRemoveButton>
