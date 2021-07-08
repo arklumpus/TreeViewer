@@ -32,14 +32,84 @@ for i in *; do
 	ln -s "../../../../MacOs/$i" "../Resources/DebuggerClient.app/Contents/MacOs/$i"
 done
 
+rm ../Resources/DebuggerClient.app/Contents/MacOs/DebuggerClient
+
+cp "DebuggerClient" "../Resources/DebuggerClient.app/Contents/MacOs/DebuggerClient"
+
 cd ../../../../../../
 
 echo -e "\033[104m\033[97m Signing app \033[0m"
 echo
 
-codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app"
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/MacOS/Automator Application Stub"
 
-codesign --verify --verbose "TreeViewer.app"
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/createdump"
+
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewer"
+
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/DebuggerClient"
+
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/Resources/DebuggerClient.app/Contents/MacOs/DebuggerClient"
+
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewerCommandLine"
+
+find TreeViewer.app/ -name "*.dylib" -type f -exec codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" {} \;
+
+codesign --deep --preserve-metadata="identifier,entitlements,requirements,flags,runtime" --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app"
+
+codesign --verify -vvv --strict --deep "TreeViewer.app"
+
+echo
+echo -e "\033[104m\033[97m Notarizing app \033[0m"
+echo
+
+rm -f "TreeViewer.zip"
+
+ditto -ck --rsrc --sequesterRsrc --keepParent "TreeViewer.app" "TreeViewer.zip"
+
+requestID=$(xcrun altool --notarize-app -f "TreeViewer.zip" --primary-bundle-id "io.github.arklumpus.TreeViewer" -u "$2" -p "$3" | grep "RequestUUID" | cut -d" " -f 3)
+
+echo "Request UUID: $requestID"
+
+breakloop="0"
+
+while [ $breakloop -lt 1 ]; do
+
+    echo "Waiting for 1 minute..."
+    sleep 60
+
+    currStatus=$(xcrun altool --notarization-info $requestID -u $2 -p $3 | grep "Status:" | cut -d":" -f 2)
+
+    echo "Status: $currStatus"
+
+    if [ "$currStatus" != " in progress" ]; then
+    	if [ "$currStatus" = " success" ]; then
+    	    breakloop="2"
+    	else
+    	    breakloop="1"
+    	fi
+    fi
+
+done
+
+if [ $breakloop -eq 2 ]; then
+
+    echo
+    echo -e "\033[104m\033[97m Stapling app \033[0m"
+    echo
+
+	xcrun stapler staple TreeViewer.app
+	xcrun stapler validate TreeViewer.app
+
+else
+
+    echo
+    echo -e "\033[101m\033[97m App notarization failed! \033[0m"
+    echo
+
+fi
+
+rm -f "TreeViewer.zip"
 
 cd ../..
 
@@ -47,7 +117,7 @@ echo
 echo -e "\033[104m\033[97m Creating DMG \033[0m"
 echo
 
-hdiutil create -srcfolder Release/Mac-x64 -volname "TreeViewer" -fs HFS+ -format UDRW -size 300m "TreeViewer.rw.dmg"
+hdiutil create -srcfolder Release/Mac-x64 -volname "TreeViewer" -fs HFS+ -format UDRW -size 350m "TreeViewer.rw.dmg"
 
 device=$(hdiutil attach -readwrite -noverify -noautoopen "TreeViewer.rw.dmg" | grep -e "^/dev/" | head -n1 | cut -f 1)
 
@@ -98,6 +168,52 @@ echo
 codesign --deep --force --timestamp --sign "$1" "TreeViewer.dmg"
 
 codesign --verify --verbose "TreeViewer.dmg"
+
+echo
+echo -e "\033[104m\033[97m Notarizing DMG \033[0m"
+echo
+
+requestID=$(xcrun altool --notarize-app -f "TreeViewer.dmg" --primary-bundle-id "io.github.arklumpus.TreeViewer" -u "$2" -p "$3" | grep "RequestUUID" | cut -d" " -f 3)
+
+echo "Request UUID: $requestID"
+
+breakloop="0"
+
+while [ $breakloop -lt 1 ]; do
+
+    echo "Waiting for 1 minute..."
+    sleep 60
+
+    currStatus=$(xcrun altool --notarization-info $requestID -u $2 -p $3 | grep "Status:" | cut -d":" -f 2)
+
+    echo "Status: $currStatus"
+
+    if [ "$currStatus" != " in progress" ]; then
+    	if [ "$currStatus" = " success" ]; then
+    	    breakloop="2"
+    	else
+    	    breakloop="1"
+    	fi
+    fi
+
+done
+
+if [ $breakloop -eq 2 ]; then
+
+    echo
+    echo -e "\033[104m\033[97m Stapling DMG \033[0m"
+    echo
+
+	xcrun stapler staple TreeViewer.dmg
+	xcrun stapler validate TreeViewer.dmg
+
+else
+
+    echo
+    echo -e "\033[101m\033[97m DMG notarization failed! \033[0m"
+    echo
+
+fi
 
 echo
 echo -e "\033[94mAll done!\033[0m"
