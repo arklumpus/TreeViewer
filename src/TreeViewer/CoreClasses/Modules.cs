@@ -1262,6 +1262,11 @@ public static Colour? Format(object attribute)
                 actualPath = Path.Combine(Modules.ModulePath, Path.GetFileName(referenceFile));
             }
 
+            if (!File.Exists(actualPath))
+            {
+                return referenceFile;
+            }
+
             return actualPath;
         }
 
