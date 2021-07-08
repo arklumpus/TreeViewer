@@ -39,9 +39,9 @@ namespace a06888353e9304d08ab245727bced8cd6
     ///     This includes the image contained in the attachment with the specified name in the Markdown document. The
     ///     correct format for the image is chosen automatically.
     ///
-    ///        Example:
+    ///     Example:
     ///
-    ///        * `attachment://Legend`    
+    ///     * `attachment://Legend`    
     /// 
     /// * `circle://<diameter>,<colour>[,<stroke thickness>[,<stroke colour>]]`
     /// 
