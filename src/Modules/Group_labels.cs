@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using PhyloTree;
@@ -37,7 +36,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.2.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
@@ -391,7 +390,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                         Colour strokeColour = sortedLabels[i][j].stroke;
                         double backgroundStrokeThickness = sortedLabels[i][j].strokeThickness;
                         Colour labelColour = sortedLabels[i][j].textColour;
-                        if (backgroundColor.A > 0 || (strokeColour.A > 0 && backgroundStrokeThickness > 0) || labelColour.A > 0)
+                        if (backgroundColor.A > 0 || (strokeColour.A > 0 && backgroundStrokeThickness > 0) || (labelColour.A > 0 && labelFont.FontSize > 0))
                         {
                             Point c1 = new Point(rootPoint.X + (distance + levelDepth) * coordinateReference.X + d1 * perpReference.X, rootPoint.Y + (distance + levelDepth) * coordinateReference.Y + d1 * perpReference.Y);
                             Point c2 = new Point(rootPoint.X + (distance + height + levelDepth) * coordinateReference.X + d1 * perpReference.X, rootPoint.Y + (distance + height + levelDepth) * coordinateReference.Y + d1 * perpReference.Y);
@@ -410,46 +409,49 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             graphics.Save();
 
-                            if (angle > 0 && angle < Math.PI)
+                            if (labelFont.FontSize > 0)
                             {
-                                if (textAlignment == 0)
+                                if (angle > 0 && angle < Math.PI)
                                 {
-                                    graphics.Translate((c1.X + c2.X) * 0.5, (c1.Y + c2.Y) * 0.5);
-                                    graphics.Rotate(perpAngle + Math.PI);
-                                    graphics.FillText(-textMargin - labelFont.MeasureText(attributeValue).Width, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    if (textAlignment == 0)
+                                    {
+                                        graphics.Translate((c1.X + c2.X) * 0.5, (c1.Y + c2.Y) * 0.5);
+                                        graphics.Rotate(perpAngle + Math.PI);
+                                        graphics.FillText(-textMargin - labelFont.MeasureText(attributeValue).Width, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 1)
+                                    {
+                                        graphics.Translate((c1.X + c3.X) * 0.5, (c1.Y + c3.Y) * 0.5);
+                                        graphics.Rotate(perpAngle + Math.PI);
+                                        graphics.FillText(-labelFont.MeasureText(attributeValue).Width * 0.5, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 2)
+                                    {
+                                        graphics.Translate((c3.X + c4.X) * 0.5, (c3.Y + c4.Y) * 0.5);
+                                        graphics.Rotate(perpAngle + Math.PI);
+                                        graphics.FillText(textMargin, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    }
                                 }
-                                else if (textAlignment == 1)
+                                else
                                 {
-                                    graphics.Translate((c1.X + c3.X) * 0.5, (c1.Y + c3.Y) * 0.5);
-                                    graphics.Rotate(perpAngle + Math.PI);
-                                    graphics.FillText(-labelFont.MeasureText(attributeValue).Width * 0.5, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
-                                }
-                                else if (textAlignment == 2)
-                                {
-                                    graphics.Translate((c3.X + c4.X) * 0.5, (c3.Y + c4.Y) * 0.5);
-                                    graphics.Rotate(perpAngle + Math.PI);
-                                    graphics.FillText(textMargin, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
-                                }
-                            }
-                            else
-                            {
-                                if (textAlignment == 0)
-                                {
-                                    graphics.Translate((c1.X + c2.X) * 0.5, (c1.Y + c2.Y) * 0.5);
-                                    graphics.Rotate(perpAngle);
-                                    graphics.FillText(textMargin, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
-                                }
-                                else if (textAlignment == 1)
-                                {
-                                    graphics.Translate((c1.X + c3.X) * 0.5, (c1.Y + c3.Y) * 0.5);
-                                    graphics.Rotate(perpAngle);
-                                    graphics.FillText(-labelFont.MeasureText(attributeValue).Width * 0.5, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
-                                }
-                                else if (textAlignment == 2)
-                                {
-                                    graphics.Translate((c3.X + c4.X) * 0.5, (c3.Y + c4.Y) * 0.5);
-                                    graphics.Rotate(perpAngle);
-                                    graphics.FillText(-textMargin - labelFont.MeasureText(attributeValue).Width, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    if (textAlignment == 0)
+                                    {
+                                        graphics.Translate((c1.X + c2.X) * 0.5, (c1.Y + c2.Y) * 0.5);
+                                        graphics.Rotate(perpAngle);
+                                        graphics.FillText(textMargin, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 1)
+                                    {
+                                        graphics.Translate((c1.X + c3.X) * 0.5, (c1.Y + c3.Y) * 0.5);
+                                        graphics.Rotate(perpAngle);
+                                        graphics.FillText(-labelFont.MeasureText(attributeValue).Width * 0.5, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 2)
+                                    {
+                                        graphics.Translate((c3.X + c4.X) * 0.5, (c3.Y + c4.Y) * 0.5);
+                                        graphics.Rotate(perpAngle);
+                                        graphics.FillText(-textMargin - labelFont.MeasureText(attributeValue).Width, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
+                                    }
                                 }
                             }
 
@@ -460,6 +462,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             }
             else if (coordinates.TryGetValue("92aac276-3af7-4506-a263-7220e0df5797", out coordinateReference))
             {
+                // Circular coordinates
+
                 List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)> labels = new List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>();
 
                 for (int nodeIndex = 0; nodeIndex < nodes.Count; nodeIndex++)
@@ -639,7 +643,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                         double backgroundStrokeThickness = sortedLabels[i][j].strokeThickness;
                         Colour labelColour = sortedLabels[i][j].textColour;
 
-                        if (backgroundColor.A > 0 || (strokeColour.A > 0 && backgroundStrokeThickness > 0) || labelColour.A > 0)
+                        if (backgroundColor.A > 0 || (strokeColour.A > 0 && backgroundStrokeThickness > 0) || (labelColour.A > 0 && labelFont.FontSize > 0))
                         {
                             Point c1 = new Point(radius * Math.Cos(d1), radius * Math.Sin(d1));
                             Point c2 = new Point(radius * Math.Cos(d2), radius * Math.Sin(d2));
@@ -683,38 +687,263 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             angle = angle % (2 * Math.PI);
 
-                            if (angle > 0 && angle < Math.PI)
+                            if (labelFont.FontSize > 0)
                             {
-                                GraphicsPath arc = new GraphicsPath().Arc(0, 0, radius + height * 0.5, d2, d1);
+                                if (angle > 0 && angle < Math.PI)
+                                {
+                                    GraphicsPath arc = new GraphicsPath().Arc(0, 0, radius + height * 0.5, d2, d1);
 
-                                if (textAlignment == 2)
-                                {
-                                    graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Left, TextBaselines.Middle, tag: nodeId);
+                                    if (textAlignment == 2)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Left, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 1)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 0.5, TextAnchors.Center, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 0)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 1 - (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Right, TextBaselines.Middle, tag: nodeId);
+                                    }
                                 }
-                                else if (textAlignment == 1)
+                                else
                                 {
-                                    graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 0.5, TextAnchors.Center, TextBaselines.Middle, tag: nodeId);
-                                }
-                                else if (textAlignment == 0)
-                                {
-                                    graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 1 - (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Right, TextBaselines.Middle, tag: nodeId);
+                                    GraphicsPath arc = new GraphicsPath().Arc(0, 0, radius + height * 0.5, d1, d2);
+
+                                    if (textAlignment == 0)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Left, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 1)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 0.5, TextAnchors.Center, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 2)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 1 - (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Right, TextBaselines.Middle, tag: nodeId);
+                                    }
                                 }
                             }
-                            else
-                            {
-                                GraphicsPath arc = new GraphicsPath().Arc(0, 0, radius + height * 0.5, d1, d2);
+                        }
+                    }
+                }
+            }
+            else if (coordinates.TryGetValue("95b61284-b870-48b9-b51c-3276f7d89df1", out coordinateReference))
+            {
+                // Radial coordinates
 
-                                if (textAlignment == 0)
+                for (int nodeIndex = 0; nodeIndex < nodes.Count; nodeIndex++)
+                {
+                    string attributeValue = "";
+
+                    if (nodes[nodeIndex].Attributes.TryGetValue(attributeName, out object attributeObject) && attributeObject != null)
+                    {
+                        if (!onlyOnLastAncestor || nodes[nodeIndex].Parent == null || !nodes[nodeIndex].Parent.Attributes.TryGetValue(attributeName, out object attributeObjectParent) || attributeObjectParent == null || !attributeObjectParent.Equals(attributeObject))
+                        {
+                            attributeValue = attributeFormatter(attributeObject);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(attributeValue))
+                    {
+                        Colour fill = defaultFill;
+                        if (nodes[nodeIndex].Attributes.TryGetValue(Fill.AttributeName, out object fillAttributeObject) && fillAttributeObject != null)
+                        {
+                            fill = fillFormatter(fillAttributeObject) ?? defaultFill;
+                        }
+
+                        Colour stroke = defaultStroke;
+                        if (nodes[nodeIndex].Attributes.TryGetValue(Stroke.AttributeName, out object strokeAttributeObject) && strokeAttributeObject != null)
+                        {
+                            stroke = strokeFormatter(strokeAttributeObject) ?? defaultStroke;
+                        }
+
+                        double strokeThickness = defaultThickness;
+                        if (nodes[nodeIndex].Attributes.TryGetValue(ThicknessFO.AttributeName, out object thicknessAttributeObject) && thicknessAttributeObject != null)
+                        {
+                            strokeThickness = thicknessFormatter(thicknessAttributeObject) ?? defaultThickness;
+                        }
+
+
+                        List<TreeNode> leaves = nodes[nodeIndex].GetLeaves();
+                        Point parentPoint = coordinates[nodes[nodeIndex].Id];
+
+                        double d1 = double.MaxValue;
+                        double d2 = double.MinValue;
+
+                        double radius = distance + height * 0.5;
+
+                        foreach (TreeNode leaf in leaves)
+                        {
+                            Point pt = coordinates[leaf.Id];
+
+                            double angle = Math.Atan2(pt.Y - parentPoint.Y, pt.X - parentPoint.X);
+
+                            d1 = Math.Min(d1, angle);
+                            d2 = Math.Max(d2, angle);
+
+                            radius = Math.Max(radius, Math.Sqrt((pt.X - parentPoint.X) * (pt.X - parentPoint.X) + (pt.Y - parentPoint.Y) * (pt.Y - parentPoint.Y)) + distance + height * 0.5);
+                        }
+
+                        if (d2 < d1)
+                        {
+                            d2 += 2 * Math.PI;
+                        }
+
+                        d1 -= margin / radius;
+                        d2 += margin / radius;
+
+                        while (d1 < 0)
+                        {
+                            d1 += 2 * Math.PI;
+                            d2 += 2 * Math.PI;
+                        }
+
+                        if (d2 > d1 + 2 * Math.PI)
+                        {
+                            d1 = 0.0001;
+                            d2 = 2 * Math.PI + 0.0001;
+                        }
+
+                        if (fill.A == 0 && (stroke.A == 0 || strokeThickness == 0))
+                        {
+                            if (textAlignment == 0)
+                            {
+                                d2 = d1;
+                            }
+                            else if (textAlignment == 1)
+                            {
+                                double center = (d1 + d2) * 0.5;
+                                d1 = center;
+                                d2 = center;
+                            }
+                            else if (textAlignment == 2)
+                            {
+                                d1 = d2;
+                            }
+                        }
+
+                        double origD1 = d1;
+                        double origD2 = d2;
+
+                        double textWidth = (labelFont.MeasureText(attributeValue).Width + textMargin * 2) / radius;
+
+                        if (textWidth > d2 - d1)
+                        {
+                            if (textAlignment == 0)
+                            {
+                                d2 = d1 + textWidth;
+                            }
+                            else if (textAlignment == 1)
+                            {
+                                double center = (d1 + d2) * 0.5;
+                                d1 = center - textWidth * 0.5;
+                                d2 = center + textWidth * 0.5;
+                            }
+                            else if (textAlignment == 2)
+                            {
+                                d1 = d2 - textWidth;
+                            }
+                        }
+
+                        while (d1 < 0)
+                        {
+                            d1 += 2 * Math.PI;
+                            d2 += 2 * Math.PI;
+                        }
+
+                        Colour textColour = defaultTextColour;
+                        if (nodes[nodeIndex].Attributes.TryGetValue(TextColour.AttributeName, out object textColourAttributeObject) && textColourAttributeObject != null)
+                        {
+                            textColour = textColourFormatter(textColourAttributeObject) ?? defaultTextColour;
+                        }
+
+                        Colour backgroundColor = fill;
+                        Colour strokeColour = stroke;
+                        double backgroundStrokeThickness = strokeThickness;
+                        Colour labelColour = textColour;
+                        string nodeId = nodes[nodeIndex].Id;
+                        radius -= height;
+
+                        if (backgroundColor.A > 0 || (strokeColour.A > 0 && backgroundStrokeThickness > 0) || (labelColour.A > 0 && labelFont.FontSize > 0))
+                        {
+                            Point c1 = new Point(radius * Math.Cos(d1) + parentPoint.X, radius * Math.Sin(d1) + parentPoint.Y);
+                            Point c2 = new Point(radius * Math.Cos(d2) + parentPoint.X, radius * Math.Sin(d2) + parentPoint.Y);
+                            Point c3 = new Point((radius + height) * Math.Cos(d2) + parentPoint.X, (radius + height) * Math.Sin(d2) + parentPoint.Y);
+                            Point c4 = new Point((radius + height) * Math.Cos(d1) + parentPoint.X, (radius + height) * Math.Sin(d1) + parentPoint.Y);
+
+                            updateMaxMin(c1);
+                            updateMaxMin(c2);
+                            updateMaxMin(c3);
+                            updateMaxMin(c4);
+
+                            GraphicsPath background = new GraphicsPath().MoveTo(c1).Arc(parentPoint, radius, d1, d2).LineTo(c3).Arc(parentPoint, radius + height, d2, d1).Close();
+
+                            graphics.FillPath(background, backgroundColor, tag: nodeId);
+                            graphics.StrokePath(background, strokeColour, backgroundStrokeThickness, tag: nodeId);
+
+                            double startAngle = d1;
+                            double endAngle = d2;
+
+                            if (textAlignment == 0)
+                            {
+                                startAngle = d1 + (textMargin / distance);
+                                endAngle = d1 + ((textMargin + labelFont.MeasureText(attributeValue).Width) / distance);
+                            }
+                            else if (textAlignment == 1)
+                            {
+                                startAngle = endAngle = (d1 + d2) * 0.5;
+                            }
+                            else if (textAlignment == 2)
+                            {
+                                startAngle = d2 - (textMargin / distance);
+                                endAngle = d2 - ((textMargin + labelFont.MeasureText(attributeValue).Width) / distance);
+                            }
+
+                            double angle = (startAngle + endAngle) * 0.5;
+
+                            while (angle < 0)
+                            {
+                                angle += 2 * Math.PI;
+                            }
+
+                            angle = angle % (2 * Math.PI);
+
+                            if (labelFont.FontSize > 0)
+                            {
+                                if (angle > 0 && angle < Math.PI)
                                 {
-                                    graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Left, TextBaselines.Middle, tag: nodeId);
+                                    GraphicsPath arc = new GraphicsPath().Arc(parentPoint, radius + height * 0.5, d2, d1);
+
+                                    if (textAlignment == 2)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Left, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 1)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 0.5, TextAnchors.Center, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 0)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 1 - (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Right, TextBaselines.Middle, tag: nodeId);
+                                    }
                                 }
-                                else if (textAlignment == 1)
+                                else
                                 {
-                                    graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 0.5, TextAnchors.Center, TextBaselines.Middle, tag: nodeId);
-                                }
-                                else if (textAlignment == 2)
-                                {
-                                    graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 1 - (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Right, TextBaselines.Middle, tag: nodeId);
+                                    GraphicsPath arc = new GraphicsPath().Arc(parentPoint, radius + height * 0.5, d1, d2);
+
+                                    if (textAlignment == 0)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Left, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 1)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 0.5, TextAnchors.Center, TextBaselines.Middle, tag: nodeId);
+                                    }
+                                    else if (textAlignment == 2)
+                                    {
+                                        graphics.FillTextOnPath(arc, attributeValue, labelFont, labelColour, 1 - (textMargin / (radius + height * 0.5)) / (d2 - d1), TextAnchors.Right, TextBaselines.Middle, tag: nodeId);
+                                    }
                                 }
                             }
                         }
