@@ -31,17 +31,13 @@ You can now run TreeViewer using the shortcut that has been created. Alternative
 
 ### macOS
 
-Installing TreeViewer on macOS is slightly more complicated, due to the draconian security policies enforced by Apple (essentially, unless developers pay 99$ to Apple every year, macOS will refuse to trust them).
-
-Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg). Right-click/Ctrl+click it and select `Open`. You should get a warning dialog about the developer not being identified; ignore it and click `Open` in the dialog. The installer should open and guide you through the process. It will do three main things:
+Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg) and double-click it (starting from version 1.2.0, the TreeViewer installer and disk image are fully signed and notarized). If you get a message that the app cannot be opened because it was not downloaded from the App Store, right-click or ctrl-click on the file and choose "Open", then click on the "Open" button in the dialog that opens. The installer will open and guide you through the process. It will do three main things:
 
 1. Copy the TreeViewer app to the `/Applications` folder.
 2. Delete any downloaded modules from previous versions of TreeVIewer.
 3. Create symlinks to the TreeViewer executables (`TreeViewer` and `TreeViewerCommandLine`) in the `/usr/local/bin` folder.
 
-**Note**: after downloading the installer, you _have to_ right-click or ctrl+click it, otherwise (as per the Apple security policy above), macOS will refuse to let you open it.
-
-Once the installer is finished, you can run TreeViewer by opening the App in your Applications folder. You can also run it from the command line by typing `TreeViewer` (or `TreeViewerCommandLine` for the command line version) in a terminal window.
+Once the installer has finished, you can run TreeViewer by opening the App in your Applications folder. You can also run it from the command line by typing `TreeViewer` (or `TreeViewerCommandLine` for the command line version) in a terminal window.
 
 TreeViewer has been tested on macOS Catalina and Big Sur.
 
@@ -116,9 +112,9 @@ If you wish, you can also add the folder where the TreeViewer executables are lo
 
 ### macOS
 
-Download the [`TreeViewer-Mac-x64.dmg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.dmg) disk image. Right-click/ctrl+click it and and choose `Open` to mount it (if a security prompt pops up, tell it that you really want to opend the disk image). Open the `TreeViewer` disk that should have appeared on your desktop and drag the `TreeViewer` app to the `Applications` folder.
+Download the [`TreeViewer-Mac-x64.dmg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.dmg) disk image. Double-click the disk image to mount it (if you get a message that the App cannot be opened because it was not downloaded from the App Store, right-click/ctrl+click it and and choose `Open` to mount it). Open the `TreeViewer` disk that should have appeared on your desktop and drag the `TreeViewer` app to the `Applications` folder.
 
-To start TreeViewer for the first time, you need to go to the `Applications` folder and right-click/ctrl+click on it and choose `Open`; then, confirm that you really want to open the app. This should only be necessary the first time you open the program; afterwards, you should be able to open TreeViewer normally.
+When you start TreeViewer for the first time from the icon in your `Applications` folder, if you get again the message that the app was not downloaded from the App Store you may need to right-click/ctrl-click on it and choose `Open`. This should only be necessary the first time you open the program; afterwards, you should be able to open TreeViewer normally.
 
 You can also create symlinks to the TreeViewer executables in a folder that is included in your `PATH` (such as `/usr/local/bin`): open a terminal and type:
 
@@ -169,7 +165,7 @@ You can use [Microsoft Visual Studio](https://visualstudio.microsoft.com/vs/) to
 
 To fully compile TreeViewer for Windows, macOS and Linux, you will need a computer with Windows 10 with the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) installed and a computer with a recent release of macOS.
 
-First of all, you will need to download the TreeViewer source code: [TreeViewer-1.1.1.tar.gz](https://github.com/arklumpus/TreeViewer/archive/v1.1.1.tar.gz) and extract it somewhere on both the Windows machine and the macOS machine.
+First of all, you will need to download the TreeViewer source code: [TreeViewer-1.2.0.tar.gz](https://github.com/arklumpus/TreeViewer/archive/v1.2.0.tar.gz) and extract it somewhere on both the Windows machine and the macOS machine.
 
 Then, on the Windows machine, open a command-line window in the folder where you have extracted the source code, and type:
 
@@ -178,23 +174,23 @@ BuildRelease Win-x64
 BuildRelease Linux-x64
 BuildRelease Mac-x64
 
-BuildBinaries-Win-x64
+BuildBinaries-Win-x64 "path/to/certificate.pfx" "certificate_password"
 bash -c ./BuildBinaries-Linux-x64.sh
 ```
 
-These commands will compile TreeViewer for all three platforms and create the installers for Windows and Linux, which will be placed in the `Binary` folder.
+These commands will compile TreeViewer for all three platforms and create the installers for Windows and Linux, which will be placed in the `Binary` folder. To build the binaries for Windows, it is necessary to supply a code-signing certificate in PFX or P12 format, together with the associated password. Such a certificate can be obtained (for a fee) from a [certificate authority](https://docs.microsoft.com/en-us/windows-hardware/drivers/dashboard/get-a-code-signing-certificate) or can be a self-signed certificate.
 
 Now you need to copy the `Release/Mac-x64` folder to the corresponding folder on the macOS machine.
 
-If you do not already have one, you need to create a certificate that will be used to sign the app (even though Apple will refuse to acknowledge this unless you pay them 99$ each year). To do this, open the `Keychain Access` application from the `Applications/Utilities` folder. Click on the `Keychain Access` menu, then `Certificate assistant`, then `Create certificate...`. Give your certificate a name, choose `Code Signing` as `Certificate Type` and click on `Create`. The certificate should have now been created and added to your `login` keychain.
+To sign the app and the installer on macOS, you will need a "Developer ID Application" certificate and a "Developer ID Installer" certificate, as well as an Apple ID and an app-specific password (which can be generated from the Apple ID page).
 
-Still on the macOS machine, open a terminal in the folder where you have extracted the TreeViewer source code and type:
+On the macOS machine, open a terminal in the folder where you have extracted the TreeViewer source code and type:
 
 ```bash
-./BuildBinaries-Mac-x64.sh "<Identity>"
+./BuildBinaries-Mac-x64.sh "<Developer ID Application Identity>" "<Developer ID Installer Identity>" "<Apple ID>" "<app-specific password>"
 ```
 
-Where `<Identity>` is the name of the certificate you created earlier. This should create the installers for macOS in the `Binary` folder.
+Where `<Developer ID Application Identity>` and `<Developer ID Installer Identity>` are the names of the certificates in your keychain (e.g. `"Developer ID Application: John Smith"`). This should create, sign and notarize the installers for macOS in the `Binary` folder.
 
 Finally, to create the module repository, go back on the Windows machine. You will need a private key file to sign the module files; you can obtain one by running TreeViewer with the `--key` command line argument. For example, you can use the version of TreeViewer that you have just compiled:
 
