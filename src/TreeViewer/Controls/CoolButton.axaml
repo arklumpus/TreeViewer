@@ -11,6 +11,7 @@
           <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
         </Transitions>
       </Setter>
+      <Setter Property="RenderTransform" Value="none" />
     </Style>
     
     <Style Selector="Border#Border1.Pressed">
