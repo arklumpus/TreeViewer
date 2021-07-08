@@ -7,3 +7,14 @@ VectSharp.dll
 PhyloTree.TreeNode.dll
 System.Linq.dll
 System.Text.Json.dll
+Avalonia.Visuals.dll
+Avalonia.Controls.dll
+Avalonia.Input.dll
+Avalonia.Base.dll
+Avalonia.Layout.dll
+Avalonia.Animation.dll
+Avalonia.Interactivity.dll
+Avalonia.Styling.dll
+System.ComponentModel.Primitives.dll
+System.ObjectModel.dll
+AvaloniaColorPicker.dll

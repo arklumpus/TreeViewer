@@ -4,6 +4,7 @@ using System.Linq;
 using PhyloTree;
 using TreeViewer;
 using VectSharp;
+using System.Threading.Tasks;
 
 namespace NodeStates
 {
@@ -79,7 +80,7 @@ namespace NodeStates
         public const string Name = "Node states";
         public const string HelpText = "Draws node states based on attributes.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "0512b822-044d-4c13-b3bb-bca494c51daa";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -87,6 +88,9 @@ namespace NodeStates
         {
             return new List<(string, string)>()
             {
+                ( "Window", "Window:" ),
+                ( "StateData", "InstanceStateData:" ),
+                
                 /// <param name="Show on:">
                 /// This parameter determines on which nodes the states are shown. If the value is `Leaves`, the
                 /// states are only shown for terminal nodes (nodes with no child nodes). If the value is `Internal
@@ -198,11 +202,21 @@ namespace NodeStates
                 ///         switch (state)
                 ///         {
                 ///             case "A":
-                ///                 return Colour.FromRgb(255, 0, 0);
+                ///                 return Colour.FromRgb(213, 94, 0);
                 ///             case "B":
-                ///                 return Colour.FromRgb(0, 255, 0);
+                ///                 return Colour.FromRgb(0, 114, 178);
                 ///             case "C":
-                ///                 return Colour.FromRgb(0, 0, 255);
+                ///                 return Colour.FromRgb(0, 158, 115);
+                ///             case "0":
+                ///                 return Colour.FromRgb(213, 94, 0);
+                ///             case "1":
+                ///                 return Colour.FromRgb(0, 114, 178);
+                ///             case "2":
+                ///                 return Colour.FromRgb(0, 158, 115);
+                ///             case "Y":
+                ///                 return Colour.FromRgb(0, 158, 115);
+                ///             case "N":
+                ///                 return Colour.FromRgb(220, 220, 220);
                 ///             default:
                 ///                 return null;
                 ///         }
@@ -221,7 +235,12 @@ namespace NodeStates
                 /// If the states are specified as numbers (e.g in the case of continuous characters), a standard number formatter can be used, by setting an
                 /// appropriate maximum and minimum value, and using a gradient to associate the colour to each state.
                 /// </param>
-                ( "State colours:", "ColourByNode:[" + System.Text.Json.JsonSerializer.Serialize(DefaultStateColourConverter) + ",\"(N/A)\",\"String\",\"180\",\"180\",\"180\",\"255\",\"true\"]" ),
+                ( "State colours:", "ColourByNode:[" + System.Text.Json.JsonSerializer.Serialize(DefaultStateColourConverter) + ",\"(N/A)\",\"String\",\"220\",\"220\",\"220\",\"255\",\"true\"]" ),
+
+                /// <param name="Wizard edit state colours">
+                /// This button opens a window that can be used to specify the state colours using a graphical interface.
+                /// </param>
+                ( "Wizard edit state colours", "Button:" ),
                 
                 /// <param name="Stroke thickness:">
                 /// This parameter determines the thickness of the stroke surrounding the state shape.
@@ -262,11 +281,21 @@ namespace NodeStates
         switch (state)
         {
             case ""A"":
-                return Colour.FromRgb(255, 0, 0);
+                return Colour.FromRgb(213, 94, 0);
             case ""B"":
-                return Colour.FromRgb(0, 255, 0);
+                return Colour.FromRgb(0, 114, 178);
             case ""C"":
-                return Colour.FromRgb(0, 0, 255);
+                return Colour.FromRgb(0, 158, 115);
+            case ""0"":
+                return Colour.FromRgb(213, 94, 0);
+            case ""1"":
+                return Colour.FromRgb(0, 114, 178);
+            case ""2"":
+                return Colour.FromRgb(0, 158, 115);
+            case ""Y"":
+                return Colour.FromRgb(0, 158, 115);
+            case ""N"":
+                return Colour.FromRgb(220, 220, 220);
             default:
                 return null;
         }
@@ -279,7 +308,7 @@ namespace NodeStates
 
         public static bool OnParameterChange(object tree, Dictionary<string, object> previousParameterValues, Dictionary<string, object> currentParameterValues, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange)
         {
-            parametersToChange = new Dictionary<string, object>() { };
+            parametersToChange = new Dictionary<string, object>() { { "Wizard edit state colours", false } };
 
             if ((int)currentParameterValues["Type:"] == 2 && (int)currentParameterValues["Anchor:"] == 2 && (int)currentParameterValues["Branch reference:"] == 2)
             {
@@ -301,6 +330,68 @@ namespace NodeStates
                 {
                     { "Suggested width:", ControlStatus.Hidden }
                 };
+            }
+
+            if ((string)currentParameterValues["Attribute type:"] == "String")
+            {
+                controlStatus["Wizard edit state colours"] = ControlStatus.Enabled;
+            }
+            else
+            {
+                controlStatus["Wizard edit state colours"] = ControlStatus.Hidden;
+            }
+
+            if ((string)previousParameterValues["Attribute:"] != (string)currentParameterValues["Attribute:"])
+            {
+                string attributeName = (string)currentParameterValues["Attribute:"];
+
+                string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
+
+                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"])
+                {
+                    parametersToChange.Add("Attribute type:", attrType);
+
+                    if (attrType == "String")
+                    {
+                        controlStatus["Wizard edit state colours"] = ControlStatus.Enabled;
+                    }
+                    else
+                    {
+                        controlStatus["Wizard edit state colours"] = ControlStatus.Hidden;
+                    }
+                }
+            }
+
+
+
+            if ((bool)currentParameterValues["Wizard edit state colours"])
+            {
+                //ShowWizardEditWindow((Avalonia.Controls.Window)currentParameterValues["Window"])
+
+                InstanceStateData stateData = (InstanceStateData)currentParameterValues["StateData"];
+
+                int moduleIndex = -1;
+
+                List<PlottingModule> plottingModules = stateData.PlottingModules();
+                for (int i = 0; i < plottingModules.Count; i++)
+                {
+                    if (plottingModules[i].Id == Id)
+                    {
+                        if ((string)stateData.GetPlottingModulesParameters(i)[Modules.ModuleIDKey] == (string)currentParameterValues[Modules.ModuleIDKey])
+                        {
+                            moduleIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                ColourFormatterOptions StateColours = (ColourFormatterOptions)currentParameterValues["State colours:"];
+                Colour defaultStateColour = StateColours.DefaultColour;
+                Func<object, Colour?> stateColourFormatter = StateColours.Formatter;
+
+                _ = ShowWizardEditWindow((Avalonia.Controls.Window)currentParameterValues["Window"], stateData, moduleIndex, (string)currentParameterValues["Attribute:"], defaultStateColour, stateColourFormatter);
+
+                //stateData.PlottingModulesParameterUpdater(0)
             }
 
             return true;
@@ -939,6 +1030,354 @@ namespace NodeStates
             }
 
             return tbr;
+        }
+
+        private static async Task ShowWizardEditWindow(Avalonia.Controls.Window parent, InstanceStateData stateData, int moduleIndex, string attributeName, Colour defaultStateColour, Func<object, Colour?> stateColourFormatter)
+        {
+            Avalonia.Controls.Window window = new Avalonia.Controls.Window() { Icon = parent.Icon, Title = "Select state colours", Width = 300, Height = 600, WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner, FontFamily = parent.FontFamily, FontSize = parent.FontSize };
+
+            Avalonia.Controls.Grid mainContainer = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(10) };
+            window.Content = mainContainer;
+
+            mainContainer.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+            mainContainer.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+            mainContainer.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(1, Avalonia.Controls.GridUnitType.Star));
+            mainContainer.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+
+            mainContainer.Children.Add(new Avalonia.Controls.TextBlock() { Text = "Select state colours:", Margin = new Avalonia.Thickness(0, 0, 0, 10), FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center });
+
+            Avalonia.Controls.Grid headerGrid = new Avalonia.Controls.Grid();
+
+            headerGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+            headerGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(100, Avalonia.Controls.GridUnitType.Pixel));
+            headerGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(48, Avalonia.Controls.GridUnitType.Pixel));
+
+            {
+                Avalonia.Controls.TextBlock blk = new Avalonia.Controls.TextBlock() { Text = "State", FontWeight = Avalonia.Media.FontWeight.Bold, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 0, 10) };
+                headerGrid.Children.Add(blk);
+            }
+
+            {
+                Avalonia.Controls.TextBlock blk = new Avalonia.Controls.TextBlock() { Text = "Colour", FontWeight = Avalonia.Media.FontWeight.Bold, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 0, 10) };
+                Avalonia.Controls.Grid.SetColumn(blk, 1);
+                headerGrid.Children.Add(blk);
+            }
+
+            {
+                Avalonia.Controls.Canvas can = new Avalonia.Controls.Canvas() { Height = 1, Background = Avalonia.Media.Brushes.Black, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom };
+                Avalonia.Controls.Grid.SetColumnSpan(can, 3);
+                headerGrid.Children.Add(can);
+            }
+
+            Avalonia.Controls.Grid.SetRow(headerGrid, 1);
+            mainContainer.Children.Add(headerGrid);
+
+            Avalonia.Controls.Grid buttonGrid = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(0, 10, 0, 0) };
+            buttonGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+            buttonGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+            buttonGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+            buttonGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+            buttonGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+            Avalonia.Controls.Grid.SetRow(buttonGrid, 3);
+            mainContainer.Children.Add(buttonGrid);
+
+            Avalonia.Controls.Button okButton = new Avalonia.Controls.Button() { Width = 100, Content = "OK", HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+            Avalonia.Controls.Grid.SetColumn(okButton, 1);
+            buttonGrid.Children.Add(okButton);
+
+            Avalonia.Controls.Button cancelButton = new Avalonia.Controls.Button() { Width = 100, Content = "Cancel", HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+            Avalonia.Controls.Grid.SetColumn(cancelButton, 3);
+            buttonGrid.Children.Add(cancelButton);
+
+            Dictionary<string, Colour> allStateColours = new Dictionary<string, Colour>();
+            HashSet<string> allStatesString = new HashSet<string>();
+
+            try
+            {
+
+                List<TreeNode> nodes = stateData.TransformedTree.GetChildrenRecursive();
+
+                foreach (TreeNode node in nodes)
+                {
+                    if (node.Attributes.TryGetValue(attributeName, out object attributeObject) && attributeObject is string attributeValue && !string.IsNullOrEmpty(attributeValue))
+                    {
+                        GetStatesString(attributeValue, allStatesString);
+                    }
+                }
+
+                foreach (string sr in allStatesString)
+                {
+                    allStateColours[sr] = stateColourFormatter(sr) ?? defaultStateColour;
+                }
+            }
+            catch { }
+
+            Avalonia.Controls.ScrollViewer scroller = new Avalonia.Controls.ScrollViewer();
+            Avalonia.Controls.Grid.SetRow(scroller, 2);
+            mainContainer.Children.Add(scroller);
+
+            Avalonia.Controls.StackPanel itemsContainer = new Avalonia.Controls.StackPanel();
+            scroller.Content = itemsContainer;
+
+            List<Avalonia.Controls.Grid> itemList = new List<Avalonia.Controls.Grid>();
+
+            void updateBackgrounds()
+            {
+                for (int i = 0; i < itemList.Count; i++)
+                {
+                    if (i % 2 == 1)
+                    {
+                        itemList[i].Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240));
+                    }
+                    else
+                    {
+                        itemList[i].Background = Avalonia.Media.Brushes.White;
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<string, Colour> stateColour in allStateColours)
+            {
+                Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid();
+                grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(100, Avalonia.Controls.GridUnitType.Pixel));
+                grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(48, Avalonia.Controls.GridUnitType.Pixel));
+
+                string key = stateColour.Key;
+                Colour col = stateColour.Value;
+
+                grd.Children.Add(new Avalonia.Controls.TextBlock()
+                {
+                    Text = key,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                    FontStyle = Avalonia.Media.FontStyle.Italic,
+                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+                });
+                AvaloniaColorPicker.ColorButton colorButton = new AvaloniaColorPicker.ColorButton() { Color = col.ToAvalonia(), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 5, 0, 5) };
+                Avalonia.Controls.Grid.SetColumn(colorButton, 1);
+                grd.Children.Add(colorButton);
+
+                colorButton.PropertyChanged += (s, e) =>
+                {
+                    if (e.Property == AvaloniaColorPicker.ColorButton.ColorProperty)
+                    {
+                        allStateColours[key] = colorButton.Color.ToVectSharp();
+                    }
+                };
+
+                AddRemoveButton removeButton = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Remove, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 16, 0) };
+                Avalonia.Controls.Grid.SetColumn(removeButton, 2);
+
+                removeButton.PointerPressed += (s, e) =>
+                {
+                    itemList.Remove(grd);
+                    allStateColours.Remove(key);
+                    itemsContainer.Children.Remove(grd);
+                    updateBackgrounds();
+                };
+
+                if (itemsContainer.Children.Count % 2 == 1)
+                {
+                    grd.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240));
+                }
+                else
+                {
+                    grd.Background = Avalonia.Media.Brushes.White;
+                }
+
+                grd.Children.Add(removeButton);
+                itemList.Add(grd);
+                itemsContainer.Children.Add(grd);
+
+            }
+
+            {
+                AddRemoveButton addButton = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Add, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 16, 0) };
+                itemsContainer.Children.Add(addButton);
+
+                addButton.PointerReleased += async (s, e) =>
+                {
+                    Avalonia.Controls.Window nameInputWindow = new Avalonia.Controls.Window() { Icon = parent.Icon, Title = "Enter state name", Width = 300, Height = 200, WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner, FontFamily = parent.FontFamily, FontSize = parent.FontSize };
+
+                    Avalonia.Controls.Grid contentGrid = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(10) };
+
+                    contentGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+                    contentGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+
+                    contentGrid.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                    contentGrid.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+
+                    nameInputWindow.Content = contentGrid;
+
+                    contentGrid.Children.Add(new Avalonia.Controls.TextBlock() { Text = "State name:", Margin = new Avalonia.Thickness(0, 0, 10, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
+
+                    Avalonia.Controls.TextBox nameBox = new Avalonia.Controls.TextBox() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                    Avalonia.Controls.Grid.SetColumn(nameBox, 1);
+                    contentGrid.Children.Add(nameBox);
+
+                    Avalonia.Controls.Grid buttonGridDialog = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(0, 10, 0, 0) };
+                    Avalonia.Controls.Grid.SetRow(buttonGridDialog, 1);
+                    Avalonia.Controls.Grid.SetColumnSpan(buttonGridDialog, 2);
+                    contentGrid.Children.Add(buttonGridDialog);
+
+                    buttonGridDialog.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                    buttonGridDialog.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+                    buttonGridDialog.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                    buttonGridDialog.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+                    buttonGridDialog.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+
+                    Avalonia.Controls.Button okButtonDialog = new Avalonia.Controls.Button() { Width = 100, Content = "OK", HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                    Avalonia.Controls.Grid.SetColumn(okButtonDialog, 1);
+                    buttonGridDialog.Children.Add(okButtonDialog);
+
+                    Avalonia.Controls.Button cancelButtonDialog = new Avalonia.Controls.Button() { Width = 100, Content = "Cancel", HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                    Avalonia.Controls.Grid.SetColumn(cancelButtonDialog, 3);
+                    buttonGridDialog.Children.Add(cancelButtonDialog);
+
+                    bool dialogResult = false;
+
+                    okButtonDialog.Click += (s, e) =>
+                    {
+                        dialogResult = true;
+                        nameInputWindow.Close();
+                    };
+
+                    cancelButtonDialog.Click += (s, e) =>
+                    {
+                        nameInputWindow.Close();
+                    };
+
+                    await nameInputWindow.ShowDialog(window);
+
+                    if (dialogResult)
+                    {
+                        string name = nameBox.Text;
+
+                        if (string.IsNullOrEmpty(name))
+                        {
+                            MessageBox box = new MessageBox("Attention!", "The state name cannot be empty!");
+                            await box.ShowDialog(window);
+                        }
+                        else if (allStateColours.ContainsKey(name))
+                        {
+                            MessageBox box = new MessageBox("Attention!", "A colour for the state has already been defined!");
+                            await box.ShowDialog(window);
+                        }
+                        else
+                        {
+                            allStateColours.Add(name, Colour.FromRgb(220, 220, 220));
+
+                            Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid();
+                            grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                            grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(100, Avalonia.Controls.GridUnitType.Pixel));
+                            grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(48, Avalonia.Controls.GridUnitType.Pixel));
+
+                            string key = name;
+                            Colour col = Colour.FromRgb(220, 220, 220);
+
+                            grd.Children.Add(new Avalonia.Controls.TextBlock()
+                            {
+                                Text = key,
+                                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                                FontStyle = Avalonia.Media.FontStyle.Italic,
+                                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+                            });
+                            AvaloniaColorPicker.ColorButton colorButton = new AvaloniaColorPicker.ColorButton() { Color = col.ToAvalonia(), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 5, 0, 5) };
+                            Avalonia.Controls.Grid.SetColumn(colorButton, 1);
+                            grd.Children.Add(colorButton);
+
+                            colorButton.PropertyChanged += (s, e) =>
+                            {
+                                if (e.Property == AvaloniaColorPicker.ColorButton.ColorProperty)
+                                {
+                                    allStateColours[key] = colorButton.Color.ToVectSharp();
+                                }
+                            };
+
+                            AddRemoveButton removeButton = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Remove, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 16, 0) };
+                            Avalonia.Controls.Grid.SetColumn(removeButton, 2);
+
+                            removeButton.PointerPressed += (s, e) =>
+                            {
+                                itemList.Remove(grd);
+                                allStateColours.Remove(key);
+                                itemsContainer.Children.Remove(grd);
+                                updateBackgrounds();
+                            };
+
+                            if (itemsContainer.Children.Count % 2 == 0)
+                            {
+                                grd.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240));
+                            }
+                            else
+                            {
+                                grd.Background = Avalonia.Media.Brushes.White;
+                            }
+
+                            grd.Children.Add(removeButton);
+                            itemList.Add(grd);
+                            itemsContainer.Children.Insert(itemsContainer.Children.Count - 1, grd);
+                        }
+                    }
+
+                };
+            }
+
+            bool result = false;
+
+            okButton.Click += (s, e) =>
+            {
+                result = true;
+                window.Close();
+            };
+
+            cancelButton.Click += (s, e) =>
+            {
+                window.Close();
+            };
+
+            await window.ShowDialog(parent);
+
+            if (result)
+            {
+                try
+                {
+                    string code = @"public static Colour? Format(object attribute)
+{
+    if (attribute is string state)
+    {
+        switch (state)
+        {
+";
+                    foreach (KeyValuePair<string, Colour> stateColour in allStateColours)
+                    {
+                        code += "            case " + System.Text.Json.JsonSerializer.Serialize(stateColour.Key) + ": return Colour.FromRgba(" + stateColour.Value.R.ToString(System.Globalization.CultureInfo.InvariantCulture) + ", " + stateColour.Value.G.ToString(System.Globalization.CultureInfo.InvariantCulture) + ", " + stateColour.Value.B.ToString(System.Globalization.CultureInfo.InvariantCulture) + ", " + stateColour.Value.A.ToString(System.Globalization.CultureInfo.InvariantCulture) + ");\n";
+                    }
+
+                    code += @"            default:
+                return null;
+        }
+    }
+    else
+    {
+        return null;
+    }
+}";
+
+                    object[] formatterParams = new object[2] { code, false };
+
+                    ColourFormatterOptions cfo = new ColourFormatterOptions(code) { AttributeName = "(N/A)", AttributeType = "String", DefaultColour = Colour.FromRgb(220, 220, 220), Parameters = formatterParams };
+
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { stateData.PlottingModulesParameterUpdater(moduleIndex)(new Dictionary<string, object>() { { "State colours:", cfo } }); });
+
+                    typeof(MainWindow).InvokeMember("UpdatePlotLayer", System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, null, parent, new object[] { moduleIndex, true });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox box = new MessageBox("Attention!", "An error occurred while generating the code!\n" + ex.Message);
+                    await box.ShowDialog(parent);
+                }
+            }
         }
     }
 }
