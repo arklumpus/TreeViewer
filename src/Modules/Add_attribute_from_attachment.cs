@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using PhyloTree;
@@ -29,7 +28,7 @@ namespace AddAttributeFromAttachment
         public const string Name = "Add attribute";
         public const string HelpText = "Adds an attribute based on an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.1.1");
         public const string Id = "f71a5e60-5e40-4a5e-9795-e5259fb283ab";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -173,13 +172,16 @@ namespace AddAttributeFromAttachment
                 {
                     TreeNode lca = null;
 
-                    if (matchAttributeType == "String")
+                    if (applyTo == 2)
                     {
-                        lca = GetLCA(tree, taxonListString, matchAttribute);
-                    }
-                    else if (matchAttributeType == "Number")
-                    {
-                        lca = GetLCA(tree, taxonListDouble, matchAttribute);
+                        if (matchAttributeType == "String")
+                        {
+                            lca = GetLCA(tree, taxonListString, matchAttribute);
+                        }
+                        else if (matchAttributeType == "Number")
+                        {
+                            lca = GetLCA(tree, taxonListDouble, matchAttribute);
+                        }
                     }
 
                     foreach (TreeNode leaf in tree.GetLeaves())
@@ -397,4 +399,3 @@ namespace AddAttributeFromAttachment
         }
     }
 }
-
