@@ -18,7 +18,7 @@ namespace NodeAgeDistributions
         public const string Name = "Age distributions";
         public const string HelpText = "Plots node age distributions.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "5dbe1f3c-dbea-49b3-8f04-f319aefca534";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -38,7 +38,7 @@ namespace NodeAgeDistributions
                 /// plot. Please note that this is not a kernel density estimation of the age distribution (as that would be too expensive to
                 /// draw in real time).
                 /// </param>
-                ( "Plot type:", "ComboBox:0[\"Histogram\",\"Envelope\"]" ),
+                ( "Plot type:", "ComboBox:1[\"Histogram\",\"Envelope\"]" ),
                 
                 /// <param name="Show on:">
                 /// This parameter determines on which nodes the age distributions are shown. If the value is `Leaves`, the
@@ -166,6 +166,12 @@ namespace NodeAgeDistributions
                 double max = samples.Max();
                 int binCount = (int)Math.Ceiling((max - min) / binWidth);
 
+                if (binCount < 0 || binCount > 100)
+                {
+                    binCount = 100;
+                    binWidth = (max - min) / binCount;
+                }
+
                 int[] bins = new int[binCount];
 
                 for (int i = 0; i < samples.Count; i++)
@@ -188,6 +194,12 @@ namespace NodeAgeDistributions
                 double min = samples.Min();
                 double max = samples.Max();
                 int binCount = (int)Math.Ceiling((max - min) / binWidth);
+
+                if (binCount < 0 || binCount > 100)
+                {
+                    binCount = 100;
+                    binWidth = (max - min) / binCount;
+                }
 
                 int[] bins = new int[binCount];
 
@@ -330,6 +342,7 @@ namespace NodeAgeDistributions
                             }
                         }
                     }
+
                 }
             }
 
