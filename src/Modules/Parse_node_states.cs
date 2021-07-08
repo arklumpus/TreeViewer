@@ -24,7 +24,8 @@ namespace ParseTipStates
     /// the file contains the value that will be matched against the specified attribute of the nodes. Other columns represent the
     /// attributes that will be attached to the matched taxon.
     /// 
-    /// More than one attribute can be parsed at once; the attributes that are loaded are specified by the [column header(s)](#column-headers)
+    /// More than one attribute can be parsed at once; if a header row is present, this can be used to specify the names of the
+    /// attributes that are loaded. Alternatively, the attributes that are loaded can be specified by the [column header(s)](#column-headers)
     /// parameter. These should correspond to the headers of the columns in the file. If the [match column](#match-column) is `1`, the
     /// header for the first column (which is matched against the [match attribute](#match-attribute)) can be skipped. Otherwise, a
     /// header must be provided for the [match column](#match-column), even though it is not used.
@@ -66,7 +67,7 @@ namespace ParseTipStates
         public const string Name = "Parse node states";
         public const string HelpText = "Loads node state data from an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("2.0.0");
+        public static Version Version = new Version("2.1.0");
         public const string Id = "716b55a3-02d9-4007-a830-8326d407b24c";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -87,7 +88,8 @@ namespace ParseTipStates
                 
                 /// <param name="Lines to skip:">
                 /// This parameter determines the lines to skip at the start of the file (useful e.g. if the data file contains
-                /// header lines).
+                /// header lines). Note that if you want to [use the header row to specify the column headers](#use-first-row-as-header),
+                /// that row must NOT be skipped.
                 /// </param>
                 ("Lines to skip:", "NumericUpDown:0[\"0\",\"Infinity\",\"1\",\"0\"]"),
                 
@@ -127,7 +129,7 @@ namespace ParseTipStates
                 /// </param>
                 ("Match attribute type:", "AttributeType:String"),
 
-                ("New attribute", "Group:3"),
+                ("New attribute", "Group:4"),
                 
                 /// <param name="Attribute(s):" default="`State`" display="">
                 /// This parameter determines the name of the attribute in which the parsed states are stored. If more than one attribute
@@ -136,7 +138,14 @@ namespace ParseTipStates
                 /// and `State2`, a possible value for this parameter could be `State1;State2`).
                 /// </param>
                 ("Attribute(s):", "TextBox:State"),
-                
+
+                /// <param name="Use first row as header">
+                /// If this check box is checked, the first row in the data file is assumed to be a header row, containing the names of the
+                /// attribute(s) where the parsed states are stored. If this check box is unchecked, the column headers need to be specified
+                /// manually in the [column header(s)](#column-headers) parameter.
+                /// </param>
+                ("Use first row as header", "CheckBox:false" ),
+
                 /// <param name="Column header(s):" default="`State`">
                 /// This parameter should contain the headers for the columns of data in the file. These will also be used as the names of
                 /// the attribute(s) where the parsed states are stored. The names of different columns should be separated using the same
@@ -177,18 +186,6 @@ namespace ParseTipStates
             controlStatus = new Dictionary<string, ControlStatus>() { { "Attribute(s):", ControlStatus.Hidden } };
             parametersToChange = new Dictionary<string, object>() { { "PreviewApplyButtons", -1 } };
 
-            /*if ((string)previousParameterValues["Attribute(s):"] != (string)currentParameterValues["Attribute(s):"])
-            {
-                string attributeName = (string)currentParameterValues["Attribute(s):"];
-
-                string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
-
-                if (!string.IsNullOrEmpty(attrType))
-                {
-                    parametersToChange.Add("Attribute type:", attrType);
-                }
-            }*/
-
             if ((string)currentParameterValues["Attribute(s):"] != "State" && (string)currentParameterValues["Column header(s):"] == "State")
             {
                 parametersToChange["Column header(s):"] = (string)currentParameterValues["Attribute(s):"];
@@ -214,6 +211,17 @@ namespace ParseTipStates
                 ShowPreview((MainWindow)currentParameterValues["ParentWindow"], currentParameterValues);
             }
 
+            if ((bool)currentParameterValues["Use first row as header"])
+            {
+                controlStatus["Column header(s):"] = ControlStatus.Hidden;
+                controlStatus["Multiple attributes should use the same separator as the data"] = ControlStatus.Hidden;
+            }
+            else
+            {
+                controlStatus["Column header(s):"] = ControlStatus.Enabled;
+                controlStatus["Multiple attributes should use the same separator as the data"] = ControlStatus.Enabled;
+            }
+
             return (int)currentParameterValues["PreviewApplyButtons"] == 1 || (previousAttachment != newAttachment);
         }
 
@@ -235,6 +243,8 @@ namespace ParseTipStates
                     string matchAttribute = (string)parameterValues["Match attribute:"];
                     string matchAttributeType = (string)parameterValues["Match attribute type:"];
 
+                    bool useHeaderRow = (bool)parameterValues["Use first row as header"];
+
                     if (attachment != null)
                     {
                         Regex separator;
@@ -248,13 +258,30 @@ namespace ParseTipStates
                             separator = new Regex(Regex.Escape(separatorString));
                         }
 
-                        string[] attributeNames = (from el in separator.Split(Regex.Unescape(attributeName)) where !string.IsNullOrEmpty(el) select el.Trim()).ToArray();
-
                         string[] lines = attachment.GetLines();
 
                         List<object[]> attributes = new List<object[]>();
 
-                        for (int i = skipLines; i < lines.Length; i++)
+                        string[] attributeNames;
+
+                        if (useHeaderRow)
+                        {
+                            try
+                            {
+                                string[] splitLine = (from el in separator.Split(lines[skipLines]) where !string.IsNullOrEmpty(el) select el).ToArray();
+                                attributeNames = splitLine;
+                            }
+                            catch
+                            {
+                                attributeNames = new string[0];
+                            }
+                        }
+                        else
+                        {
+                            attributeNames = (from el in separator.Split(Regex.Unescape(attributeName)) where !string.IsNullOrEmpty(el) select el.Trim()).ToArray();
+                        }
+
+                        for (int i = skipLines + (useHeaderRow ? 1 : 0); i < lines.Length; i++)
                         {
                             if (!string.IsNullOrEmpty(lines[i]))
                             {
@@ -485,6 +512,7 @@ namespace ParseTipStates
             int matchColumn = (int)(double)parameterValues["Match column:"];
             string matchAttribute = (string)parameterValues["Match attribute:"];
             string matchAttributeType = (string)parameterValues["Match attribute type:"];
+            bool useHeaderRow = (bool)parameterValues["Use first row as header"];
 
             if (attachment != null)
             {
@@ -499,13 +527,30 @@ namespace ParseTipStates
                     separator = new Regex(Regex.Escape(separatorString));
                 }
 
-                string[] attributeNames = (from el in separator.Split(Regex.Unescape(attributeName)) where !string.IsNullOrEmpty(el) select el.Trim()).ToArray();
-
                 string[] lines = attachment.GetLines();
 
                 Dictionary<string, object[]> attributes = new Dictionary<string, object[]>();
 
-                for (int i = skipLines; i < lines.Length; i++)
+                string[] attributeNames;
+
+                if (useHeaderRow)
+                {
+                    try
+                    {
+                        string[] splitLine = (from el in separator.Split(lines[skipLines]) where !string.IsNullOrEmpty(el) select el).ToArray();
+                        attributeNames = splitLine;
+                    }
+                    catch
+                    {
+                        attributeNames = new string[0];
+                    }
+                }
+                else
+                {
+                    attributeNames = (from el in separator.Split(Regex.Unescape(attributeName)) where !string.IsNullOrEmpty(el) select el.Trim()).ToArray();
+                }
+
+                for (int i = skipLines + (useHeaderRow ? 1 : 0); i < lines.Length; i++)
                 {
                     if (!string.IsNullOrEmpty(lines[i]))
                     {
