@@ -25,7 +25,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Add attribute](f71a5e60-5e40-4a5e-9795-e5259fb283ab)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Adds an attribute based on an attachment.
 
@@ -56,6 +56,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 **Module type**: MenuAction
 
 **Module ID**: `98804064-922f-4395-8a96-216d4b3ff259`
+
+<br />
+
+### [Age distributions timeline](b93f8a2b-8731-4658-92f5-bb80af7292a8)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Plots age distributions on a timeline.
+
+**Module type**: Plotting
+
+**Module ID**: `b93f8a2b-8731-4658-92f5-bb80af7292a8`
 
 <br />
 
@@ -389,7 +401,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Group labels](7ef15916-4383-4ee7-b4bd-bd44a7be1849)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.2.0, by Giorgio Bianchini_
 
 **Description**: Highlights monophyletic groups with a label.
 
@@ -512,7 +524,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Node states](0512b822-044d-4c13-b3bb-bca494c51daa)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Draws node states based on attributes.
 
@@ -548,7 +560,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Parse node states](716b55a3-02d9-4007-a830-8326d407b24c)
 
-_Version 2.0.0, by Giorgio Bianchini_
+_Version 2.1.0, by Giorgio Bianchini_
 
 **Description**: Loads node state data from an attachment.
 
@@ -572,7 +584,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions](5dbe1f3c-dbea-49b3-8f04-f319aefca534)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Plots node age distributions.
 
@@ -800,7 +812,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Set up age distributions](a1ccf05a-cf3c-4ca4-83be-af56f501c2a6)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Computes node age distributions.
 
