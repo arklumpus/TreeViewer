@@ -1918,19 +1918,42 @@ namespace TreeViewer
                             Expander exp = new Expander() { Margin = new Thickness(5, 0, 0, 0) };
 
                             Grid grd = new Grid();
-                            grd.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
                             grd.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                            grd.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                            grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                            grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
                             TrimmedTextBox blk = new TrimmedTextBox(108) { Text = (defaultValue.Length > 1 ? "LCA of " : "") + defaultValue.Aggregate((a, b) => a + ", " + b), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-
+                            Grid.SetColumnSpan(blk, 2);
                             grd.Children.Add(blk);
 
-                            Button control = new Button() { Content = "Edit", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Thickness(10, 5, 10, 5), Margin = new Thickness(5, 5, 0, 5) };
+                            Button control = new Button() { Content = "Edit", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, Padding = new Thickness(5, 5, 5, 5), Margin = new Thickness(0, 5, 0, 5) };
 
                             Grid.SetColumn(exp, 1);
-                            Grid.SetColumn(control, 1);
+                            Grid.SetRow(control, 1);
+
+                            Button chooseSelection = new Button() { Content = "Use selection", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, Padding = new Thickness(5, 5, 5, 5), Margin = new Thickness(5, 5, 0, 5), HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                            Grid.SetRow(chooseSelection, 1);
+                            Grid.SetColumn(chooseSelection, 1);
 
                             grd.Children.Add(control);
+                            grd.Children.Add(chooseSelection);
+                            chooseSelection.IsEnabled = this.IsSelectionAvailable;
+
+                            void checkIfSelectionEnabled(object sender, AvaloniaPropertyChangedEventArgs e)
+                            {
+                                if (e.Property == MainWindow.IsSelectionAvailableProperty)
+                                {
+                                    chooseSelection.IsEnabled = this.IsSelectionAvailable;
+                                }
+                            }
+
+                            this.PropertyChanged += checkIfSelectionEnabled;
+
+                            chooseSelection.DetachedFromLogicalTree += (s, e) =>
+                            {
+                                this.PropertyChanged -= checkIfSelectionEnabled;
+                            };
 
                             exp.Label = grd;
 
@@ -1988,6 +2011,34 @@ namespace TreeViewer
                                     for (int j = 0; j < win.Result.Length; j++)
                                     {
                                         valueContainer.Children.Add(new TextBlock() { Text = win.Result[j], Margin = new Thickness(0, 0, 5, 0), FontStyle = FontStyle.Italic });
+                                    }
+
+                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
+                                    UpdateControls(controlStatus, parameterControls);
+                                    UpdateParameters(parametersToChange, parameterUpdaters);
+
+                                    if (needsUpdate)
+                                    {
+                                        updateAction();
+                                    }
+                                }
+                            };
+
+                            chooseSelection.Click += (s, e) =>
+                            {
+                                if (this.SelectedNode != null)
+                                {
+                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
+
+                                    string[] nodeNames = this.SelectedNode.GetNodeNames().ToArray();
+
+                                    tbr[parameterName] = nodeNames;
+
+                                    blk.Text = (nodeNames.Length > 1 ? "LCA of " : "") + nodeNames.Aggregate((a, b) => a + ", " + b);
+                                    valueContainer.Children.Clear();
+                                    for (int j = 0; j < nodeNames.Length; j++)
+                                    {
+                                        valueContainer.Children.Add(new TextBlock() { Text = nodeNames[j], Margin = new Thickness(0, 0, 5, 0), FontStyle = FontStyle.Italic });
                                     }
 
                                     bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
@@ -3877,6 +3928,11 @@ namespace TreeViewer
             {
                 AttachmentItem attachmentPanel = new AttachmentItem(kvp.Key);
                 attachmentPanel.ItemDeleted += async (s, e) => { await UpdateTransformedTree(); UpdateAttachmentSelectors(); };
+                attachmentPanel.ItemReplaced += async (s, e) =>
+                {
+                    await UpdateOnlyTransformedTree();
+                    RefreshAttachmentSelectors(e.ItemName);
+                };
 
                 this.FindControl<StackPanel>("AttachmentContainerPanel").Children.Add(attachmentPanel);
 
@@ -3901,6 +3957,21 @@ namespace TreeViewer
 
                 int index = items.IndexOf(selectedItem);
                 box.SelectedIndex = Math.Max(index, 0);
+            }
+        }
+
+        private void RefreshAttachmentSelectors(string replacedAttachmentName)
+        {
+            foreach (ComboBox box in AttachmentSelectors)
+            {
+                string selectedItem = (string)box.SelectedItem;
+
+                if (selectedItem == replacedAttachmentName)
+                {
+                    int index = box.SelectedIndex;
+                    box.SelectedIndex = 0;
+                    box.SelectedIndex = index;
+                }
             }
         }
 
