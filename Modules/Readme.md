@@ -425,7 +425,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Lasso selection](a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Selects tips from the tree.
 
@@ -560,7 +560,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Parse node states](716b55a3-02d9-4007-a830-8326d407b24c)
 
-_Version 2.1.0, by Giorgio Bianchini_
+_Version 2.1.1, by Giorgio Bianchini_
 
 **Description**: Loads node state data from an attachment.
 
@@ -692,7 +692,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Replace attribute](f17160ad-0462-449a-8a57-e1af775c92ba)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Changes the value of an attribute of a node that matches a criterion.
 
