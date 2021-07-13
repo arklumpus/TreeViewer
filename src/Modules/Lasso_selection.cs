@@ -7,6 +7,7 @@ using TreeViewer;
 using VectSharp;
 using VectSharp.Canvas;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace LassoSelection
 {
@@ -15,7 +16,10 @@ namespace LassoSelection
     /// 
     /// When you enable this module, a message is shown indicating that lasso selection is active. You can then use the mouse
     /// to draw a polygon on the tree plot (every time you click, a new point is added). When you reach the last vertex of the
-    /// polygon, double click to close the shape. The names of the nodes that fall within the selected area are then copied
+    /// polygon, double click to close the shape.
+    /// 
+    /// At this point, a new window is shown, which lets you choose one of the attributes that are present on the selected tips.
+    /// When you click on `OK`, the values of the selected attribute for the nodes that fall within the selected area are copied
     /// to the clipboard and can be pasted into other software (e.g. a text editor).
     /// </summary>
     public static class MyModule
@@ -23,7 +27,7 @@ namespace LassoSelection
         public const string Name = "Lasso selection";
         public const string HelpText = "Selects tips from the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -103,6 +107,9 @@ namespace LassoSelection
 
             List<Point> selectionPoints = new List<Point>();
 
+            bool globalIsClosed = false;
+            Avalonia.Controls.Shapes.Path globalPath = null;
+
             void pointerPressed(object sender, Avalonia.Input.PointerPressedEventArgs e)
             {
                 Avalonia.Point pt = e.GetCurrentPoint(can).Position;
@@ -164,110 +171,8 @@ namespace LassoSelection
 
                             if (isClosed)
                             {
-                                Avalonia.Media.IBrush selectionChildBrush = window.SelectionChildBrush;
-                                List<string> tipsInside = new List<string>();
-                                List<string> idsInside = new List<string>();
-                                foreach (KeyValuePair<string, Point> kvp in window.Coordinates)
-                                {
-                                    if (path.RenderedGeometry.FillContains(new Avalonia.Point(kvp.Value.X - window.PlotOrigin.X + 10, kvp.Value.Y - window.PlotOrigin.Y + 10)))
-                                    {
-                                        TreeNode node = window.TransformedTree.GetNodeFromId(kvp.Key);
-                                        if (node != null && node.Children.Count == 0)
-                                        {
-                                            if (!string.IsNullOrEmpty(node.Name))
-                                            {
-                                                tipsInside.Add(node.Name);
-                                                idsInside.Add(node.Id);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                foreach (string id in idsInside)
-                                {
-                                    foreach ((double, RenderAction) selPath in MainWindow.FindPaths(window.SelectionCanvas, id))
-                                    {
-                                        Canvas can = selPath.Item2.Parent as Canvas;
-
-                                        while (can != window.SelectionCanvas)
-                                        {
-                                            can.ZIndex = 90;
-                                            can = can.Parent as Canvas;
-                                        }
-
-                                        if (selPath.Item2.Fill != null)
-                                        {
-                                            window.ChangeActionFill(selPath.Item2, selectionChildBrush);
-                                        }
-
-                                        if (selPath.Item2.Stroke != null)
-                                        {
-                                            window.ChangeActionStroke(selPath.Item2, selectionChildBrush);
-                                        }
-                                    }
-                                }
-
-                                if (tipsInside.Count > 0)
-                                {
-                                    _ = Avalonia.Application.Current.Clipboard.SetTextAsync(tipsInside.Aggregate((a, b) => a + "\n"+ b));
-
-                                    Border bord = new Border(){ VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(10, 10, 10, 20), Padding = new Avalonia.Thickness(50, 10), CornerRadius = new Avalonia.CornerRadius(10), Background = window.SelectionChildBrush, BorderBrush = window.SelectionBrush, BorderThickness = new Avalonia.Thickness(2) };
-                                    bord.Child= new TextBlock(){ Text = "The " + tipsInside.Count.ToString() + " selected tips have been copied to the clipboard!" };
-                                    Grid.SetColumn(bord, 2);
-                                    Grid.SetColumnSpan(bord, Grid.GetColumnSpan(zom));
-                                    Grid.SetRow(bord, 1);
-                                    bord.Transitions = new Avalonia.Animation.Transitions();
-                                    bord.Transitions.Add(new Avalonia.Animation.DoubleTransition(){ Property = Avalonia.Controls.Shapes.Path.OpacityProperty, Duration = new TimeSpan(15000000) });
-                                    window.FindControl<Grid>("MainGrid").Children.Add(bord);
-
-                                    System.Threading.Thread thr = new System.Threading.Thread(async () =>
-                                    {
-                                        System.Threading.Thread.Sleep(1000);
-
-                                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                                        {
-                                            window.FindControl<Grid>("MainGrid").Children.Remove(lassoBord);
-                                            ((Canvas)window.SelectionCanvas.Parent).Children.Remove(can);
-                                            bord.Opacity = 0;
-                                        });
-
-                                        System.Threading.Thread.Sleep(2000);
-
-                                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                                        {
-                                            window.FindControl<Grid>("MainGrid").Children.Remove(bord);
-                                        });
-
-                                        stateData.Tags["a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6"] = false;
-                                    });
-                                    thr.Start();
-                                }
-                                else
-                                {
-                                    System.Threading.Thread thr = new System.Threading.Thread(async () =>
-                                    {
-                                        System.Threading.Thread.Sleep(1000);
-
-                                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                                        {
-                                            window.FindControl<Grid>("MainGrid").Children.Remove(lassoBord);
-                                            ((Canvas)window.SelectionCanvas.Parent).Children.Remove(can);
-                                        });
-
-                                        stateData.Tags["a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6"] = false;
-                                    });
-                                    thr.Start();
-                                }
-
-                                can.PointerPressed -= pointerPressed;
-
-                                window.HasPointerDoneSomething = true;
-
-                                path.Transitions = new Avalonia.Animation.Transitions();
-                                path.Transitions.Add(new Avalonia.Animation.DoubleTransition(){ Property = Avalonia.Controls.Shapes.Path.OpacityProperty, Duration = new TimeSpan(5000000) });
-
-                                _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { path.Opacity = 0; });
-                                lassoBord.Opacity = 0;
+                                globalIsClosed = isClosed;
+                                globalPath = path;
                             }
 
                             zom.PropertyChanged += zoomHandler;
@@ -278,12 +183,249 @@ namespace LassoSelection
                             };
                         })
                     }
-                }
-                ));
+                }));
             };
 
+
+
+            void pointerReleased(object sender, Avalonia.Input.PointerReleasedEventArgs e)
+            {
+                bool isClosed = globalIsClosed;
+                Avalonia.Controls.Shapes.Path path = globalPath;
+
+                if (isClosed)
+                {
+                    Avalonia.Media.IBrush selectionChildBrush = window.SelectionChildBrush;
+                    List<string> tipsInside = new List<string>();
+                    List<string> idsInside = new List<string>();
+
+                    foreach (KeyValuePair<string, Point> kvp in window.Coordinates)
+                    {
+                        if (path.RenderedGeometry.FillContains(new Avalonia.Point(kvp.Value.X - window.PlotOrigin.X + 10, kvp.Value.Y - window.PlotOrigin.Y + 10)))
+                        {
+                            TreeNode node = window.TransformedTree.GetNodeFromId(kvp.Key);
+                            if (node != null && node.Children.Count == 0)
+                            {
+                                idsInside.Add(node.Id);
+                            }
+                        }
+                    }
+
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+
+                        string attributeName = await ShowAttributeSelectionWindow(idsInside, window, window.TransformedTree);
+
+                        foreach (string id in idsInside)
+                        {
+                            foreach ((double, RenderAction) selPath in MainWindow.FindPaths(window.SelectionCanvas, id))
+                            {
+                                Canvas can = selPath.Item2.Parent as Canvas;
+
+                                while (can != window.SelectionCanvas)
+                                {
+                                    can.ZIndex = 90;
+                                    can = can.Parent as Canvas;
+                                }
+
+                                if (selPath.Item2.Fill != null)
+                                {
+                                    window.ChangeActionFill(selPath.Item2, selectionChildBrush);
+                                }
+
+                                if (selPath.Item2.Stroke != null)
+                                {
+                                    window.ChangeActionStroke(selPath.Item2, selectionChildBrush);
+                                }
+                            }
+                        }
+
+                        if (attributeName != null)
+                        {
+                            foreach (TreeNode node in window.TransformedTree.GetChildrenRecursiveLazy())
+                            {
+                                if (idsInside.Contains(node.Id))
+                                {
+                                    if (node.Attributes.TryGetValue(attributeName, out object attributeValue))
+                                    {
+                                        if (attributeValue is string attributeString)
+                                        {
+                                            tipsInside.Add(attributeString);
+                                        }
+                                        else if (attributeValue is double attributeDouble)
+                                        {
+                                            tipsInside.Add(attributeDouble.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (tipsInside.Count > 0)
+                        {
+                            _ = Avalonia.Application.Current.Clipboard.SetTextAsync(tipsInside.Aggregate((a, b) => a + "\n" + b));
+
+                            Border bord = new Border() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(10, 10, 10, 20), Padding = new Avalonia.Thickness(50, 10), CornerRadius = new Avalonia.CornerRadius(10), Background = window.SelectionChildBrush, BorderBrush = window.SelectionBrush, BorderThickness = new Avalonia.Thickness(2) };
+                            bord.Child = new TextBlock() { Text = "The " + tipsInside.Count.ToString() + " selected tips have been copied to the clipboard!" };
+                            Grid.SetColumn(bord, 2);
+                            Grid.SetColumnSpan(bord, Grid.GetColumnSpan(zom));
+                            Grid.SetRow(bord, 1);
+                            bord.Transitions = new Avalonia.Animation.Transitions();
+                            bord.Transitions.Add(new Avalonia.Animation.DoubleTransition() { Property = Avalonia.Controls.Shapes.Path.OpacityProperty, Duration = new TimeSpan(15000000) });
+                            window.FindControl<Grid>("MainGrid").Children.Add(bord);
+
+                            System.Threading.Thread thr = new System.Threading.Thread(async () =>
+                            {
+                                System.Threading.Thread.Sleep(1000);
+
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    window.FindControl<Grid>("MainGrid").Children.Remove(lassoBord);
+                                    ((Canvas)window.SelectionCanvas.Parent).Children.Remove(can);
+                                    bord.Opacity = 0;
+                                });
+
+                                System.Threading.Thread.Sleep(2000);
+
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    window.FindControl<Grid>("MainGrid").Children.Remove(bord);
+                                });
+
+                                stateData.Tags["a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6"] = false;
+                            });
+                            thr.Start();
+                        }
+                        else
+                        {
+                            System.Threading.Thread thr = new System.Threading.Thread(async () =>
+                            {
+                                System.Threading.Thread.Sleep(1000);
+
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    window.FindControl<Grid>("MainGrid").Children.Remove(lassoBord);
+                                    ((Canvas)window.SelectionCanvas.Parent).Children.Remove(can);
+                                });
+
+                                stateData.Tags["a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6"] = false;
+                            });
+                            thr.Start();
+                        }
+
+                        can.PointerPressed -= pointerPressed;
+                        can.PointerReleased -= pointerReleased;
+
+                        window.HasPointerDoneSomething = true;
+
+                        path.Transitions = new Avalonia.Animation.Transitions();
+                        path.Transitions.Add(new Avalonia.Animation.DoubleTransition() { Property = Avalonia.Controls.Shapes.Path.OpacityProperty, Duration = new TimeSpan(5000000) });
+
+                        _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { path.Opacity = 0; });
+                        lassoBord.Opacity = 0;
+                    });
+                }
+            }
+
             can.PointerPressed += pointerPressed;
+            can.PointerReleased += pointerReleased;
         }
 
+        private static async Task<string> ShowAttributeSelectionWindow(List<string> selectedIds, Window window, TreeNode tree)
+        {
+            if (selectedIds.Count == 0)
+            {
+                return "Name";
+            }
+            else
+            {
+                Window attributeSelectionWindow = new Window() { FontFamily = window.FontFamily, FontSize = window.FontSize, Icon = window.Icon, Width = 300, Height = 180, Title = "Select attribute...", WindowStartupLocation = WindowStartupLocation.CenterOwner }; ;
+
+                Grid grd = new Grid() { Margin = new Avalonia.Thickness(10) };
+                attributeSelectionWindow.Content = grd;
+
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                grd.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                grd.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+
+                {
+                    TextBlock blk = new TextBlock() { Text = selectedIds.Count + " tips selected.", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 0, 10) };
+                    grd.Children.Add(blk);
+                }
+
+                {
+                    TextBlock blk = new TextBlock() { Text = "Select attribute to copy:", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 15, Margin = new Avalonia.Thickness(0, 0, 0, 10) };
+                    Grid.SetRow(blk, 1);
+                    grd.Children.Add(blk);
+                }
+
+                Grid buttonGrid = new Grid();
+
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+                Button okButton = new Button() { HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Width = 100, Content = "OK" };
+                Grid.SetColumn(okButton, 1);
+                buttonGrid.Children.Add(okButton);
+
+                Button cancelButton = new Button() { HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Width = 100, Content = "Cancel" };
+                Grid.SetColumn(cancelButton, 3);
+                buttonGrid.Children.Add(cancelButton);
+
+                Grid.SetRow(buttonGrid, 5);
+                grd.Children.Add(buttonGrid);
+
+                bool result = false;
+
+                okButton.Click += (s, e) =>
+                {
+                    result = true;
+                    attributeSelectionWindow.Close();
+                };
+
+                cancelButton.Click += (s, e) =>
+                {
+                    attributeSelectionWindow.Close();
+                };
+
+                HashSet<string> attributes = new HashSet<string>();
+
+                foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                {
+                    if (selectedIds.Contains(node.Id))
+                    {
+                        foreach (KeyValuePair<string, object> attribute in node.Attributes)
+                        {
+                            attributes.Add(attribute.Key);
+                        }
+                    }
+                }
+
+                List<string> attributesList = attributes.ToList();
+
+                ComboBox attributeBox = new ComboBox() { Items = attributesList, SelectedIndex = Math.Max(attributesList.IndexOf("Name"), 0), Margin = new Avalonia.Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                Grid.SetRow(attributeBox, 3);
+                grd.Children.Add(attributeBox);
+
+
+                await attributeSelectionWindow.ShowDialog(window);
+
+                if (result)
+                {
+                    return attributesList[attributeBox.SelectedIndex];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+        }
     }
 }
