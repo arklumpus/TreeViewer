@@ -67,7 +67,7 @@ namespace ParseTipStates
         public const string Name = "Parse node states";
         public const string HelpText = "Loads node state data from an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("2.1.0");
+        public static Version Version = new Version("2.1.1");
         public const string Id = "716b55a3-02d9-4007-a830-8326d407b24c";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -438,7 +438,7 @@ namespace ParseTipStates
                 previewGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 if (i % 2 == 0)
                 {
-                    Canvas canvas = new Canvas() { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240)) };
+                    Canvas canvas = new Canvas() { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240)), ZIndex = -100 };
                     Grid.SetRow(canvas, i + 2);
                     Grid.SetColumnSpan(canvas, columnCount);
                     previewGrid.Children.Add(canvas);
