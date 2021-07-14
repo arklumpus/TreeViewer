@@ -38,7 +38,7 @@ namespace TreeViewer
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
                 {
-                    FileName = "https://github.com/" + GlobalSettings.ProgramRepository,
+                    FileName = "https://treeviewer.org",
                     UseShellExecute = true
                 });
             };
