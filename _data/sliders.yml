@@ -1,0 +1,23 @@
+# example slider
+- selector: example_slider
+  captions: true
+  images:
+    - src: /img/examples/slide1.png
+      alt: A tree of Cyprinodontiform fishes
+    - src: /img/examples/slide2.png
+      alt: Presence/absence of genes in bacteria
+    - src: /img/examples/slide3.png
+      alt: BLAST scores in thousands of genomes
+    - src: /img/examples/slide4.png
+      alt: A tree with a sequence alignment
+    - src: /img/examples/slide5.png
+      alt: A time-calibrated tree of Cyanobacteria
+    - src: /img/examples/slide6.png
+      alt: Presence/absence of genes in bacteria
+    - src: /img/examples/slide7.png
+      alt: BLAST scores for the resuls of an online query
+    - src: /img/examples/slide8.png
+      alt: A time-calibrated tree of Cyanobacteria
+  settings:
+    height: "'500px'"
+    interval: "3000"
