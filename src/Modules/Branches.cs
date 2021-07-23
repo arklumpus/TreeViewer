@@ -25,7 +25,7 @@ namespace Branches
         public const string Name = "Branches";
         public const string HelpText = "Plots tree branches as lines.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "7c767b07-71be-48b2-8753-b27f3e973570";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -307,7 +307,13 @@ namespace Branches
                         {
                             double distAP2 = (anglePoint.X - parentPoint.X) * (anglePoint.X - parentPoint.X) + (anglePoint.Y - parentPoint.Y) * (anglePoint.Y - parentPoint.Y);
                             double distAC2 = (anglePoint.X - childPoint.X) * (anglePoint.X - childPoint.X) + (anglePoint.Y - childPoint.Y) * (anglePoint.Y - childPoint.Y);
+
                             prop = Math.Sqrt(distAP2 / (distAP2 + distAC2));
+                        }
+
+                        if (double.IsNaN(prop))
+                        {
+                            prop = 0;
                         }
 
                         Point internalPoint = new Point(parentPoint.X * (1 - prop) + childPoint.X * prop, parentPoint.Y * (1 - prop) + childPoint.Y * prop);
@@ -388,7 +394,6 @@ namespace Branches
 
 
                     }
-
 
                     minX = Math.Min(minX, childPoint.X);
                     maxX = Math.Max(maxX, childPoint.X);
