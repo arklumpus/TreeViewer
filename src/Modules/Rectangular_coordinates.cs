@@ -33,7 +33,7 @@ namespace RectangularCoordinates
         public const string Name = "Rectangular";
         public const string HelpText = "Computes the coordinates for a rectangular tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "68e25ec6-5911-4741-8547-317597e1b792";
         public const ModuleTypes ModuleType = ModuleTypes.Coordinate;
 
@@ -169,6 +169,11 @@ namespace RectangularCoordinates
             }
 
             double totalLength = upstreamLengths.Values.Max();
+
+            if (totalLength == 0)
+            {
+                totalLength = 1;
+            }
 
             Dictionary<string, double> yMultipliersCache = new Dictionary<string, double>();
 
