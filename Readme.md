@@ -1,7 +1,7 @@
 # TreeViewer
 
 <p align="center">
-    <img src="Icons/Program/Banner.svg">
+    <a href="https://treeviewer.org"><img src="Icons/Program/Banner.svg"></a>
 </p>
 
 ## Introduction
