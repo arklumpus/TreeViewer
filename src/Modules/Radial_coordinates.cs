@@ -35,7 +35,7 @@ namespace Radial_coordinates
         public const string Name = "Radial";
         public const string HelpText = "Computes the coordinates for a radial tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "95b61284-b870-48b9-b51c-3276f7d89df1";
         public const ModuleTypes ModuleType = ModuleTypes.Coordinate;
 
@@ -177,9 +177,12 @@ namespace Radial_coordinates
 
             List<string> nodeIds = new List<string>(from el in storedPos select el.Key);
 
+            double hFactor = maxX != minX ? ((maxX - minX) / width) : 1;
+            double vFactor = maxY != minY ? ((maxY - minY) / height) : 1;
+
             for (int i = 0; i < nodeIds.Count; i++)
             {
-                storedPos[nodeIds[i]] = new Point((storedPos[nodeIds[i]].X - minX) / (maxX - minX) * width, (storedPos[nodeIds[i]].Y - minY) / (maxY - minY) * height);
+                storedPos[nodeIds[i]] = new Point((storedPos[nodeIds[i]].X - minX) / hFactor, (storedPos[nodeIds[i]].Y - minY) / vFactor);
             }
 
             static double dist(Point p1, Point p2)
@@ -196,7 +199,7 @@ namespace Radial_coordinates
             {
                 if (nodes[i].Parent != null && !double.IsNaN(nodes[i].Length) && nodes[i].Length > 0)
                 {
-                    if (!double.IsNaN(nodes[i].Length))
+                    if (!double.IsNaN(nodes[i].Length) && nodes[i].Length != 0)
                     {
                         scaleFactor += dist(storedPos[nodes[i].Id], storedPos[nodes[i].Parent.Id]) / nodes[i].Length;
                     }
