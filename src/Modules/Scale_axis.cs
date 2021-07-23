@@ -17,7 +17,7 @@ namespace ScaleAxis
         public const string Name = "Scale axis";
         public const string HelpText = "Draws a scale axis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "aeacf625-90cf-41a5-8d10-c37c75aaa2b1";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -29,7 +29,7 @@ namespace ScaleAxis
 
             return new List<(string, string)>()
             {
-                ( "Axes", "Group:6"),
+                ( "Axes", "Group:8"),
                 
                 /// <param name="Top axis">
                 /// This check box determines whether the axis is shown above the tree.
@@ -61,6 +61,16 @@ namespace ScaleAxis
                 /// This parameter determines the thickness of line used to draw the axis.
                 /// </param>
                 ( "Line thickness:", "NumericUpDown:1[\"0\",\"Infinity\"]"),
+                
+                /// <param name="Units:">
+                /// This parameter is used to determine the measurement units of the scale axis (e.g. Mya or Gya).
+                /// </param>
+                ( "Units:", "TextBox:"),
+                
+                /// <param name="Unit position:">
+                /// This parameter is used to determine the position of the measurement unit.
+                /// </param>
+                ( "Unit position:", "ComboBox:1[\"Root\",\"Both\",\"Tips\"]"),
 
                 ( "Ticks", "Group:5"),
                 
@@ -226,6 +236,9 @@ namespace ScaleAxis
 
             double spacing = (double)parameterValues["Spacing:"];
 
+            string units = (string)parameterValues["Units:"];
+            int unitPosition = (int)parameterValues["Unit position:"];
+
             if (!circularCoordinates)
             {
                 Point scaleNorm = normalizePoint(scalePoint);
@@ -341,6 +354,11 @@ namespace ScaleAxis
                 {
                     graphics.StrokePath(new GraphicsPath().MoveTo(bottomAxis[0]).LineTo(bottomAxis[1]), axisColour, lineWidth);
 
+                    string firstLabel = null;
+                    string lastLabel = null;
+                    Point firstLabelPoint = new Point(0, 0);
+                    Point lastLabelPoint = new Point(0, 0);
+
                     for (int i = 0; i <= tickCount; i++)
                     {
                         Point tickStart = new Point(bottomAxis[0].X * (1 - i * tickAmount) + bottomAxis[1].X * i * tickAmount, bottomAxis[0].Y * (1 - i * tickAmount) + bottomAxis[1].Y * i * tickAmount);
@@ -358,6 +376,16 @@ namespace ScaleAxis
                         if (i % labelsEvery == 0)
                         {
                             string text = (start + i * tickSpacing).ToString(digits);
+
+                            if (i == 0)
+                            {
+                                firstLabel = text;
+                                firstLabelPoint = tickEnd;
+                            }
+
+                            lastLabel = text;
+                            lastLabelPoint = tickEnd;
+
                             Size textSize = fnt.MeasureText(text);
                             graphics.Save();
                             graphics.Translate(tickEnd);
@@ -375,10 +403,110 @@ namespace ScaleAxis
 
                             graphics.Restore();
 
-                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5, 10)));
-                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5, 10)));
-                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5, 10 + textSize.Height)));
-                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5, 10 + textSize.Height)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5 * scaleNorm.X + 10 * perpScaleNorm.X, -textSize.Width * 0.5 * scaleNorm.Y + 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5 * scaleNorm.X + 10 * perpScaleNorm.X, textSize.Width * 0.5 * scaleNorm.Y + 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5 * scaleNorm.X + (10 + textSize.Height) * perpScaleNorm.X, textSize.Width * 0.5 * scaleNorm.Y + (10 + textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5 * scaleNorm.X + (10 + textSize.Height) * perpScaleNorm.X, -textSize.Width * 0.5 * scaleNorm.Y + (10 + textSize.Height) * perpScaleNorm.Y)));
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(units))
+                    {
+                        Size textSize = fnt.MeasureText(units);
+
+                        if (unitPosition == 0 || unitPosition == 1)
+                        {
+                            Point candidatePoint;
+                            Point endPoint;
+
+                            Size lastLabelSize = fnt.MeasureText(lastLabel);
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * Math.Cos(angle) - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * Math.Sin(angle) - scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(bottomAxis[1].X - scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[1].Y - scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                            }
+                            else
+                            {
+                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(bottomAxis[1].X - scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[1].Y - scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                            }
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff > 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+                            graphics.Rotate(angle);
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                graphics.FillText(-textSize.Width, 10, units, fnt, axisColour);
+                            }
+                            else
+                            {
+                                graphics.Rotate(Math.PI);
+                                graphics.FillText(0, -10 - fnt.MeasureTextAdvanced(units).Top, units, fnt, axisColour);
+                            }
+
+                            graphics.Restore();
+
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X + 10 * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(10 * perpScaleNorm.X, 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point((10 + textSize.Height) * perpScaleNorm.X, (10 + textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X + (10 + textSize.Height) * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + (10 + textSize.Height) * perpScaleNorm.Y)));
+                        }
+
+                        if (unitPosition == 2 || unitPosition == 1)
+                        {
+                            Point candidatePoint;
+                            Point endPoint;
+
+                            Size fistLabelSize = fnt.MeasureText(firstLabel);
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * Math.Cos(angle) + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * Math.Sin(angle) + scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(bottomAxis[0].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[0].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                            }
+                            else
+                            {
+                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(bottomAxis[0].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[0].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                            }
+
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff < 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+                            graphics.Rotate(angle);
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                graphics.FillText(0, 10, units, fnt, axisColour);
+                            }
+                            else
+                            {
+                                graphics.Rotate(Math.PI);
+                                graphics.FillText(-textSize.Width, -10 - fnt.MeasureTextAdvanced(units).Top, units, fnt, axisColour);
+                            }
+
+                            graphics.Restore();
+
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X + 10 * perpScaleNorm.X, textSize.Width * scaleNorm.Y + 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(10 * perpScaleNorm.X, 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point((10 + textSize.Height) * perpScaleNorm.X, (10 + textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X + (10 + textSize.Height) * perpScaleNorm.X, textSize.Width * scaleNorm.Y + (10 + textSize.Height) * perpScaleNorm.Y)));
                         }
                     }
                 }
@@ -386,6 +514,11 @@ namespace ScaleAxis
                 if (showTopAxis)
                 {
                     graphics.StrokePath(new GraphicsPath().MoveTo(topAxis[0]).LineTo(topAxis[1]), axisColour, lineWidth);
+
+                    string firstLabel = null;
+                    string lastLabel = null;
+                    Point firstLabelPoint = new Point(0, 0);
+                    Point lastLabelPoint = new Point(0, 0);
 
                     for (int i = 0; i <= tickCount; i++)
                     {
@@ -404,6 +537,16 @@ namespace ScaleAxis
                         if (i % labelsEvery == 0)
                         {
                             string text = (start + i * tickSpacing).ToString(digits);
+
+                            if (i == 0)
+                            {
+                                firstLabel = text;
+                                firstLabelPoint = tickEnd;
+                            }
+
+                            lastLabel = text;
+                            lastLabelPoint = tickEnd;
+
                             Size textSize = fnt.MeasureText(text);
                             graphics.Save();
                             graphics.Translate(tickEnd);
@@ -411,20 +554,121 @@ namespace ScaleAxis
 
                             if (Math.Abs(angle) < Math.PI / 2)
                             {
-                                graphics.FillText(-textSize.Width * 0.5, -10, text, fnt, axisColour, TextBaselines.Bottom);
+                                graphics.FillText(-textSize.Width * 0.5, -10, text, fnt, axisColour, TextBaselines.Baseline);
                             }
                             else
                             {
                                 graphics.Rotate(Math.PI);
-                                graphics.FillText(-textSize.Width * 0.5, 10 + textSize.Height, text, fnt, axisColour, TextBaselines.Bottom);
+                                graphics.FillText(-textSize.Width * 0.5, 10 + textSize.Height, text, fnt, axisColour, TextBaselines.Baseline);
                             }
 
                             graphics.Restore();
 
-                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5, -10)));
-                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5, -10)));
-                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5, -10 - textSize.Height)));
-                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5, -10 - textSize.Height)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5 * scaleNorm.X - 10 * perpScaleNorm.X, -textSize.Width * 0.5 * scaleNorm.Y - 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5 * scaleNorm.X - 10 * perpScaleNorm.X, textSize.Width * 0.5 * scaleNorm.Y - 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(textSize.Width * 0.5 * scaleNorm.X + (-10 - textSize.Height) * perpScaleNorm.X, textSize.Width * 0.5 * scaleNorm.Y + (-10 - textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(tickEnd, new Point(-textSize.Width * 0.5 * scaleNorm.X + (-10 - textSize.Height) * perpScaleNorm.X, -textSize.Width * 0.5 * scaleNorm.Y + (-10 - textSize.Height) * perpScaleNorm.Y)));
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(units))
+                    {
+                        Size textSize = fnt.MeasureText(units);
+
+                        if (unitPosition == 0 || unitPosition == 1)
+                        {
+                            Point candidatePoint = new Point(topAxis[1].X - scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[1].Y - scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+                            Point endPoint;
+
+                            Size lastLabelSize = fnt.MeasureText(lastLabel);
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * Math.Cos(angle) - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * Math.Sin(angle) - scaleNorm.Y * fnt.FontSize);
+                            }
+                            else
+                            {
+                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
+                            }
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff > 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+                            graphics.Rotate(angle);
+
+                            Font.DetailedFontMetrics metrics = fnt.MeasureTextAdvanced(units);
+
+                            double top = metrics.Top;
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                graphics.FillText(-textSize.Width, -10, units, fnt, axisColour, TextBaselines.Baseline);
+                            }
+                            else
+                            {
+                                graphics.Rotate(Math.PI);
+                                graphics.FillText(0, 10 + top, units, fnt, axisColour, TextBaselines.Baseline);
+                            }
+
+                            graphics.Restore();
+
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - 10 * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + (-10) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-10 * perpScaleNorm.X, -10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-(10 + top) * perpScaleNorm.X, -(10 + top) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - (10 + top) * perpScaleNorm.X, -textSize.Width * scaleNorm.Y - (10 + top) * perpScaleNorm.Y)));
+                        }
+
+                        if (unitPosition == 2 || unitPosition == 1)
+                        {
+                            Point candidatePoint = new Point(topAxis[0].X + scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[0].Y + scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+                            Point endPoint;
+
+                            Size fistLabelSize = fnt.MeasureText(firstLabel);
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * Math.Cos(angle) + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * Math.Sin(angle) + scaleNorm.Y * fnt.FontSize);
+                            }
+                            else
+                            {
+                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                            }
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff < 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+                            graphics.Rotate(angle);
+
+                            double top = fnt.MeasureTextAdvanced(units).Top;
+
+                            if (Math.Abs(angle) < Math.PI / 2)
+                            {
+                                graphics.FillText(0, -10, units, fnt, axisColour, TextBaselines.Baseline);
+                            }
+                            else
+                            {
+                                graphics.Rotate(Math.PI);
+                                graphics.FillText(-textSize.Width, 10 + top, units, fnt, axisColour, TextBaselines.Baseline);
+                            }
+
+                            graphics.Restore();
+
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - 10 * perpScaleNorm.X, textSize.Width * scaleNorm.Y - 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-10 * perpScaleNorm.X, -10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-(10 + top) * perpScaleNorm.X, -(10 + top) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - (10 + top) * perpScaleNorm.X, textSize.Width * scaleNorm.Y - (10 + top) * perpScaleNorm.Y)));
                         }
                     }
                 }
@@ -479,6 +723,11 @@ namespace ScaleAxis
                 {
                     double axisY = center.Y + maxRadius + tickSize + 15 + spacing;
 
+                    string firstLabel = null;
+                    string lastLabel = null;
+                    Point firstLabelPoint = new Point(0, 0);
+                    Point lastLabelPoint = new Point(0, 0);
+
                     Point[] bottomAxis = new Point[]
                     {
                         new Point(center.X + scalePoint.Y, axisY),
@@ -519,6 +768,13 @@ namespace ScaleAxis
                             if (i % labelsEvery == 0)
                             {
                                 string text = (start + i * tickSpacing).ToString(digits);
+
+                                if (i == 0)
+                                {
+                                    firstLabel = text;
+                                    firstLabelPoint = tickEnd;
+                                }
+
                                 Size textSize = fnt.MeasureText(text);
                                 graphics.Save();
                                 graphics.Translate(tickEnd);
@@ -550,6 +806,13 @@ namespace ScaleAxis
                             if (i % labelsEvery == 0)
                             {
                                 string text = (start + i * tickSpacing).ToString(digits);
+
+                                if (i == 0)
+                                {
+                                    lastLabel = text;
+                                    lastLabelPoint = tickEnd;
+                                }
+
                                 Size textSize = fnt.MeasureText(text);
                                 graphics.Save();
                                 graphics.Translate(tickEnd);
@@ -564,10 +827,84 @@ namespace ScaleAxis
                             }
                         }
                     }
+
+                    if (!string.IsNullOrEmpty(units))
+                    {
+                        Size textSize = fnt.MeasureText(units);
+
+                        Point scaleNorm = new Point(1, 0);
+                        Point perpScaleNorm = new Point(0, 1);
+
+                        if (unitPosition == 0 || unitPosition == 1)
+                        {
+                            Point candidatePoint;
+                            Point endPoint;
+
+                            Size lastLabelSize = fnt.MeasureText(lastLabel);
+
+                            endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
+                            candidatePoint = new Point(bottomAxis[1].X - scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[1].Y - scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff > 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+
+                            graphics.FillText(-textSize.Width, 10, units, fnt, axisColour);
+
+                            graphics.Restore();
+
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X + 10 * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(10 * perpScaleNorm.X, 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point((10 + textSize.Height) * perpScaleNorm.X, (10 + textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X + (10 + textSize.Height) * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + (10 + textSize.Height) * perpScaleNorm.Y)));
+                        }
+
+                        if (unitPosition == 2 || unitPosition == 1)
+                        {
+                            Point candidatePoint;
+                            Point endPoint;
+
+                            Size fistLabelSize = fnt.MeasureText(firstLabel);
+
+                            endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                            candidatePoint = new Point(bottomAxis[0].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[0].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff < 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+
+                            graphics.FillText(0, 10, units, fnt, axisColour);
+
+                            graphics.Restore();
+
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X + 10 * perpScaleNorm.X, textSize.Width * scaleNorm.Y + 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(10 * perpScaleNorm.X, 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point((10 + textSize.Height) * perpScaleNorm.X, (10 + textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X + (10 + textSize.Height) * perpScaleNorm.X, textSize.Width * scaleNorm.Y + (10 + textSize.Height) * perpScaleNorm.Y)));
+                        }
+                    }
                 }
 
                 if (showTopAxis)
                 {
+                    string firstLabel = null;
+                    string lastLabel = null;
+                    Point firstLabelPoint = new Point(0, 0);
+                    Point lastLabelPoint = new Point(0, 0);
+
                     double axisY = center.Y - maxRadius - tickSize - 15 - spacing;
 
                     Point[] topAxis = new Point[]
@@ -610,10 +947,18 @@ namespace ScaleAxis
                             if (i % labelsEvery == 0)
                             {
                                 string text = (start + i * tickSpacing).ToString(digits);
+
+                                if (i == 0)
+                                {
+                                    firstLabel = text;
+                                    firstLabelPoint = tickEnd;
+                                }
+
+
                                 Size textSize = fnt.MeasureText(text);
                                 graphics.Save();
                                 graphics.Translate(tickEnd);
-                                graphics.FillText(-textSize.Width * 0.5, -10, text, fnt, axisColour, TextBaselines.Bottom);
+                                graphics.FillText(-textSize.Width * 0.5, -10, text, fnt, axisColour, TextBaselines.Baseline);
 
                                 graphics.Restore();
 
@@ -641,10 +986,17 @@ namespace ScaleAxis
                             if (i % labelsEvery == 0)
                             {
                                 string text = (start + i * tickSpacing).ToString(digits);
+
+                                if (i == 0)
+                                {
+                                    lastLabel = text;
+                                    lastLabelPoint = tickEnd;
+                                }
+
                                 Size textSize = fnt.MeasureText(text);
                                 graphics.Save();
                                 graphics.Translate(tickEnd);
-                                graphics.FillText(-textSize.Width * 0.5, -10, text, fnt, axisColour, TextBaselines.Bottom);
+                                graphics.FillText(-textSize.Width * 0.5, -10, text, fnt, axisColour, TextBaselines.Baseline);
 
                                 graphics.Restore();
 
@@ -655,6 +1007,75 @@ namespace ScaleAxis
                             }
                         }
                     }
+
+                    if (!string.IsNullOrEmpty(units))
+                    {
+                        Size textSize = fnt.MeasureText(units);
+
+                        Point scaleNorm = new Point(1, 0);
+                        Point perpScaleNorm = new Point(0, 1);
+
+                        if (unitPosition == 0 || unitPosition == 1)
+                        {
+                            Point candidatePoint = new Point(topAxis[1].X - scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[1].Y - scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+                            Point endPoint;
+
+                            Size lastLabelSize = fnt.MeasureText(lastLabel);
+
+                            endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff > 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+
+                            graphics.FillText(-textSize.Width, -10, units, fnt, axisColour, TextBaselines.Baseline);
+
+                            graphics.Restore();
+
+                            double top = fnt.MeasureTextAdvanced(units).Top;
+
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - 10 * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + (-10) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-10 * perpScaleNorm.X, -10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-(10 + top) * perpScaleNorm.X, -(10 + top) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - (10 + top) * perpScaleNorm.X, -textSize.Width * scaleNorm.Y - (10 + top) * perpScaleNorm.Y)));
+                        }
+
+                        if (unitPosition == 2 || unitPosition == 1)
+                        {
+                            Point candidatePoint = new Point(topAxis[0].X + scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[0].Y + scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+                            Point endPoint;
+
+                            Size fistLabelSize = fnt.MeasureText(firstLabel);
+
+                            endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+
+                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+
+                            if (diff < 0)
+                            {
+                                endPoint = candidatePoint;
+                            }
+
+                            graphics.Save();
+                            graphics.Translate(endPoint);
+                            graphics.FillText(0, -10, units, fnt, axisColour, TextBaselines.Baseline);
+
+                            graphics.Restore();
+
+                            double top = fnt.MeasureTextAdvanced(units).Top;
+
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - 10 * perpScaleNorm.X, textSize.Width * scaleNorm.Y - 10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-10 * perpScaleNorm.X, -10 * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-(10 + top) * perpScaleNorm.X, -(10 + top) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - (10 + top) * perpScaleNorm.X, textSize.Width * scaleNorm.Y - (10 + top) * perpScaleNorm.Y)));
+                        }
+                    }
                 }
             }
 
@@ -662,4 +1083,3 @@ namespace ScaleAxis
         }
     }
 }
-
