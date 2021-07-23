@@ -134,7 +134,7 @@ Safe even when opening huge files.
 
 ### [Branches](7c767b07-71be-48b2-8753-b27f3e973570)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Plots tree branches as lines.
 
@@ -668,7 +668,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Radial](95b61284-b870-48b9-b51c-3276f7d89df1)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a radial tree.
 
@@ -680,7 +680,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Rectangular](68e25ec6-5911-4741-8547-317597e1b792)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a rectangular tree.
 
@@ -764,7 +764,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Scale axis](aeacf625-90cf-41a5-8d10-c37c75aaa2b1)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Draws a scale axis.
 
