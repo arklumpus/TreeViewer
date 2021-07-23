@@ -309,7 +309,7 @@ namespace TreeViewer
                         ChangeActionStroke(pth.Item2, selectionBrush);
                     }
                 }
-                
+
                 this.FindControl<StackPanel>("SelectionContainerPanel").Children.Clear();
 
                 Grid nodeString = new Grid() { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240)) };
@@ -336,10 +336,21 @@ namespace TreeViewer
                 Grid leavesContainer = new Grid() { Margin = new Avalonia.Thickness(0, 5, 0, 0) };
                 leavesContainer.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                 leavesContainer.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                leavesContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                leavesContainer.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
 
                 List<string> names = node.GetLeafNames();
 
-                leavesContainer.Children.Add(new TextBlock() { Text = names.Count.ToString() + (names.Count > 1 ? " leaves:" : " leaf:"), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, FontWeight = Avalonia.Media.FontWeight.Bold });
+                leavesContainer.Children.Add(new TextBlock() { Text = names.Count.ToString() + (names.Count > 1 ? " leaves:" : " leaf:"), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, FontWeight = Avalonia.Media.FontWeight.Bold, Margin = new Avalonia.Thickness(0, 0, 0, 3) });
+
+                {
+                    Button copyButton = new Button() { HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Content = "Copy", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Padding = new Avalonia.Thickness(0, 2) };
+                    Grid.SetRow(copyButton, 1);
+                    leavesContainer.Children.Add(copyButton);
+
+                    copyButton.Click += CopySelectionButtonClicked;
+                }
+
                 /*ScrollViewer leavesSV = new ScrollViewer() { VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, MaxHeight = 150 };
 
                 StackPanel leavesItemsContainer = new StackPanel() { Margin = new Avalonia.Thickness(5, 0, 0, 0) };
@@ -373,6 +384,7 @@ namespace TreeViewer
                 leavesSV.Text = text.ToString();
 
                 Grid.SetColumn(leavesSV, 1);
+                Grid.SetRowSpan(leavesSV, 2);
                 leavesContainer.Children.Add(leavesSV);
 
                 this.FindControl<StackPanel>("SelectionContainerPanel").Children.Add(leavesContainer);
@@ -425,11 +437,11 @@ namespace TreeViewer
                     ToolTip.SetTip(valueBlock, valueBlock.Text);
 
                     Grid.SetColumn(valueBlock, 1);
-                    
+
 
                     TextBox editValueBox = new TextBox() { Margin = new Avalonia.Thickness(5, 0, 5, 0), Padding = new Avalonia.Thickness(5, 0, 5, 0), IsVisible = false, Height = 23, MaxHeight = 23, MinHeight = 23 };
                     Grid.SetColumn(editValueBox, 1);
-                    
+
 
                     if (ind % 2 == 0)
                     {
@@ -586,6 +598,14 @@ namespace TreeViewer
                 SelectedNode = node;
 
                 ExpandSelection();
+
+                Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+               {
+                   this.Height++;
+                   await System.Threading.Tasks.Task.Delay(10);
+                   this.Height--;
+               });
+
             }
             else
             {
@@ -661,6 +681,118 @@ namespace TreeViewer
             if (IsPointerPressed)
             {
                 HasPointerDoneSomething = true;
+            }
+        }
+
+        private async void CopySelectionButtonClicked(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            if (this.SelectedNode != null)
+            {
+                List<TreeNode> selectedTips = this.SelectedNode.GetLeaves();
+
+                Window attributeSelectionWindow = new Window() { FontFamily = this.FontFamily, FontSize = this.FontSize, Icon = this.Icon, Width = 300, Height = 180, Title = "Select attribute...", WindowStartupLocation = WindowStartupLocation.CenterOwner }; ;
+
+                Grid grd = new Grid() { Margin = new Avalonia.Thickness(10) };
+                attributeSelectionWindow.Content = grd;
+
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                grd.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                grd.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+
+                {
+                    TextBlock blk = new TextBlock() { Text = selectedTips.Count + " tips selected.", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 0, 10) };
+                    grd.Children.Add(blk);
+                }
+
+                {
+                    TextBlock blk = new TextBlock() { Text = "Select attribute to copy:", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 15, Margin = new Avalonia.Thickness(0, 0, 0, 10) };
+                    Grid.SetRow(blk, 1);
+                    grd.Children.Add(blk);
+                }
+
+                Grid buttonGrid = new Grid();
+
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                buttonGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+                Button okButton = new Button() { HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Width = 100, Content = "OK" };
+                Grid.SetColumn(okButton, 1);
+                buttonGrid.Children.Add(okButton);
+
+                Button cancelButton = new Button() { HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Width = 100, Content = "Cancel" };
+                Grid.SetColumn(cancelButton, 3);
+                buttonGrid.Children.Add(cancelButton);
+
+                Grid.SetRow(buttonGrid, 5);
+                grd.Children.Add(buttonGrid);
+
+                bool result = false;
+
+                okButton.Click += (s, e) =>
+                {
+                    result = true;
+                    attributeSelectionWindow.Close();
+                };
+
+                cancelButton.Click += (s, e) =>
+                {
+                    attributeSelectionWindow.Close();
+                };
+
+                HashSet<string> attributes = new HashSet<string>();
+
+                foreach (TreeNode node in selectedTips)
+                {
+                    foreach (KeyValuePair<string, object> attribute in node.Attributes)
+                    {
+                        attributes.Add(attribute.Key);
+                    }
+                }
+
+                List<string> attributesList = attributes.ToList();
+
+                ComboBox attributeBox = new ComboBox() { Items = attributesList, SelectedIndex = Math.Max(attributesList.IndexOf("Name"), 0), Margin = new Avalonia.Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                Grid.SetRow(attributeBox, 3);
+                grd.Children.Add(attributeBox);
+
+
+                await attributeSelectionWindow.ShowDialog(this);
+
+                if (result)
+                {
+                    string attributeName = attributesList[attributeBox.SelectedIndex];
+
+                    List<string> attributeValues = new List<string>();
+
+                    if (attributeName != null)
+                    {
+                        foreach (TreeNode node in selectedTips)
+                        {
+                            if (node.Attributes.TryGetValue(attributeName, out object attributeValue))
+                            {
+                                if (attributeValue is string attributeString)
+                                {
+                                    attributeValues.Add(attributeString);
+                                }
+                                else if (attributeValue is double attributeDouble)
+                                {
+                                    attributeValues.Add(attributeDouble.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                }
+                            }
+                        }
+                    }
+
+                    if (attributeValues.Count > 0)
+                    {
+                        _ = Avalonia.Application.Current.Clipboard.SetTextAsync(attributeValues.Aggregate((a, b) => a + "\n" + b));
+                    }
+                }
             }
         }
     }
