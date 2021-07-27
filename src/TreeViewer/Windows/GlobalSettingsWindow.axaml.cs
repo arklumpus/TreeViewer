@@ -82,6 +82,18 @@ namespace TreeViewer
 
             {
                 StackPanel container = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(10) };
+                CheckBox checkBox = new CheckBox() { Margin = new Thickness(5), Content = "Show legacy up/down arrows to move modules", IsChecked = GlobalSettings.Settings.ShowLegacyUpDownArrows };
+                container.Children.Add(checkBox);
+                this.FindControl<WrapPanel>("MainContainer").Children.Add(container);
+
+                applyChanges.Add(() =>
+                {
+                    GlobalSettings.Settings.ShowLegacyUpDownArrows = checkBox.IsChecked == true;
+                });
+            }
+
+            {
+                StackPanel container = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(10) };
                 container.Children.Add(new TextBlock() { Text = "Background colour:", Margin = new Thickness(5), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
                 AvaloniaColorPicker.ColorButton colorButton = new AvaloniaColorPicker.ColorButton() { Color = ((Colour)GlobalSettings.Settings.BackgroundColour).ToAvalonia(), Margin = new Thickness(0, 5, 5, 5), FontFamily = this.FontFamily, FontSize = this.FontSize };
                 container.Children.Add(colorButton);
@@ -181,6 +193,7 @@ namespace TreeViewer
                 }
 
                 GlobalSettings.Settings.DrawTreeWhenOpened = true;
+                GlobalSettings.Settings.ShowLegacyUpDownArrows = false;
                 GlobalSettings.Settings.BackgroundColour = Colour.FromRgb(240, 244, 250);
                 GlobalSettings.Settings.ModuleRepositoryBaseUri = GlobalSettings.DefaultModuleRepository;
                 GlobalSettings.Settings.UpdateCheckMode = GlobalSettings.UpdateCheckModes.ProgramAndAllModules;

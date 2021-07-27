@@ -47,6 +47,10 @@ namespace TreeViewer
                 {
                     Click?.Invoke(this, e);
                 }
+                else
+                {
+                    e.Handled = true;
+                }
             }
         }
 

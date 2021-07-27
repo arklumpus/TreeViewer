@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:paz="clr-namespace:Avalonia.Controls.PanAndZoom;assembly=Avalonia.Controls.PanAndZoom"
+        xmlns:accordion="clr-namespace:AvaloniaAccordion;assembly=AvaloniaAccordion"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="1000" Height="600"
         x:Class="TreeViewer.MainWindow"
@@ -32,8 +33,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <Style Selector="StackPanel.Attachment:pointerover Ellipse">
       <Setter Property="Fill" Value="#BCBCBC" />
     </Style>
+    <Style Selector="accordion|Accordion">
+      <Setter Property="HeaderBackground" Value="#ffffff" />
+      <Setter Property="HeaderHoverBackground" Value="#e6e6e6" />
+      <Setter Property="HeaderPressedBackground" Value="#999999" />
+      <Setter Property="HeaderForeground" Value="#303030" />
+      <Setter Property="BottomBarBrush" Value="#0078d7" />
+      <Setter Property="BottomBarThickness" Value="0" />
+      <Setter Property="ContentBackground" Value="#ffffff" />
+    </Style>
+
+    
   </Window.Styles>
-  <Grid>
+  <Grid Name="RootGrid">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="2" />

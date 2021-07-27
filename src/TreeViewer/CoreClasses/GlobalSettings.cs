@@ -42,6 +42,7 @@ namespace TreeViewer
 
         internal static readonly string DefaultModuleRepository = @"https://raw.githubusercontent.com/arklumpus/TreeViewer/main/Modules/";
 
+        public bool ShowLegacyUpDownArrows { get; set; } = false;
         public TimeSpan AutosaveInterval { get; set; } = new TimeSpan(0, 10, 0);
         public bool DrawTreeWhenOpened { get; set; } = true;
         public Colour SelectionColour { get; set; } = Colour.FromRgb(35, 127, 255);
@@ -112,6 +113,16 @@ namespace TreeViewer
                     else
                     {
                         GlobalSettings.Settings.DrawTreeWhenOpened = Convert.ToBoolean(settingValue);
+                    }
+                    break;
+                case "ShowLegacyUpDownArrows":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.ShowLegacyUpDownArrows = false;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.ShowLegacyUpDownArrows = Convert.ToBoolean(settingValue);
                     }
                     break;
                 case "SelectionColour":

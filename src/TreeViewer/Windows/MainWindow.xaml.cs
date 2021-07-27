@@ -32,6 +32,7 @@ using VectSharp;
 using VectSharp.Canvas;
 using System.Security.Cryptography;
 using Avalonia.Controls.ApplicationLifetimes;
+using AvaloniaAccordion;
 
 namespace TreeViewer
 {
@@ -167,7 +168,7 @@ namespace TreeViewer
                 AutosaveTimer?.Stop();
                 GlobalSettings.Settings.MainWindows.Remove(this);
                 Trees?.Dispose();
-                
+
                 if (cachedDebuggerServer != null)
                 {
                     DebuggerServer.Dispose();
@@ -723,7 +724,7 @@ namespace TreeViewer
             content.Children.Add(new Viewbox() { Child = module.GetIcon().PaintToCanvas(), Height = 42 });
             TextBlock blk = new TextBlock() { Text = module.ButtonText, Margin = new Thickness(0, 5, 0, 5), TextAlignment = TextAlignment.Center, FontSize = 13.5 };
             Grid.SetRow(blk, 1);
-            content.Children.Add(blk);            
+            content.Children.Add(blk);
 
             CoolButton btn = new CoolButton() { ButtonContent = content, Width = 105, Height = 120, CornerRadius = new CornerRadius(5), Margin = new Thickness(-7, -10, -7, 0), Padding = new Thickness(12) };
 
@@ -1201,7 +1202,7 @@ namespace TreeViewer
 
 
 
-        private Dictionary<string, object> UpdateParameterPanel(Expander parent, GenericParameterChangeDelegate parameterChangeDelegate, List<(string, string)> parameters, Action updateAction, out Action<Dictionary<string, object>> UpdateParameterAction)
+        private Dictionary<string, object> UpdateParameterPanel(Accordion parent, GenericParameterChangeDelegate parameterChangeDelegate, List<(string, string)> parameters, Action updateAction, out Action<Dictionary<string, object>> UpdateParameterAction)
         {
             StackPanel controlsPanel = new StackPanel();
             Dictionary<string, object> tbr = new Dictionary<string, object>();
@@ -2840,14 +2841,14 @@ namespace TreeViewer
                 };
             }
 
-            parent.Child = controlsPanel;
+            parent.AccordionContent = controlsPanel;
 
             return tbr;
         }
 
         private void BuildTransformerPanel(string suggestedModuleId)
         {
-            Expander exp = new Expander() { Margin = new Thickness(5, 0, 0, 5) };
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
 
             Grid transformerPanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
             transformerPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel) };
@@ -2868,20 +2869,32 @@ namespace TreeViewer
             Grid.SetColumn(TransformerComboBox, 2);
             transformerPanel.Children.Add(TransformerComboBox);
 
+            TransformerComboBox.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
             HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
             Grid.SetColumn(helpButton, 3);
             transformerPanel.Children.Add(helpButton);
 
             ToolTip.SetTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
 
+            helpButton.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
             helpButton.Click += (s, e) =>
             {
+                e.Handled = true;
+
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[Modules.TransformerModules[TransformerComboBox.SelectedIndex].Id].BuildReadmeMarkdown(), Modules.TransformerModules[TransformerComboBox.SelectedIndex].Id);
 
                 win.Show(this);
             };
 
-            exp.Label = transformerPanel;
+            exp.AccordionHeader = transformerPanel;
 
             List<(string, string)> transformerParameters = Modules.TransformerModules[moduleIndex].GetParameters(Trees);
 
@@ -2946,10 +2959,10 @@ namespace TreeViewer
         {
             FurtherTransformations.Add(module);
 
-            Expander exp = new Expander() { Margin = new Thickness(5, 0, 0, 5) };
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
 
             Grid modulePanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel) };
+            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel) };
 
             Canvas alert = AlertPage.PaintToCanvas();
             FurtherTransformationsAlerts.Add(alert);
@@ -2972,8 +2985,10 @@ namespace TreeViewer
                 moveUp.IsVisible = false;
             }
 
-            moveUp.PointerReleased += async (s, e) =>
+            moveUp.Click += async (s, e) =>
             {
+                e.Handled = true;
+
                 int index = FurtherTransformationsContainer.Children.IndexOf(exp);
 
                 if (index > 0)
@@ -3003,20 +3018,20 @@ namespace TreeViewer
                     {
                         if (i == 0)
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[2].IsVisible = false;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[2].IsVisible = true;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = true;
                         }
 
                         if (i == FurtherTransformationsContainer.Children.Count - 1)
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[3].IsVisible = false;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[3].IsVisible = true;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
                         }
                     }
 
@@ -3029,8 +3044,10 @@ namespace TreeViewer
             modulePanel.Children.Add(moveDown);
             moveDown.IsVisible = false;
 
-            moveDown.PointerReleased += async (s, e) =>
+            moveDown.Click += async (s, e) =>
             {
+                e.Handled = true;
+
                 int index = FurtherTransformationsContainer.Children.IndexOf(exp);
 
                 if (index < FurtherTransformationsContainer.Children.Count - 1)
@@ -3059,20 +3076,20 @@ namespace TreeViewer
                     {
                         if (i == 0)
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[2].IsVisible = false;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[2].IsVisible = true;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = true;
                         }
 
                         if (i == FurtherTransformationsContainer.Children.Count - 1)
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[3].IsVisible = false;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)FurtherTransformationsContainer.Children[i]).Label).Children[3].IsVisible = true;
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
                         }
                     }
 
@@ -3084,8 +3101,10 @@ namespace TreeViewer
             Grid.SetColumn(remove, 5);
             modulePanel.Children.Add(remove);
 
-            remove.PointerReleased += async (s, e) =>
+            remove.Click += async (s, e) =>
             {
+                e.Handled = true;
+
                 int index = FurtherTransformationsContainer.Children.IndexOf(exp);
 
                 FurtherTransformations.RemoveAt(index);
@@ -3096,11 +3115,26 @@ namespace TreeViewer
 
                 if (FurtherTransformations.Count > 0)
                 {
-                    ((Grid)((Expander)FurtherTransformationsContainer.Children[0]).Label).Children[2].IsVisible = false;
-                    ((Grid)((Expander)FurtherTransformationsContainer.Children.Last()).Label).Children[3].IsVisible = false;
+                    ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[2].IsVisible = false;
+                    ((Grid)((Accordion)FurtherTransformationsContainer.Children.Last()).AccordionHeader).Children[3].IsVisible = false;
                 }
 
                 await UpdateFurtherTransformations(index);
+            };
+
+            remove.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
+            moveUp.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
+            moveDown.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
             };
 
             HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
@@ -3109,14 +3143,106 @@ namespace TreeViewer
 
             ToolTip.SetTip(helpButton, module.HelpText);
 
+            helpButton.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
             helpButton.Click += (s, e) =>
             {
+                e.Handled = true;
+
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[module.Id].BuildReadmeMarkdown(), module.Id);
 
                 win.Show(this);
             };
 
-            exp.Label = modulePanel;
+            exp.AccordionHeader = modulePanel;
+
+            PointerPressedEventArgs pressEventArgs = null;
+
+            Avalonia.Threading.DispatcherTimer pressTimer = new Avalonia.Threading.DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(500) };
+
+            if (!GlobalSettings.Settings.ShowLegacyUpDownArrows)
+            {
+                moveUp.Width = 0;
+                moveDown.Width = 0;
+                moveUp.Height = 0;
+                moveDown.Height = 0;
+                moveUp.Opacity = 0;
+                moveDown.Opacity = 0;
+
+                pressTimer.Tick += (s, e) =>
+                {
+                    pressTimer.Stop();
+
+                    if (pressEventArgs != null)
+                    {
+                        pressEventArgs.Pointer.Capture(exp);
+                        pressEventArgs.Handled = true;
+
+                        if (exp.IsOpen)
+                        {
+                            exp.IsOpen = false;
+                        }
+
+                        Func<PointerReleasedEventArgs, (int, int)> act = null;
+
+                        async void StopDrag(object sender, PointerReleasedEventArgs e)
+                        {
+                            exp.PointerReleased -= StopDrag;
+
+                            if (act != null)
+                            {
+                                (int oldIndex, int newIndex) = act.Invoke(e);
+
+                                if (oldIndex != newIndex)
+                                {
+
+                                    FurtherTransformationModule mod = FurtherTransformations[oldIndex];
+                                    FurtherTransformations.RemoveAt(oldIndex);
+                                    FurtherTransformations.Insert(newIndex, mod);
+
+                                    Dictionary<string, object> param = FurtherTransformationsParameters[oldIndex];
+                                    FurtherTransformationsParameters.RemoveAt(oldIndex);
+                                    FurtherTransformationsParameters.Insert(newIndex, param);
+
+
+                                    Action<Dictionary<string, object>> paramUpd = UpdateFurtherTransformationParameters[oldIndex];
+                                    UpdateFurtherTransformationParameters.RemoveAt(oldIndex);
+                                    UpdateFurtherTransformationParameters.Insert(newIndex, paramUpd);
+
+                                    Canvas alert = FurtherTransformationsAlerts[oldIndex];
+                                    FurtherTransformationsAlerts.RemoveAt(oldIndex);
+                                    FurtherTransformationsAlerts.Insert(newIndex, alert);
+
+                                    await UpdateFurtherTransformations(Math.Min(newIndex, oldIndex));
+                                }
+                            }
+                        }
+
+                        StartDrag(exp, FurtherTransformationsContainer, ref act, pressEventArgs);
+
+                        exp.PointerReleased += StopDrag;
+                    }
+                };
+
+                exp.PointerPressed += (s, e) =>
+                {
+                    if (!helpButton.IsPointerOver && !remove.IsPointerOver)
+                    {
+                        pressEventArgs = e;
+                        pressTimer.Start();
+                    }
+                };
+
+                exp.PointerReleased += (s, e) =>
+                {
+                    pressEventArgs = null;
+                    pressTimer.Stop();
+                };
+            }
+
 
             List<(string, string)> moduleParameters = module.GetParameters(TransformedTree);
             moduleParameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
@@ -3145,12 +3271,12 @@ namespace TreeViewer
 
             if (FurtherTransformations.Count > 1)
             {
-                ((Grid)((Expander)FurtherTransformationsContainer.Children[0]).Label).Children[3].IsVisible = true;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[3].IsVisible = true;
             }
 
             if (FurtherTransformations.Count > 2)
             {
-                ((Grid)((Expander)FurtherTransformationsContainer.Children[FurtherTransformationsContainer.Children.Count - 2]).Label).Children[3].IsVisible = true;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children[FurtherTransformationsContainer.Children.Count - 2]).AccordionHeader).Children[3].IsVisible = true;
             }
 
             return tbr;
@@ -3166,14 +3292,14 @@ namespace TreeViewer
 
             if (FurtherTransformations.Count > 0)
             {
-                ((Grid)((Expander)FurtherTransformationsContainer.Children[0]).Label).Children[2].IsVisible = false;
-                ((Grid)((Expander)FurtherTransformationsContainer.Children.Last()).Label).Children[3].IsVisible = false;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[2].IsVisible = false;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children.Last()).AccordionHeader).Children[3].IsVisible = false;
             }
         }
 
         private void BuildCoordinatesPanel(string suggestedModuleId)
         {
-            Expander exp = new Expander() { Margin = new Thickness(5, 0, 0, 5) };
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
 
             Grid coordinatesPanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
             coordinatesPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel) };
@@ -3194,6 +3320,10 @@ namespace TreeViewer
             Grid.SetColumn(CoordinatesComboBox, 2);
             coordinatesPanel.Children.Add(CoordinatesComboBox);
 
+            CoordinatesComboBox.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
 
             HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
             Grid.SetColumn(helpButton, 3);
@@ -3201,14 +3331,21 @@ namespace TreeViewer
 
             ToolTip.SetTip(helpButton, Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].HelpText);
 
+            helpButton.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
             helpButton.Click += (s, e) =>
             {
+                e.Handled = true;
+
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].Id].BuildReadmeMarkdown(), Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].Id);
 
                 win.Show(this);
             };
 
-            exp.Label = coordinatesPanel;
+            exp.AccordionHeader = coordinatesPanel;
 
             List<(string, string)> coordinateParameters = Modules.CoordinateModules[moduleIndex].GetParameters(TransformedTree);
             coordinateParameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
@@ -3342,8 +3479,8 @@ namespace TreeViewer
 
             if (PlottingActions.Count > 0)
             {
-                ((Grid)((Expander)PlottingActionsContainer.Children[0]).Label).Children[2].IsVisible = false;
-                ((Grid)((Expander)PlottingActionsContainer.Children.Last()).Label).Children[3].IsVisible = false;
+                ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[2].IsVisible = false;
+                ((Grid)((Accordion)PlottingActionsContainer.Children.Last()).AccordionHeader).Children[3].IsVisible = false;
             }
         }
 
@@ -3356,10 +3493,10 @@ namespace TreeViewer
 
             PlottingActions.Add(module);
 
-            Expander exp = new Expander() { Margin = new Thickness(5, 0, 0, 5) };
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
 
             Grid modulePanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel) };
+            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel) };
 
             Canvas alert = AlertPage.PaintToCanvas();
             PlottingAlerts.Add(alert);
@@ -3386,8 +3523,15 @@ namespace TreeViewer
 
             ToolTip.SetTip(helpButton, module.HelpText);
 
+            helpButton.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
             helpButton.Click += (s, e) =>
             {
+                e.Handled = true;
+
                 HelpWindow win = new HelpWindow(Modules.LoadedModulesMetadata[module.Id].BuildReadmeMarkdown(), module.Id);
 
                 win.Show(this);
@@ -3401,8 +3545,10 @@ namespace TreeViewer
                 moveUp.IsVisible = false;
             }
 
-            moveUp.PointerReleased += (s, e) =>
+            moveUp.Click += (s, e) =>
             {
+                e.Handled = true;
+
                 int index = PlottingActionsContainer.Children.IndexOf(exp);
 
                 if (index > 0)
@@ -3435,20 +3581,20 @@ namespace TreeViewer
                     {
                         if (i == 0)
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[3].IsVisible = false;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[3].IsVisible = true;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
                         }
 
                         if (i == PlottingActionsContainer.Children.Count - 1)
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[4].IsVisible = false;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[4].IsVisible = true;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = true;
                         }
                     }
 
@@ -3480,8 +3626,10 @@ namespace TreeViewer
             modulePanel.Children.Add(moveDown);
             moveDown.IsVisible = false;
 
-            moveDown.PointerReleased += (s, e) =>
+            moveDown.Click += (s, e) =>
             {
+                e.Handled = true;
+
                 int index = PlottingActionsContainer.Children.IndexOf(exp);
 
                 if (index < PlottingActionsContainer.Children.Count - 1)
@@ -3514,20 +3662,20 @@ namespace TreeViewer
                     {
                         if (i == 0)
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[3].IsVisible = false;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[3].IsVisible = true;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
                         }
 
                         if (i == PlottingActionsContainer.Children.Count - 1)
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[4].IsVisible = false;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = false;
                         }
                         else
                         {
-                            ((Grid)((Expander)PlottingActionsContainer.Children[i]).Label).Children[4].IsVisible = true;
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = true;
                         }
                     }
 
@@ -3555,12 +3703,42 @@ namespace TreeViewer
                 }
             };
 
+            if (!GlobalSettings.Settings.ShowLegacyUpDownArrows)
+            {
+                moveUp.Width = 0;
+                moveDown.Width = 0;
+                moveUp.Height = 0;
+                moveDown.Height = 0;
+                moveUp.Opacity = 0;
+                moveDown.Opacity = 0;
+            }
+
+
             AddRemoveButton remove = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Remove };
+
+            remove.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
+            moveUp.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
+            moveDown.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
+
             Grid.SetColumn(remove, 5);
             modulePanel.Children.Add(remove);
 
-            remove.PointerReleased += (s, e) =>
+            remove.Click += (s, e) =>
             {
+                e.Handled = true;
+
                 int index = PlottingActionsContainer.Children.IndexOf(exp);
 
                 PlottingActions.RemoveAt(index);
@@ -3572,8 +3750,8 @@ namespace TreeViewer
 
                 if (PlottingActions.Count > 0)
                 {
-                    ((Grid)((Expander)PlottingActionsContainer.Children[0]).Label).Children[3].IsVisible = false;
-                    ((Grid)((Expander)PlottingActionsContainer.Children.Last()).Label).Children[4].IsVisible = false;
+                    ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[3].IsVisible = false;
+                    ((Grid)((Accordion)PlottingActionsContainer.Children.Last()).AccordionHeader).Children[4].IsVisible = false;
                 }
 
                 Canvas plotCanvas = PlotCanvases[index];
@@ -3599,7 +3777,102 @@ namespace TreeViewer
                 UpdatePlotBounds();
             };
 
-            exp.Label = modulePanel;
+            exp.AccordionHeader = modulePanel;
+
+            PointerPressedEventArgs pressEventArgs = null;
+
+            Avalonia.Threading.DispatcherTimer pressTimer = new Avalonia.Threading.DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(500) };
+
+            if (!GlobalSettings.Settings.ShowLegacyUpDownArrows)
+            {
+
+                pressTimer.Tick += (s, e) =>
+                {
+                    pressTimer.Stop();
+
+                    if (pressEventArgs != null)
+                    {
+                        pressEventArgs.Pointer.Capture(exp);
+                        pressEventArgs.Handled = true;
+
+                        if (exp.IsOpen)
+                        {
+                            exp.IsOpen = false;
+                        }
+
+                        Func<PointerReleasedEventArgs, (int, int)> act = null;
+
+                        void StopDrag(object sender, PointerReleasedEventArgs e)
+                        {
+                            exp.PointerReleased -= StopDrag;
+
+                            if (act != null)
+                            {
+                                (int oldIndex, int newIndex) = act.Invoke(e);
+
+                                if (oldIndex != newIndex)
+                                {
+                                    PlottingModule mod = PlottingActions[oldIndex];
+                                    PlottingActions.RemoveAt(oldIndex);
+                                    PlottingActions.Insert(newIndex, mod);
+
+                                    Dictionary<string, object> param = PlottingParameters[oldIndex];
+                                    PlottingParameters.RemoveAt(oldIndex);
+                                    PlottingParameters.Insert(newIndex, param);
+
+                                    Action<Dictionary<string, object>> updater = UpdatePlottingParameters[oldIndex];
+                                    UpdatePlottingParameters.RemoveAt(oldIndex);
+                                    UpdatePlottingParameters.Insert(newIndex, updater);
+
+                                    Canvas alert = PlottingAlerts[oldIndex];
+                                    PlottingAlerts.RemoveAt(oldIndex);
+                                    PlottingAlerts.Insert(newIndex, alert);
+
+                                    Canvas plotCanvas = PlotCanvases[oldIndex];
+                                    PlotCanvases.RemoveAt(oldIndex);
+                                    PlotCanvases.Insert(newIndex, plotCanvas);
+
+                                    (VectSharp.Point, VectSharp.Point) bounds = PlotBounds[oldIndex];
+                                    PlotBounds.RemoveAt(oldIndex);
+                                    PlotBounds.Insert(newIndex, bounds);
+
+                                    Canvas selectionCanvas = SelectionCanvases[oldIndex];
+                                    SelectionCanvases.RemoveAt(oldIndex);
+                                    SelectionCanvases.Insert(newIndex, selectionCanvas);
+
+                                    Canvas parentCanvas = this.FindControl<Canvas>("PlotCanvas");
+                                    parentCanvas.Children.RemoveAt(oldIndex);
+                                    parentCanvas.Children.Insert(newIndex, plotCanvas);
+
+                                    SelectionCanvas.Children.RemoveAt(oldIndex);
+                                    SelectionCanvas.Children.Insert(newIndex, selectionCanvas);
+                                }
+                            }
+                        }
+
+                        StartDrag(exp, PlottingActionsContainer, ref act, pressEventArgs);
+
+                        exp.PointerReleased += StopDrag;
+                    }
+                };
+
+                exp.PointerPressed += (s, e) =>
+                {
+                    if (!helpButton.IsPointerOver && !remove.IsPointerOver)
+                    {
+                        pressEventArgs = e;
+                        pressTimer.Start();
+                    }
+                };
+
+                exp.PointerReleased += (s, e) =>
+                {
+                    pressEventArgs = null;
+                    pressTimer.Stop();
+                };
+            }
+
+            //exp.Transitions = new Avalonia.Animation.Transitions() { new Avalonia.Animation.ThicknessTransition() { Property = Accordion.MarginProperty, Duration = TimeSpan.FromMilliseconds(50) } };
 
             List<(string, string)> moduleParameters = module.GetParameters(TransformedTree);
             moduleParameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
@@ -3617,12 +3890,12 @@ namespace TreeViewer
 
             if (PlottingActions.Count > 1)
             {
-                ((Grid)((Expander)PlottingActionsContainer.Children[0]).Label).Children[4].IsVisible = true;
+                ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[4].IsVisible = true;
             }
 
             if (PlottingActions.Count > 2)
             {
-                ((Grid)((Expander)PlottingActionsContainer.Children[PlottingActionsContainer.Children.Count - 2]).Label).Children[4].IsVisible = true;
+                ((Grid)((Accordion)PlottingActionsContainer.Children[PlottingActionsContainer.Children.Count - 2]).AccordionHeader).Children[4].IsVisible = true;
             }
 
             return updateParameterAction;

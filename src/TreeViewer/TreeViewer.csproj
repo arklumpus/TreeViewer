@@ -7,7 +7,7 @@
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
     <AssemblyName>TreeViewer</AssemblyName>
-    <Version>1.2.2</Version>
+    <Version>1.3.0-a1</Version>
     <ApplicationIcon>Assets\Program.ico</ApplicationIcon>
     <Authors>Giorgio Bianchini</Authors>
     <Company>University of Bristol</Company>
@@ -89,6 +89,7 @@
     <PackageReference Include="Avalonia" Version="0.10.6" />
     <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="3.6.0" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.6" />
+    <PackageReference Include="AvaloniaAccordion" Version="1.0.0" />
     <PackageReference Include="AvaloniaColorPicker" Version="1.0.6.1" />
     <PackageReference Include="CSharpEditor" Version="1.1.1" />
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />

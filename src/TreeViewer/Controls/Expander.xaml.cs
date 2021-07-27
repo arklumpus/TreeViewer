@@ -20,6 +20,7 @@ using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 using System;
 using System.Globalization;
 
@@ -75,6 +76,16 @@ namespace TreeViewer
         {
             this.IsExpanded = !this.IsExpanded;
             this.FindControl<Border>("ContentBorder").Opacity = this.IsExpanded ? 1 : 0;
+        }
+
+        protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+        {
+            base.OnPropertyChanged(change);
+
+            if (change.Property == Expander.IsExpandedProperty)
+            {
+                this.FindAncestorOfType<AvaloniaAccordion.Accordion>()?.InvalidateHeight();
+            }
         }
     }
 
