@@ -7,3 +7,5 @@ PhyloTree.TreeNode.dll
 VectSharp.dll
 System.Linq.dll
 System.Text.Json.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

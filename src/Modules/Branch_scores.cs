@@ -49,30 +49,52 @@ namespace a10bbbbe1c6344582907311f067a54081
         public const string Name = "Branch score style";
         public const string HelpText = "Sets the plot actions to display node scores using the branch colours.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.1.1");
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public const string Id = "10bbbbe1-c634-4582-9073-11f067a54081";
 
         public static bool IsAvailableInCommandLine { get; } = true;
 
-        public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
-        public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.None;
+        public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { (Avalonia.Input.Key.None, Avalonia.Input.KeyModifiers.None) };
 
         public static bool TriggerInTextBox { get; } = false;
 
-        public static string ButtonText { get; } = "Branch\nscores";
+        public static string ButtonText { get; } = "Branch scores";
 
-        private const string IconBase64 = "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";
+        public static string GroupName { get; } = "Tree style";
 
-        public static Page GetIcon()
+        public static double GroupIndex { get; } = 4;
+
+        public static bool IsLargeButton { get; } = true;
+
+        public static List<(string, Func<double, VectSharp.Page>)> SubItems { get; } = new List<(string, Func<double, VectSharp.Page>)>();
+
+        private static string Icon32Base64 = "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";
+        private static string Icon48Base64 = "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";
+        private static string Icon64Base64 = "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";
+
+        public static VectSharp.Page GetIcon(double scaling)
         {
-            byte[] bytes = Convert.FromBase64String(IconBase64);
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon48Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon64Base64);
+            }
 
             IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
 
-            RasterImage icon;
+            VectSharp.RasterImage icon;
 
             try
             {
@@ -87,8 +109,8 @@ namespace a10bbbbe1c6344582907311f067a54081
                 Marshal.FreeHGlobal(imagePtr);
             }
 
-            Page pag = new Page(icon.Width, icon.Height);
-            pag.Graphics.DrawRasterImage(0, 0, icon);
+            VectSharp.Page pag = new VectSharp.Page(32, 32);
+            pag.Graphics.DrawRasterImage(0, 0, 32, 32, icon);
 
             return pag;
         }
@@ -96,14 +118,14 @@ namespace a10bbbbe1c6344582907311f067a54081
         private static string GetColourFormatterCode(double min, double max, Gradient gradient)
         {
             StringBuilder codeBuilder = new StringBuilder();
-            codeBuilder.AppendLine(@"static Gradient gradient = new Gradient(new List<GradientStop>()
+            codeBuilder.AppendLine(@"static Gradient gradient = new Gradient(new List<TreeViewer.GradientStop>()
 {");
             int indentationLevel = 1;
 
             for (int i = 0; i < gradient.GradientStops.Count; i++)
             {
                 codeBuilder.Append(' ', indentationLevel * 4);
-                codeBuilder.Append("new GradientStop(");
+                codeBuilder.Append("new TreeViewer.GradientStop(");
                 codeBuilder.Append(gradient.GradientStops[i].Position.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 codeBuilder.Append(", Colour.FromRgba(");
                 codeBuilder.Append(gradient.GradientStops[i].Colour.R.ToString(System.Globalization.CultureInfo.InvariantCulture));
@@ -153,7 +175,7 @@ public static Colour? Format(object attribute)
             return codeBuilder.ToString();
         }
 
-        public static void PerformAction(MainWindow window, InstanceStateData stateData)
+        public static void PerformAction(int actionIndex, MainWindow window, InstanceStateData stateData)
         {
             if (stateData.Trees != null)
             {
@@ -231,12 +253,29 @@ public static Colour? Format(object attribute)
                     double maxValue;
                     int branchCount;
 
-                    Avalonia.Controls.Window parameterWindow = new Avalonia.Controls.Window() { Width = 250, Height = 350, Title = "Branch scores", FontFamily = window.FontFamily, FontSize = window.FontSize, Icon = window.Icon };
+                    ChildWindow parameterWindow = new ChildWindow() { Width = 250, Height = 350, Title = "Branch scores", FontFamily = window.FontFamily, FontSize = 14, Icon = window.Icon, SizeToContent = Avalonia.Controls.SizeToContent.Height, WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner };
 
-                    Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(10) };
+                    Avalonia.Controls.Grid headerGrid = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(10) };
+                    headerGrid.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+                    headerGrid.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                    headerGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+                    headerGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                    parameterWindow.Content = headerGrid;
+
+                    headerGrid.Children.Add(new DPIAwareBox(GetIcon));
+
+                    {
+                        Avalonia.Controls.TextBlock blk = new Avalonia.Controls.TextBlock() { FontSize = 16, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 114, 178)), Text = "Branch scores", Margin = new Avalonia.Thickness(10, 0, 0, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                        Avalonia.Controls.Grid.SetColumn(blk, 1);
+                        headerGrid.Children.Add(blk);
+                    }
+
+                    Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(0, 10, 0, 0) };
                     grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
                     grd.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
-                    parameterWindow.Content = grd;
+                    Avalonia.Controls.Grid.SetRow(grd, 1);
+                    Avalonia.Controls.Grid.SetColumnSpan(grd, 2);
+                    headerGrid.Children.Add(grd);
 
                     grd.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(1, Avalonia.Controls.GridUnitType.Star));
 
@@ -304,7 +343,7 @@ public static Colour? Format(object attribute)
                     grd.RowDefinitions.Add(new Avalonia.Controls.RowDefinition(0, Avalonia.Controls.GridUnitType.Auto));
 
                     {
-                        Avalonia.Controls.TextBlock blk = new Avalonia.Controls.TextBlock() { Text = "For BLAST bit scores, a minimum of 0 and a maximum of 400-600 is recommended.", TextAlignment = Avalonia.Media.TextAlignment.Center, FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(180, 180, 180)), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 5, 10), TextWrapping = Avalonia.Media.TextWrapping.Wrap };
+                        Avalonia.Controls.TextBlock blk = new Avalonia.Controls.TextBlock() { Text = "For BLAST bit scores, a minimum of 0 and a maximum of 400-600 is recommended.", TextAlignment = Avalonia.Media.TextAlignment.Center, FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(140, 140, 140)), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Avalonia.Thickness(0, 0, 5, 10), TextWrapping = Avalonia.Media.TextWrapping.Wrap };
                         Avalonia.Controls.Grid.SetRow(blk, 3);
                         Avalonia.Controls.Grid.SetColumnSpan(blk, 2);
                         grd.Children.Add(blk);
@@ -375,11 +414,13 @@ public static Colour? Format(object attribute)
                     buttonGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
                     buttonGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
 
-                    Avalonia.Controls.Button okButton = new Avalonia.Controls.Button() { Content = "OK", Width = 100, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                    Avalonia.Controls.Button okButton = new Avalonia.Controls.Button() { Content = "OK", Width = 100, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13 };
+                    okButton.Classes.Add("PlainButton");
                     Avalonia.Controls.Grid.SetColumn(okButton, 1);
                     buttonGrid.Children.Add(okButton);
 
-                    Avalonia.Controls.Button cancelButton = new Avalonia.Controls.Button() { Content = "Cancel", Width = 100, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                    Avalonia.Controls.Button cancelButton = new Avalonia.Controls.Button() { Content = "Cancel", Width = 100, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13 };
+                    cancelButton.Classes.Add("PlainButton");
                     Avalonia.Controls.Grid.SetColumn(cancelButton, 3);
                     buttonGrid.Children.Add(cancelButton);
 
@@ -412,7 +453,7 @@ public static Colour? Format(object attribute)
                         }
                     };
 
-                    parameterWindow.ShowDialog(window);
+                    parameterWindow.ShowDialog2(window);
                 }
                 else
                 {
@@ -595,7 +636,7 @@ public static Colour? Format(object attribute)
 
                             bool gradientFinished = false;
 
-                            List<GradientStop> gradientStops = new List<GradientStop>();
+                            List<TreeViewer.GradientStop> gradientStops = new List<TreeViewer.GradientStop>();
 
                             while (!gradientFinished)
                             {
@@ -620,7 +661,7 @@ public static Colour? Format(object attribute)
 
                                             if (col != null)
                                             {
-                                                gradientStops.Add(new GradientStop(position, col.Value));
+                                                gradientStops.Add(new TreeViewer.GradientStop(position, col.Value));
                                                 elementValid = true;
                                             }
                                         }
@@ -687,26 +728,24 @@ public static Colour? Format(object attribute)
                 double posLeft = Math.Max((double)i / branchCount - 0.00001, 0);
                 double posRight = Math.Min(posLeft + 0.00001, 1);
 
-                Gradient gradient = new Gradient(new List<GradientStop>()
+                Gradient gradient = new Gradient(new List<TreeViewer.GradientStop>()
                 {
-                    new GradientStop(posLeft, currCol.WithAlpha(0)),
-                    new GradientStop(posRight, currCol),
+                    new TreeViewer.GradientStop(posLeft, currCol.WithAlpha(0)),
+                    new TreeViewer.GradientStop(posRight, currCol),
                 });
 
                 if (i == 0)
                 {
-                    gradient = new Gradient(new List<GradientStop>()
+                    gradient = new Gradient(new List<TreeViewer.GradientStop>()
                     {
-                        new GradientStop(0, currCol),
-                        new GradientStop(1, currCol),
+                        new TreeViewer.GradientStop(0, currCol),
+                        new TreeViewer.GradientStop(1, currCol),
                     });
                 }
 
                 string colourFormatterSource = GetColourFormatterCode(minValue, maxValue, gradient);
-
-                ColourFormatterOptions branchColour = new ColourFormatterOptions(colourFormatterSource) { AttributeName = attributeName, AttributeType = "Number", DefaultColour = currCol.WithAlpha(0) };
-
-                branchColour.Parameters = new object[] {
+				
+				object[] formatterParams = new object[] {
                     colourFormatterSource,
                     minValue,
                     maxValue,
@@ -714,6 +753,7 @@ public static Colour? Format(object attribute)
                     true
                     };
 
+                ColourFormatterOptions branchColour = new ColourFormatterOptions(colourFormatterSource, formatterParams) { AttributeName = attributeName, AttributeType = "Number", DefaultColour = currCol.WithAlpha(0) };
 
                 Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
                 updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 }, { "Line weight:", branchWidth }, { "Colour:", branchColour } });
@@ -730,16 +770,16 @@ public static Colour? Format(object attribute)
                     };
 
                 Gradient gradient = Modules.DefaultGradients["TransparentToBlack"];
-
-                ColourFormatterOptions branchColour = new ColourFormatterOptions(Modules.DefaultAttributeConvertersToColour[0]) { AttributeName = "Color", AttributeType = "String", DefaultColour = Colours.White };
-
-                branchColour.Parameters = new object[] {
+				
+				object[] formatterParams = new object[] {
                     Modules.DefaultAttributeConvertersToColour[0],
                     0,
                     1,
                     gradient,
                     true
                     };
+
+                ColourFormatterOptions branchColour = new ColourFormatterOptions(Modules.DefaultAttributeConvertersToColour[0], formatterParams) { AttributeName = "Color", AttributeType = "String", DefaultColour = Colours.White };
 
 
                 Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
@@ -842,11 +882,11 @@ public static Colour? Format(object attribute)
             }
 
             if (InstanceStateData.IsUIAvailable)
-			{
-				window.BuildAttachmentList();
-				window.UpdateCoordinates();
-				window.AutoFit();
-			}
-		}
-	}
+            {
+                window.BuildAttachmentList();
+                window.UpdateCoordinates();
+                window.AutoFit();
+            }
+        }
+    }
 }

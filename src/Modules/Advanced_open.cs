@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TreeViewer;
+using System.Runtime.InteropServices;
 
 namespace AdvancedOpenFileMenuAction
 {
@@ -21,76 +22,81 @@ namespace AdvancedOpenFileMenuAction
         public const string Id = "98804064-922f-4395-8a96-216d4b3ff259";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
-        public static string ItemText { get; } = "Advanced open...";
+        public static string ItemText { get; } = "Advanced open";
         public static string ParentMenu { get; } = "File";
-        public static string GroupId { get; } = "48171c7a-a759-4d04-84b0-546d82b36a19";
+        public static string GroupName { get; } = Modules.FileMenuFirstAreaId;
         public static Avalonia.AvaloniaProperty PropertyAffectingEnabled { get; } = null;
-        public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.O;
-        public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Shift;
+		
+		public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { ( Avalonia.Input.Key.O, Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Shift ) };
         public static bool TriggerInTextBox { get; } = false;
 
-        public static bool IsEnabled(MainWindow window)
+        public static double GroupIndex { get; } = 1;
+        public static bool IsLargeButton { get; } = false;
+        public static List<(string, Func<double, VectSharp.Page>)> SubItems { get; } = new List<(string, Func<double, VectSharp.Page>)>();
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAACqSURBVDhPjZOBEYUwCEPRyRyt7qTzVYKpYgte3923IaRK9b7UWov+IorMgCTlh8zvWblG7LhJwjsdKspp/J5wAu1vCGUwA8owgZZt80YrBH2EPjdoJlZaD/QPli9wuQ6bVdsnpjacvl8ki/DJ9FL6UHhm9p7RoWGwjJ9C34LAgg7axkJvAE1KWRRKw/VOrjkIK+kR0gmAD0Zgsr//Athx8Udw2nrT9KPfiFzFPVfAitB//wAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAD8SURBVEhLxZQBEsIgDARbX9an0T/5P8zBpbYI5VA73RlNmuQCpMp0OTHGYJ8egeXjQE23iVLT4kF7GeoCK04hchwnInT/Qtnv/hHZhhbsSoUaJ5yOyFLefGFIBhoImwt4ASxDMtBkqWnxzfgGEojDMiQDTZZSCy85BAnEYBk6xer8Jqj/25GhKzW33KEh/UQtvy1gRto5a5zyHjs87wXyWKymbNrifQIizRxYrS/yZCiB5xzevQ8GurD2cwQFTDlhZlwCCrqJ2aC7UdaM3kUrrcpofQZHx06N/jsYBeLco8t3i1DslIt1fwRdTOdN0g7pJ2r5n0Gj3K/WcJpeHJmrLPSGe1UAAAAASUVORK5CYII=";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGhSURBVFhH1ZZLksIwDEQDZ5oDZNbMoXIoWA/LWcydQrfdcoLtkPhTRfGqTGJJlvyRFYZ5nie0UqahEyd603sRJ6DXNtx6gLq7yLxq0jnOer6N6gloI0pJc0eKkiOoSdqA3CxI3u1Mt1CYJM5n5QAWMKJd3VIKkYuwE2IKdWDvXsNsxOPX9zrCCRB1s0DNla9pqoQYH/ztTgCqODh3ohqO9248LycAcVVw2P2xqRvgeDpZMW5OAKLa4OskvUq8STYJIYoT7ps/MLm7noCd5cLddObPML/y6RYB0ZJDHEDUdYZeEmA/WT1kcUV0q9V7QLL46uYngMfhbYeupSSnEwBFZ069N6ti8S1BzMvgBuxyVZEy7g5bVq/hHgnXHApuaIyRFCjKvMoj8YLkh9CQzZVLnUCdN3nC2Rd/DTGQBebie0/865kjp7vQ15n39Cga+H64fdzDiKojaEbOjOIkbNpW+OMq4ny4odmZf6Elepzmj97rQfAuhajlP2FRvYjoMoEYbm1ypJLxWLK05oAlXf3nuDcItL5yfa5aKQic/UuWMgwPWDaQrI+cA2YAAAAASUVORK5CYII=";
+
+        public static VectSharp.Page GetIcon(double scaling)
         {
-            return true;
-        }
+            byte[] bytes;
 
-        public static async Task PerformAction(MainWindow window)
-        {
-            OpenFileDialog dialog;
-
-            List<FileDialogFilter> filters = new List<FileDialogFilter>();
-
-            List<string> allExtensions = new List<string>();
-
-            for (int i = 0; i < Modules.FileTypeModules.Count; i++)
+            if (scaling <= 1)
             {
-                filters.Add(new FileDialogFilter() { Name = Modules.FileTypeModules[i].Extensions[0], Extensions = new List<string>(Modules.FileTypeModules[i].Extensions.Skip(1)) });
-                allExtensions.AddRange(Modules.FileTypeModules[i].Extensions.Skip(1));
+
+                bytes = Convert.FromBase64String(Icon16Base64);
             }
-
-            filters.Insert(0, new FileDialogFilter() { Name = "All tree files", Extensions = allExtensions });
-            filters.Add(new FileDialogFilter() { Name = "All files", Extensions = new List<string>() { "*" } });
-
-            if (!Modules.IsMac)
+            else if (scaling <= 1.5)
             {
-                dialog = new OpenFileDialog()
-                {
-                    Title = "Open tree file",
-                    AllowMultiple = false,
-                    Filters = filters
-                };
+                bytes = Convert.FromBase64String(Icon24Base64);
             }
             else
             {
-                dialog = new OpenFileDialog()
-                {
-                    Title = "Open tree file",
-                    AllowMultiple = false
-                };
+                bytes = Convert.FromBase64String(Icon32Base64);
             }
 
-            string[] result = await dialog.ShowAsync(window);
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
 
-            if (result != null && result.Length == 1)
+            VectSharp.RasterImage icon;
+
+            try
             {
-                AdvancedOpenWindow win = new AdvancedOpenWindow(result[0]);
-                await win.ShowDialog2(window);
-
-                if (win.LoadedTrees != null)
-                {
-                    if (window.Trees == null)
-                    {
-                        window.Trees = win.LoadedTrees;
-                        window.FileOpened(win.ModuleSuggestions);
-                    }
-                    else
-                    {
-                        MainWindow win2 = new MainWindow(win.LoadedTrees, win.ModuleSuggestions, result[0]);
-                        win2.Show();
-                    }
-                }
-
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
             }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            VectSharp.Page pag = new VectSharp.Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
+
+        public static Avalonia.Controls.Control GetFileMenuPage()
+        {
+            return new TreeViewer.AdvancedOpenPage();
+        }
+
+        public static List<bool> IsEnabled(MainWindow window)
+        {
+            return new List<bool>() { true };
+        }
+
+        public static Task PerformAction(int index, MainWindow window)
+        {
+			window.RibbonBar.SelectedIndex = 0;
+			window.GetFilePage<AdvancedOpenPage>(out int ind);
+			window.RibbonFilePage.SelectedIndex = ind;
+			
+            return Task.CompletedTask;
         }
     }
 }

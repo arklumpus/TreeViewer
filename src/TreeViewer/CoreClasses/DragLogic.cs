@@ -1,8 +1,24 @@
-﻿using Avalonia;
+﻿/*
+    TreeViewer - Cross-platform software to draw phylogenetic trees
+    Copyright (C) 2021  Giorgio Bianchini
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, version 3.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
-using AvaloniaAccordion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +29,7 @@ namespace TreeViewer
 {
     public partial class MainWindow
     {
-        private void StartDrag(Accordion exp, StackPanel parent, ref Func<PointerReleasedEventArgs, (int, int)> onPointerReleased, PointerEventArgs currArgs, double moduleHeight = 34)
+        private void StartDrag(Accordion exp, StackPanel parent, ref Func<PointerReleasedEventArgs, (int, int)> onPointerReleased, PointerEventArgs currArgs, double moduleHeight = 24)
         {
             parent.Cursor = new Cursor(StandardCursorType.SizeAll);
 
@@ -23,7 +39,7 @@ namespace TreeViewer
             placeHolderContent.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             placeHolderContent.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
 
-            Viewbox arrowBox = new Viewbox() { Width = 18, Margin = new Thickness(5, 3, 5, 3) };
+            Viewbox arrowBox = new Viewbox() { Width = 10, Margin = new Thickness(5, 3, 5, 3) };
 
             Canvas arrowCanvas = new Canvas() { Width = 16, Height = 16 };
             arrowCanvas.Children.Add(new Avalonia.Controls.Shapes.Path() { Data = Geometry.Parse("M2,6 L8,12 L14,6"), StrokeThickness = 2, Stroke = new SolidColorBrush(Color.FromRgb(48, 48, 48)), StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round, Width = 16, Height = 16 });
@@ -315,8 +331,6 @@ namespace TreeViewer
                 exp.IsVisible = true;
 
                 return (previousIndex, newIndex);
-
-                //System.Diagnostics.Debug.WriteLine(previousIndex + " --> " + newIndex);
             };
         }
     }

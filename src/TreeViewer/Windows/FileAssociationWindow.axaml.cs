@@ -1,16 +1,32 @@
+/*
+    TreeViewer - Cross-platform software to draw phylogenetic trees
+    Copyright (C) 2021  Giorgio Bianchini
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, version 3.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Principal;
 
 namespace TreeViewer
 {
-    public class FileAssociationWindow : Window
+    public class FileAssociationWindow : ChildWindow
     {
         public FileAssociationWindow()
         {
@@ -40,6 +56,8 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+
+            this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.FileTypeIcons.tre")) { Width = 32, Height = 32 });
 
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
             {
@@ -96,9 +114,9 @@ namespace TreeViewer
                 StackPanel description = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
 
                 description.Children.Add(new TextBlock() { Text = "." + kvp.Key, FontWeight = Avalonia.Media.FontWeight.Bold });
-                description.Children.Add(new TextBlock() { Text = " - " + kvp.Value, FontStyle = Avalonia.Media.FontStyle.Italic });
+                description.Children.Add(new TextBlock() { Text = " - " + kvp.Value, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(114, 114, 114)) });
 
-                CheckBox checkBox = new CheckBox() { Content = description, IsChecked = true, Margin = new Thickness(0, 5, 0, 0) };
+                CheckBox checkBox = new CheckBox() { Content = description, IsChecked = true, Margin = new Thickness(0, 0, 0, 0), FontSize = 13 };
 
                 extensionCheckboxes.Add(kvp.Key, checkBox);
 
@@ -119,7 +137,12 @@ namespace TreeViewer
 
                     for (int i = 1; i < filesToOpen.Length; i++)
                     {
-                        _ = mainWindow.LoadFile(filesToOpen[i], deleteFiles);
+                        string file = filesToOpen[i];
+
+                        mainWindow.Opened += async (s, e) =>
+                        {
+                            await mainWindow.LoadFile(file, deleteFiles);
+                        };
                     }
                     mainWindow.Show();
 
@@ -145,7 +168,7 @@ namespace TreeViewer
                 }
                 catch (Exception ex)
                 {
-                    await new MessageBox("Attention!", "An error occurred while associating the file extensions!\n" + ex.Message).ShowDialog(this);
+                    await new MessageBox("Attention!", "An error occurred while associating the file extensions!\n" + ex.Message).ShowDialog2(this);
                 }
 
                 if (Program.WaitingForRebootAfterAdmin)
@@ -160,7 +183,12 @@ namespace TreeViewer
 
                     for (int i = 1; i < filesToOpen.Length; i++)
                     {
-                        _ = mainWindow.LoadFile(filesToOpen[i], deleteFiles);
+                        string file = filesToOpen[i];
+
+                        mainWindow.Opened += async (s, e) =>
+                        {
+                            await mainWindow.LoadFile(file, deleteFiles);
+                        };
                     }
                     mainWindow.Show();
 

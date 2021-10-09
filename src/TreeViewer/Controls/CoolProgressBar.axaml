@@ -1,0 +1,58 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TreeViewer.CoolProgressBar">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="1*" MaxHeight="24"/>
+    </Grid.RowDefinitions>
+    <Grid HorizontalAlignment="Left" Name="LabelLabelContainer" IsVisible="False" Height="38">
+      <Grid.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Width" Duration="0:0:0.1" />
+          <DoubleTransition Property="Height" Duration="0:0:0.1" />
+          <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+        </Transitions>
+      </Grid.Transitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="25"/>
+        <RowDefinition Height="8"/>
+        <RowDefinition Height="5"/>
+      </Grid.RowDefinitions>
+      <Border Background="#E6E6E6" BorderThickness="1" BorderBrush="#0072b2">
+        <Grid Name="LabelContainer" Height="24" HorizontalAlignment="Center" Margin="0,0,0,0">
+
+        </Grid>
+      </Border>
+      <Canvas Name="LabelPath" Grid.Row="1" HorizontalAlignment="Left">
+        <Path Width="20" Height="8"  Data="M0,-2 L0,-1 L9,8 L18,-1 L18,-2" Fill="#E6E6E6" UseLayoutRounding="True"></Path>
+        <Path Width="20" Height="8" Grid.Row="1" Data="M0.5,-0.5 L9,8 L17.5,-0.5" Stroke="#0072b2" StrokeThickness="1" Fill="#E6E6E6" HorizontalAlignment="Left" UseLayoutRounding="True"></Path>
+      </Canvas>
+    </Grid>
+
+
+    <Grid Grid.Row="1" Name="ProgressBarContainer">
+
+    </Grid>
+  </Grid>
+</UserControl>

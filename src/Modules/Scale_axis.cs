@@ -4,6 +4,7 @@ using System.Linq;
 using PhyloTree;
 using TreeViewer;
 using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace ScaleAxis
 {
@@ -20,6 +21,52 @@ namespace ScaleAxis
         public static Version Version = new Version("1.1.0");
         public const string Id = "aeacf625-90cf-41a5-8d10-c37c75aaa2b1";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
+		
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABHSURBVDhPY4CBoqKiBhCGcgnyYYAJSpMNRg0YNQAEBsYAr9qN/4HYAcSmxAX7QYYwgkyDCpAFGKE0SQDJUkdKvOC4rdn/AAC+1Bl/V5f5TwAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABqSURBVEhLY2RAAkVFRQ1QJkNfXx+cTao4MmCC0jQDoxYQBKMWEASjFhAEoxYQBKMWYACv2o3/gdgByqWZD/bDLKFlEIEtYQR5CSpAE0DzSEap9KkB0ELEkZY+cNzW7H+AVhaADWdgYGAAAH34H4wiqvdHAAAAAElFTkSuQmCC";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACBSURBVFhHY2RAA0VFRQ1QJhj09fWh8CmVRwdMUHrAwKgDRh0w6oBRB4w6YNQBow4YdcCoA0YdQFcHeNVu/A/EDlAuGAxECOxHdsRARQHcEQOZBsCOYATFC1RgQMCA5wKMviEtAZbQdhzIEHDc1ux/YKAcALYcxBgIB8AtZ2BgYAAAHz4knPTTCf0AAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {

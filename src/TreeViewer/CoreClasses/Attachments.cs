@@ -15,6 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,6 +34,42 @@ namespace TreeViewer
 
         private string TempFileName { get; }
         private bool DeleteTempFileOnDispose { get; }
+
+        private AttachmentFontFamily fontFamilyCache = null;
+        public AttachmentFontFamily GetFontFamily()
+        {
+            if (CacheResults)
+            {
+                if (fontFamilyCache == null)
+                {
+                    this.Stream.Seek(this.StreamStart, SeekOrigin.Begin);
+
+                    try
+                    {
+                        fontFamilyCache = AttachmentFontFamily.Create(this.Name, this.Stream);
+                    }
+                    catch
+                    {
+                        fontFamilyCache = null;
+                    }
+                }
+
+                return fontFamilyCache;
+            }
+            else
+            {
+                this.Stream.Seek(this.StreamStart, SeekOrigin.Begin);
+
+                try
+                {
+                    return AttachmentFontFamily.Create(this.Name, this.Stream);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
 
         public Attachment(string name, bool cacheResults, bool storeInMemory, string fileName)
         {
@@ -125,6 +163,34 @@ namespace TreeViewer
             {
                 linesCache = tbr.ToArray();
                 return linesCache;
+            }
+        }
+
+        private string textCache = null;
+        public string GetText()
+        {
+            if (textCache != null)
+            {
+                return textCache;
+            }
+
+            Stream.Seek(StreamStart, SeekOrigin.Begin);
+
+            string tbr;
+
+            using (StreamReader reader = new StreamReader(Stream, leaveOpen: true))
+            {
+                tbr = reader.ReadToEnd();
+            }
+
+            if (!CacheResults)
+            {
+                return tbr;
+            }
+            else
+            {
+                textCache = tbr;
+                return textCache;
             }
         }
 
@@ -286,4 +352,54 @@ namespace TreeViewer
             GC.SuppressFinalize(this);
         }
     }
+
+    public class AttachmentFontFamily : VectSharp.FontFamily
+    {
+        public string AttachmentName { get; }
+
+        private AttachmentFontFamily(string attachmentName, Stream ttfStream) : base(ttfStream)
+        {
+            this.AttachmentName = attachmentName;
+        }
+
+        private AttachmentFontFamily(string attachmentName, string fileName) : base(fileName)
+        {
+            this.AttachmentName = attachmentName;
+        }
+
+        public static AttachmentFontFamily Create(string attachmentName, Stream ttfStream)
+        {
+            string temp = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+
+            using (FileStream fs = new FileStream(temp, FileMode.Create))
+            {
+                ttfStream.CopyTo(fs);
+            }
+
+            AttachmentFontFamily tbr = new AttachmentFontFamily(attachmentName, temp);
+
+            try
+            {
+                ((ClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Exit += (s, e) =>
+                {
+                    try
+                    {
+                        tbr.TrueTypeFile.Destroy();
+                        File.Delete(temp);
+                    }
+                    catch
+                    {
+                    
+                    }
+                };
+            }
+            catch
+            {
+
+            }
+
+            return tbr;
+        }
+    }
+
 }

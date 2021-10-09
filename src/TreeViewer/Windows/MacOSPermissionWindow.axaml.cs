@@ -26,7 +26,7 @@ using VectSharp.MarkdownCanvas;
 
 namespace TreeViewer
 {
-    public class MacOSPermissionWindow : Window
+    public class MacOSPermissionWindow : ChildWindow
     {
         public MacOSPermissionWindow()
         {

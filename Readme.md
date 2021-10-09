@@ -34,7 +34,7 @@ You can now run TreeViewer using the shortcut that has been created. Alternative
 Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg) and double-click it (starting from version 1.2.0, the TreeViewer installer and disk image are fully signed and notarized). If you get a message that the app cannot be opened because it was not downloaded from the App Store, right-click or ctrl-click on the file and choose "Open", then click on the "Open" button in the dialog that opens. The installer will open and guide you through the process. It will do three main things:
 
 1. Copy the TreeViewer app to the `/Applications` folder.
-2. Delete any downloaded modules from previous versions of TreeVIewer.
+2. Delete any downloaded modules from previous versions of TreeViewer.
 3. Create symlinks to the TreeViewer executables (`TreeViewer` and `TreeViewerCommandLine`) in the `/usr/local/bin` folder.
 
 Once the installer has finished, you can run TreeViewer by opening the App in your Applications folder. You can also run it from the command line by typing `TreeViewer` (or `TreeViewerCommandLine` for the command line version) in a terminal window.
@@ -43,7 +43,7 @@ TreeViewer has been tested on macOS Catalina and Big Sur.
 
 ### Linux
 
-TreeViewer has been tested on Debian buster, Ubuntu 20.04 and 20.10, Linux Mint 20.1, openSUSE Leap 15.2, Fedora 33, and CentOS 7 and 8.
+TreeViewer has been tested on Debian 11 (bullseye), Ubuntu 20.04.3 and 21.04, Linux Mint 20.2, openSUSE Leap 15.3, Fedora 34, and CentOS 7 and 8.
 
 Open a terminal window and download the installer using `wget` or `curl` (whichever you prefer/have available):
 
@@ -88,6 +88,8 @@ After granting the file permission to load and compile the source code, you shou
 ## Troubleshooting and known issues
 
 * On some Linux distributions, the file icons sometimes don't show up for some file types. This appears to be dependent on the file manager used by each distro, so unfortunately there is not much that we can do. Strangely enough, even though the custom icon is not shown, double clicking the files should still work and open them in TreeViewer.
+
+* Tool tips are disabled on Linux due to a [bug in Avalonia](https://github.com/AvaloniaUI/Avalonia/issues/6677).
 
 * On macOS you may get two (or more) TreeViewer icons in the section of your dock that holds recently open applications. This is due to the way that macOS handles opening files, which is not fully supported by the Avalonia framework that TreeViewer uses for its UI (see [https://github.com/AvaloniaUI/Avalonia/discussions/5504](https://github.com/AvaloniaUI/Avalonia/discussions/5504)).
 

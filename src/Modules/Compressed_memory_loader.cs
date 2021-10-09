@@ -62,14 +62,14 @@ namespace CompressedMemoryLoader
 
             if (TreeViewer.GlobalSettings.Settings.AdditionalSettings.TryGetValue("Large file threshold:", out object largeFileThresholdValue))
             {
-				if (largeFileThresholdValue is long threshValue)
-				{
-					largeFileThreshold = threshValue;
-				}
-				else if (largeFileThresholdValue is JsonElement element)
-				{
-					largeFileThreshold = element.GetInt64();
-				}
+                if (largeFileThresholdValue is long threshValue)
+                {
+                    largeFileThreshold = threshValue;
+                }
+                else if (largeFileThresholdValue is JsonElement element)
+                {
+                    largeFileThreshold = element.GetInt64();
+                }
             }
 
             if (fileInfo.Length > largeFileThreshold || treeLoader is TreeCollection)
@@ -89,13 +89,13 @@ namespace CompressedMemoryLoader
             if (TreeViewer.GlobalSettings.Settings.AdditionalSettings.TryGetValue("Large file threshold:", out object largeFileThresholdValue))
             {
                 if (largeFileThresholdValue is long threshValue)
-				{
-					largeFileThreshold = threshValue;
-				}
-				else if (largeFileThresholdValue is JsonElement element)
-				{
-					largeFileThreshold = element.GetInt64();
-				}
+                {
+                    largeFileThreshold = threshValue;
+                }
+                else if (largeFileThresholdValue is JsonElement element)
+                {
+                    largeFileThreshold = element.GetInt64();
+                }
             }
 
             if (fileInfo.Length > largeFileThreshold)
@@ -111,7 +111,7 @@ namespace CompressedMemoryLoader
 
                     Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        Window settingsWindow = new Window() { Width = 450, Height = 300, FontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"), FontSize = 15, Title = "Skip trees...", WindowStartupLocation = WindowStartupLocation.CenterOwner };
+                        ChildWindow settingsWindow = new ChildWindow() { Width = 450, SizeToContent = SizeToContent.Height, FontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"), FontSize = 14, Title = "Skip trees...", WindowStartupLocation = WindowStartupLocation.CenterOwner };
 
                         Grid mainGrid = new Grid() { Margin = new Avalonia.Thickness(10) };
                         mainGrid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
@@ -126,10 +126,23 @@ namespace CompressedMemoryLoader
                         Grid alertPanel = new Grid() { Margin = new Avalonia.Thickness(0, 0, 0, 10) };
                         alertPanel.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                         alertPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                        alertPanel.Children.Add(MainWindow.AlertPage.PaintToCanvas());
-                        TextBlock alertBlock = new TextBlock() { Text = "The file you are trying to open is very large (" + (fileInfo.Length / 1024 / 1024).ToString() + "MB). The trees are going to be loaded in compressed format, so there should not be any memory issues; however, to speed things up, you may want to skip some of the trees.", TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new Avalonia.Thickness(5, 0, 0, 0) };
+                        alertPanel.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                        alertPanel.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-                        Grid.SetColumn(alertBlock, 1);
+                        Viewbox alert = MainWindow.GetAlertIcon();
+                        alert.Width = 32;
+                        alert.Height = 32;
+
+                        alertPanel.Children.Add(alert);
+
+                        TextBlock alertTitle = new TextBlock() { Text = "Large tree file", FontSize = 16, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 114, 178)), Margin = new Avalonia.Thickness(10, 0, 0, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                        Grid.SetColumn(alertTitle, 1);
+                        alertPanel.Children.Add(alertTitle);
+
+                        TextBlock alertBlock = new TextBlock() { Text = "The file you are trying to open is very large (" + (fileInfo.Length / 1024 / 1024).ToString() + "MB). The trees are going to be loaded in compressed format, so there should not be any memory issues; however, to speed things up, you may want to skip some of the trees.", TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new Avalonia.Thickness(0, 5, 0, 0), FontSize = 13 };
+
+                        Grid.SetRow(alertBlock, 1);
+                        Grid.SetColumnSpan(alertBlock, 2);
                         alertPanel.Children.Add(alertBlock);
                         panel.Children.Add(alertPanel);
 
@@ -156,7 +169,7 @@ namespace CompressedMemoryLoader
                         untilPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
                         CheckBox untilBox = new CheckBox() { FontWeight = Avalonia.Media.FontWeight.Bold, Content = "Up to tree:", Margin = new Avalonia.Thickness(0, 0, 5, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
                         untilPanel.Children.Add(untilBox);
-                        NumericUpDown untilNud = new NumericUpDown() { Minimum = 1, FormatString = "0", Value = 1, Padding = new Avalonia.Thickness(5, 0, 5, 0) };
+                        NumericUpDown untilNud = new NumericUpDown() { Minimum = 1, FormatString = "0", Value = 1, Padding = new Avalonia.Thickness(5, 0, 5, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
                         Grid.SetColumn(untilNud, 1);
                         untilPanel.Children.Add(untilNud);
                         panel.Children.Add(untilPanel);
@@ -167,10 +180,12 @@ namespace CompressedMemoryLoader
                         buttonPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
                         buttonPanel.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                         buttonPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                        Button okButton = new Button() { Width = 100, Content = "OK" };
+                        Button okButton = new Button() { Width = 100, Content = "OK", HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13 };
+                        okButton.Classes.Add("PlainButton");
                         Grid.SetColumn(okButton, 1);
                         buttonPanel.Children.Add(okButton);
-                        Button cancelButton = new Button() { Width = 100, Content = "Cancel" };
+                        Button cancelButton = new Button() { Width = 100, Content = "Cancel", HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13 };
+                        cancelButton.Classes.Add("PlainButton");
                         Grid.SetColumn(cancelButton, 3);
                         buttonPanel.Children.Add(cancelButton);
                         Grid.SetRow(buttonPanel, 1);

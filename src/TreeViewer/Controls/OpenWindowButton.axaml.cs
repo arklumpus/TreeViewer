@@ -34,6 +34,8 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+
+            this.Content = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.NewCodeWindow")) { Width = 16, Height = 16 };
         }
     }
 }

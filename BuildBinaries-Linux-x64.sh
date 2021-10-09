@@ -1,6 +1,6 @@
 rm -rf Binary/Linux-x64
 
-mkdir Binary/Linux-x64
+mkdir -p Binary/Linux-x64
 
 cd Installers/Linux-x64
 

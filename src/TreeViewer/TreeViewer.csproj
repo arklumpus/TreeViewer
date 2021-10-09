@@ -7,7 +7,7 @@
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
     <AssemblyName>TreeViewer</AssemblyName>
-    <Version>1.3.0-a1</Version>
+    <Version>2.0.0</Version>
     <ApplicationIcon>Assets\Program.ico</ApplicationIcon>
     <Authors>Giorgio Bianchini</Authors>
     <Company>University of Bristol</Company>
@@ -29,28 +29,222 @@
     </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\About-32.png" />
+    <EmbeddedResource Include="Assets\About-48.png" />
+    <EmbeddedResource Include="Assets\About-64.png" />
+    <EmbeddedResource Include="Assets\Action-32.png" />
+    <EmbeddedResource Include="Assets\Action-48.png" />
+    <EmbeddedResource Include="Assets\Action-64.png" />
     <EmbeddedResource Include="Assets\ActionTemplate.png" />
+    <EmbeddedResource Include="Assets\AddAttachment-24.png" />
+    <EmbeddedResource Include="Assets\AddAttachment-32.png" />
+    <EmbeddedResource Include="Assets\AddAttachment-16.png" />
+    <EmbeddedResource Include="Assets\AddAttribute-32.png" />
+    <EmbeddedResource Include="Assets\AddAttribute-48.png" />
+    <EmbeddedResource Include="Assets\AddAttribute-64.png" />
+    <EmbeddedResource Include="Assets\AddFurtherTransformation-32.png" />
+    <EmbeddedResource Include="Assets\AddFurtherTransformation-48.png" />
+    <EmbeddedResource Include="Assets\AddFurtherTransformation-64.png" />
+    <EmbeddedResource Include="Assets\AddPlotAction-32.png" />
+    <EmbeddedResource Include="Assets\AddPlotAction-48.png" />
+    <EmbeddedResource Include="Assets\AddPlotAction-64.png" />
+    <EmbeddedResource Include="Assets\Attributes-32.png" />
+    <EmbeddedResource Include="Assets\Attributes-48.png" />
+    <EmbeddedResource Include="Assets\Attributes-64.png" />
+    <EmbeddedResource Include="Assets\AutosavedCode-32.png" />
+    <EmbeddedResource Include="Assets\AutosavedCode-48.png" />
+    <EmbeddedResource Include="Assets\AutosavedCode-64.png" />
+    <EmbeddedResource Include="Assets\AutosavedTrees-32.png" />
+    <EmbeddedResource Include="Assets\AutosavedTrees-48.png" />
+    <EmbeddedResource Include="Assets\AutosavedTrees-64.png" />
+    <EmbeddedResource Include="Assets\Autosaves-16.png" />
+    <EmbeddedResource Include="Assets\Autosaves-24.png" />
+    <EmbeddedResource Include="Assets\Autosaves-32.png" />
+    <EmbeddedResource Include="Assets\BackArrow-16.png" />
+    <EmbeddedResource Include="Assets\BackArrow-24.png" />
+    <EmbeddedResource Include="Assets\BackArrow-32.png" />
+    <EmbeddedResource Include="Assets\Banner_dark-1000.png" />
+    <EmbeddedResource Include="Assets\Banner_dark-500.png" />
+    <EmbeddedResource Include="Assets\Banner_dark-750.png" />
+    <EmbeddedResource Include="Assets\BinaryFile-32.png" />
+    <EmbeddedResource Include="Assets\BinaryFile-48.png" />
+    <EmbeddedResource Include="Assets\BinaryFile-64.png" />
+    <EmbeddedResource Include="Assets\Close-16.png" />
+    <EmbeddedResource Include="Assets\Close-24.png" />
+    <EmbeddedResource Include="Assets\Close-32.png" />
+    <EmbeddedResource Include="Assets\ColourFormatter-32.png" />
+    <EmbeddedResource Include="Assets\ColourFormatter-48.png" />
+    <EmbeddedResource Include="Assets\ColourFormatter-64.png" />
+    <EmbeddedResource Include="Assets\Coordinates-32.png" />
+    <EmbeddedResource Include="Assets\Coordinates-48.png" />
+    <EmbeddedResource Include="Assets\Coordinates-64.png" />
     <EmbeddedResource Include="Assets\CoordinatesTemplate.png" />
     <EmbeddedResource Include="Assets\DarkArrow.png" />
+    <EmbeddedResource Include="Assets\ExportModule-32.png" />
+    <EmbeddedResource Include="Assets\ExportModule-48.png" />
+    <EmbeddedResource Include="Assets\ExportModule-64.png" />
+    <EmbeddedResource Include="Assets\FileType-32.png" />
+    <EmbeddedResource Include="Assets\FileType-48.png" />
+    <EmbeddedResource Include="Assets\FileType-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\asn-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\asn-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\asn-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\asnb-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\asnb-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\asnb-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nex-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nex-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nex-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nwk-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nwk-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nwk-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nwka-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nwka-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\nwka-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tbi-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tbi-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tbi-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tre-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tre-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tre-64.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tree-32.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tree-48.png" />
+    <EmbeddedResource Include="Assets\FileTypeIcons\tree-64.png" />
     <EmbeddedResource Include="Assets\FileTypeTemplate.png" />
+    <EmbeddedResource Include="Assets\FontIcons.offsets" />
+    <EmbeddedResource Include="Assets\FontIcons.stream" />
+    <EmbeddedResource Include="Assets\fonts.json" />
+    <EmbeddedResource Include="Assets\FurtherTransformations-32.png" />
+    <EmbeddedResource Include="Assets\FurtherTransformations-48.png" />
+    <EmbeddedResource Include="Assets\FurtherTransformations-64.png" />
     <EmbeddedResource Include="Assets\FurtherTransformationTemplate.png" />
     <EmbeddedResource Include="Assets\GenericFileType.png" />
+    <EmbeddedResource Include="Assets\History-16.png" />
+    <EmbeddedResource Include="Assets\History-24.png" />
+    <EmbeddedResource Include="Assets\History-32.png" />
+    <EmbeddedResource Include="Assets\Home-16.png" />
+    <EmbeddedResource Include="Assets\Home-24.png" />
+    <EmbeddedResource Include="Assets\Home-32.png" />
+    <EmbeddedResource Include="Assets\InstallModule-16.png" />
+    <EmbeddedResource Include="Assets\InstallModule-24.png" />
+    <EmbeddedResource Include="Assets\InstallModule-32.png" />
+    <EmbeddedResource Include="Assets\InstallModule-48.png" />
+    <EmbeddedResource Include="Assets\InstallModule-64.png" />
+    <EmbeddedResource Include="Assets\LeftMouseButton-16.png" />
+    <EmbeddedResource Include="Assets\LeftMouseButton-24.png" />
+    <EmbeddedResource Include="Assets\LeftMouseButton-32.png" />
     <EmbeddedResource Include="Assets\LightArrow.png" />
+    <EmbeddedResource Include="Assets\LoadFile-32.png" />
+    <EmbeddedResource Include="Assets\LoadFile-48.png" />
+    <EmbeddedResource Include="Assets\LoadFile-64.png" />
     <EmbeddedResource Include="Assets\LoadFileTemplate.png" />
+    <EmbeddedResource Include="Assets\LoadModule-16.png" />
+    <EmbeddedResource Include="Assets\LoadModule-24.png" />
+    <EmbeddedResource Include="Assets\LoadModule-32.png" />
+    <EmbeddedResource Include="Assets\LoadModule-48.png" />
+    <EmbeddedResource Include="Assets\LoadModule-64.png" />
     <EmbeddedResource Include="Assets\MacOSPermissionsInstructions.md" />
+    <EmbeddedResource Include="Assets\MenuAction-32.png" />
+    <EmbeddedResource Include="Assets\MenuAction-48.png" />
+    <EmbeddedResource Include="Assets\MenuAction-64.png" />
     <EmbeddedResource Include="Assets\MenuActionTemplate.png" />
+    <EmbeddedResource Include="Assets\ModuleCreator-16.png" />
+    <EmbeddedResource Include="Assets\ModuleCreator-24.png" />
+    <EmbeddedResource Include="Assets\ModuleCreator-32.png" />
+    <EmbeddedResource Include="Assets\ModuleCreator-48.png" />
+    <EmbeddedResource Include="Assets\ModuleCreator-64.png" />
+    <EmbeddedResource Include="Assets\ModuleManager-16.png" />
+    <EmbeddedResource Include="Assets\ModuleManager-24.png" />
+    <EmbeddedResource Include="Assets\ModuleManager-32.png" />
+    <EmbeddedResource Include="Assets\ModuleRepository-16.png" />
+    <EmbeddedResource Include="Assets\ModuleRepository-24.png" />
+    <EmbeddedResource Include="Assets\ModuleRepository-32.png" />
+    <EmbeddedResource Include="Assets\MouseWheel-16.png" />
+    <EmbeddedResource Include="Assets\MouseWheel-24.png" />
+    <EmbeddedResource Include="Assets\MouseWheel-32.png" />
+    <EmbeddedResource Include="Assets\NewCodeWindow-16.png" />
+    <EmbeddedResource Include="Assets\NewCodeWindow-24.png" />
+    <EmbeddedResource Include="Assets\NewCodeWindow-32.png" />
+    <EmbeddedResource Include="Assets\NumberFormatter-32.png" />
+    <EmbeddedResource Include="Assets\NumberFormatter-48.png" />
+    <EmbeddedResource Include="Assets\NumberFormatter-64.png" />
+    <EmbeddedResource Include="Assets\OpenDark-16.png" />
+    <EmbeddedResource Include="Assets\OpenDark-24.png" />
+    <EmbeddedResource Include="Assets\OpenDark-32.png" />
+    <EmbeddedResource Include="Assets\Pencil-16.png" />
+    <EmbeddedResource Include="Assets\Pencil-24.png" />
+    <EmbeddedResource Include="Assets\Pencil-32.png" />
+    <EmbeddedResource Include="Assets\PlotActions-32.png" />
+    <EmbeddedResource Include="Assets\PlotActions-48.png" />
+    <EmbeddedResource Include="Assets\PlotActions-64.png" />
     <EmbeddedResource Include="Assets\PlotActionTemplate.png" />
+    <EmbeddedResource Include="Assets\Preferences-16.png" />
+    <EmbeddedResource Include="Assets\Preferences-24.png" />
+    <EmbeddedResource Include="Assets\Preferences-32.png" />
+    <EmbeddedResource Include="Assets\Program-16.png" />
+    <EmbeddedResource Include="Assets\Program-24.png" />
+    <EmbeddedResource Include="Assets\Program-32.png" />
     <EmbeddedResource Include="Assets\Program.ico" />
+    <EmbeddedResource Include="Assets\SelectionAction-32.png" />
+    <EmbeddedResource Include="Assets\SelectionAction-48.png" />
+    <EmbeddedResource Include="Assets\SelectionAction-64.png" />
     <EmbeddedResource Include="Assets\SelectionActionTemplate.png" />
+    <EmbeddedResource Include="Assets\SelectionInfo-32.png" />
+    <EmbeddedResource Include="Assets\SelectionInfo-48.png" />
+    <EmbeddedResource Include="Assets\SelectionInfo-64.png" />
+    <EmbeddedResource Include="Assets\SelectNode-32.png" />
+    <EmbeddedResource Include="Assets\SelectNode-48.png" />
+    <EmbeddedResource Include="Assets\SelectNode-64.png" />
     <EmbeddedResource Include="Assets\Shield.png" />
+    <EmbeddedResource Include="Assets\SourceCode-32.png" />
+    <EmbeddedResource Include="Assets\SourceCode-48.png" />
+    <EmbeddedResource Include="Assets\SourceCode-64.png" />
+    <EmbeddedResource Include="Assets\StringFormatter-32.png" />
+    <EmbeddedResource Include="Assets\StringFormatter-48.png" />
+    <EmbeddedResource Include="Assets\StringFormatter-64.png" />
+    <EmbeddedResource Include="Assets\TextEditor-16.png" />
+    <EmbeddedResource Include="Assets\TextEditor-24.png" />
+    <EmbeddedResource Include="Assets\TextEditor-32.png" />
+    <EmbeddedResource Include="Assets\TextFile-32.png" />
+    <EmbeddedResource Include="Assets\TextFile-48.png" />
+    <EmbeddedResource Include="Assets\TextFile-64.png" />
+    <EmbeddedResource Include="Assets\Transformer-32.png" />
+    <EmbeddedResource Include="Assets\Transformer-48.png" />
+    <EmbeddedResource Include="Assets\Transformer-64.png" />
     <EmbeddedResource Include="Assets\TransformerTemplate.png" />
     <EmbeddedResource Include="Assets\Banner.png" />
     <EmbeddedResource Include="Assets\ProgramIcon.png" />
     <EmbeddedResource Include="Assets\ProgressWindowBackground.png" />
     <EmbeddedResource Include="Assets\QuestionMark.png" />
     <EmbeddedResource Include="Assets\Tick.png" />
+    <EmbeddedResource Include="Assets\Trash-16.png" />
+    <EmbeddedResource Include="Assets\Trash-24.png" />
+    <EmbeddedResource Include="Assets\Trash-32.png" />
+    <EmbeddedResource Include="Assets\UninstallModule-32.png" />
+    <EmbeddedResource Include="Assets\UninstallModule-48.png" />
+    <EmbeddedResource Include="Assets\UninstallModule-64.png" />
+    <EmbeddedResource Include="Assets\Updates-32.png" />
+    <EmbeddedResource Include="Assets\Updates-48.png" />
+    <EmbeddedResource Include="Assets\Updates-64.png" />
     <EmbeddedResource Include="Assets\Warning.png" />
     <EmbeddedResource Include="Assets\WindowIcon.png" />
+    <EmbeddedResource Include="Assets\WindowTree.svg" />
+    <EmbeddedResource Include="Assets\WindowTreeHome.svg" />
+    <EmbeddedResource Include="Assets\Wrench-16.png" />
+    <EmbeddedResource Include="Assets\Wrench-24.png" />
+    <EmbeddedResource Include="Assets\Wrench-32.png" />
+    <EmbeddedResource Include="Examples\Alignment.png" />
+    <EmbeddedResource Include="Examples\Alignment.tbi" />
+    <EmbeddedResource Include="Examples\BLAST_scores.png" />
+    <EmbeddedResource Include="Examples\BLAST_scores.tbi" />
+    <EmbeddedResource Include="Examples\Character_states.png" />
+    <EmbeddedResource Include="Examples\Character_states.tbi" />
+    <EmbeddedResource Include="Examples\Clock.png" />
+    <EmbeddedResource Include="Examples\Clock.tbi" />
+    <EmbeddedResource Include="Examples\Figures.png" />
+    <EmbeddedResource Include="Examples\Figures.tbi" />
+    <EmbeddedResource Include="Examples\Support.png" />
+    <EmbeddedResource Include="Examples\Support.tbi" />
     <EmbeddedResource Include="Templates\Action.cs" />
     <EmbeddedResource Include="Templates\Coordinates.cs" />
     <EmbeddedResource Include="Templates\FileType.cs" />
@@ -73,9 +267,203 @@
     <Compile Remove="Templates\Transformer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\About-32.png" />
+    <None Remove="Assets\About-48.png" />
+    <None Remove="Assets\About-64.png" />
+    <None Remove="Assets\Action-32.png" />
+    <None Remove="Assets\Action-48.png" />
+    <None Remove="Assets\Action-64.png" />
+    <None Remove="Assets\AddAttachment-16.png" />
+    <None Remove="Assets\AddAttachment-24.png" />
+    <None Remove="Assets\AddAttachment-32.png" />
+    <None Remove="Assets\AddAttribute-32.png" />
+    <None Remove="Assets\AddAttribute-48.png" />
+    <None Remove="Assets\AddAttribute-64.png" />
+    <None Remove="Assets\AddFurtherTransformation-32.png" />
+    <None Remove="Assets\AddFurtherTransformation-48.png" />
+    <None Remove="Assets\AddFurtherTransformation-64.png" />
+    <None Remove="Assets\AddPlotAction-32.png" />
+    <None Remove="Assets\AddPlotAction-48.png" />
+    <None Remove="Assets\AddPlotAction-64.png" />
+    <None Remove="Assets\Attributes-32.png" />
+    <None Remove="Assets\Attributes-48.png" />
+    <None Remove="Assets\Attributes-64.png" />
+    <None Remove="Assets\AutosavedCode-32.png" />
+    <None Remove="Assets\AutosavedCode-48.png" />
+    <None Remove="Assets\AutosavedCode-64.png" />
+    <None Remove="Assets\AutosavedTrees-32.png" />
+    <None Remove="Assets\AutosavedTrees-48.png" />
+    <None Remove="Assets\AutosavedTrees-64.png" />
+    <None Remove="Assets\Autosaves-16.png" />
+    <None Remove="Assets\Autosaves-24.png" />
+    <None Remove="Assets\Autosaves-32.png" />
+    <None Remove="Assets\BackArrow-16.png" />
+    <None Remove="Assets\BackArrow-24.png" />
+    <None Remove="Assets\BackArrow-32.png" />
+    <None Remove="Assets\Banner_dark-1000.png" />
+    <None Remove="Assets\Banner_dark-500.png" />
+    <None Remove="Assets\Banner_dark-750.png" />
+    <None Remove="Assets\BinaryFile-32.png" />
+    <None Remove="Assets\BinaryFile-48.png" />
+    <None Remove="Assets\BinaryFile-64.png" />
+    <None Remove="Assets\Close-16.png" />
+    <None Remove="Assets\Close-24.png" />
+    <None Remove="Assets\Close-32.png" />
+    <None Remove="Assets\ColourFormatter-32.png" />
+    <None Remove="Assets\ColourFormatter-48.png" />
+    <None Remove="Assets\ColourFormatter-64.png" />
+    <None Remove="Assets\Coordinates-32.png" />
+    <None Remove="Assets\Coordinates-48.png" />
+    <None Remove="Assets\Coordinates-64.png" />
     <None Remove="Assets\DarkArrow.png" />
+    <None Remove="Assets\ExportModule-32.png" />
+    <None Remove="Assets\ExportModule-48.png" />
+    <None Remove="Assets\ExportModule-64.png" />
+    <None Remove="Assets\FileType-32.png" />
+    <None Remove="Assets\FileType-48.png" />
+    <None Remove="Assets\FileType-64.png" />
+    <None Remove="Assets\FileTypeIcons\asn-32.png" />
+    <None Remove="Assets\FileTypeIcons\asn-48.png" />
+    <None Remove="Assets\FileTypeIcons\asn-64.png" />
+    <None Remove="Assets\FileTypeIcons\asnb-32.png" />
+    <None Remove="Assets\FileTypeIcons\asnb-48.png" />
+    <None Remove="Assets\FileTypeIcons\asnb-64.png" />
+    <None Remove="Assets\FileTypeIcons\nex-32.png" />
+    <None Remove="Assets\FileTypeIcons\nex-48.png" />
+    <None Remove="Assets\FileTypeIcons\nex-64.png" />
+    <None Remove="Assets\FileTypeIcons\nwk-32.png" />
+    <None Remove="Assets\FileTypeIcons\nwk-48.png" />
+    <None Remove="Assets\FileTypeIcons\nwk-64.png" />
+    <None Remove="Assets\FileTypeIcons\nwka-32.png" />
+    <None Remove="Assets\FileTypeIcons\nwka-48.png" />
+    <None Remove="Assets\FileTypeIcons\nwka-64.png" />
+    <None Remove="Assets\FileTypeIcons\tbi-32.png" />
+    <None Remove="Assets\FileTypeIcons\tbi-48.png" />
+    <None Remove="Assets\FileTypeIcons\tbi-64.png" />
+    <None Remove="Assets\FileTypeIcons\tre-32.png" />
+    <None Remove="Assets\FileTypeIcons\tre-48.png" />
+    <None Remove="Assets\FileTypeIcons\tre-64.png" />
+    <None Remove="Assets\FileTypeIcons\tree-32.png" />
+    <None Remove="Assets\FileTypeIcons\tree-48.png" />
+    <None Remove="Assets\FileTypeIcons\tree-64.png" />
+    <None Remove="Assets\FontIcons.offsets" />
+    <None Remove="Assets\FontIcons.stream" />
+    <None Remove="Assets\fonts.json" />
+    <None Remove="Assets\FurtherTransformations-32.png" />
+    <None Remove="Assets\FurtherTransformations-48.png" />
+    <None Remove="Assets\FurtherTransformations-64.png" />
+    <None Remove="Assets\History-16.png" />
+    <None Remove="Assets\History-24.png" />
+    <None Remove="Assets\History-32.png" />
+    <None Remove="Assets\Home-16.png" />
+    <None Remove="Assets\Home-24.png" />
+    <None Remove="Assets\Home-32.png" />
+    <None Remove="Assets\InstallModule-16.png" />
+    <None Remove="Assets\InstallModule-24.png" />
+    <None Remove="Assets\InstallModule-32.png" />
+    <None Remove="Assets\InstallModule-48.png" />
+    <None Remove="Assets\InstallModule-64.png" />
+    <None Remove="Assets\LeftMouseButton-16.png" />
+    <None Remove="Assets\LeftMouseButton-24.png" />
+    <None Remove="Assets\LeftMouseButton-32.png" />
     <None Remove="Assets\LightArrow.png" />
+    <None Remove="Assets\LoadFile-32.png" />
+    <None Remove="Assets\LoadFile-48.png" />
+    <None Remove="Assets\LoadFile-64.png" />
+    <None Remove="Assets\LoadModule-16.png" />
+    <None Remove="Assets\LoadModule-24.png" />
+    <None Remove="Assets\LoadModule-32.png" />
+    <None Remove="Assets\LoadModule-48.png" />
+    <None Remove="Assets\LoadModule-64.png" />
     <None Remove="Assets\MacOSPermissionsInstructions.md" />
+    <None Remove="Assets\MenuAction-32.png" />
+    <None Remove="Assets\MenuAction-48.png" />
+    <None Remove="Assets\MenuAction-64.png" />
+    <None Remove="Assets\ModuleCreator-16.png" />
+    <None Remove="Assets\ModuleCreator-24.png" />
+    <None Remove="Assets\ModuleCreator-32.png" />
+    <None Remove="Assets\ModuleCreator-48.png" />
+    <None Remove="Assets\ModuleCreator-64.png" />
+    <None Remove="Assets\ModuleManager-16.png" />
+    <None Remove="Assets\ModuleManager-24.png" />
+    <None Remove="Assets\ModuleManager-32.png" />
+    <None Remove="Assets\ModuleRepository-16.png" />
+    <None Remove="Assets\ModuleRepository-24.png" />
+    <None Remove="Assets\ModuleRepository-32.png" />
+    <None Remove="Assets\MouseWheel-16.png" />
+    <None Remove="Assets\MouseWheel-24.png" />
+    <None Remove="Assets\MouseWheel-32.png" />
+    <None Remove="Assets\NewCodeWindow-16.png" />
+    <None Remove="Assets\NewCodeWindow-24.png" />
+    <None Remove="Assets\NewCodeWindow-32.png" />
+    <None Remove="Assets\NumberFormatter-32.png" />
+    <None Remove="Assets\NumberFormatter-48.png" />
+    <None Remove="Assets\NumberFormatter-64.png" />
+    <None Remove="Assets\OpenDark-16.png" />
+    <None Remove="Assets\OpenDark-24.png" />
+    <None Remove="Assets\OpenDark-32.png" />
+    <None Remove="Assets\Pencil-16.png" />
+    <None Remove="Assets\Pencil-24.png" />
+    <None Remove="Assets\Pencil-32.png" />
+    <None Remove="Assets\PlotActions-32.png" />
+    <None Remove="Assets\PlotActions-48.png" />
+    <None Remove="Assets\PlotActions-64.png" />
+    <None Remove="Assets\Preferences-16.png" />
+    <None Remove="Assets\Preferences-24.png" />
+    <None Remove="Assets\Preferences-32.png" />
+    <None Remove="Assets\Program-16.png" />
+    <None Remove="Assets\Program-24.png" />
+    <None Remove="Assets\Program-32.png" />
+    <None Remove="Assets\SelectionAction-32.png" />
+    <None Remove="Assets\SelectionAction-48.png" />
+    <None Remove="Assets\SelectionAction-64.png" />
+    <None Remove="Assets\SelectionInfo-32.png" />
+    <None Remove="Assets\SelectionInfo-48.png" />
+    <None Remove="Assets\SelectionInfo-64.png" />
+    <None Remove="Assets\SelectNode-32.png" />
+    <None Remove="Assets\SelectNode-48.png" />
+    <None Remove="Assets\SelectNode-64.png" />
+    <None Remove="Assets\SourceCode-32.png" />
+    <None Remove="Assets\SourceCode-48.png" />
+    <None Remove="Assets\SourceCode-64.png" />
+    <None Remove="Assets\StringFormatter-32.png" />
+    <None Remove="Assets\StringFormatter-48.png" />
+    <None Remove="Assets\StringFormatter-64.png" />
+    <None Remove="Assets\TextEditor-16.png" />
+    <None Remove="Assets\TextEditor-24.png" />
+    <None Remove="Assets\TextEditor-32.png" />
+    <None Remove="Assets\TextFile-32.png" />
+    <None Remove="Assets\TextFile-48.png" />
+    <None Remove="Assets\TextFile-64.png" />
+    <None Remove="Assets\Transformer-32.png" />
+    <None Remove="Assets\Transformer-48.png" />
+    <None Remove="Assets\Transformer-64.png" />
+    <None Remove="Assets\Trash-16.png" />
+    <None Remove="Assets\Trash-24.png" />
+    <None Remove="Assets\Trash-32.png" />
+    <None Remove="Assets\UninstallModule-32.png" />
+    <None Remove="Assets\UninstallModule-48.png" />
+    <None Remove="Assets\UninstallModule-64.png" />
+    <None Remove="Assets\Updates-32.png" />
+    <None Remove="Assets\Updates-48.png" />
+    <None Remove="Assets\Updates-64.png" />
+    <None Remove="Assets\WindowTree.svg" />
+    <None Remove="Assets\WindowTreeHome.svg" />
+    <None Remove="Assets\Wrench-16.png" />
+    <None Remove="Assets\Wrench-24.png" />
+    <None Remove="Assets\Wrench-32.png" />
+    <None Remove="Examples\Alignment.png" />
+    <None Remove="Examples\Alignment.tbi" />
+    <None Remove="Examples\BLAST_scores.png" />
+    <None Remove="Examples\BLAST_scores.tbi" />
+    <None Remove="Examples\Character_states.png" />
+    <None Remove="Examples\Character_states.tbi" />
+    <None Remove="Examples\Clock.png" />
+    <None Remove="Examples\Clock.tbi" />
+    <None Remove="Examples\Figures.png" />
+    <None Remove="Examples\Figures.tbi" />
+    <None Remove="Examples\Support.png" />
+    <None Remove="Examples\Support.tbi" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Fonts\OpenSans-Bold.ttf" />
@@ -86,25 +474,26 @@
     <EmbeddedResource Include="Fonts\RobotoMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.6" />
-    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="3.6.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.6" />
-    <PackageReference Include="AvaloniaAccordion" Version="1.0.0" />
-    <PackageReference Include="AvaloniaColorPicker" Version="1.0.6.1" />
-    <PackageReference Include="CSharpEditor" Version="1.1.1" />
+    <PackageReference Include="Avalonia" Version="0.10.7" />
+    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="4.1.1-a1" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.7" />
+    <PackageReference Include="AvaloniaColorPicker" Version="1.1.0" />
+    <PackageReference Include="CSharpEditor" Version="1.1.2" />
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
-    <PackageReference Include="MDEdit" Version="1.0.0" />
+    <PackageReference Include="MDEdit" Version="1.0.1" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-    <PackageReference Include="Mono.Options" Version="6.6.0.161" />
+    <PackageReference Include="Mono.Options" Version="6.12.0.148" />
     <PackageReference Include="MuPDFCore" Version="1.3.1" />
-    <PackageReference Include="TreeNode" Version="1.1.2" />
-    <PackageReference Include="VectSharp" Version="1.7.0" />
-    <PackageReference Include="VectSharp.Canvas" Version="2.1.8" />
-    <PackageReference Include="VectSharp.Markdown" Version="1.0.5" />
-    <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.0.5" />
-    <PackageReference Include="VectSharp.MuPDFUtils" Version="1.1.3" />
-    <PackageReference Include="VectSharp.PDF" Version="2.2.2" />
-    <PackageReference Include="VectSharp.SVG" Version="1.3.0" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+    <PackageReference Include="TreeNode" Version="1.1.3" />
+    <PackageReference Include="VectSharp" Version="1.8.1" />
+    <PackageReference Include="VectSharp.Canvas" Version="2.3.1" />
+    <PackageReference Include="VectSharp.Markdown" Version="1.0.7" />
+    <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.0.7" />
+    <PackageReference Include="VectSharp.MuPDFUtils" Version="1.1.4" />
+    <PackageReference Include="VectSharp.PDF" Version="2.3.0" />
+    <PackageReference Include="VectSharp.Raster" Version="2.0.6" />
+    <PackageReference Include="VectSharp.SVG" Version="1.4.0" />
   </ItemGroup>
 
   <Target Name="_ResolveCopyLocalNuGetPkgXmls" AfterTargets="ResolveReferences">

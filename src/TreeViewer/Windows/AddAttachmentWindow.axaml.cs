@@ -20,7 +20,7 @@ using Avalonia.Markup.Xaml;
 
 namespace TreeViewer
 {
-    public class AddAttachmentWindow : Window
+    public class AddAttachmentWindow : ChildWindow
     {
         public bool Result { get; private set; } = false;
 
@@ -31,6 +31,8 @@ namespace TreeViewer
         public AddAttachmentWindow()
         {
             this.InitializeComponent();
+
+            this.FindControl<Grid>("HeaderGrid").Children.Add(Icons.GetAddAttachmentIcon(1));
 
             this.FindControl<Button>("OKButton").Click += (s, e) =>
             {
@@ -45,24 +47,6 @@ namespace TreeViewer
             {
                 this.Result = false;
                 this.Close();
-            };
-
-            this.FindControl<Expander>("AdvancedExpander").PropertyChanged += (s, e) =>
-            {
-                if (e.Property == Expander.IsExpandedProperty)
-                {
-                    if (this.FindControl<Expander>("AdvancedExpander").IsExpanded)
-                    {
-                        this.FindControl<Expander>("AdvancedExpander").Height = 120;
-                        this.Height = 230;
-                    }
-                    else
-                    {
-                        this.FindControl<Expander>("AdvancedExpander").Height = 20;
-                        this.Height = 130;
-                    }
-                }
-
             };
         }
 

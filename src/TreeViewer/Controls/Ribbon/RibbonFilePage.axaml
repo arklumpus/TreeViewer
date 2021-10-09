@@ -1,0 +1,103 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TreeViewer.RibbonFilePage">
+  <UserControl.Transitions>
+    <Transitions>
+      <DoubleTransition Property="Opacity" Duration="0:0:0:0.1" />
+      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1" />
+    </Transitions>
+  </UserControl.Transitions>
+  <Grid>
+    <Grid.Styles>
+      <Style Selector="Border.ItemBorder">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="BorderBrush" Value="Transparent" />
+      </Style>
+
+      <Style Selector="Border.ItemBorder.active">
+        <Setter Property="Background" Value="#50000000"/>
+      </Style>
+
+      <Style Selector="Border.ItemBorder:pointerover">
+        <Setter Property="Background" Value="#30000000"/>
+      </Style>
+
+      <Style Selector=":focus Border.ItemBorder.active">
+        <Setter Property="BorderBrush" Value="White" />
+      </Style>
+
+      <Style Selector="Border.ItemBorder[IsEnabled=false]">
+        <Setter Property="Opacity" Value="0.35" />
+      </Style>
+
+
+
+    </Grid.Styles>
+
+
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition MinWidth="160" Width="Auto"/>
+      <ColumnDefinition Width="1*"/>
+    </Grid.ColumnDefinitions>
+
+    <Canvas Grid.Column="0" Background="#0072b2"/>
+    <Canvas Grid.Column="1" Background="#F3F3F3"/>
+
+    <Grid Grid.Column="1" Name="ClientArea" Focusable="True">
+
+    </Grid>
+
+    <Grid IsHitTestVisible="False" Grid.ColumnSpan="2" VerticalAlignment="Top" Name="ThemeGrid">
+      <Grid.Transitions>
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+        </Transitions>
+      </Grid.Transitions>
+      <Viewbox Name="WindowIconBox" Height="200" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1,0,0,0"/>
+      <Viewbox Name="WindowTreeBox" Height="66" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+    </Grid>
+
+    <Grid Grid.Column="0" Focusable="True">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="80" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="1*" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Border Grid.Row="0" Height="45" VerticalAlignment="Bottom" Classes="ItemBorder" BorderThickness="0" PointerPressed="BackButtonPressedEvent">
+        <Canvas Width="21" Height="21" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="18,0,0,0" Name="BackArrowContainer">
+          
+        </Canvas>
+      </Border>
+      <StackPanel Grid.Row="1" Name="FirstArea"></StackPanel>
+      <Canvas Grid.Row="2" Background="#4B98DC" Height="1" Margin="20,8,20,8"></Canvas>
+      <StackPanel Grid.Row="3" Name="SecondArea"></StackPanel>
+      <Canvas Grid.Row="4" Background="#4B98DC" Height="1" Margin="20,8,20,8"></Canvas>
+      <StackPanel Grid.Row="5" Name="ThirdArea" Margin="0,0,0,17"></StackPanel>
+    </Grid>
+    
+  </Grid>
+</UserControl>

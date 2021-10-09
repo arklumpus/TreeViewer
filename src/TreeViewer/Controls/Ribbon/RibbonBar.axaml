@@ -1,0 +1,135 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TreeViewer.RibbonBar" Focusable="True">
+  <UserControl.Styles>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid">
+      <Setter Property="Margin" Value="1,0,1,0" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid>TextBlock.ActualBlock">
+      <Setter Property="Margin" Value="13,0,13,0" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid:pointerover">
+      <Setter Property="Background" Value="#004E8A" />
+    </Style>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid.Contextual">
+      <Setter Property="Background" Value="#30000000" />
+    </Style>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid.Contextual:pointerover">
+      <Setter Property="Background" Value="#4F80C2" />
+    </Style>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid.Selected">
+      <Setter Property="Background" Value="#F3F3F3" />
+    </Style>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid.Selected>TextBlock.ActualBlock">
+      <Setter Property="Foreground" Value="#0072b2" />
+    </Style>
+
+    <Style Selector=".Colorful StackPanel#ItemsContainer>Grid.Selected>TextBlock.ActualBlock">
+      <Setter Property="Foreground" Value="#0072b2" />
+    </Style>
+
+    <Style Selector=".Colorful Grid#SelectionGrid">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+
+
+    <Style Selector=".Grey StackPanel#ItemsContainer>Grid">
+      <Setter Property="Margin" Value="1,0,1,0" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector=".Grey StackPanel#ItemsContainer>Grid>TextBlock.SizingBlock">
+      <Setter Property="Margin" Value="13,0,13,4" />
+    </Style>
+
+    <Style Selector=".Grey StackPanel#ItemsContainer>Grid>TextBlock.ActualBlock">
+      <Setter Property="Foreground" Value="Black" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+
+    <Style Selector=".Grey StackPanel#ItemsContainer>Grid.Contextual>TextBlock.ActualBlock">
+      <Setter Property="Foreground" Value="#0072b2" />
+    </Style>
+
+    <Style Selector=".Grey StackPanel#ItemsContainer>Grid:pointerover>TextBlock.ActualBlock">
+      <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+
+    <Style Selector=".Grey StackPanel#ItemsContainer>Grid.Selected>TextBlock.ActualBlock">
+      <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+    <Style Selector=".Grey Grid#SelectionGrid">
+      <Setter Property="Transitions">
+        <Setter.Value>
+          <Transitions>
+            <DoubleTransition Property="Width" Duration="0.1" />
+            <TransformOperationsTransition Property="RenderTransform" Duration="0.1" />
+          </Transitions>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="RenderTransform" Value="translate(0,0)" />
+    </Style>
+
+    <Style Selector=".Grey Grid#SelectionGrid Canvas">
+      <Setter Property="Margin" Value="11,0,11,0" />
+      <Setter Property="Transitions">
+        <Setter.Value>
+          <Transitions>
+            <ThicknessTransition Property="Margin" Duration="0.1" />
+          </Transitions>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style Selector=".Grey Grid#SelectionGrid:pointerover Canvas">
+      <Setter Property="Margin" Value="3,0,3,0" />
+    </Style>
+
+    <Style Selector=".Grey Grid#ContainerGrid">
+      <Setter Property="Background" Value="#F3F3F3" />
+    </Style>
+
+  </UserControl.Styles>
+
+  <Grid Height="30" Name="ContainerGrid">
+    <StackPanel Orientation="Horizontal" Height="30" Name="ItemsContainer">
+
+    </StackPanel>
+
+    <Grid Name="SelectionGrid" Background="Transparent" Width="10" HorizontalAlignment="Left">
+      <Canvas VerticalAlignment="Bottom" Background="#0072b2" Height="4" />
+    </Grid>
+  </Grid>
+</UserControl>

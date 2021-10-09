@@ -4,6 +4,8 @@ using System.Linq;
 using PhyloTree;
 using TreeViewer;
 using PhyloTree.Extensions;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace AddAttributeFromAttachment
 {
@@ -33,6 +35,52 @@ namespace AddAttributeFromAttachment
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = true;
+		
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFUSURBVDhPY2QgAIqKihqAVD2ERyIAaQbi/7dv3/6PDYDkmKBqMQDM5szMTAYVFRWw2M6dOxmKi4vBNAxgNQCbZhDYtWsXQ19fHyOIhgEWKA0HuDSDgJubG4j6D6XBACUQ0TVfuv+GoXL+MbCcppwQQ0+KDZgNAyDvwL2AS3N7ohXD1iY/huuP3kEUQsGdO3egLCAAaQZieGhfvPf6v1ftRjANA1ClcABSD7YUl+Yle6+DaRAGAbCuecX/wRhiAMjFYC+gBBjM2csO3GKIclADi2EDwNiAG9A4ffp0FD/pKYqA/R3jrMm4rdmfEQSgUhgALAF1DtglJx/9AdsOAiDNMCfjAnCTkQ2BeQdsMwEDUAB6gEKFEQApEGGAGUqDwfHjxw9YWloynjlzxkFZWZmBlZW1AcQHiYMV+FuBA45h4/FGMA0EGHkBGrrggAXRsNDGDhgYAGUu5l8fk85mAAAAAElFTkSuQmCC";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGjSURBVEhLrZU9TgMxEIUnwBG4AFKEoOEAVAikLUDiAEADXdpsRcFPaKhIux00QA8SRSKBqOiBAkQiOADcYfGbjC2v1971Svmk1Xhs5439bCstaki32z1V4WSSTRmIqy8fjUZ5DJg7I7+tRa+80+lQu92edEYwK7GSOvHBYEBZltFwOORcz9F5JTG2YFymY770RlgEcRUa22IzJ7FEE/EkSRB4F9I2eK9pSPzm6ZNun78kI9pZW6Td9SXJyqRpKi0LiMM71/Prx4988+guf/3+5RwReRXQKZxB3crP91dpZWGe+3SswxRoIg7efv6k5Wc8HnPkAjHi70pw6/ieP3B49cJn0HLAGMTxLhS9KM/ttus7VOgyzflTQAd6smjegfcq2rbodgx65f1+3xTooVN7ZqM9fzjb5qhtCaE2hFUYcYPPJvtKAuSwyoUFLItczEMTz4xdvke1t7Hs///Q4gcXpfFCh1vEhW9JYKUhCg9NvAueydTwnQmQ4TIVZ1DYgSa0ExRx73kd3gLAV8R+oaWrGCBYALhFmoqDygLALoLYRJyI6B8D/fVadcmsawAAAABJRU5ErkJggg==";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIfSURBVFhHrZe9TgJBFIUHfAVfwIQQbawshIpohAIjsVUbfQSobBS0sJJH0EqsNcEAhVJJY2WlJsQXsLVe54xzN7vD7s7d2f2SYX4Ycs7cuXOjBZED7Xa7K7vz/1k6MhvIIg4yGQiK1+t10Wg0MGTR6XRUX1SfDmQRD+IUAY74eDwWk8lEzxb3UQSW1GcKUooPZbuX7Xc+n5exUCqV0PnmUl0BN+wk3u/3d2Xrosc8GBGCbcDhzt90T5hzBcuAY8Jt6J4w5wprErqIGzmAk0O8Gfw9Kwk54nfPH+L09lUMXj5VE54n9nc21Xc68Wqylc3fUz7ERoArPph+iavjqlhfWRbv3z/KzEGtLA63VvWuaBILkYs4QI851rksGHAVJ8x5FMgRImQgqzjANSRhVMienwN5iSMHni5bkbk1Go28oDiKlNroIk5zQEnXPHtU46PttYK46XjqS+LkuiB1aE2JY1DMIo758GLPN4KxLfslvjhADjiLY267c4OQOLCWYojhZHTnpji9ew6mOICBHgZIjuDziIPMpCk6SRS1q0QTZpiD2Y6EM9HbWFifoXnnIDHbUxJyazNBUNjVafM0ADjPksjDwMIr4OREnsQmDCcSKgJxRFRCPQoRWwc4kUBtl0apYX9qEgtRkgmMsaZZqHBcrP8XzGazaaVSQfhq8k8stYbeKt6qhtceZuogJtZSDMxI5HFygmUABE1oMosLIcQf2rCdbdxgd4YAAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -141,7 +189,7 @@ namespace AddAttributeFromAttachment
             return (bool)currentParameterValues["Apply"] || (previousAttachment != newAttachment);
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             Attachment attachment = (Attachment)parameterValues["Taxon list:"];
 

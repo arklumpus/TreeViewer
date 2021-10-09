@@ -16,3 +16,5 @@ Avalonia.Animation.dll
 System.ObjectModel.dll
 VectSharp.dll
 System.IO.FileSystem.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

@@ -297,17 +297,24 @@ namespace TreeViewerCommandLine
                     }
                     else if (moduleSuggestions[i].Item1 != "@Attachment")
                     {
-                        ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[moduleSuggestions[i].Item1], moduleSuggestions[i].Item2);
+                        ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[moduleSuggestions[i].Item1], -1, moduleSuggestions[i].Item2);
                         if (i == 0)
                         {
                             UpdateCommand.UpdateTransformer();
                             UpdateCommand.UpdateFurtherTransformations();
                         }
+
+                        if (Modules.LoadedModulesMetadata[moduleSuggestions[i].Item1].ModuleType == ModuleTypes.FurtherTransformation)
+                        {
+                            UpdateCommand.UpdateFurtherTransformations(Program.FurtherTransformations.Count - 1);
+                        }
+                        else if (Modules.LoadedModulesMetadata[moduleSuggestions[i].Item1].ModuleType == ModuleTypes.Coordinate)
+                        {
+                            UpdateCommand.UpdateCoordinates();
+                        }
+
                     }
                 }
-
-                UpdateCommand.UpdateFurtherTransformations();
-                UpdateCommand.UpdateCoordinates();
             }
 
         }

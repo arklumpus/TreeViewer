@@ -7,3 +7,5 @@ VectSharp.dll
 PhyloTree.TreeNode.dll
 VectSharp.Markdown.dll
 Markdig.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

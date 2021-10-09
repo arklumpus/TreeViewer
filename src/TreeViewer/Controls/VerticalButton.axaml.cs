@@ -16,8 +16,9 @@
 */
 
 using Avalonia.Controls;
-using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using System;
 
 namespace TreeViewer
 {
@@ -28,21 +29,17 @@ namespace TreeViewer
             InitializeComponent();
         }
 
+        public event EventHandler<RoutedEventArgs> Click;
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-        }
 
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
-        {
-            base.OnPointerPressed(e);
-            this.FindControl<Canvas>("MainCanvas").Classes.Add("pressed");
-        }
-
-        protected override void OnPointerReleased(PointerReleasedEventArgs e)
-        {
-            base.OnPointerReleased(e);
-            this.FindControl<Canvas>("MainCanvas").Classes.Remove("pressed");
+            this.FindControl<Button>("MainContent").Content = new DPIAwareBox(Icons.GetIcon("TreeViewer.Assets.Wrench-16.png", "TreeViewer.Assets.Wrench-24.png", "TreeViewer.Assets.Wrench-32.png", 8, 16)) { Width = 8, Height = 16 };
+            this.FindControl<Button>("MainContent").Click += (s, e) =>
+            {
+                this.Click?.Invoke(this, e);
+            };
         }
     }
 }

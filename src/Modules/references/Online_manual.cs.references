@@ -6,3 +6,6 @@ System.Diagnostics.Process.dll
 System.ComponentModel.Primitives.dll
 Avalonia.Base.dll
 Avalonia.Input.dll
+VectSharp.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

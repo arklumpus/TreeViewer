@@ -15,33 +15,36 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="425" Height="135"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" Width="425" SizeToContent="Height"
         x:Class="TreeViewer.ProgressWindow" CanResize="False"
-        Title="Action in progress..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15" SystemDecorations="None" WindowStartupLocation="CenterOwner"
-        Opened="WindowOpened" Background="Transparent" TransparencyLevelHint="Transparent" ShowInTaskbar="False" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Grid>
-    <Image Source="resm:TreeViewer.Assets.ProgressWindowBackground.png?assembly=TreeViewer" Stretch="Fill" Width="424.5" Height="134.5" />
-    <Border BorderBrush="Gray" BorderThickness="0" CornerRadius="20" Background="#E0FFFFFF" Width="400" Height="110" VerticalAlignment="Top" HorizontalAlignment="Left">
-      <Border.RenderTransform>
-        <TranslateTransform X="8.954" Y="8.954"/>
-      </Border.RenderTransform>
-      <Grid Name="MainGrid">
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="1*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="1*" />
-          <ColumnDefinition Width="0" />
-        </Grid.ColumnDefinitions>
-        <TextBlock Margin="10" HorizontalAlignment="Center" Grid.ColumnSpan="2" Name="ProgressText">Performing action...</TextBlock>
-        <ProgressBar Grid.Row="1" Margin="10,20,10,20" Maximum="100" Name="ProgressBar" IsIndeterminate="True" Height="24"></ProgressBar>
-        <TextBlock Margin="0,0,10,0" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Name="ProgressDesc" IsVisible="True">0%</TextBlock>
-      </Grid>
-    </Border>
-  </Grid>
-</Window>
+        Title="Action in progress..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15" WindowStartupLocation="CenterOwner"
+        Opened="WindowOpened" ShowInTaskbar="False" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" HasControlBox="False">
+    <local:ChildWindow.Content>
+        <Grid Name="MainGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <!--<RowDefinition Height="Auto" />-->
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="0" />
+            </Grid.ColumnDefinitions>
+            <Grid Margin="10, 10, 10, 5" Grid.ColumnSpan="2" Name="ProgressTextContainer">
+
+            </Grid>
+            <!--<Grid Grid.Row="1" Margin="10,0,10,0" Grid.ColumnSpan="2" Name="LabelTextContainer">
+        
+      </Grid>-->
+            <Grid Grid.Row="1" Margin="20,10,10,20" Height="70">
+                <local:CoolProgressBar  Name="ProgressBar" IsIndeterminate="True" Height="24" />
+            </Grid>
+            <TextBlock Margin="0,0,10,10" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Name="ProgressDesc" IsVisible="True">0%</TextBlock>
+        </Grid>
+    </local:ChildWindow.Content>
+</local:ChildWindow>

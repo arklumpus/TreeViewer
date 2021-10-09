@@ -33,9 +33,21 @@ namespace RectangularCoordinates
         public const string Name = "Rectangular";
         public const string HelpText = "Computes the coordinates for a rectangular tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "68e25ec6-5911-4741-8547-317597e1b792";
         public const ModuleTypes ModuleType = ModuleTypes.Coordinate;
+
+        public static List<(string, string)> GetGlobalSettings()
+        {
+            return new List<(string, string)>()
+            {
+                /// <param name="Maximum default aspect ratio">
+                /// This parameter determines the maximum aspect ratio that the module will use when computing
+                /// the default width and height of the plot.
+                /// </param>
+                ( "Maximum default aspect ratio:", "NumericUpDown:1.333333333[\"1\",\"Infinity\",\"0.1\"]" )
+            };
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -51,13 +63,27 @@ namespace RectangularCoordinates
 
             double aspectRatio = defaultWidth / defaultHeight;
 
-            if (aspectRatio > 16.0 / 9)
+            double maxAspectRatio = 4.0 / 3;
+
+            if (TreeViewer.GlobalSettings.Settings.AdditionalSettings.TryGetValue("Maximum default aspect ratio:", out object defaultAspectRatioValue))
             {
-                defaultWidth = defaultHeight * 16 / 9;
+                if (defaultAspectRatioValue is double aspectRatioValue)
+                {
+                    maxAspectRatio = aspectRatioValue;
+                }
+                else if (defaultAspectRatioValue is System.Text.Json.JsonElement element)
+                {
+                    maxAspectRatio = element.GetDouble();
+                }
             }
-            else if (aspectRatio < 9.0 / 16)
+
+            if (aspectRatio > maxAspectRatio)
             {
-                defaultWidth = defaultHeight * 9 / 16;
+                defaultWidth = defaultHeight * maxAspectRatio;
+            }
+            else if (aspectRatio < 1 / maxAspectRatio)
+            {
+                defaultWidth = defaultHeight / maxAspectRatio;
             }
 
             return new List<(string, string)>()
@@ -72,7 +98,7 @@ namespace RectangularCoordinates
                 /// (e.g. because the tree does not have any branch length information), the default width
                 /// is equal to the default height.
                 /// 
-                /// The default width and height are adjusted to keep an aspect ratio between 9:16 and 16:9.
+                /// The default width and height are adjusted to keep an aspect ratio below the [Maximum default aspect ratio](#maximum-default-aspect-ratio).
                 /// </param>
                 ( "Width:", "NumericUpDown:" + defaultWidth.ToString(0) + "[\"0\",\"Infinity\"]" ),
                 

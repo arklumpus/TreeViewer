@@ -20,21 +20,42 @@ namespace RerootSelectionAction
         public const string Name = "Root tree on selection";
         public const string HelpText = "Re-roots the tree using the selection as outgroup.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.1.1");
         public const string Id = "77f387fb-c843-4164-aed2-bd5b8f325809";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
         public static bool IsAvailableInCommandLine { get; } = true;
-        public static string ButtonText { get; } = "Re-root\ntree";
+        public static string ButtonText { get; } = "Re-root tree";
         public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
         public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.None;
         public static bool TriggerInTextBox { get; } = false;
 
-        private const string IconBase64 = "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";
+        public static string GroupName { get; } = "Arrange";
+        public static double GroupIndex { get; } = 4;
+        public static bool IsLargeButton { get; } = true;
+        public static List<(string, Func<double, Page>)> SubItems { get; } = new List<(string, Func<double, Page>)>();
 
-        public static Page GetIcon()
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFNSURBVFhH7ZZRDoIwDIaZ8c2LeAvfPQ48G/UAcBeP4C28iM/Ijy0pyzq2uYXE8CXNxlbKv7YzVqmcL48eRo/J7GhcjU3AJmB1AYbGibqub8Nw/T7pvA6ncTy+n+MYwL3rOsSeMctA34/XevHjiSzHhYAhAz2MlrLgi/lfTUgljMIENp2zgYD90aZpgpqYuCMDIc4xjRnlu6dJNZxwdiX5ZMOJkhrSjidBbI6r9oAx6vtOYv2Zn5sQNcdpcM1ktvjqUY+p5LgFSzX37me7hm3bGhhqz0ZbXrIJACl9kFWARP4+YC5NMgmwnWzHEOz3uCyYIztskkmAdHA5SmHSXLjWpT9ic58El8AWxybR1oG2XqQHtAy4yCbAdboQvAIQNOZOA+2kmsDsJdA+VLwEPiCqSAZi0+0C/4jGKDF1ZqSApdQXyQAH9Z0Ye/p+VX0A++O2Bt8aiN0AAAAASUVORK5CYII=";
+        private static string Icon48Base64 = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiQAABYkAZsVxhQAAAFgSURBVGhD7Zi/boMwEMZNBhjyGhn6Ft275FmAqa06VSVLgGfJkr1v0Rfp0oXeoaOyKAZ8/DmQ7idZdpzYvk8+fzEEZgGe3m4VNc39/bzIGg0HqneLCpBGBUijAqRRAdI4BcRxfKqqynCKTdf3vqWPzr95HJQkyUcQBC/U5cXX8ZFaxjx8f1KLB8SSlWX5Sh//0bkDEDgWVvBzMxTH7s+A86YIKfSXfEVRLHqjbIMpnKbpqPXVRqXZ/xmAXM+gTqGEdc84fiBPr332NgRzXZs6BtwBziQh2BuOm8KU4JE6BhTAnSSimsuU4BsiTCEvu5zLXqfMY49VF5Jm8RSC33Pc5gJzO+9Aa6cQx22eqR5kDQFzuI2TVc8Appyr5HnOcjR1IWk2IQDv/1x0B+bEPtTUNchmBOCLhLHYQjchwCf4NnoGpFEB0ngLsB2AukTRFJJGBUizewHeD/VbQ1NIFmN+AfLL0EpMdigmAAAAAElFTkSuQmCC";
+        private static string Icon64Base64 = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAYpJREFUeJztmTFOwzAYRmOLjSPQ7tyCHQZuwQGirEzMyUyPwVJmbsEBuAJjYgaUqk2H2PHfvEr+3hbJTV4//Y2/pK5amcfXj3B8vH97dms7HOPJi18DCoAWoFEAtACNAqAFaBQALUCjAGgBGgVAC9DMPok1TfM0DMOuqqo7iwt+3z6cHN//flmc9kAI4cd7/9K27WfM+tkJ6Pv+vTL68mvgnNuEEHax62cDcM5t8pQQtrELi78H3KR+oOu6zDc43cnRPu9kB+q6DvOrzil+AhQALUCjAGgBGmfV9FIbWCzWTXRk9PVWTS+1gcVyqSY6+nrjphfdwGK5cBPdFn8POGuCqU1vaQNbSm4TnfoWPwEKgBagSX4atCZ1n5/+hnP7Bz4Buft8bv/AAzDa5xf3DzwAGvweMCV2n7fqH8VPgAKgBWgUAC1Ac3W7QCz5/0/8owmgBdZmOjnFT4ACoAVoFAAtQKMAaAGa7B5g1cgoip8ABUAL0CgAWoBGAdACNPj7ALpHFD8BCoAWoPkDLlpt4WVFCQ0AAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
         {
-            byte[] bytes = Convert.FromBase64String(IconBase64);
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon48Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon64Base64);
+            }
 
             IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
@@ -54,18 +75,18 @@ namespace RerootSelectionAction
                 Marshal.FreeHGlobal(imagePtr);
             }
 
-            Page pag = new Page(icon.Width, icon.Height);
-            pag.Graphics.DrawRasterImage(0, 0, icon);
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
 
             return pag;
         }
 
-        public static bool IsAvailable(TreeNode selection, MainWindow window, InstanceStateData stateData)
+        public static List<bool> IsAvailable(TreeNode selection, MainWindow window, InstanceStateData stateData)
         {
-            return (selection != null && selection.Parent != null && selection.Parent.Parent != null);
+            return new List<bool>() { (selection != null && selection.Parent != null && (selection.Parent.Parent != null || selection.Parent.Children.Count > 2)) };
         }
 
-        public static void PerformAction(TreeNode selection, MainWindow window, InstanceStateData stateData)
+        public static void PerformAction(int actionIndex, TreeNode selection, MainWindow window, InstanceStateData stateData)
         {
             FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "c6f96861-11c0-4853-9738-6a90cc81d660");
             int index = stateData.FurtherTransformationModules().IndexOf(module);
@@ -93,22 +114,95 @@ namespace RerootSelectionAction
                 }
             }
 
+            if (InstanceStateData.IsUIAvailable && index >= 0)
+            {
+                TreeNode tree = index == 0 ? window.FirstTransformedTree : window.AllTransformedTrees[index - 1];
+
+                List<TreeNode> originalNodes = new List<TreeNode>();
+
+                foreach (TreeNode node in selection.GetChildrenRecursiveLazy())
+                {
+                    if (!string.IsNullOrEmpty(node.Name))
+                    {
+                        TreeNode correspNode = tree.GetNodeFromId(node.Id);
+
+                        if (correspNode != null)
+                        {
+                            originalNodes.Add(correspNode);
+                        }
+                    }
+                }
+
+                string[] origNodeNames = (from el in originalNodes where !string.IsNullOrEmpty(el.Name) orderby el.Name select el.Name).ToArray();
+
+                TreeNode lca = tree.GetLastCommonAncestor(origNodeNames);
+
+                List<string> newNodeNames = lca.GetNodeNames();
+                newNodeNames.Sort();
+
+                if (newNodeNames.SequenceEqual(origNodeNames))
+                {
+                    nodeNames = origNodeNames;
+                }
+                else
+                {
+                    originalNodes.Clear();
+                    List<TreeNode> selectionNodes = selection.GetChildrenRecursive();
+
+                    foreach (TreeNode node in window.TransformedTree.GetChildrenRecursiveLazy())
+                    {
+                        if (!selectionNodes.Contains(node))
+                        {
+                            if (!string.IsNullOrEmpty(node.Name))
+                            {
+                                TreeNode correspNode = tree.GetNodeFromId(node.Id);
+
+                                if (correspNode != null)
+                                {
+                                    originalNodes.Add(correspNode);
+                                }
+                            }
+                        }
+                    }
+
+                    origNodeNames = (from el in originalNodes where !string.IsNullOrEmpty(el.Name) orderby el.Name select el.Name).ToArray();
+
+                    lca = tree.GetLastCommonAncestor(origNodeNames);
+
+                    newNodeNames = lca.GetNodeNames();
+                    newNodeNames.Sort();
+
+                    if (newNodeNames.SequenceEqual(origNodeNames))
+                    {
+                        nodeNames = origNodeNames;
+                    }
+                }
+            }
+
             if (index < 0)
             {
                 Action<Dictionary<string, object>> changeParameter = stateData.AddFurtherTransformationModule(module);
-                changeParameter(new Dictionary<string, object>() { { "Outgroup:", selection.GetNodeNames().ToArray() }, { "Rooting mode:", 1 } });
+                changeParameter(new Dictionary<string, object>() { { "Outgroup:",  nodeNames }, { "Rooting mode:", 1 } });
                 if (InstanceStateData.IsUIAvailable)
                 {
-                    _ = window.UpdateFurtherTransformations(index);
+                    _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await window.UpdateFurtherTransformations(index);
+                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(selection.GetNodeNames()));
+                    });
                 }
             }
             else
             {
-                stateData.FurtherTransformationModulesParameterUpdater(index)(new Dictionary<string, object>() { { "Outgroup:", selection.GetNodeNames().ToArray() }, { "Rooting mode:", 1 } });
+                stateData.FurtherTransformationModulesParameterUpdater(index)(new Dictionary<string, object>() { { "Outgroup:", nodeNames }, { "Rooting mode:", 1 } });
 
                 if (InstanceStateData.IsUIAvailable)
                 {
-                    _ = window.UpdateFurtherTransformations(index);
+                    _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await window.UpdateFurtherTransformations(index);
+                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(selection.GetNodeNames()));
+                    });
                 }
             }
         }

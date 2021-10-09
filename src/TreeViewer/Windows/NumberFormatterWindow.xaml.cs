@@ -140,7 +140,7 @@ namespace TreeViewer
         }
     }
 
-    public class NumberFormatterWindow : Window
+    public class NumberFormatterWindow : ChildWindow
     {
         public bool Result { get; private set; } = false;
 
@@ -154,6 +154,8 @@ namespace TreeViewer
         public NumberFormatterWindow()
         {
             this.InitializeComponent();
+
+            this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.NumberFormatter")) { Width = 32, Height = 32 });
         }
 
         public async Task Initialize(string attributeName, string attributeType, double defaultValue, object[] parameters, InterprocessDebuggerServer debuggerServer, string editorId)
@@ -164,8 +166,18 @@ namespace TreeViewer
             this.FindControl<TextBox>("AttributeNameContainer").Text = attributeName;
             this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex = attributeType == "String" ? 0 : attributeType == "Number" ? 1 : -1;
 
-            this.FindControl<StackPanel>("AlertContainer").Children.Add(MainWindow.AlertPage.PaintToCanvas());
-            this.FindControl<StackPanel>("AlertContainer").Children.Add(new TextBlock() { Text = "Note: custom formatter code will be used!", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0) });
+            Viewbox alertIcon = MainWindow.GetAlertIcon();
+            alertIcon.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
+            alertIcon.Width = 16;
+            alertIcon.Height = 16;
+
+            this.FindControl<Grid>("AlertContainer").Children.Add(alertIcon);
+
+            {
+                TextBlock blk = new TextBlock() { Text = "Using custom formatter code!", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0), FontSize = 13, TextWrapping = Avalonia.Media.TextWrapping.Wrap };
+                Grid.SetColumn(blk, 1);
+                this.FindControl<Grid>("AlertContainer").Children.Add(blk);
+            }
 
             string initialText = "";
 
@@ -182,6 +194,7 @@ namespace TreeViewer
 
             ConverterCodeBox = await Editor.Create(initialText, "using TreeViewer;\npublic static class FormatterModule {", "}", guid: editorId);
             ConverterCodeBox.IsReferencesButtonEnabled = false;
+            ConverterCodeBox.Background = this.Background;
 
             if (attributeType == "String")
             {
@@ -192,24 +205,21 @@ namespace TreeViewer
                 ConverterCodeBox.TextChanged += CheckNumber;
             }
 
-            this.FindControl<Expander>("CustomFormatterExpander").Child = ConverterCodeBox;
+            this.FindControl<Grid>("CodeContainer").Children.Add(ConverterCodeBox);
         }
 
         void CheckString(object sender, EventArgs e)
         {
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, Modules.DefaultAttributeConvertersToDouble[0]);
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, Modules.DefaultAttributeConvertersToDouble[0]);
         }
 
         void CheckNumber(object sender, EventArgs e)
         {
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, Modules.DefaultAttributeConvertersToDouble[1]);
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, Modules.DefaultAttributeConvertersToDouble[1]);
         }
 
         private string SetupString(object[] parameters)
         {
-            this.FindControl<Grid>("StringOptions").IsVisible = true;
-            this.FindControl<Grid>("NumberOptions").IsVisible = false;
-
             if (ConverterCodeBox != null)
             {
                 ConverterCodeBox.TextChanged -= CheckNumber;
@@ -224,7 +234,7 @@ namespace TreeViewer
                 };
             };
 
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], Modules.DefaultAttributeConvertersToDouble[0]);
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], Modules.DefaultAttributeConvertersToDouble[0]);
             initialized = true;
 
             return (string)parameters[0];
@@ -232,9 +242,6 @@ namespace TreeViewer
 
         private string SetupNumber(object[] parameters)
         {
-            this.FindControl<Grid>("StringOptions").IsVisible = true;
-            this.FindControl<Grid>("NumberOptions").IsVisible = false;
-
             if (ConverterCodeBox != null)
             {
                 ConverterCodeBox.TextChanged -= CheckString;
@@ -252,7 +259,7 @@ namespace TreeViewer
                 };
             };
 
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], Modules.DefaultAttributeConvertersToDouble[1]);
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], Modules.DefaultAttributeConvertersToDouble[1]);
             initialized = true;
 
             return (string)parameters[0];

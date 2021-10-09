@@ -24,7 +24,7 @@ using VectSharp.MarkdownCanvas;
 
 namespace TreeViewer
 {
-    public class HelpWindow : Window
+    public class HelpWindow : ChildWindow
     {
         public HelpWindow()
         {
@@ -38,9 +38,11 @@ namespace TreeViewer
             Markdig.Syntax.MarkdownDocument markdownDocument = Markdig.Markdown.Parse(markdownSource, new Markdig.MarkdownPipelineBuilder().UseGridTables().UsePipeTables().UseEmphasisExtras().UseGenericAttributes().UseAutoIdentifiers().UseAutoLinks().UseTaskLists().UseListExtras().UseCitations().UseMathematics().Build());
 
             MarkdownRenderer renderer = this.FindControl<MarkdownCanvasControl>("MarkdownCanvas").Renderer;
-            renderer.ImageUnitMultiplier /= 1.8;
-            renderer.ImageMultiplier *= 1.8;
-            this.FindControl<MarkdownCanvasControl>("MarkdownCanvas").FontSize = 18;
+            renderer.ImageUnitMultiplier /= 1.4;
+            renderer.ImageMultiplier *= 1.4;
+            renderer.HeaderFontSizeMultipliers[0] *= 1.3;
+            this.FindControl<MarkdownCanvasControl>("MarkdownCanvas").FontSize = 14;
+
             renderer.RasterImageLoader = image => new VectSharp.MuPDFUtils.RasterImageFile(image);
 
             int imageIndex = 0;

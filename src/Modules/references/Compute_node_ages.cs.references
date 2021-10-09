@@ -5,3 +5,5 @@ System.Collections.dll
 TreeViewer.dll
 PhyloTree.TreeNode.dll
 VectSharp.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

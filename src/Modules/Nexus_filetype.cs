@@ -66,6 +66,7 @@ namespace OpenNexus
                 string line = sr.ReadLine();
 
                 List<Attachment> attachments = new List<Attachment>();
+                string serializedModules = null;
 
                 while (!sr.EndOfStream)
                 {
@@ -92,29 +93,7 @@ namespace OpenNexus
                             sb.Append(buffer, 0, currRead);
                         }
 
-                        string serializedModules = sb.ToString();
-
-                        List<List<(string, Dictionary<string, object>)>> modules = ModuleUtils.DeserializeModules(serializedModules, askForCodePermission);
-
-                        if (modules[0].Count > 0)
-                        {
-                            moduleSuggestions[0] = modules[0][0];
-                        }
-
-                        if (modules[2].Count > 0)
-                        {
-                            moduleSuggestions[1] = modules[2][0];
-                        }
-
-                        for (int i = 0; i < modules[1].Count; i++)
-                        {
-                            moduleSuggestions.Add(modules[1][i]);
-                        }
-
-                        for (int i = 0; i < modules[3].Count; i++)
-                        {
-                            moduleSuggestions.Add(modules[3][i]);
-                        }
+                        serializedModules = sb.ToString();
                     }
                     else if (!sr.EndOfStream && line.Trim().Equals("begin attachment;", StringComparison.OrdinalIgnoreCase))
                     {
@@ -209,6 +188,30 @@ namespace OpenNexus
                             Attachment att = new Attachment(nameLine, cacheResults, storeInMemory, tempFileName, true);
                             attachments.Add(att);
                         }
+                    }
+                }
+                
+                if (serializedModules != null)
+                {
+                    List<List<(string, Dictionary<string, object>)>> modules = ModuleUtils.DeserializeModules(serializedModules, attachments, askForCodePermission);
+                    if (modules[0].Count > 0)
+                    {
+                        moduleSuggestions[0] = modules[0][0];
+                    }
+
+                    if (modules[2].Count > 0)
+                    {
+                        moduleSuggestions[1] = modules[2][0];
+                    }
+
+                    for (int i = 0; i < modules[1].Count; i++)
+                    {
+                        moduleSuggestions.Add(modules[1][i]);
+                    }
+
+                    for (int i = 0; i < modules[3].Count; i++)
+                    {
+                        moduleSuggestions.Add(modules[3][i]);
                     }
                 }
 

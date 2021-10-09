@@ -15,12 +15,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<treeviewer:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:treeviewer="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="800" Height="450"
-        x:Class="DebuggerClient.MainWindow"
+        x:Class="DebuggerClient.MainWindow" Topmost="True"
         Title="Breakpoint viewer" Icon="resm:DebuggerClient.WindowIcon.png?assembly=DebuggerClient">
-    
-</Window>
+
+</treeviewer:ChildWindow>

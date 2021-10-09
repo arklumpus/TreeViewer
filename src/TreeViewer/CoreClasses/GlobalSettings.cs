@@ -38,12 +38,28 @@ namespace TreeViewer
             ProgramAndAllModules,
         }
 
+        public enum InterfaceStyles
+        {
+            WindowsStyle,
+            MacOSStyle
+        }
+
+        public enum RibbonStyles
+        {
+            Colourful,
+            Grey
+        }
+
         internal static readonly string ProgramRepository = "arklumpus/TreeViewer";
 
         internal static readonly string DefaultModuleRepository = @"https://raw.githubusercontent.com/arklumpus/TreeViewer/main/Modules/";
 
         public bool ShowLegacyUpDownArrows { get; set; } = false;
+        public InterfaceStyles InterfaceStyle { get; set; } = Modules.IsMac ? InterfaceStyles.MacOSStyle : InterfaceStyles.WindowsStyle;
+        public RibbonStyles RibbonStyle { get; set; } = Modules.IsWindows ? RibbonStyles.Colourful : RibbonStyles.Grey;
         public TimeSpan AutosaveInterval { get; set; } = new TimeSpan(0, 10, 0);
+        public int DragInterval { get; set; } = 250;
+        public int KeepRecentFilesFor { get; set; } = 30;
         public bool DrawTreeWhenOpened { get; set; } = true;
         public Colour SelectionColour { get; set; } = Colour.FromRgb(35, 127, 255);
         public Colour BackgroundColour { get; set; } = Colour.FromRgb(240, 244, 250);
@@ -55,7 +71,7 @@ namespace TreeViewer
         public static GlobalSettings Settings { get; }
         internal List<MainWindow> MainWindows { get; } = new List<MainWindow>();
 
-        public static JsonSerializerOptions SerializationOptions = new JsonSerializerOptions()
+        public static JsonSerializerOptions SerializationOptions { get; } = new JsonSerializerOptions()
         {
             WriteIndented = true,
             Converters =
@@ -103,6 +119,26 @@ namespace TreeViewer
                     else
                     {
                         GlobalSettings.Settings.AutosaveInterval = TimeSpan.Parse(settingValue);
+                    }
+                    break;
+                case "DragInterval":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.DragInterval = 250;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.DragInterval = int.Parse(settingValue);
+                    }
+                    break;
+                case "KeepRecentFilesFor":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.KeepRecentFilesFor = 30;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.KeepRecentFilesFor = int.Parse(settingValue);
                     }
                     break;
                 case "DrawTreeWhenOpened":
@@ -163,6 +199,26 @@ namespace TreeViewer
                     else
                     {
                         GlobalSettings.Settings.UpdateCheckMode = (GlobalSettings.UpdateCheckModes)Enum.Parse(typeof(GlobalSettings.UpdateCheckModes), settingValue);
+                    }
+                    break;
+                case "InterfaceStyle":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.InterfaceStyle = Modules.IsMac ? InterfaceStyles.MacOSStyle : InterfaceStyles.WindowsStyle;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.InterfaceStyle = (GlobalSettings.InterfaceStyles)Enum.Parse(typeof(GlobalSettings.InterfaceStyles), settingValue);
+                    }
+                    break;
+                case "RibbonStyle":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.RibbonStyle = Modules.IsWindows ? RibbonStyles.Colourful : RibbonStyles.Grey;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.RibbonStyle = (GlobalSettings.RibbonStyles)Enum.Parse(typeof(GlobalSettings.RibbonStyles), settingValue);
                     }
                     break;
                 default:
@@ -361,27 +417,9 @@ namespace TreeViewer
             }
         }
 
-        internal GlobalSettingsWindow GlobalSettingsWindow = null;
-
         internal void UpdateAdditionalSettings()
         {
-            if (GlobalSettingsWindow != null)
-            {
-                GlobalSettingsWindow.Disposing = true;
-                GlobalSettingsWindow.Close();
-            }
-
-            GlobalSettingsWindow = new GlobalSettingsWindow();
-        }
-
-        internal async Task ShowGlobalSettingsWindow(Window parent)
-        {
-            if (GlobalSettingsWindow == null)
-            {
-                GlobalSettingsWindow = new GlobalSettingsWindow();
-            }
-
-            await this.GlobalSettingsWindow.ShowDialog(parent);
+           
         }
 
         public GlobalSettings()

@@ -33,26 +33,49 @@ namespace RootedStyleAction
         public const string Name = "Rooted tree style";
         public const string HelpText = "Sets the plot actions to display the tree as a rooted tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "e56b8297-4417-4494-9369-cbe9e5d25397";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public static bool IsAvailableInCommandLine { get; } = true;
-        public static string ButtonText { get; } = "Rooted\nstyle";
-        public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
-        public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.None;
+        public static string ButtonText { get; } = "Rooted";
+        public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { (Avalonia.Input.Key.None, Avalonia.Input.KeyModifiers.None) };
         public static bool TriggerInTextBox { get; } = false;
 
-        private const string IconBase64 = "iVBORw0KGgoAAAANSUhEUgAAAEkAAAAqCAYAAAD/E3YoAAAACXBIWXMAAA4CAAAOAgHPOoN6AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAqRJREFUaIHtmk1IVFEUx//3vafjOON3n2aM0qKEIVCzdhGtijbmUshAqo0ZFS1rURREy1aVGIjorhZB5MogCIqwVloWhRjEoJUEM6Nv5r17WojQZniH997cmcn7W593/ocfM3fOfYyABweGx1vMnLEIIO5V+x+Sl+vpbsurqtoW9a5AfC31+ZadWUmpmKxskJDLrydMT0mbpH/Mf1ieffKimDOVKS5bkhCCANhFHKZsMUo9QCWgJTHQkhhoSQy0JAZaEgMtiYGVvDBxiiT2FCqQwDaVA5UjFhHdAdBeqECCDLHFP3DW3OjgYQCJQgW7evrbWrpPzwQNSp4bP0jCvCcAM2gvdVAu71rnLQA5AF8Kle3o6nPcMPKEeQigo/ns6vMw2imBZC71ZqqVfXcLBSnTC5OXrgP4pTQ3GI5aSRvYAH6WINc3W/tEZqIlMdCSGGhJDLQkBloSA/YK0JQ8cXN7V99Fv0EEavX7bKnxlNTctvd76tunu+56ercrhPQbZEZiUcOK7vT7fCkRzDoLQGOQoP0D9wfMaMON+bGzvQAWg/RSDffr5iDgllwVa06TdClID2DzomycDNqHgxC0VherGS3FtSQQJMxrINlPkEW//5EkZ+n99LsKlETCzf55tTA5chUbbzCKTb7iJP3DChS9TdB7EgMtiYGWxEDZmSSJSBhGU+fQ42eGWeX/wCXqAPA2vMm8USaJDEw76d8Pyc3HAPjel6pqmxsB4i7BoaA0DEAEQG2QBp1DYw+kna1bmBw5A0W/bqpXABsB/wgmrOoc7GxI4/DQBzcDLYlBRW7cwrCiieOXE/XtvQ3FzJGW68w9GlyqOEkGISNq4sfi+3pmJXy/3uJBAh19t49UnKS6eOTK15mpp9JZryl2littd/Xjy8xfdizC+WO0VFMAAAAASUVORK5CYII=";
+        public static string GroupName { get; } = "Tree style";
 
-        public static Page GetIcon()
+        public static double GroupIndex { get; } = 1;
+
+        public static bool IsLargeButton { get; } = false;
+
+        public static List<(string, Func<double, VectSharp.Page>)> SubItems { get; } = new List<(string, Func<double, VectSharp.Page>)>();
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABbSURBVDhPY6AUMEJpMCgqKvoPZZIHyDGACUqTDSg2gBHd2X19fSjhQghgBCKyASSHCboGYgygPAygNBhgs5FQmOCVpEuYEHQBlAkHpEYzCiDZBeiA5DAgDBgYAB1HK2AtTjNZAAAAAElFTkSuQmCC";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACbSURBVEhL3ZMBCoAgDEU1OrEXqC7glWujKWKbNbXAHsiwYPX3/6zJcM6tUJbz1s5ENaVbcxZQsOOhazOcgq6M/wErzdt7f0lYDe8roBoJijgFNTuiVdC+I6U9KL2T+EFMqUaejEAT4ZlqygZHZSb8lJgu1TIFdbkCrfEi2IhrJj1Hvje5xN0oOPO1CjAA3zOOBxIlb3opELwx5gBjTT7Jz6I+nAAAAABJRU5ErkJggg==";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACZSURBVFhH7ZVLDoAgDETBI3MB9QK9smIsK6VDLPWXvoQ0DQuayXSIoUJKacpl3Ds7Bq5nmD8ukhVYtsOtGZICt+AD+AAROZ2IqlnRg+cV4HqgKFNToFdSahSwTUqUhOi+FV9DHwCuIUIbVJICM9d30msNL8tXHtcmpaUJv5GUngNqEyJQTmgU+EdOuAlVH4lEq0ktFWgwaQgrVu1BKqj9TNoAAAAASUVORK5CYII=";
+
+        public static VectSharp.Page GetIcon(double scaling)
         {
-            byte[] bytes = Convert.FromBase64String(IconBase64);
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
 
             IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
 
-            RasterImage icon;
+            VectSharp.RasterImage icon;
 
             try
             {
@@ -67,58 +90,175 @@ namespace RootedStyleAction
                 Marshal.FreeHGlobal(imagePtr);
             }
 
-            Page pag = new Page(icon.Width, icon.Height);
-            pag.Graphics.DrawRasterImage(0, 0, icon);
+            VectSharp.Page pag = new VectSharp.Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
 
             return pag;
         }
 
-        public static void PerformAction(MainWindow window, InstanceStateData stateData)
+        public static void PerformAction(int actionIndex, MainWindow window, InstanceStateData stateData)
         {
             if (stateData.Trees != null)
             {
-                while (stateData.PlottingModules().Count > 0)
+                int branches = 0;
+                int labelName = 0;
+                int labelLength = 0;
+                int other = 0;
+
+                List<PlottingModule> plottingModules = stateData.PlottingModules();
+
+                for (int i = 0; i < plottingModules.Count; i++)
                 {
-                    stateData.RemovePlottingModule(0);
+                    if (plottingModules[i].Id == "7c767b07-71be-48b2-8753-b27f3e973570")
+                    {
+                        branches++;
+                    }
+                    else if (plottingModules[i].Id == "ac496677-2650-4d92-8646-0812918bab03")
+                    {
+                        string labelAttribute = (string)stateData.GetPlottingModulesParameters(i)["Attribute:"];
+
+                        if (labelAttribute == "Name")
+                        {
+                            labelName++;
+                        }
+                        else if (labelAttribute == "Length")
+                        {
+                            labelLength++;
+                        }
+                        else
+                        {
+                            other++;
+                        }
+                    }
+                    else
+                    {
+                        other++;
+                    }
                 }
-                stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
+				
+				if (InstanceStateData.IsUIAvailable)
+				{
+					Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+					{
+						if (branches > 1 || labelName > 1 || labelLength > 1 || other > 0)
+						{
+							MessageBox box = new MessageBox("Question", "It looks like you have made some changes to the plot. Please note that if you use this module, those changes may be lost.\nIf you wish to keep your changes, use the \"Reshape tree\" action instead.\nDo you wish to proceed anyways?", MessageBox.MessageBoxButtonTypes.YesNo);
 
-                stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
+							await box.ShowDialog2(window);
 
-                Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-                updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(new FontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
+							if (box.Result == MessageBox.Results.No)
+							{
+								return;
+							}
+						}
 
-                double defaultHeight = stateData.TransformedTree.GetLeaves().Count * 14;
+						while (stateData.PlottingModules().Count > 0)
+						{
+							stateData.RemovePlottingModule(0);
+						}
+						stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
 
-                double totalLength = stateData.TransformedTree.LongestDownstreamLength();
-                double defaultWidth = 20 * totalLength / (from el in stateData.TransformedTree.GetChildrenRecursiveLazy() where el.Length > 0 select el.Length).MinOrDefault(0);
+						stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
 
-                if (double.IsNaN(defaultWidth))
-                {
-                    defaultWidth = defaultHeight;
-                }
+						Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
+						updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(new FontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
 
-                double aspectRatio = defaultWidth / defaultHeight;
+						double defaultHeight = stateData.TransformedTree.GetLeaves().Count * 14;
 
-                if (aspectRatio > 16.0 / 9)
-                {
-                    defaultWidth = defaultHeight * 16 / 9;
-                }
-                else if (aspectRatio < 9.0 / 16)
-                {
-                    defaultWidth = defaultHeight * 9 / 16;
-                }
+						double totalLength = stateData.TransformedTree.LongestDownstreamLength();
+						double defaultWidth = 20 * totalLength / (from el in stateData.TransformedTree.GetChildrenRecursiveLazy() where el.Length > 0 select el.Length).MinOrDefault(0);
 
-                CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "68e25ec6-5911-4741-8547-317597e1b792");
+						if (double.IsNaN(defaultWidth))
+						{
+							defaultWidth = defaultHeight;
+						}
 
-                updater = stateData.SetCoordinatesModule(module);
-                updater(new Dictionary<string, object>() { { "Width:", defaultWidth }, { "Height:", defaultHeight }, { "Rotation:", 0.0 }, { "Apply", true } });
+						double aspectRatio = defaultWidth / defaultHeight;
+						
+						double maxAspectRatio = 4.0 / 3;
 
-                if (InstanceStateData.IsUIAvailable)
-                {
-                    window.UpdateCoordinates();
-                    window.AutoFit();
-                }
+						if (TreeViewer.GlobalSettings.Settings.AdditionalSettings.TryGetValue("Maximum default aspect ratio:", out object defaultAspectRatioValue))
+						{
+							if (defaultAspectRatioValue is double aspectRatioValue)
+							{
+								maxAspectRatio = aspectRatioValue;
+							}
+							else if (defaultAspectRatioValue is System.Text.Json.JsonElement element)
+							{
+								maxAspectRatio = element.GetDouble();
+							}
+						}
+
+						if (aspectRatio > maxAspectRatio)
+						{
+							defaultWidth = defaultHeight * maxAspectRatio;
+						}
+						else if (aspectRatio < 1 / maxAspectRatio)
+						{
+							defaultWidth = defaultHeight / maxAspectRatio;
+						}
+
+						CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "68e25ec6-5911-4741-8547-317597e1b792");
+
+						updater = stateData.SetCoordinatesModule(module);
+						updater(new Dictionary<string, object>() { { "Width:", defaultWidth }, { "Height:", defaultHeight }, { "Rotation:", 0.0 }, { "Apply", true } });
+
+						window.AutoFit();
+					});
+				}
+				else
+				{
+					while (stateData.PlottingModules().Count > 0)
+					{
+						stateData.RemovePlottingModule(0);
+					}
+					stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
+
+					stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
+
+					Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
+					updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(new FontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
+
+					double defaultHeight = stateData.TransformedTree.GetLeaves().Count * 14;
+
+					double totalLength = stateData.TransformedTree.LongestDownstreamLength();
+					double defaultWidth = 20 * totalLength / (from el in stateData.TransformedTree.GetChildrenRecursiveLazy() where el.Length > 0 select el.Length).MinOrDefault(0);
+
+					if (double.IsNaN(defaultWidth))
+					{
+						defaultWidth = defaultHeight;
+					}
+
+					double aspectRatio = defaultWidth / defaultHeight;
+					
+					double maxAspectRatio = 4.0 / 3;
+
+					if (TreeViewer.GlobalSettings.Settings.AdditionalSettings.TryGetValue("Maximum default aspect ratio:", out object defaultAspectRatioValue))
+					{
+						if (defaultAspectRatioValue is double aspectRatioValue)
+						{
+							maxAspectRatio = aspectRatioValue;
+						}
+						else if (defaultAspectRatioValue is System.Text.Json.JsonElement element)
+						{
+							maxAspectRatio = element.GetDouble();
+						}
+					}
+
+					if (aspectRatio > maxAspectRatio)
+					{
+						defaultWidth = defaultHeight * maxAspectRatio;
+					}
+					else if (aspectRatio < 1 / maxAspectRatio)
+					{
+						defaultWidth = defaultHeight / maxAspectRatio;
+					}
+
+					CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "68e25ec6-5911-4741-8547-317597e1b792");
+
+					updater = stateData.SetCoordinatesModule(module);
+					updater(new Dictionary<string, object>() { { "Width:", defaultWidth }, { "Height:", defaultHeight }, { "Rotation:", 0.0 }, { "Apply", true } });
+				}
             }
         }
     }

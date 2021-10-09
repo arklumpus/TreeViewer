@@ -15,29 +15,32 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" Width="980" Height="450"
         x:Class="TreeViewer.MarkdownEditorWindow"
         Title="Markdown editor" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Grid Margin="10" Name="MainGrid">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="1*" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <Grid Grid.Row="1" Margin="0, 10, 0, 0">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-      </Grid.ColumnDefinitions>
-      <Button Grid.Column="1" Width="100" Click="OKClicked" HorizontalContentAlignment="Center">OK</Button>
-      <Button Grid.Column="3" Width="100" Click="CancelClicked" HorizontalContentAlignment="Center">Cancel</Button>
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner">
+  <local:ChildWindow.Content>
+    <Grid Margin="0, 0, 0, 10" Name="MainGrid">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="1*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid Grid.Row="1" Margin="0, 0, 0, 0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="1" Width="100" Click="OKClicked" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">OK</Button>
+        <Button Grid.Column="3" Width="100" Click="CancelClicked" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">Cancel</Button>
+      </Grid>
     </Grid>
-  </Grid>
-</Window>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

@@ -25,7 +25,7 @@ using System.Reflection;
 
 namespace TreeViewer
 {
-    public class MessageBox : Window
+    public class MessageBox : ChildWindow
     {
         public MessageBox()
         {
@@ -58,7 +58,6 @@ namespace TreeViewer
             this.InitializeComponent();
 
             this.Title = title;
-            //this.FindControl<TextBlock>("Message").Text = text;
 
             using (StringReader reader = new StringReader(text))
             {
@@ -68,7 +67,6 @@ namespace TreeViewer
 
                 while (line != null)
                 {
-                    //<TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Name="Message">
                     TextBlock message = new TextBlock() { TextWrapping = Avalonia.Media.TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = line };
 
                     if (isFirst)
@@ -114,7 +112,18 @@ namespace TreeViewer
 
         private void MessageBoxOpened(object sender, EventArgs e)
         {
+            if (this.Bounds.Height > 500)
+            {
+                this.SizeToContent = SizeToContent.Manual;
+                this.Height = 500;
+                this.FindControl<ScrollViewer>("MessageScrollViewer").IsVisible = false;
+                Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    this.FindControl<ScrollViewer>("MessageScrollViewer").IsVisible = true;
+                }, Avalonia.Threading.DispatcherPriority.MinValue);
+            }
 
+            this.MaxHeight = 500;
         }
 
         private void InitializeComponent()

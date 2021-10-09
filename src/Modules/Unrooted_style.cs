@@ -32,26 +32,49 @@ namespace UnrootedStyleAction
         public const string Name = "Unrooted tree style";
         public const string HelpText = "Sets the plot actions to display the tree as an unrooted tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "a99eb0c6-a69d-4785-961a-a0c247e9704d";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public static bool IsAvailableInCommandLine { get; } = true;
-        public static string ButtonText { get; } = "Unrooted\nstyle";
-        public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
-        public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.None;
+        public static string ButtonText { get; } = "Unrooted";
+		public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { (Avalonia.Input.Key.None, Avalonia.Input.KeyModifiers.None) };
         public static bool TriggerInTextBox { get; } = false;
 
-        private const string IconBase64 = "iVBORw0KGgoAAAANSUhEUgAAACQAAAAqCAYAAADbCvnoAAAACXBIWXMAAAIqAAACKgG3IjmbAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAB1NJREFUWIXNmHtQ1NcVx7/3t0+WKqIgZlCLYoz4W7QNidHUjFHbEJxOZ5zOWLVqiOyuNklJTDvRpA+pScZM7ETHzDgjUYksAiGZiUyaSlTUTo0GVLQoyMPHKk+X3cUF9vV73NM/UANUYXfH2n5n9o/93XvO/ey55557fssQhsScsrEkSO/7ZXmD49OXg+HYRCshnEmys15gxFfH6oS1A5/PtBX9TrQULnrkQE1f5XVLfc4vwLEpw7ZbBwCi7cBCRrRNDnTHPUwgTZjzSKM1OUzJaa+rXHtj8tNZzQrXVCgBb1XTgdxtAEKPGgj+zgZ3/BMLREFnXKZCP4lAczuqS7NDruuOoXOn/XanwbPkGcKJExQpUFhbdkfy7avVO5igmQLG3vC3N3zovXysdugks6U4yRCKrze3TbVFChMpEJzVJefUYM8JLgcuOv6+NR+AMnB83oayGGJKOSkyd54uOfJfBwIgca5eJ7AgAM/gIWI9vYG9IJruulD+mvPSIUc0QNrITcjNBOE/TpZoLdpKxJZ2Nx63OmvKTwBQowGKNEIglbsZ03wPlJcniFb7DgAbAZLjUueNfz7veFQwUQGByM0EYQwApGQXGMW21M8A2Hpbat+WvZ0lGl3Me11trbWi7cDCaIC0ACBaiyqI8c31+WuqRuRRJQ/ADLPX709WVKGEiIvdDcfXdZz89G8AYsY+sfjLhDlLX9XqTOsBHI8KiId8XNDHlIivlM2q27Wsb1ggKF0AoCjsNJFKzvNfZrtqyo8B8AHo9jRWujyNlQ0AWKQw94DazxT9ceJPcg5BCu4AYLnfxJTsAmOsTrOAOF8OAFyVvB0n9716u/lUFQZXagmA4+4Xs6U4iZhaDUbP1eWvuRkWkPfyP2tHT/zx5tEpT++aadn/Vf2el8oBYMb6ghQt12YR0RKALQJgBKkXCQIPdDbvut186hSG1KKhUiFZGGcm95kD7pFg7gEBUFqO7CyevvyjhdpRiXvMlsLniLEsqJhJoG415Ps25Lm51VNb8Z335vnWtLUFR2MSp4weCQZ5eQJrZValz1V+q/awPxIgAOgJelrto0YlLuNczZJ97pO+trq/dlV9dkGW/bcBeAH0AFCgSK0EIXUk5+b2aT8lRpN8Lf/aCyCse+0eUIZttynIYz5UQ76qhtJcCyTJcwfAN9QZJ8UhaPRTH+yWmGgtns1V+U+kSLVtpwprwoEZBBSgmI9BfLyz+vMcSNKl4YxIlhxMb3pq4LPptuIEHVd/BoYXQUUvAJgAxlyCPiZBtNq/IYG9W797VWVYQKLFvgJAdq/j3CuehsqzIxmpPHRVy4SJoq1wPkjIBCgTpGYQSCI5VCV5nfZex5kq5/mDzRPmvfSjMdOfzdboTUdEq/00gb1X/8mqQw/yzcQc+zQwqgn1dH5+peytDejfpmGV+ou/LDQmTT0GAMTVJsXvPe2/1XjWfaH8bMDT5sb3+RYEEAvgsaQ5y+fEpz2frdHHLmag7EufrLHfN0JE0iquqE2th7dvCQcGAARDTDcAdF8+urb95P6qO3Y9APoA8CHTfQCu3Koubb9VXfpdgviCSHLvA3NKW78vZzegLwWkEYvWXXGBKQBgSEytAVAfppkfwDVX3eFWDFMutAA6AKkjXBgAEMBVANDpYyMxuytpeN9RSOD928Khht2Th+07GiPlToQ0TBuV/XCKyqFO058DHELUEcqwlcWZbYW5DwVIUhkHAIFTFC1wv4Jq4M+c00bk5Q1iiMqhcAeIBIrqB81YX5ACRXgt0NW8BXu2DCoTUTmUoahA9EmtUYQPuCrduF75Uf7QsWEjlGEriwtS6AyAvSFj944rH+eGAECn6a9D0SS1eV3hU8TZMl973Tr09XVFBHQuf5cv9ZeZBw1jk98xBOOtaTb77y/nrz5ogFEFAHWEHMqw7dZJiJ3BgXQQzWJAOqn0DEhx+Z1Xvr6fTTh9b1Lc1HnmCXNX/kYbO2YpAzumKNJmjVb3rdLXldVY8mYFAJhfLpnEtaqZgWaBaBYYMwNIA6ADECBVblLlYJMS8HYY4ib8ignaHoGEFRf3/PpcpEBAfySTx89dOX9c2qI3BK3hSQACcaVCYFoTMaQDiAfAQfyGKgcbebD3Wsjb6ehrq2t2NxxtgSz7AAQAhEZNefLx5Pm2LRpj7LNgtKkuf/UOgFEkQHdlAvSTZ6zZadcYTLO5Ip1VQ/5mpc91PeC6fvV2Q+XVgKe9B/33VmDAZ+jfNVrAkJK69A/rjOOm5ILhiMw02U35K10Rv6rMtNq3MdDrPTfOb2w5vP3rAYv60d9uDL3th9P4pDkrFiekZ74PQaMnqJkRHVvRav+AAW/2tFzY1PLN9n0A2tHfdvgByAizbx4gn6/t0jVfR/0/fvBYWqIihy5GAFP0rmi1KylL3nobwJgIFx5JAoCJAEzhwVjsW0SrXflh1sZ3AIx9yDCRKd1auEC02uWUFzdu+p/DAEDc5PT4cbN/vhT9x/r/QgyA8VEt9m9cpljTCIHhdAAAAABJRU5ErkJggg==";
+        public static string GroupName { get; } = "Tree style";
 
-        public static Page GetIcon()
+        public static double GroupIndex { get; } = 2;
+
+        public static bool IsLargeButton { get; } = false;
+
+        public static List<(string, Func<double, VectSharp.Page>)> SubItems { get; } = new List<(string, Func<double, VectSharp.Page>)>();
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAACnSURBVDhPYxhwwAilSQZFRUUJQGo+M5Tz39LS8uHx48cvgPiEAEwzEDsygUWADCCeD5XAC5A19/X1HQC7AGjzA6ALDgKZ6/G5BF0zSAxsAAgQMgSbZhDACESgQgcgtR/CwwAomkEAxQAkzYlAhQvAglCAywVwL+DTDAIgL4G8BmSCvHgQ5GWQOCwa8WqGAWyGMBGrGQagahKBGBJOQAP+Q/03MgEDAwClc2sXcLnLmQAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAACiSURBVEhL7ZTRDYAgDETByWQlBmEl3EwpKQS0gBWifvB+eontHbGKmHyOxDoUrfXqigU9PCA1B2KAe7CjVMaYDTWLs7lDLShSLDayoMzhoGmAwgqwQkrmILId1BpLtGYuS+aE3OklvyJi8A7kQaglD+XdV8QxD7RmYsAT80Bt1u+gxxzA3uw/wiqWXvMAEeKRLiDcQcAj8xrZVTHafPIHhDgABgdqAudtU9YAAAAASUVORK5CYII=";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAADLSURBVFhH7ZVbDoUgDETRlV22xELYku7sSk0xguVRLegH56c1sTMTpaoGg7eZsHbFGPNzZYG+e4CzOdA1QGzu0EEAd8MfW22tXbEXgTIHjxkvYhYcECFlDk0cQGMFRELkzIHLGSgNcKjRIg+hRIhajeQWPAnBmc2u4Z0Q3JlsAIAQ5FAMnFrDbnz3Fdwx93BmyQBPzD21GpcAEuaeGq0ggKS5p6R5bEELcwA1gn8M1p09QCtzDxHiYGptXgKewGvmwPlL2N18MPgASm0CWppzwshXFAAAAABJRU5ErkJggg==";
+
+        public static VectSharp.Page GetIcon(double scaling)
         {
-            byte[] bytes = Convert.FromBase64String(IconBase64);
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
 
             IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
 
-            RasterImage icon;
+            VectSharp.RasterImage icon;
 
             try
             {
@@ -66,38 +89,107 @@ namespace UnrootedStyleAction
                 Marshal.FreeHGlobal(imagePtr);
             }
 
-            Page pag = new Page(icon.Width, icon.Height);
-            pag.Graphics.DrawRasterImage(0, 0, icon);
+            VectSharp.Page pag = new VectSharp.Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
 
             return pag;
         }
 
-        public static void PerformAction(MainWindow window, InstanceStateData stateData)
+        public static void PerformAction(int actionIndex, MainWindow window, InstanceStateData stateData)
         {
             if (stateData.Trees != null)
             {
-                while (stateData.PlottingModules().Count > 0)
+                int branches = 0;
+                int labelName = 0;
+                int labelLength = 0;
+                int other = 0;
+
+                List<PlottingModule> plottingModules = stateData.PlottingModules();
+
+                for (int i = 0; i < plottingModules.Count; i++)
                 {
-                    stateData.RemovePlottingModule(0);
+                    if (plottingModules[i].Id == "7c767b07-71be-48b2-8753-b27f3e973570")
+                    {
+                        branches++;
+                    }
+                    else if (plottingModules[i].Id == "ac496677-2650-4d92-8646-0812918bab03")
+                    {
+                        string labelAttribute = (string)stateData.GetPlottingModulesParameters(i)["Attribute:"];
+
+                        if (labelAttribute == "Name")
+                        {
+                            labelName++;
+                        }
+                        else if (labelAttribute == "Length")
+                        {
+                            labelLength++;
+                        }
+                        else
+                        {
+                            other++;
+                        }
+                    }
+                    else
+                    {
+                        other++;
+                    }
                 }
-                Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-                updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 } });
-
-                updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-                updater(new Dictionary<string, object>() { { "Reference:", 1 }, { "Branch reference:", 1 } });
-
-                double defaultHeight = Math.Min(10000, stateData.TransformedTree.GetLeaves().Count * 14);
-
-                CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "95b61284-b870-48b9-b51c-3276f7d89df1");
-
-                updater = stateData.SetCoordinatesModule(module);
-                updater(new Dictionary<string, object>() { { "Width:", defaultHeight }, { "Height:", defaultHeight }, { "Apply", true } });
 
                 if (InstanceStateData.IsUIAvailable)
-                {
-                    window.UpdateCoordinates();
-                    window.AutoFit();
-                }
+				{
+					Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+					{
+						if (branches > 1 || labelName > 1 || labelLength > 1 || other > 0)
+						{
+							MessageBox box = new MessageBox("Question", "It looks like you have made some changes to the plot. Please note that if you use this module, those changes may be lost.\nIf you wish to keep your changes, use the \"Reshape tree\" action instead.\nDo you wish to proceed anyways?", MessageBox.MessageBoxButtonTypes.YesNo);
+
+							await box.ShowDialog2(window);
+
+							if (box.Result == MessageBox.Results.No)
+							{
+								return;
+							}
+						}
+
+						while (stateData.PlottingModules().Count > 0)
+						{
+							stateData.RemovePlottingModule(0);
+						}
+						Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
+						updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 } });
+
+						updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
+						updater(new Dictionary<string, object>() { { "Reference:", 1 }, { "Branch reference:", 1 } });
+
+						double defaultHeight = Math.Min(10000, stateData.TransformedTree.GetLeaves().Count * 14);
+
+						CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "95b61284-b870-48b9-b51c-3276f7d89df1");
+
+						updater = stateData.SetCoordinatesModule(module);
+						updater(new Dictionary<string, object>() { { "Width:", defaultHeight }, { "Height:", defaultHeight }, { "Apply", true } });
+
+						window.AutoFit();
+					});
+				}
+				else
+				{
+					while (stateData.PlottingModules().Count > 0)
+					{
+						stateData.RemovePlottingModule(0);
+					}
+					Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
+					updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 } });
+
+					updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
+					updater(new Dictionary<string, object>() { { "Reference:", 1 }, { "Branch reference:", 1 } });
+
+					double defaultHeight = Math.Min(10000, stateData.TransformedTree.GetLeaves().Count * 14);
+
+					CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "95b61284-b870-48b9-b51c-3276f7d89df1");
+
+					updater = stateData.SetCoordinatesModule(module);
+					updater(new Dictionary<string, object>() { { "Width:", defaultHeight }, { "Height:", defaultHeight }, { "Apply", true } });
+				}
             }
         }
     }

@@ -32,12 +32,16 @@ using VectSharp;
 using VectSharp.Canvas;
 using System.Security.Cryptography;
 using Avalonia.Controls.ApplicationLifetimes;
-using AvaloniaAccordion;
+using Avalonia.VisualTree;
+using Avalonia.Media.Transformation;
 
 namespace TreeViewer
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IWindowWithToolTips
     {
+        public List<Control> ControlsWithToolTips { get; } = new List<Control>();
+
+
         public static readonly Avalonia.StyledProperty<bool> IsTreeOpenedProperty = Avalonia.AvaloniaProperty.Register<MainWindow, bool>(nameof(IsTreeOpenedProperty), false);
         public bool IsTreeOpened
         {
@@ -113,56 +117,68 @@ namespace TreeViewer
         public Dictionary<string, VectSharp.Point> Coordinates = null;
 
         public ComboBox TransformerComboBox;
-        Canvas TransformerAlert;
+        Control TransformerAlert;
         public Dictionary<string, object> TransformerParameters;
         public Action<Dictionary<string, object>> UpdateTransformerParameters;
 
         public ComboBox CoordinatesComboBox;
-        Canvas CoordinatesAlert;
+        Control CoordinatesAlert;
         public Dictionary<string, object> CoordinatesParameters;
         public Action<Dictionary<string, object>> UpdateCoordinatesParameters;
 
         StackPanel PlottingActionsContainer;
         public List<PlottingModule> PlottingActions = new List<PlottingModule>();
 
-        List<Canvas> PlottingAlerts;
+        List<Control> PlottingAlerts;
         public List<Dictionary<string, object>> PlottingParameters;
         public List<Action<Dictionary<string, object>>> UpdatePlottingParameters;
-        //List<TextBlock> PlottingTimings;
 
         StackPanel FurtherTransformationsContainer;
         public List<FurtherTransformationModule> FurtherTransformations = new List<FurtherTransformationModule>();
 
-        List<Canvas> FurtherTransformationsAlerts;
+        List<Control> FurtherTransformationsAlerts;
         public List<Dictionary<string, object>> FurtherTransformationsParameters;
         public List<Action<Dictionary<string, object>>> UpdateFurtherTransformationParameters;
 
         List<Action> SelectionActionActions;
 
         private string WindowGuid = System.Guid.NewGuid().ToString();
-        private string OriginalFileName = null;
+        public string OriginalFileName { get; set; } = null;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public MainWindow(TreeCollection trees, List<(string, Dictionary<string, object>)> moduleSuggestions, string fileName)
+        public MainWindow(TreeCollection trees, List<(string, Dictionary<string, object>)> moduleSuggestions, string fileName, string nameOverride = null)
         {
             InitializeComponent();
 
-            Trees = trees;
-            FileOpened(moduleSuggestions);
-
-            if (!string.IsNullOrEmpty(fileName))
+            this.Opened += (s, e) =>
             {
-                this.Title = "TreeViewer - " + Path.GetFileName(fileName);
-                this.OriginalFileName = fileName;
-            }
+                Trees = trees;
+                FileOpened(moduleSuggestions, fileName);
+
+                if (string.IsNullOrEmpty(nameOverride))
+                {
+                    if (!string.IsNullOrEmpty(fileName))
+                    {
+                        this.Title = "TreeViewer - " + Path.GetFileName(fileName);
+                        this.OriginalFileName = fileName;
+                    }
+                }
+                else
+                {
+                    this.Title = "TreeViewer - " + Path.GetFileName(nameOverride);
+                    this.OriginalFileName = nameOverride;
+                }
+            };
         }
 
         private void WindowClosed(object sender, EventArgs e)
         {
+            RenderingUpdateRequestTerminator.Set();
+
             lock (AutosaveLock)
             {
                 AutosaveTimer?.Stop();
@@ -181,8 +197,10 @@ namespace TreeViewer
             }
         }
 
-        public async Task LoadFile(string fileName, bool deleteAfter)
+        public async Task<Window> LoadFile(string fileName, bool deleteAfter, string nameOverride = null)
         {
+            Window tbr = null;
+
             double maxResult = 0;
             int maxIndex = -1;
 
@@ -217,6 +235,7 @@ namespace TreeViewer
 
                     EventWaitHandle progressWindowHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
                     ProgressWindow progressWin = new ProgressWindow(progressWindowHandle) { ProgressText = "Opening and loading file..." };
+                    SemaphoreSlim progressSemaphore = new SemaphoreSlim(0, 1);
                     Action<double> progressAction = (progress) =>
                     {
                         if (progress >= 0)
@@ -322,38 +341,62 @@ namespace TreeViewer
                             }
                             catch (Exception ex)
                             {
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWin.Close(); });
                                 await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => { await new MessageBox("Error!", "An error has occurred while loading the file!\n" + ex.Message).ShowDialog2(this); return Task.CompletedTask; });
                             }
 
-                            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWin.Close(); });
+                            progressSemaphore.Release();
                         }
                         else
                         {
                             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => { await new MessageBox("Attention!", "The file cannot be loaded by any of the currently installed modules!").ShowDialog2(this); return Task.CompletedTask; });
+                            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWin.Close(); });
                         }
                     });
 
                     thr.Start();
 
-                    await progressWin.ShowDialog2(this);
+                    _ = progressWin.ShowDialog2(this);
+
+                    await progressSemaphore.WaitAsync();
+                    progressSemaphore.Release();
+                    progressSemaphore.Dispose();
 
                     if (coll != null)
                     {
                         if (Trees == null)
                         {
                             Trees = coll;
-                            FileOpened(moduleSuggestions);
+
+                            FileOpened(moduleSuggestions, fileName, progressWin);
+
                             if (!deleteAfter)
                             {
-                                this.Title = "TreeViewer - " + Path.GetFileName(fileName);
-                                this.OriginalFileName = fileName;
+                                if (string.IsNullOrEmpty(nameOverride))
+                                {
+                                    this.Title = "TreeViewer - " + Path.GetFileName(fileName);
+                                    this.OriginalFileName = fileName;
+                                }
+                                else
+                                {
+                                    this.Title = "TreeViewer - " + Path.GetFileName(nameOverride);
+                                    this.OriginalFileName = nameOverride;
+                                }
                             }
+
+                            tbr = this;
                         }
                         else
                         {
-                            MainWindow win = new MainWindow(coll, moduleSuggestions, deleteAfter ? "" : fileName);
+                            progressWin.Close();
+                            MainWindow win = new MainWindow(coll, moduleSuggestions, deleteAfter ? "" : fileName, nameOverride);
                             win.Show();
+                            tbr = win;
                         }
+                    }
+                    else
+                    {
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWin.Close(); });
                     }
                 }
                 catch (Exception ex)
@@ -368,8 +411,14 @@ namespace TreeViewer
 
             if (deleteAfter)
             {
-                File.Delete(fileName);
+                try
+                {
+                    File.Delete(fileName);
+                }
+                catch { }
             }
+
+            return tbr;
         }
 
 
@@ -384,9 +433,107 @@ namespace TreeViewer
         {
             AvaloniaXamlLoader.Load(this);
 
+            bool closing = false;
+
+            this.Closing += async (s, e) =>
+            {
+                if (!closing && IsTreeOpened)
+                {
+                    int totalElements = PlottingActionsContainer.Children.Count + FurtherTransformationsContainer.Children.Count;
+
+                    System.Diagnostics.Debug.WriteLine(totalElements);
+
+                    if (totalElements > 20)
+                    {
+                        e.Cancel = true;
+
+                        if (GlobalSettings.Settings.MainWindows.Count == 1)
+                        {
+                            System.Diagnostics.Process.GetCurrentProcess().Kill();
+                            return;
+                        }
+
+                        SemaphoreSlim semaphore = new SemaphoreSlim(0, 1);
+
+                        ProgressWindow win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Unloading tree plot, please wait..." };
+                        win.Opened += (s2, e2) =>
+                        {
+                            semaphore.Release();
+                        };
+
+                        _ = win.ShowDialog2(this);
+
+                        await semaphore.WaitAsync();
+                        semaphore.Release();
+                        semaphore.Dispose();
+
+                        int removedElements = 0;
+
+                        while (FurtherTransformationsContainer.Children.Count > 0)
+                        {
+                            await Task.Run(async () =>
+                            {
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    FurtherTransformationsContainer.Children.RemoveAt(0);
+                                    removedElements++;
+                                });
+                                await Task.Delay(10);
+                            });
+
+                            win.Progress = (double)removedElements / totalElements;
+                        }
+
+                        while (PlottingActionsContainer.Children.Count > 0)
+                        {
+                            await Task.Run(async () =>
+                            {
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    PlottingActionsContainer.Children.RemoveAt(0);
+                                    removedElements++;
+                                });
+                                await Task.Delay(10);
+                            });
+
+                            win.Progress = (double)removedElements / totalElements;
+                        }
+
+                        win.Close();
+
+
+                        closing = true;
+                        this.Close();
+                    }
+                }
+            };
+
+            SetupPlatform();
+
+            this.FindControl<Grid>("LeftMouseButtonContainerGrid").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.LeftMouseButton")));
+            this.FindControl<Grid>("MouseWheelContainerGrid").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.MouseWheel")));
+
+            this.FindControl<Grid>("SelectionGrid").PropertyChanged += (s, e) =>
+            {
+                if (e.Property == Grid.BoundsProperty)
+                {
+                    double maxWidth = ((Rect)e.NewValue).Width - (GlobalSettings.Settings.InterfaceStyle == GlobalSettings.InterfaceStyles.WindowsStyle ? 30 : 35);
+                    this.FindControl<ScrollViewer>("SelectedNodeScrollViewer").MaxWidth = maxWidth;
+                    this.FindControl<TextBox>("SelectedNodeLeavesBox").MaxWidth = maxWidth;
+                }
+            };
+
+            SelectionCanvas = this.FindControl<Canvas>("SelectionCanvas");
+
+            FullPlotCanvas = new SKMultiLayerRenderCanvas(new List<SKRenderContext>(), new List<SKRenderAction>(), Colour.FromRgba(0, 0, 0, 0), 1, 1);
+            FullSelectionCanvas = new SKMultiLayerRenderCanvas(new List<SKRenderContext>(), new List<SKRenderAction>(), Colour.FromRgba(0, 0, 0, 0), 1, 1);
+
+            SelectionCanvas.Children.Add(FullSelectionCanvas);
+            this.FindControl<Canvas>("PlotCanvas").Children.Add(FullPlotCanvas);
+
             GlobalSettings.Settings.MainWindows.Add(this);
 
-            this.FindControl<Canvas>("PlotBackground").Background = new SolidColorBrush(((Colour)GlobalSettings.Settings.BackgroundColour).ToAvalonia());
+            //this.FindControl<Canvas>("PlotBackground").Background = new SolidColorBrush(((Colour)GlobalSettings.Settings.BackgroundColour).ToAvalonia());
 
             StateData.AddPlottingModule = this.AddPlottingModule;
             StateData.RemovePlottingModule = this.RemovePlottingModule;
@@ -445,12 +592,6 @@ namespace TreeViewer
 
             StateData.SerializeAllModules = this.SerializeAllModules;
 
-            /* if (Modules.MissingModules == null)
-             {
-                 Modules.LoadInstalledModules();
-             }*/
-
-
             if (Modules.MissingModules == null)
             {
                 this.Opened += async (s, e) =>
@@ -475,44 +616,26 @@ namespace TreeViewer
 
             SelectionActionActions = new List<Action>();
 
-            for (int i = 0; i < Modules.SelectionActionModules.Count; i++)
-            {
-                BuildSelectionActionModuleButton(Modules.SelectionActionModules[i], i);
-            }
-
-            for (int i = 0; i < Modules.ActionModules.Count; i++)
-            {
-                BuildActionModuleButton(Modules.ActionModules[i], i);
-            }
-
             BuildAllMenuModules();
-
-            Modules.ModuleLoaded += (s, e) =>
-            {
-                if (e.LoadedModuleMetadata.ModuleType == ModuleTypes.Action)
-                {
-                    BuildActionModuleButton((ActionModule)e.LoadedModule, Modules.ActionModules.Count - 1);
-                }
-                else if (e.LoadedModuleMetadata.ModuleType == ModuleTypes.SelectionAction)
-                {
-                    BuildSelectionActionModuleButton((SelectionActionModule)e.LoadedModule, Modules.SelectionActionModules.Count - 1);
-                }
-                else if (e.LoadedModuleMetadata.ModuleType == ModuleTypes.MenuAction)
-                {
-                    BuildAllMenuModules();
-                }
-                else if (e.LoadedModuleMetadata.ModuleType == ModuleTypes.Transformer && TransformerComboBox != null)
-                {
-                    ((List<string>)TransformerComboBox.Items).Add(e.LoadedModule.Name);
-                }
-                else if (e.LoadedModuleMetadata.ModuleType == ModuleTypes.Coordinate && CoordinatesComboBox != null)
-                {
-                    ((List<string>)CoordinatesComboBox.Items).Add(e.LoadedModule.Name);
-                }
-            };
 
             this.AutosaveTimer = new Avalonia.Threading.DispatcherTimer(GlobalSettings.Settings.AutosaveInterval, Avalonia.Threading.DispatcherPriority.Background, Autosave);
             this.AutosaveTimer.Start();
+
+            this.PropertyChanged += (s, e) =>
+            {
+                if (WasAutoFitted)
+                {
+                    if (e.Property == Window.BoundsProperty && (((Rect)e.OldValue).Width != ((Rect)e.NewValue).Width || ((Rect)e.OldValue).Height != ((Rect)e.NewValue).Height))
+                    {
+                        AutoFit();
+                    }
+                }
+            };
+
+            this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").PointerWheelChanged += (s, e) =>
+            {
+                WasAutoFitted = false;
+            };
         }
 
         private void BuildAllMenuModules()
@@ -520,7 +643,6 @@ namespace TreeViewer
             List<(string, List<(string, List<MenuActionModule>)>)> menuItems = new List<(string, List<(string, List<MenuActionModule>)>)>();
 
             menuItems.Add(("File", new List<(string, List<MenuActionModule>)>()));
-            menuItems.Add(("Edit", new List<(string, List<MenuActionModule>)>()));
 
             for (int i = 0; i < Modules.MenuActionModules.Count; i++)
             {
@@ -543,7 +665,7 @@ namespace TreeViewer
                     menuItems.Add((parentMenu, subMenu));
                 }
 
-                string groupId = Modules.MenuActionModules[i].GroupId;
+                string groupId = Modules.MenuActionModules[i].GroupName;
 
                 List<MenuActionModule> subSubMenu = null;
 
@@ -589,34 +711,100 @@ namespace TreeViewer
 
                 if (menuItems[i].Item1 == "File")
                 {
-                    NativeMenuItem autosavesItem = new NativeMenuItem("Autosaves...");
-                    autosavesItem.Command = new SimpleCommand((win) => true, async (win) => { AutosaveWindow window = new AutosaveWindow(this); await window.ShowDialog((MainWindow)win); }, this, null);
-                    autosavesItem.CommandParameter = this;
-                    autosavesItem.Gesture = new KeyGesture(Key.A, Modules.ControlModifier | KeyModifiers.Shift);
+                    {
+                        NativeMenuItem homeItem = new NativeMenuItem("Home");
+                        homeItem.Command = new SimpleCommand((win) => true, (win) => { this.RibbonBar.SelectedIndex = 0; this.RibbonFilePage.SelectedIndex = 0; }, this, null);
+                        homeItem.CommandParameter = this;
+                        homeItem.Gesture = new KeyGesture(Key.H, Modules.ControlModifier | KeyModifiers.Shift);
+                        subMenu.Menu.Items.Add(homeItem);
 
-                    subMenu.Menu.Items.Add(autosavesItem);
+                        NativeMenuItem autosavesItem = new NativeMenuItem("Autosaves") { Menu = new NativeMenu() };
 
-                    subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
+                        NativeMenuItem autosavedTrees = new NativeMenuItem("Autosaved trees");
+                        autosavedTrees.Command = new SimpleCommand((win) => true, (win) =>
+                        {
+                            this.RibbonBar.SelectedIndex = 0;
+                            AutosavesPage page = this.GetFilePage<AutosavesPage>(out int ind);
+                            this.RibbonFilePage.SelectedIndex = ind;
+                            ((RibbonFilePageContentTabbedWithButtons)page.PageContent).SelectedIndex = 0;
+                        }, this, null);
+                        autosavedTrees.CommandParameter = this;
+                        autosavedTrees.Gesture = new KeyGesture(Key.A, Modules.ControlModifier | KeyModifiers.Shift);
+                        autosavesItem.Menu.Items.Add(autosavedTrees);
+
+                        NativeMenuItem autosavedCode = new NativeMenuItem("Autosaved code");
+                        autosavedCode.Command = new SimpleCommand((win) => true, (win) =>
+                        {
+                            this.RibbonBar.SelectedIndex = 0;
+                            AutosavesPage page = this.GetFilePage<AutosavesPage>(out int ind);
+                            this.RibbonFilePage.SelectedIndex = ind;
+                            ((RibbonFilePageContentTabbedWithButtons)page.PageContent).SelectedIndex = 1;
+
+                        }, this, null);
+                        autosavedCode.CommandParameter = this;
+                        autosavesItem.Menu.Items.Add(autosavedCode);
+
+                        subMenu.Menu.Items.Add(autosavesItem);
+
+                        subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
+                    }
                 }
-
-                List<Func<MainWindow, bool>> enabledActions = new List<Func<MainWindow, bool>>();
 
                 for (int j = 0; j < menuItems[i].Item2.Count; j++)
                 {
                     for (int k = 0; k < menuItems[i].Item2[j].Item2.Count; k++)
                     {
                         NativeMenuItem item = new NativeMenuItem(menuItems[i].Item2[j].Item2[k].ItemText);
-                        Func<MainWindow, Task> clickAction = menuItems[i].Item2[j].Item2[k].PerformAction;
 
-                        item.Gesture = new KeyGesture(menuItems[i].Item2[j].Item2[k].ShortcutKey, Modules.GetModifier(menuItems[i].Item2[j].Item2[k].ShortcutModifier));
+                        if (menuItems[i].Item2[j].Item2[k].SubItems.Count == 0)
+                        {
+                            Func<MainWindow, Task> clickAction;
+                            Func<int, MainWindow, Task> performAction = menuItems[i].Item2[j].Item2[k].PerformAction;
 
-                        Func<MainWindow, bool> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
-                        enabledActions.Add(menuItems[i].Item2[j].Item2[k].IsEnabled);
-                        item.Command = new SimpleCommand((win) => isEnabled((MainWindow)win), async (win) => { await clickAction((MainWindow)win); }, this, menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled);
+                            clickAction = a => performAction(0, a);
 
-                        item.CommandParameter = this;
+                            if (menuItems[i].Item2[j].Item2[k].ShortcutKeys[0].Item1 != Key.None)
+                            {
+                                item.Gesture = new KeyGesture(menuItems[i].Item2[j].Item2[k].ShortcutKeys[0].Item1, Modules.GetModifier(menuItems[i].Item2[j].Item2[k].ShortcutKeys[0].Item2));
+                            }
+
+                            Func<MainWindow, List<bool>> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
+                            item.Command = new SimpleCommand((win) => isEnabled((MainWindow)win)[0], async (win) => { await clickAction((MainWindow)win); }, this, menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled);
+
+                            item.CommandParameter = this;
+                        }
+                        else
+                        {
+                            item.Menu = new NativeMenu();
+
+                            for (int l = 0; l < menuItems[i].Item2[j].Item2[k].SubItems.Count; l++)
+                            {
+                                NativeMenuItem subItem = new NativeMenuItem(menuItems[i].Item2[j].Item2[k].SubItems[l].Item1);
+
+                                if (!string.IsNullOrEmpty(menuItems[i].Item2[j].Item2[k].SubItems[l].Item1))
+                                {
+                                    int lIndex = l;
+
+                                    Func<MainWindow, Task> clickAction;
+                                    Func<int, MainWindow, Task> performAction = menuItems[i].Item2[j].Item2[k].PerformAction;
+
+                                    clickAction = a => performAction(lIndex - 1, a);
+
+                                    if (menuItems[i].Item2[j].Item2[k].ShortcutKeys[l].Item1 != Key.None)
+                                    {
+                                        subItem.Gesture = new KeyGesture(menuItems[i].Item2[j].Item2[k].ShortcutKeys[l].Item1, Modules.GetModifier(menuItems[i].Item2[j].Item2[k].ShortcutKeys[l].Item2));
+                                    }
+
+                                    Func<MainWindow, List<bool>> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
+                                    subItem.Command = new SimpleCommand((win) => isEnabled((MainWindow)win)[lIndex], async (win) => { await clickAction((MainWindow)win); }, this, menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled);
+
+                                    subItem.CommandParameter = this;
+                                    item.Menu.Items.Add(subItem);
+                                }
+                            }
+                        }
+
                         subMenu.Menu.Items.Add(item);
-
                     }
                     if (j < menuItems[i].Item2.Count - 1)
                     {
@@ -628,7 +816,7 @@ namespace TreeViewer
                 {
                     subMenu.Menu.Items.Add(new NativeMenuItemSeparator());
 
-                    NativeMenuItem exitItem = new NativeMenuItem("Exit");
+                    NativeMenuItem exitItem = new NativeMenuItem("Close");
                     exitItem.Command = new SimpleCommand((win) => true, (win) => { this.Close(); }, this, null);
                     exitItem.CommandParameter = this;
 
@@ -671,9 +859,11 @@ namespace TreeViewer
                     }
 
                     NativeMenuItem preferencesItem = new NativeMenuItem("Preferences...");
-                    preferencesItem.Command = new SimpleCommand((win) => true, async (win) =>
+                    preferencesItem.Command = new SimpleCommand((win) => true, (win) =>
                     {
-                        await GlobalSettings.Settings.ShowGlobalSettingsWindow((MainWindow)win);
+                        this.RibbonBar.SelectedIndex = 0;
+                        this.GetFilePage<PreferencesPage>(out int ind);
+                        this.RibbonFilePage.SelectedIndex = ind;
                     }, this, null);
                     preferencesItem.CommandParameter = this;
                     preferencesItem.Gesture = new KeyGesture(Key.R, Modules.ControlModifier);
@@ -695,7 +885,7 @@ namespace TreeViewer
                     creatorItem.Command = new SimpleCommand((win) => true, async (win) =>
                     {
                         MessageBox box = new MessageBox("Attention", "The program will now be rebooted to open the module creator (we will do our best to recover the files that are currently open). Do you wish to proceed?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
-                        await box.ShowDialog((MainWindow)win);
+                        await box.ShowDialog2((MainWindow)win);
 
                         if (box.Result == MessageBox.Results.Yes)
                         {
@@ -714,83 +904,6 @@ namespace TreeViewer
 
             NativeMenu.SetMenu(this, menu);
         }
-
-        private void BuildSelectionActionModuleButton(SelectionActionModule module, int i)
-        {
-            Grid content = new Grid();
-
-            content.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
-            content.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            content.Children.Add(new Viewbox() { Child = module.GetIcon().PaintToCanvas(), Height = 42 });
-            TextBlock blk = new TextBlock() { Text = module.ButtonText, Margin = new Thickness(0, 5, 0, 5), TextAlignment = TextAlignment.Center, FontSize = 13.5 };
-            Grid.SetRow(blk, 1);
-            content.Children.Add(blk);
-
-            CoolButton btn = new CoolButton() { ButtonContent = content, Width = 105, Height = 120, CornerRadius = new CornerRadius(5), Margin = new Thickness(-7, -10, -7, 0), Padding = new Thickness(12) };
-
-            ToolTip.SetTip(btn, module.HelpText);
-
-            int row = i / 3;
-            int column = i % 3;
-
-            Grid.SetRow(btn, row);
-            Grid.SetColumn(btn, column);
-
-            int index = i;
-
-            SelectionActionActions.Add(() => { });
-
-            btn.Click += (s, e) =>
-            {
-                SelectionActionActions[index]();
-            };
-
-            while (this.FindControl<Grid>("SelectionActionsContainerGrid").RowDefinitions.Count < row + 1)
-            {
-                this.FindControl<Grid>("SelectionActionsContainerGrid").RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            }
-
-            this.FindControl<Grid>("SelectionActionsContainerGrid").Children.Add(btn);
-        }
-
-        private void BuildActionModuleButton(ActionModule module, int i)
-        {
-            if (Modules.ActionModules[i].ButtonText != null)
-            {
-                Grid content = new Grid();
-
-                content.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
-                content.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-
-                content.Children.Add(new Viewbox() { Child = module.GetIcon().PaintToCanvas(), Height = 42 });
-                TextBlock blk = new TextBlock() { Text = module.ButtonText, Margin = new Thickness(0, 5, 0, 5), TextAlignment = TextAlignment.Center, FontSize = 13.5 };
-                Grid.SetRow(blk, 1);
-                content.Children.Add(blk);
-
-                //Button btn = new Button() { Content = content, Padding = new Thickness(5), Width = 80, Height = 100, Margin = new Thickness(5) };
-
-                CoolButton btn = new CoolButton() { ButtonContent = content, Width = 105, Height = 120, CornerRadius = new CornerRadius(5), Margin = new Thickness(-7, -10, -7, 0) };
-
-                ToolTip.SetTip(btn, module.HelpText);
-
-                int index = i;
-
-                btn.Click += async (s, e) =>
-                {
-                    try
-                    {
-                        Modules.ActionModules[index].PerformAction(this, this.StateData);
-                    }
-                    catch (Exception ex)
-                    {
-                        await new MessageBox("Attention!", "An error occurred while performing the action!\n" + ex.Message).ShowDialog2(this);
-                    }
-                };
-
-                this.FindControl<StackPanel>("ActionsContainerGrid").Children.Add(btn);
-            }
-        }
-
         public static void UpdateAttachmentLinks(Dictionary<string, object> parameters, InstanceStateData stateData)
         {
             foreach (KeyValuePair<string, object> parameter in parameters)
@@ -811,7 +924,7 @@ namespace TreeViewer
             }
         }
 
-        public async void FileOpened(List<(string, Dictionary<string, object>)> suggestedModules)
+        public async void FileOpened(List<(string, Dictionary<string, object>)> suggestedModules, string path, ProgressWindow window = null)
         {
             if (GlobalSettings.Settings.DrawTreeWhenOpened && suggestedModules.Count == 2)
             {
@@ -831,8 +944,6 @@ namespace TreeViewer
                     suggestedModules.Add(("1f3e0b88-c42d-417c-ba14-ba228be086a7", new Dictionary<string, object>()));
                 }
             }
-
-            this.FindControl<AddRemoveButton>("AddAttachmentButton").IsVisible = true;
 
             AttributeSelectors = new List<ComboBox>();
             AttachmentSelectors = new List<ComboBox>();
@@ -857,14 +968,37 @@ namespace TreeViewer
             BuildTransformerPanel(suggestedModules[0].Item1);
             UpdateTransformerParameters(suggestedModules[0].Item2);
 
-            await UpdateOnlyTransformedTree();
+            if (window == null)
+            {
+                window = new ProgressWindow
+                {
 
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(new Canvas() { Background = new SolidColorBrush(Color.FromRgb(180, 180, 180)), Height = 1, Margin = new Thickness(0, 5, 0, 5) });
+                };
+
+                _ = window.ShowDialog2(this);
+            }
+
+            await UpdateOnlyTransformedTree(window);
 
             BuildFurtherTransformationPanel();
 
-            ProgressWindow window = new ProgressWindow() { ProgressText = "Loading further transformations..." };
-            _ = window.ShowDialog(this);
+            if (window == null)
+            {
+                window = new ProgressWindow
+                {
+                    ProgressText = "Loading further transformations...",
+                    IsIndeterminate = false,
+                    Progress = 0
+                };
+
+                _ = window.ShowDialog2(this);
+            }
+            else
+            {
+                window.ProgressText = "Loading further transformations...";
+                window.IsIndeterminate = false;
+                window.Progress = 0;
+            }
 
             SemaphoreSlim semaphore2 = new SemaphoreSlim(0, 1);
 
@@ -872,23 +1006,48 @@ namespace TreeViewer
             {
                 await UpdateOnlyFurtherTransformations(0, window);
 
+                List<(FurtherTransformationModule, Dictionary<string, object>)> furtherTransformations = new List<(FurtherTransformationModule, Dictionary<string, object>)>();
+
                 for (int i = 0; i < suggestedModules.Count; i++)
                 {
                     FurtherTransformationModule mod = Modules.GetModule(Modules.FurtherTransformationModules, suggestedModules[i].Item1);
                     if (mod != null)
                     {
-                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                        {
-                            try
-                            {
-                                Action<Dictionary<string, object>> updater = AddFurtherTransformation(mod);
-                                updater(suggestedModules[i].Item2);
-                            }
-                            catch { }
-                        });
-
-                        await UpdateOnlyFurtherTransformations(FurtherTransformations.Count - 1, window);
+                        furtherTransformations.Add((mod, suggestedModules[i].Item2));
                     }
+                }
+
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    window.Steps = furtherTransformations.Count;
+                });
+
+                for (int i = 0; i < furtherTransformations.Count; i++)
+                {
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        window.LabelText = furtherTransformations[i].Item1.Name;
+
+                        try
+                        {
+                            Action<Dictionary<string, object>> updater = AddFurtherTransformation(furtherTransformations[i].Item1);
+                            updater(furtherTransformations[i].Item2);
+                        }
+                        catch { }
+                    });
+
+                    await UpdateOnlyFurtherTransformations(FurtherTransformations.Count - 1, window, (prog) =>
+                    {
+                        _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            window.Progress = (double)(i + prog) / furtherTransformations.Count;
+                        });
+                    });
+
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        window.Progress = (double)(i + 1) / furtherTransformations.Count;
+                    });
                 }
 
                 semaphore2.Release();
@@ -897,21 +1056,13 @@ namespace TreeViewer
 
             await semaphore2.WaitAsync();
             semaphore2.Release();
-
-            window.Close();
-
-
-            //UpdateOnlyFurtherTransformations();
-
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(new Canvas() { Background = new SolidColorBrush(Color.FromRgb(180, 180, 180)), Height = 1, Margin = new Thickness(0, 5, 0, 5) });
+            semaphore2.Dispose();
 
             List<string> coordinateModules = (from el in Modules.CoordinateModules select el.Name).ToList();
             BuildCoordinatesPanel(suggestedModules[1].Item1);
             UpdateCoordinatesParameters(suggestedModules[1].Item2);
 
             UpdateOnlyCoordinates();
-
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(new Canvas() { Background = new SolidColorBrush(Color.FromRgb(180, 180, 180)), Height = 1, Margin = new Thickness(0, 5, 0, 5) });
 
             for (int i = 0; i < suggestedModules.Count; i++)
             {
@@ -923,6 +1074,8 @@ namespace TreeViewer
 
             BuildPlottingPanel(GraphBackground);
 
+            List<(PlottingModule, Dictionary<string, object>)> plotActionModules = new List<(PlottingModule, Dictionary<string, object>)>();
+
             for (int i = 0; i < suggestedModules.Count; i++)
             {
                 if (suggestedModules[i].Item1 != "@Background" && suggestedModules[i].Item1 != "@Attachment")
@@ -930,26 +1083,95 @@ namespace TreeViewer
                     PlottingModule mod = Modules.GetModule(Modules.PlottingModules, suggestedModules[i].Item1);
                     if (mod != null)
                     {
-                        try
-                        {
-                            Action<Dictionary<string, object>> updater = AddPlottingModule(mod);
-                            updater(suggestedModules[i].Item2);
-                        }
-                        catch { }
+                        plotActionModules.Add((mod, suggestedModules[i].Item2));
                     }
                 }
             }
+
+            window.ProgressText = "Loading plot actions...";
+            window.IsIndeterminate = false;
+            window.Progress = 0;
+            window.LabelText = " ";
+            window.Steps = plotActionModules.Count;
+
+            for (int i = 0; i < plotActionModules.Count; i++)
+            {
+                window.LabelText = plotActionModules[i].Item1.Name;
+
+                await Task.Run(async () =>
+                {
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        try
+                        {
+                            Action<Dictionary<string, object>> updater = AddPlottingModule(plotActionModules[i].Item1);
+                            updater(plotActionModules[i].Item2);
+                        }
+                        catch { }
+                    });
+                    await Task.Delay(10);
+                });
+
+                window.Progress = (double)(i + 1) / plotActionModules.Count;
+            }
+
+            window.Close();
 
             foreach ((string, Dictionary<string, object>) item in suggestedModules.Skip(2))
             {
                 try
                 {
-                    Modules.GetModule(Modules.ActionModules, item.Item1)?.PerformAction(this, this.StateData);
+                    Modules.GetModule(Modules.ActionModules, item.Item1)?.PerformAction(0, this, this.StateData);
                 }
                 catch { }
             }
 
-            UpdateAllPlotLayers();
+            Avalonia.Media.Transformation.TransformOperations.Builder builder = new Avalonia.Media.Transformation.TransformOperations.Builder(1);
+            builder.AppendTranslate(-16, 0);
+            Avalonia.Media.Transformation.TransformOperations offScreen = builder.Build();
+
+            for (int i = 0; i < RibbonTabs.Length; i++)
+            {
+                if (RibbonTabs[i] != null)
+                {
+                    if (i != RibbonBar.SelectedIndex)
+                    {
+                        RibbonTabs[i].ZIndex = 0;
+                        RibbonTabs[i].RenderTransform = offScreen;
+                        RibbonTabs[i].Opacity = 0;
+                        RibbonTabs[i].IsHitTestVisible = false;
+                    }
+                    else
+                    {
+                        RibbonTabs[i].ZIndex = 1;
+                        RibbonTabs[i].RenderTransform = Avalonia.Media.Transformation.TransformOperations.Identity;
+                        RibbonTabs[i].Opacity = 1;
+                        RibbonTabs[i].IsHitTestVisible = true;
+                    }
+                }
+            }
+
+            foreach (List<RibbonButton> l in RibbonActionPanel.RibbonButtons)
+            {
+                foreach (RibbonButton b in l)
+                {
+                    b.IsEnabled = true;
+                }
+            }
+
+            RibbonFilePage.Close();
+
+            await UpdateAllPlotLayers();
+
+            _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Avalonia.Media.Imaging.RenderTargetBitmap bmp = FullPlotCanvas.RenderAtResolution(184, 184, new SkiaSharp.SKColor((byte)(this.StateData.GraphBackgroundColour.R * 255), (byte)(this.StateData.GraphBackgroundColour.G * 255), (byte)(this.StateData.GraphBackgroundColour.B * 255), (byte)(this.StateData.GraphBackgroundColour.A * 255)));
+
+                RecentFile.Create(path, ref bmp).Save();
+                AutoFit();
+
+                StartPlotUpdaterThread();
+            }, Avalonia.Threading.DispatcherPriority.MinValue);
         }
 
         private void UpdateControls(Dictionary<string, ControlStatus> controlStatus, Dictionary<string, Control> controls)
@@ -970,6 +1192,18 @@ namespace TreeViewer
                         controls[kvp.Key].IsVisible = false;
                         controls[kvp.Key].IsEnabled = false;
                         break;
+                }
+            }
+
+            foreach (KeyValuePair<string, Control> kvp in controls)
+            {
+                if (kvp.Value != null)
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        kvp.Value.FindAncestorOfType<Accordion>()?.InvalidateHeight();
+                    }, Avalonia.Threading.DispatcherPriority.MinValue);
+                    break;
                 }
             }
         }
@@ -1093,7 +1327,19 @@ namespace TreeViewer
                 else if (kvp.Value is VectSharp.Font valueFont)
                 {
                     parameter[1] = "font";
-                    parameter[2] = System.Text.Json.JsonSerializer.Serialize(new string[] { System.Text.Json.JsonSerializer.Serialize(valueFont.FontFamily.FileName), System.Text.Json.JsonSerializer.Serialize(valueFont.FontSize) }, Modules.DefaultSerializationOptions);
+
+                    if (valueFont.FontFamily is AttachmentFontFamily aff)
+                    {
+                        parameter[2] = System.Text.Json.JsonSerializer.Serialize(new string[] { System.Text.Json.JsonSerializer.Serialize("attachment://" + aff.AttachmentName), System.Text.Json.JsonSerializer.Serialize(valueFont.FontSize) }, Modules.DefaultSerializationOptions);
+                    }
+                    else if (valueFont.FontFamily is WebFontFamily wff)
+                    {
+                        parameter[2] = System.Text.Json.JsonSerializer.Serialize(new string[] { System.Text.Json.JsonSerializer.Serialize("webfont://" + wff.FamilyName + "[" + wff.Style + "]"), System.Text.Json.JsonSerializer.Serialize(valueFont.FontSize) }, Modules.DefaultSerializationOptions);
+                    }
+                    else
+                    {
+                        parameter[2] = System.Text.Json.JsonSerializer.Serialize(new string[] { System.Text.Json.JsonSerializer.Serialize(valueFont.FontFamily.FileName), System.Text.Json.JsonSerializer.Serialize(valueFont.FontSize) }, Modules.DefaultSerializationOptions);
+                    }
                 }
                 else if (kvp.Value is VectSharp.Point valuePoint)
                 {
@@ -1200,1663 +1446,19 @@ namespace TreeViewer
             return System.Text.Json.JsonSerializer.Serialize(allObjects, Modules.DefaultSerializationOptions);
         }
 
-
-
-        private Dictionary<string, object> UpdateParameterPanel(Accordion parent, GenericParameterChangeDelegate parameterChangeDelegate, List<(string, string)> parameters, Action updateAction, out Action<Dictionary<string, object>> UpdateParameterAction)
-        {
-            StackPanel controlsPanel = new StackPanel();
-            Dictionary<string, object> tbr = new Dictionary<string, object>();
-
-            if (parameters.Count > 1)
-            {
-                Stack<Controls> parents = new Stack<Controls>();
-                parents.Push(controlsPanel.Children);
-
-                Stack<int> childrenTillPop = new Stack<int>();
-                childrenTillPop.Push(-1);
-
-                Dictionary<string, Control> parameterControls = new Dictionary<string, Control>();
-                Dictionary<string, Action<object>> parameterUpdaters = new Dictionary<string, Action<object>>();
-
-                bool programmaticUpdate = false;
-
-                for (int i = 0; i < parameters.Count; i++)
-                {
-                    string controlType = parameters[i].Item2.Substring(0, parameters[i].Item2.IndexOf(":"));
-                    string controlParameters = parameters[i].Item2.Substring(parameters[i].Item2.IndexOf(":") + 1);
-
-                    if (controlType == "Id")
-                    {
-                        string parameterName = parameters[i].Item1;
-                        tbr.Add(parameterName, controlParameters);
-                        parameterUpdaters.Add(parameterName, (value) =>
-                        {
-                            tbr[parameterName] = value;
-                        });
-                    }
-                    else if (controlType == "TreeCollection")
-                    {
-                        string parameterName = parameters[i].Item1;
-                        tbr.Add(parameterName, this.Trees);
-                    }
-                    else if (controlType == "Window")
-                    {
-                        string parameterName = parameters[i].Item1;
-                        tbr.Add(parameterName, this);
-                    }
-                    else if (controlType == "InstanceStateData")
-                    {
-                        string parameterName = parameters[i].Item1;
-                        tbr.Add(parameterName, this.StateData);
-                    }
-                    else if (controlType == "Group")
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        int numChildren = int.Parse(controlParameters);
-                        Border brd = new Border() { CornerRadius = new CornerRadius(10), Margin = new Thickness(0, 12, 0, 5), Padding = new Thickness(10, 0, 10, 0), BorderBrush = new SolidColorBrush(Color.FromRgb(200, 200, 200)), BorderThickness = new Thickness(1) };
-                        StackPanel pnl = new StackPanel();
-                        brd.Child = pnl;
-
-                        Border header = new Border() { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left, Margin = new Thickness(-5, -12, 0, 5), Background = Brushes.White, Padding = new Thickness(5, 0, 5, 0) };
-                        header.Child = new TextBlock() { Text = parameterName };
-                        pnl.Children.Add(header);
-
-                        parents.Peek().Add(brd);
-
-                        parameterControls.Add(parameterName, brd);
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-
-                        parents.Push(pnl.Children);
-                        childrenTillPop.Push(numChildren);
-                    }
-                    else if (controlType == "Expander")
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        int numChildren = int.Parse(controlParameters);
-
-                        Expander exp = new Expander() { Margin = new Thickness(0, 12, 0, 5) };
-                        exp.Label = new TextBlock() { Text = parameterName };
-                        StackPanel pnl = new StackPanel();
-                        exp.Child = pnl;
-
-                        parents.Peek().Add(exp);
-
-                        parameterControls.Add(parameterName, exp);
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-
-                        parents.Push(pnl.Children);
-                        childrenTillPop.Push(numChildren);
-                    }
-                    else if (controlType == "Button")
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        Button control = new Button() { Content = parameterName, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Thickness(10, 5, 10, 5), Margin = new Thickness(0, 5, 0, 5) };
-
-                        parameterControls.Add(parameterName, control);
-
-                        parents.Peek().Add(control);
-
-                        tbr.Add(parameterName, false);
-
-                        parameterUpdaters.Add(parameterName, (value) =>
-                        {
-                            tbr[parameterName] = value;
-                        });
-
-                        control.Click += (s, e) =>
-                        {
-                            Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                            tbr[parameterName] = true;
-
-                            bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                            UpdateControls(controlStatus, parameterControls);
-                            UpdateParameters(parametersToChange, parameterUpdaters);
-
-                            if (needsUpdate)
-                            {
-                                updateAction();
-                            }
-                        };
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-                    }
-                    else if (controlType == "Buttons")
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        string[] buttons = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                        Grid control = new Grid() { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
-
-                        for (int j = 0; j < buttons.Length; j++)
-                        {
-                            Button butt = new Button() { Content = buttons[j], HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Thickness(5, 5, 5, 5), Margin = new Thickness(2.5, 5, 2.5, 5) };
-
-                            control.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-
-                            Grid.SetColumn(butt, j);
-
-                            control.Children.Add(butt);
-
-                            int index = j;
-
-                            butt.Click += (s, e) =>
-                            {
-                                Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                tbr[parameterName] = index;
-
-                                bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                UpdateControls(controlStatus, parameterControls);
-                                UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                if (needsUpdate)
-                                {
-                                    updateAction();
-                                }
-                            };
-                        }
-
-                        parameterControls.Add(parameterName, control);
-                        parents.Peek().Add(control);
-                        tbr.Add(parameterName, -1);
-
-                        parameterUpdaters.Add(parameterName, (value) =>
-                        {
-                            tbr[parameterName] = value;
-                        });
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-                    }
-                    else if (controlType == "CheckBox")
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        CheckBox control = new CheckBox() { Content = parameterName, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Thickness(10, 0, 10, 0), Margin = new Thickness(0, 5, 0, 5), IsChecked = Convert.ToBoolean(controlParameters) };
-
-                        parameterControls.Add(parameterName, control);
-
-                        parents.Peek().Add(control);
-
-                        tbr.Add(parameterName, control.IsChecked == true);
-
-                        parameterUpdaters.Add(parameterName, (value) =>
-                        {
-                            tbr[parameterName] = value;
-                            control.IsChecked = (bool)value;
-                        });
-
-                        control.Click += (s, e) =>
-                        {
-                            Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                            tbr[parameterName] = control.IsChecked == true;
-
-                            bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                            UpdateControls(controlStatus, parameterControls);
-                            UpdateParameters(parametersToChange, parameterUpdaters);
-
-                            if (needsUpdate)
-                            {
-                                updateAction();
-                            }
-                        };
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-                    }
-                    else if (controlType == "Formatter")
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        Button control = new Button() { Content = parameterName, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Padding = new Thickness(10, 5, 10, 5), Margin = new Thickness(0, 5, 0, 5) };
-
-                        parameterControls.Add(parameterName, control);
-
-                        parents.Peek().Add(control);
-
-                        string[] parsedParameters = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                        object[] formatterParams = new object[parsedParameters.Length - 1];
-
-                        string attrType = (string)tbr[parsedParameters[0]];
-
-                        if (attrType == "String")
-                        {
-                            formatterParams[0] = parsedParameters[1];
-                            formatterParams[1] = Convert.ToBoolean(parsedParameters[2]);
-                        }
-                        else if (attrType == "Number")
-                        {
-                            formatterParams[0] = int.Parse(parsedParameters[1], System.Globalization.CultureInfo.InvariantCulture);
-                            formatterParams[1] = double.Parse(parsedParameters[2], System.Globalization.CultureInfo.InvariantCulture);
-                            formatterParams[2] = double.Parse(parsedParameters[3], System.Globalization.CultureInfo.InvariantCulture);
-                            formatterParams[3] = double.Parse(parsedParameters[4], System.Globalization.CultureInfo.InvariantCulture);
-                            formatterParams[4] = Convert.ToBoolean(parsedParameters[5]);
-                            formatterParams[5] = Convert.ToBoolean(parsedParameters[6]);
-                            formatterParams[6] = parsedParameters[7];
-                            formatterParams[7] = Convert.ToBoolean(parsedParameters[8]);
-                        }
-
-                        tbr.Add(parameterName, new FormatterOptions(parsedParameters[parsedParameters.Length - 2]) { Parameters = formatterParams });
-
-                        parameterUpdaters.Add(parameterName, (value) =>
-                        {
-                            tbr[parameterName] = value;
-                        });
-
-                        control.Click += async (s, e) =>
-                        {
-                            string attributeType = (string)tbr[parsedParameters[0]];
-
-                            FormatOptionWindow win = new FormatOptionWindow();
-
-                            string editorId = "StringFormatter_" + parameterName.CoerceValidFileName() + "_" + (string)tbr[Modules.ModuleIDKey];
-                            await win.Initialize(attributeType, ((FormatterOptions)tbr[parameterName]).Parameters, this.DebuggerServer, editorId);
-
-                            await win.ShowDialog2(this);
-
-                            if (win.Result)
-                            {
-                                Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                tbr[parameterName] = win.Formatter;
-
-                                bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                UpdateControls(controlStatus, parameterControls);
-                                UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                if (needsUpdate)
-                                {
-                                    updateAction();
-                                }
-                            }
-                        };
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-                    }
-                    else if (controlType == "Label")
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        Grid paramPanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-                        paramPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                        TextBlock labelBlock = new TextBlock() { Text = parameterName, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, TextWrapping = TextWrapping.Wrap };
-                        paramPanel.Children.Add(labelBlock);
-                        parents.Peek().Add(paramPanel);
-
-                        if (controlParameters.StartsWith("["))
-                        {
-                            string[] items = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            if (items.Length > 0)
-                            {
-                                switch (items[0])
-                                {
-                                    case "Left":
-                                        labelBlock.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
-                                        break;
-                                    case "Right":
-                                        labelBlock.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right;
-                                        break;
-                                    case "Center":
-                                        labelBlock.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center;
-                                        break;
-                                }
-                            }
-
-                            if (items.Length > 1)
-                            {
-                                switch (items[1])
-                                {
-                                    case "Normal":
-                                        labelBlock.FontStyle = FontStyle.Normal;
-                                        labelBlock.FontWeight = FontWeight.Normal;
-                                        break;
-                                    case "Bold":
-                                        labelBlock.FontStyle = FontStyle.Normal;
-                                        labelBlock.FontWeight = FontWeight.Bold;
-                                        break;
-                                    case "Italic":
-                                        labelBlock.FontStyle = FontStyle.Italic;
-                                        labelBlock.FontWeight = FontWeight.Normal;
-                                        break;
-                                    case "BoldItalic":
-                                        labelBlock.FontStyle = FontStyle.Italic;
-                                        labelBlock.FontWeight = FontWeight.Bold;
-                                        break;
-                                }
-                            }
-
-                            if (items.Length > 2)
-                            {
-                                labelBlock.Foreground = new SolidColorBrush(Color.Parse(items[2]));
-                            }
-                        }
-
-                        parameterControls.Add(parameterName, paramPanel);
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-                    }
-                    else
-                    {
-                        string parameterName = parameters[i].Item1;
-
-                        Grid paramPanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-                        paramPanel.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                        paramPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                        paramPanel.Children.Add(new TextBlock() { Text = parameterName, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
-                        parents.Peek().Add(paramPanel);
-
-                        parameterControls.Add(parameterName, paramPanel);
-
-                        int popping = childrenTillPop.Pop();
-                        if (popping > 0)
-                        {
-                            popping--;
-                            if (popping == 0)
-                            {
-                                parents.Pop();
-                            }
-                            else
-                            {
-                                childrenTillPop.Push(popping);
-                            }
-                        }
-                        else
-                        {
-                            childrenTillPop.Push(popping);
-                        }
-
-                        if (controlType == "ComboBox")
-                        {
-                            int defaultIndex = int.Parse(controlParameters.Substring(0, controlParameters.IndexOf("[")));
-                            controlParameters = controlParameters.Substring(controlParameters.IndexOf("["));
-
-                            List<string> items = System.Text.Json.JsonSerializer.Deserialize<List<string>>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            ComboBox box = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Items = items, SelectedIndex = defaultIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
-
-                            Grid.SetColumn(box, 1);
-
-                            paramPanel.Children.Add(box);
-
-                            tbr.Add(parameterName, box.SelectedIndex);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                box.SelectedIndex = (int)value;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            box.SelectionChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = box.SelectedIndex;
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "TextBox")
-                        {
-                            TextBox box = new TextBox() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Text = controlParameters, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
-
-                            Grid.SetColumn(box, 1);
-
-                            paramPanel.Children.Add(box);
-
-                            tbr.Add(parameterName, controlParameters);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                box.Text = (string)value;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            box.PropertyChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate && e.Property == TextBox.TextProperty)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = box.Text;
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "AttributeSelector")
-                        {
-                            int defaultIndex = Math.Max(0, AttributeList.IndexOf(controlParameters));
-
-                            ComboBox box = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Items = AttributeList, SelectedIndex = defaultIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
-
-                            AttributeSelectors.Add(box);
-
-                            Grid.SetColumn(box, 1);
-
-                            paramPanel.Children.Add(box);
-
-                            tbr.Add(parameterName, controlParameters);
-
-                            box.Tag = false;
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                box.SelectedIndex = AttributeList.IndexOf((string)value);
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            box.SelectionChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate && !(bool)box.Tag)
-                                {
-                                    if (box.SelectedIndex < 0 || box.SelectedIndex >= AttributeList.Count)
-                                    {
-                                        if (defaultIndex < AttributeList.Count)
-                                        {
-                                            box.SelectedIndex = defaultIndex;
-                                        }
-                                        else
-                                        {
-                                            box.SelectedIndex = 0;
-                                        }
-
-                                        return;
-                                    }
-
-                                    string newValue = AttributeList[box.SelectedIndex];
-                                    string oldValue = (string)tbr[parameterName];
-
-                                    if (newValue != oldValue)
-                                    {
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = newValue;
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-
-                            };
-                        }
-                        else if (controlType == "Attachment")
-                        {
-                            List<string> items = new List<string>(StateData.Attachments.Count + 1) { "Select attachment" };
-
-                            if (StateData.Attachments.Count > 0)
-                            {
-                                items.AddRange(StateData.Attachments.Keys);
-                            }
-
-                            ComboBox box = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Items = items, SelectedIndex = 0, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
-
-                            AttachmentSelectors.Add(box);
-
-                            Grid.SetColumn(box, 1);
-
-                            paramPanel.Children.Add(box);
-
-                            tbr.Add(parameterName, null);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-
-                                items = new List<string>(StateData.Attachments.Count + 1) { "Select attachment" };
-
-                                if (StateData.Attachments.Count > 0)
-                                {
-                                    items.AddRange(StateData.Attachments.Keys);
-                                }
-
-                                if (value is Attachment att)
-                                {
-                                    box.SelectedIndex = items.IndexOf(att.Name);
-                                    tbr[parameterName] = value;
-                                }
-                                else
-                                {
-                                    box.SelectedIndex = 0;
-                                    tbr[parameterName] = null;
-                                }
-
-                                programmaticUpdate = false;
-                            });
-
-                            box.SelectionChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    if (box.SelectedIndex <= 0 || box.SelectedIndex >= StateData.Attachments.Count + 1)
-                                    {
-                                        box.SelectedIndex = 0;
-                                        tbr[parameterName] = null;
-                                        return;
-                                    }
-
-                                    items = new List<string>(StateData.Attachments.Count + 1) { "Select attachment" };
-
-                                    if (StateData.Attachments.Count > 0)
-                                    {
-                                        items.AddRange(StateData.Attachments.Keys);
-                                    }
-
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = StateData.Attachments[items[box.SelectedIndex]];
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "Node")
-                        {
-                            string[] defaultValue = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            ((TextBlock)paramPanel.Children[0]).VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
-
-                            ((TextBlock)paramPanel.Children[0]).Margin = new Thickness(0, 10, 0, 5);
-
-                            Expander exp = new Expander() { Margin = new Thickness(5, 0, 0, 0) };
-
-                            Grid grd = new Grid();
-                            grd.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                            grd.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                            grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-                            grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-
-                            TrimmedTextBox blk = new TrimmedTextBox(108) { Text = (defaultValue.Length > 1 ? "LCA of " : "") + defaultValue.Aggregate((a, b) => a + ", " + b), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-                            Grid.SetColumnSpan(blk, 2);
-                            grd.Children.Add(blk);
-
-                            Button control = new Button() { Content = "Edit", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, Padding = new Thickness(5, 5, 5, 5), Margin = new Thickness(0, 5, 0, 5) };
-
-                            Grid.SetColumn(exp, 1);
-                            Grid.SetRow(control, 1);
-
-                            Button chooseSelection = new Button() { Content = "Use selection", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, Padding = new Thickness(5, 5, 5, 5), Margin = new Thickness(5, 5, 0, 5), HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
-                            Grid.SetRow(chooseSelection, 1);
-                            Grid.SetColumn(chooseSelection, 1);
-
-                            grd.Children.Add(control);
-                            grd.Children.Add(chooseSelection);
-                            chooseSelection.IsEnabled = this.IsSelectionAvailable;
-
-                            void checkIfSelectionEnabled(object sender, AvaloniaPropertyChangedEventArgs e)
-                            {
-                                if (e.Property == MainWindow.IsSelectionAvailableProperty)
-                                {
-                                    chooseSelection.IsEnabled = this.IsSelectionAvailable;
-                                }
-                            }
-
-                            this.PropertyChanged += checkIfSelectionEnabled;
-
-                            chooseSelection.DetachedFromLogicalTree += (s, e) =>
-                            {
-                                this.PropertyChanged -= checkIfSelectionEnabled;
-                            };
-
-                            exp.Label = grd;
-
-                            paramPanel.Children.Add(exp);
-
-                            ScrollViewer valueScroller = new ScrollViewer() { VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, Padding = new Thickness(0, 0, 0, 16) };
-
-                            StackPanel valueContainer = new StackPanel();
-
-                            for (int j = 0; j < defaultValue.Length; j++)
-                            {
-                                valueContainer.Children.Add(new TextBlock() { Text = defaultValue[j], Margin = new Thickness(0, 0, 5, 0), FontStyle = FontStyle.Italic });
-                            }
-
-                            tbr.Add(parameterName, defaultValue);
-
-                            parameterUpdaters.Add(parameterName, (value) =>
-                            {
-                                tbr[parameterName] = value;
-                                blk.Text = (((string[])value).Length > 1 ? "LCA of " : "") + ((string[])value).Aggregate((a, b) => a + ", " + b);
-                                valueContainer.Children.Clear();
-                                for (int j = 0; j < ((string[])value).Length; j++)
-                                {
-                                    valueContainer.Children.Add(new TextBlock() { Text = ((string[])value)[j], Margin = new Thickness(0, 0, 5, 0), FontStyle = FontStyle.Italic });
-                                }
-                            });
-
-                            valueScroller.Content = valueContainer;
-
-                            exp.Child = valueScroller;
-
-                            control.Click += async (s, e) =>
-                            {
-                                NodeChoiceWindow win;
-                                int index = FurtherTransformationsParameters.IndexOf(tbr);
-                                if (index >= 0 && index < AllTransformedTrees.Length)
-                                {
-                                    win = new NodeChoiceWindow(AllTransformedTrees[index], (string[])tbr[parameterName]);
-                                }
-                                else
-                                {
-                                    win = new NodeChoiceWindow(TransformedTree, (string[])tbr[parameterName]);
-                                }
-
-                                await win.ShowDialog2(this);
-
-                                if (win.Result != null)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = win.Result;
-
-                                    blk.Text = (win.Result.Length > 1 ? "LCA of " : "") + win.Result.Aggregate((a, b) => a + ", " + b);
-                                    valueContainer.Children.Clear();
-                                    for (int j = 0; j < win.Result.Length; j++)
-                                    {
-                                        valueContainer.Children.Add(new TextBlock() { Text = win.Result[j], Margin = new Thickness(0, 0, 5, 0), FontStyle = FontStyle.Italic });
-                                    }
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-
-                            chooseSelection.Click += (s, e) =>
-                            {
-                                if (this.SelectedNode != null)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    string[] nodeNames = this.SelectedNode.GetNodeNames().ToArray();
-
-                                    tbr[parameterName] = nodeNames;
-
-                                    blk.Text = (nodeNames.Length > 1 ? "LCA of " : "") + nodeNames.Aggregate((a, b) => a + ", " + b);
-                                    valueContainer.Children.Clear();
-                                    for (int j = 0; j < nodeNames.Length; j++)
-                                    {
-                                        valueContainer.Children.Add(new TextBlock() { Text = nodeNames[j], Margin = new Thickness(0, 0, 5, 0), FontStyle = FontStyle.Italic });
-                                    }
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-
-                        }
-                        else if (controlType == "NumericUpDown")
-                        {
-                            double defaultValue = double.Parse(controlParameters.Substring(0, controlParameters.IndexOf("[")));
-                            controlParameters = controlParameters.Substring(controlParameters.IndexOf("["));
-
-                            string[] range = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            double minRange = double.Parse(range[0], System.Globalization.CultureInfo.InvariantCulture);
-                            double maxRange = double.Parse(range[1], System.Globalization.CultureInfo.InvariantCulture);
-
-                            double increment = (maxRange - minRange) * 0.01;
-
-                            if (range.Length > 2)
-                            {
-                                increment = double.Parse(range[2], System.Globalization.CultureInfo.InvariantCulture);
-                            }
-
-                            if (double.IsNaN(increment) || double.IsInfinity(increment))
-                            {
-                                increment = 1;
-                            }
-
-                            string formatString = Extensions.GetFormatString(increment);
-
-                            if (range.Length > 3)
-                            {
-                                formatString = range[3];
-                            }
-
-                            NumericUpDown nud = new NumericUpDown() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Minimum = minRange, Maximum = maxRange, Increment = increment, Value = defaultValue, FormatString = formatString, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
-
-                            Grid.SetColumn(nud, 1);
-
-                            paramPanel.Children.Add(nud);
-
-                            tbr.Add(parameters[i].Item1, nud.Value);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                nud.Value = (double)value;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            nud.ValueChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = nud.Value;
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "NumericUpDownByNode")
-                        {
-                            double defaultValue = double.Parse(controlParameters.Substring(0, controlParameters.IndexOf("[")));
-                            controlParameters = controlParameters.Substring(controlParameters.IndexOf("["));
-
-                            string[] range = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            double minRange = double.Parse(range[0], System.Globalization.CultureInfo.InvariantCulture);
-                            double maxRange = double.Parse(range[1], System.Globalization.CultureInfo.InvariantCulture);
-
-                            double increment = (maxRange - minRange) * 0.01;
-
-                            if (double.IsNaN(increment) || double.IsInfinity(increment))
-                            {
-                                increment = 1;
-                            }
-
-                            NumericUpDown nud = new NumericUpDown() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Minimum = minRange, Maximum = maxRange, Increment = increment, Value = defaultValue, FormatString = Extensions.GetFormatString(increment), VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
-
-                            Grid.SetColumn(nud, 1);
-
-                            paramPanel.Children.Add(nud);
-
-                            paramPanel.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-
-
-                            //Button butEdit = new Button() { Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left, Content = "..." };
-                            VerticalButton butEdit = new VerticalButton() { Margin = new Thickness(5, 0, 0, 0), Width = 6, Height = 30 };
-                            Grid.SetColumn(butEdit, 2);
-                            paramPanel.Children.Add(butEdit);
-
-                            object[] formatterParams = new object[4];
-
-                            string attrType = range[4];
-
-                            if (attrType == "String")
-                            {
-                                formatterParams[0] = range[2];
-                                formatterParams[1] = minRange;
-                                formatterParams[2] = maxRange;
-                                formatterParams[3] = Convert.ToBoolean(range[5]);
-                            }
-                            else if (attrType == "Number")
-                            {
-                                formatterParams[0] = range[2];
-                                formatterParams[1] = minRange;
-                                formatterParams[2] = maxRange;
-                                formatterParams[3] = Convert.ToBoolean(range[5]);
-                            }
-
-                            tbr.Add(parameters[i].Item1, new NumberFormatterOptions(range[2]) { AttributeName = range[3], AttributeType = attrType, DefaultValue = defaultValue, Parameters = formatterParams });
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                nud.Value = ((NumberFormatterOptions)value).DefaultValue;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            nud.ValueChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    ((NumberFormatterOptions)tbr[parameterName]).DefaultValue = nud.Value;
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-
-                            butEdit.PointerReleased += async (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    NumberFormatterOptions opt = (NumberFormatterOptions)tbr[parameterName];
-
-                                    NumberFormatterWindow win = new NumberFormatterWindow();
-
-                                    string editorId = "NumberFormatter_" + parameterName.CoerceValidFileName() + "_" + (string)tbr[Modules.ModuleIDKey];
-                                    await win.Initialize(opt.AttributeName, opt.AttributeType, opt.DefaultValue, opt.Parameters, this.DebuggerServer, editorId);
-
-                                    await win.ShowDialog2(this);
-
-                                    if (win.Result)
-                                    {
-
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = win.Formatter;
-                                        nud.Value = win.Formatter.DefaultValue;
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "Slider")
-                        {
-                            double defaultValue = double.Parse(controlParameters.Substring(0, controlParameters.IndexOf("[")));
-                            controlParameters = controlParameters.Substring(controlParameters.IndexOf("["));
-
-                            string[] range = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            double minRange = double.Parse(range[0], System.Globalization.CultureInfo.InvariantCulture);
-                            double maxRange = double.Parse(range[1], System.Globalization.CultureInfo.InvariantCulture);
-
-                            double increment = (maxRange - minRange) * 0.01;
-
-                            if (double.IsNaN(increment) || double.IsInfinity(increment))
-                            {
-                                increment = 1;
-                            }
-
-                            StackPanel container = new StackPanel();
-                            Grid.SetColumn(container, 1);
-                            paramPanel.Children.Add(container);
-
-                            Slider slid = new Slider() { Margin = new Thickness(5, -15, 0, 0), Minimum = minRange, Maximum = maxRange, Value = defaultValue, LargeChange = increment, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-
-                            slid.Resources.Add("SliderHorizontalThumbWidth", 5);
-                            slid.Resources.Add("SliderHorizontalThumbHeight", 20);
-                            slid.Resources.Add("SliderPreContentMargin", 0.0);
-                            slid.Resources.Add("SliderPostContentMargin", 0.0);
-
-                            container.Children.Add(slid);
-
-                            NumericUpDown valueBlock = null;
-
-                            if (range.Length > 2)
-                            {
-                                valueBlock = new NumericUpDown() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0), Value = slid.Value, FormatString = range[2], Minimum = minRange, Maximum = maxRange, Increment = increment, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
-                                container.Children.Add(valueBlock);
-                            }
-                            else
-                            {
-                                valueBlock = new NumericUpDown() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0), Value = slid.Value, FormatString = Extensions.GetFormatString(increment), Minimum = minRange, Maximum = maxRange, Increment = increment, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
-                                container.Children.Add(valueBlock);
-                            }
-
-                            tbr.Add(parameters[i].Item1, slid.Value);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                slid.Value = (double)value;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            slid.PropertyChanged += (s, e) =>
-                            {
-                                if (e.Property == Slider.ValueProperty)
-                                {
-                                    bool prevProgUpd = programmaticUpdate;
-                                    programmaticUpdate = true;
-                                    valueBlock.Value = slid.Value;
-                                    programmaticUpdate = prevProgUpd;
-
-
-                                    if (!programmaticUpdate)
-                                    {
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = slid.Value;
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-                            };
-
-
-                            if (valueBlock != null)
-                            {
-                                valueBlock.ValueChanged += (s, e) =>
-                                {
-                                    bool prevProgUpd = programmaticUpdate;
-                                    programmaticUpdate = true;
-                                    slid.Value = valueBlock.Value;
-                                    programmaticUpdate = prevProgUpd;
-
-                                    if (!programmaticUpdate)
-                                    {
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = slid.Value;
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                };
-                            }
-                        }
-                        else if (controlType == "Font")
-                        {
-                            string[] font = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            VectSharp.Font fnt = new VectSharp.Font(new VectSharp.FontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
-
-                            FontButton but = new FontButton() { FontSize = 15, Font = fnt, Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
-
-                            Grid.SetColumn(but, 1);
-
-                            paramPanel.Children.Add(but);
-
-                            tbr.Add(parameters[i].Item1, fnt);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                but.Font = (VectSharp.Font)value;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            but.FontChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = but.Font;
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "Point")
-                        {
-                            double[] point = System.Text.Json.JsonSerializer.Deserialize<double[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            Grid grid = new Grid();
-                            grid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                            grid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                            grid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-                            grid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-
-                            NumericUpDown nudX = new NumericUpDown() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Increment = 1, Value = point[0], FormatString = Extensions.GetFormatString(point[0]), VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
-                            NumericUpDown nudY = new NumericUpDown() { Margin = new Thickness(5, 2, 0, 0), Padding = new Thickness(5, 0, 5, 0), Increment = 1, Value = point[1], FormatString = Extensions.GetFormatString(point[1]), VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
-
-                            TextBlock blkX = new TextBlock() { Text = "X:", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0) };
-                            TextBlock blkY = new TextBlock() { Text = "Y:", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 2, 0, 0) };
-
-                            Grid.SetColumn(grid, 1);
-
-                            Grid.SetColumn(nudX, 1);
-
-                            Grid.SetRow(blkY, 1);
-                            Grid.SetRow(nudY, 1);
-                            Grid.SetColumn(nudY, 1);
-
-
-
-                            grid.Children.Add(blkX);
-                            grid.Children.Add(nudX);
-                            grid.Children.Add(blkY);
-                            grid.Children.Add(nudY);
-
-                            paramPanel.Children.Add(grid);
-
-                            tbr.Add(parameters[i].Item1, new VectSharp.Point(nudX.Value, nudY.Value));
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                nudX.Value = ((VectSharp.Point)value).X;
-                                nudY.Value = ((VectSharp.Point)value).Y;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            nudX.ValueChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = new VectSharp.Point(nudX.Value, nudY.Value);
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-
-                            nudY.ValueChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = new VectSharp.Point(nudX.Value, nudY.Value);
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "Colour")
-                        {
-                            int[] colour = System.Text.Json.JsonSerializer.Deserialize<int[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            VectSharp.Colour col = VectSharp.Colour.FromRgba((byte)colour[0], (byte)colour[1], (byte)colour[2], (byte)colour[3]);
-
-                            AvaloniaColorPicker.ColorButton but = new AvaloniaColorPicker.ColorButton() { Color = col.ToAvalonia(), Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left, FontFamily = this.FontFamily, FontSize = this.FontSize };
-
-                            Grid.SetColumn(but, 1);
-
-                            paramPanel.Children.Add(but);
-
-                            tbr.Add(parameters[i].Item1, col);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                but.Color = ((VectSharp.Colour)value).ToAvalonia();
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            but.PropertyChanged += (s, e) =>
-                            {
-                                if (e.Property == AvaloniaColorPicker.ColorButton.ColorProperty)
-                                {
-                                    if (!programmaticUpdate)
-                                    {
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = but.Color.ToVectSharp();
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "SourceCode")
-                        {
-                            string defaultSource = controlParameters;
-
-                            Button but = new Button() { Content = "Edit...", Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
-
-                            Grid.SetColumn(but, 1);
-
-                            paramPanel.Children.Add(but);
-
-                            tbr.Add(parameters[i].Item1, new CompiledCode(defaultSource));
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            but.Click += async (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    CodeEditorWindow win = new CodeEditorWindow();
-
-                                    string editorId = "CodeEditor_" + parameterName.CoerceValidFileName() + "_" + (string)tbr[Modules.ModuleIDKey];
-                                    await win.FinishInitialization(((CompiledCode)tbr[parameterName]).SourceCode, this.DebuggerServer, editorId);
-
-                                    await win.ShowDialog2(this);
-
-                                    if (win.Result != null)
-                                    {
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = win.Result;
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "Markdown")
-                        {
-                            string defaultSource = controlParameters;
-
-                            Button but = new Button() { Content = "Edit...", Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center };
-
-                            Grid.SetColumn(but, 1);
-
-                            paramPanel.Children.Add(but);
-
-                            tbr.Add(parameters[i].Item1, defaultSource);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            but.Click += async (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    MarkdownEditorWindow win = new MarkdownEditorWindow();
-
-                                    string editorId = "MarkdownEditor_" + parameterName.CoerceValidFileName() + "_" + (string)tbr[Modules.ModuleIDKey];
-                                    await win.FinishInitialization((string)tbr[parameterName], editorId, this.StateData);
-
-                                    await win.ShowDialog2(this);
-
-                                    if (win.Result != null)
-                                    {
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = win.Result;
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "Dash")
-                        {
-                            double[] dash = System.Text.Json.JsonSerializer.Deserialize<double[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            VectSharp.LineDash lineDash = new VectSharp.LineDash(dash[0], dash[1], dash[2]);
-
-                            DashControl control = new DashControl() { LineDash = lineDash, Margin = new Thickness(5, 0, 0, 0) };
-
-                            Grid.SetColumn(control, 1);
-
-                            paramPanel.Children.Add(control);
-
-                            tbr.Add(parameters[i].Item1, lineDash);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                control.LineDash = (VectSharp.LineDash)value;
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            control.DashChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = control.LineDash;
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "ColourByNode")
-                        {
-                            string[] colour = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
-
-                            VectSharp.Colour col = VectSharp.Colour.FromRgba(int.Parse(colour[3]), int.Parse(colour[4]), int.Parse(colour[5]), int.Parse(colour[6]));
-
-                            StackPanel pnl = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
-                            AvaloniaColorPicker.ColorButton but = new AvaloniaColorPicker.ColorButton() { Color = col.ToAvalonia(), Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left, FontFamily = this.FontFamily, FontSize = this.FontSize };
-                            pnl.Children.Add(but);
-
-                            //Button butEdit = new Button() { Margin = new Thickness(5, 0, 0, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left, Content = "...", Padding = new Thickness(5, 0, 5, 5) };
-                            VerticalButton butEdit = new VerticalButton() { Margin = new Thickness(5, 0, 0, 0), Width = 6, Height = 30 };
-                            pnl.Children.Add(butEdit);
-
-                            Grid.SetColumn(pnl, 1);
-
-                            paramPanel.Children.Add(pnl);
-
-                            object[] formatterParams = new object[colour.Length - 5];
-
-                            string attrType = colour[2];
-
-                            if (attrType == "String")
-                            {
-                                formatterParams[0] = colour[0];
-                                formatterParams[1] = Convert.ToBoolean(colour[7]);
-                            }
-                            else if (attrType == "Number")
-                            {
-                                formatterParams[0] = colour[0];
-                                formatterParams[1] = double.Parse(colour[7], System.Globalization.CultureInfo.InvariantCulture);
-                                formatterParams[2] = double.Parse(colour[8], System.Globalization.CultureInfo.InvariantCulture);
-                                formatterParams[3] = Modules.DefaultGradients[colour[9]];
-                                formatterParams[4] = Convert.ToBoolean(colour[10]);
-                            }
-
-                            tbr.Add(parameters[i].Item1, new ColourFormatterOptions(colour[0]) { AttributeName = colour[1], AttributeType = attrType, DefaultColour = col, Parameters = formatterParams });
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                but.Color = ((ColourFormatterOptions)value).DefaultColour.ToAvalonia();
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            but.PropertyChanged += (s, e) =>
-                            {
-                                if (e.Property == AvaloniaColorPicker.ColorButton.ColorProperty)
-                                {
-                                    if (!programmaticUpdate)
-                                    {
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        ((ColourFormatterOptions)tbr[parameterName]).DefaultColour = but.Color.ToVectSharp();
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-                            };
-
-                            butEdit.PointerReleased += async (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    ColourFormatterOptions opt = (ColourFormatterOptions)tbr[parameterName];
-
-                                    ColourFormatterWindow win = new ColourFormatterWindow();
-
-                                    string editorId = "ColourFormatter_" + parameterName.CoerceValidFileName() + "_" + (string)tbr[Modules.ModuleIDKey];
-                                    await win.Initialize(opt.AttributeName, opt.AttributeType, opt.DefaultColour, opt.Parameters, this.DebuggerServer, editorId);
-
-                                    await win.ShowDialog2(this);
-
-                                    if (win.Result)
-                                    {
-
-                                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                        tbr[parameterName] = win.Formatter;
-                                        but.Color = win.Formatter.DefaultColour.ToAvalonia();
-
-                                        bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                        UpdateControls(controlStatus, parameterControls);
-                                        UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                        if (needsUpdate)
-                                        {
-                                            updateAction();
-                                        }
-                                    }
-                                }
-                            };
-                        }
-                        else if (controlType == "AttributeType")
-                        {
-                            List<string> attributeTypes = new List<string>(Modules.AttributeTypes);
-
-                            int defaultIndex = attributeTypes.IndexOf(controlParameters);
-
-                            ComboBox box = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Items = attributeTypes, SelectedIndex = defaultIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
-
-                            Grid.SetColumn(box, 1);
-
-                            paramPanel.Children.Add(box);
-
-                            tbr.Add(parameterName, attributeTypes[box.SelectedIndex]);
-
-                            parameterUpdaters.Add(parameterName, value =>
-                            {
-                                programmaticUpdate = true;
-                                box.SelectedIndex = attributeTypes.IndexOf((string)value);
-                                tbr[parameterName] = value;
-                                programmaticUpdate = false;
-
-                            });
-
-                            box.SelectionChanged += (s, e) =>
-                            {
-                                if (!programmaticUpdate)
-                                {
-                                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-
-                                    tbr[parameterName] = attributeTypes[box.SelectedIndex];
-
-                                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                                    UpdateControls(controlStatus, parameterControls);
-                                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                                    if (needsUpdate)
-                                    {
-                                        updateAction();
-                                    }
-                                }
-                            };
-                        }
-
-                    }
-                }
-
-                parameterChangeDelegate(tbr, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange);
-                UpdateControls(controlStatus, parameterControls);
-                UpdateParameters(parametersToChange, parameterUpdaters);
-
-                UpdateParameterAction = (parametersToChange) =>
-                {
-                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
-                    UpdateParameters(parametersToChange, parameterUpdaters);
-
-                    bool needsUpdate = parameterChangeDelegate(tbr, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange2);
-                    UpdateControls(controlStatus, parameterControls);
-                    UpdateParameters(parametersToChange2, parameterUpdaters);
-                };
-            }
-            else
-            {
-                Dictionary<string, Action<object>> parameterUpdaters = new Dictionary<string, Action<object>>();
-
-                for (int i = 0; i < parameters.Count; i++)
-                {
-                    string controlType = parameters[i].Item2.Substring(0, parameters[i].Item2.IndexOf(":"));
-                    string controlParameters = parameters[i].Item2.Substring(parameters[i].Item2.IndexOf(":") + 1);
-
-                    if (controlType == "Id")
-                    {
-                        string parameterName = parameters[i].Item1;
-                        tbr.Add(parameterName, controlParameters);
-                        parameterUpdaters.Add(parameterName, (value) =>
-                        {
-                            tbr[parameterName] = value;
-                        });
-                    }
-                }
-
-                controlsPanel.Children.Add(new TextBlock() { Foreground = new SolidColorBrush(Color.FromRgb(180, 180, 180)), Text = "No options available", FontStyle = FontStyle.Italic });
-                UpdateParameterAction = (parametersToChange) =>
-                {
-                    UpdateParameters(parametersToChange, parameterUpdaters);
-                };
-            }
-
-            parent.AccordionContent = controlsPanel;
-
-            return tbr;
-        }
-
         private void BuildTransformerPanel(string suggestedModuleId)
         {
-            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
+            this.FindControl<StackPanel>("TransformerModuleContainerPanel").Children.Add(new TextBlock() { Text = "Transformer module", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 5), FontSize = 16, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) });
 
-            Grid transformerPanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-            transformerPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel) };
+            Grid transformerPanel = new Grid() { Margin = new Thickness(5, 5, 0, 5) };
+            transformerPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star) };
 
-            transformerPanel.Children.Add(new TextBlock() { Text = "Transformer", FontWeight = Avalonia.Media.FontWeight.Bold, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 18 });
+            transformerPanel.Children.Add(new TextBlock() { Text = "Choose module:", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13 });
 
-            TransformerAlert = AlertPage.PaintToCanvas();
-            TransformerAlert.Margin = new Thickness(5, 0, 0, 0);
+            TransformerAlert = GetAlertIcon();
+            TransformerAlert.Width = 16;
+            TransformerAlert.Height = 16;
+            TransformerAlert.Margin = new Thickness(0, 0, 5, 0);
             TransformerAlert.IsVisible = false;
             Grid.SetColumn(TransformerAlert, 1);
 
@@ -2865,7 +1467,7 @@ namespace TreeViewer
             int moduleIndex = Math.Max(0, Modules.TransformerModules.IndexOf(Modules.GetModule(Modules.TransformerModules, suggestedModuleId)));
 
             List<string> transformerModules = (from el in Modules.TransformerModules select el.Name).ToList();
-            TransformerComboBox = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Items = transformerModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
+            TransformerComboBox = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Items = transformerModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
             Grid.SetColumn(TransformerComboBox, 2);
             transformerPanel.Children.Add(TransformerComboBox);
 
@@ -2874,11 +1476,18 @@ namespace TreeViewer
                 e.Handled = true;
             };
 
-            HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-            Grid.SetColumn(helpButton, 3);
-            transformerPanel.Children.Add(helpButton);
+            this.FindControl<StackPanel>("TransformerModuleContainerPanel").Children.Add(transformerPanel);
 
-            ToolTip.SetTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
+            Grid parametersHeaderPanel = new Grid() { Margin = new Thickness(0, 0, 0, 0) };
+            parametersHeaderPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel) };
+
+            parametersHeaderPanel.Children.Add(new TextBlock() { Text = "Parameters", FontWeight = FontWeight.Bold, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13 });
+
+            HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            Grid.SetColumn(helpButton, 1);
+            parametersHeaderPanel.Children.Add(helpButton);
+
+            AvaloniaBugFixes.SetToolTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
 
             helpButton.PointerPressed += (s, e) =>
             {
@@ -2894,49 +1503,58 @@ namespace TreeViewer
                 win.Show(this);
             };
 
-            exp.AccordionHeader = transformerPanel;
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 0), ArrowSize = 10 };
+
+            exp.AccordionHeader = parametersHeaderPanel;
+
+
 
             List<(string, string)> transformerParameters = Modules.TransformerModules[moduleIndex].GetParameters(Trees);
 
             transformerParameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
 
             GenericParameterChangeDelegate transformerParameterChange = (Dictionary<string, object> previousParameterValues, Dictionary<string, object> currentParameterValues, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange) =>
-                {
-                    return Modules.TransformerModules[TransformerComboBox.SelectedIndex].OnParameterChange(Trees, previousParameterValues, currentParameterValues, out controlStatus, out parametersToChange);
-                };
+            {
+                return Modules.TransformerModules[TransformerComboBox.SelectedIndex].OnParameterChange(Trees, previousParameterValues, currentParameterValues, out controlStatus, out parametersToChange);
+            };
 
             TransformerComboBox.SelectionChanged += async (s, e) =>
             {
-                ToolTip.SetTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
+                AvaloniaBugFixes.SetToolTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
                 List<(string, string)> parameters = Modules.TransformerModules[TransformerComboBox.SelectedIndex].GetParameters(Trees);
                 parameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
-                TransformerParameters = UpdateParameterPanel(exp, transformerParameterChange, parameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters);
+                TransformerParameters = UpdateParameterPanel(transformerParameterChange, parameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters, out Control content);
+                exp.AccordionContent = content;
                 await UpdateTransformedTree();
             };
 
-            TransformerParameters = UpdateParameterPanel(exp, transformerParameterChange, transformerParameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters);
+            TransformerParameters = UpdateParameterPanel(transformerParameterChange, transformerParameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters, out Control content);
+            exp.AccordionContent = content;
 
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(exp);
+            this.FindControl<StackPanel>("TransformerModuleContainerPanel").Children.Add(exp);
         }
 
 
         private void BuildFurtherTransformationPanel()
         {
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(new TextBlock() { Text = "Further transformations", FontWeight = Avalonia.Media.FontWeight.Bold, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 5), FontSize = 18 });
+            this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Children.Add(new TextBlock() { Text = "Further transformations", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 5), FontSize = 16, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) });
 
             FurtherTransformations = new List<FurtherTransformationModule>();
-            FurtherTransformationsAlerts = new List<Canvas>();
+            FurtherTransformationsAlerts = new List<Control>();
             FurtherTransformationsParameters = new List<Dictionary<string, object>>();
             UpdateFurtherTransformationParameters = new List<Action<Dictionary<string, object>>>();
 
             FurtherTransformationsContainer = new StackPanel();
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(FurtherTransformationsContainer);
+            this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Children.Add(FurtherTransformationsContainer);
 
-            StackPanel addButtonContainer = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(2, 0, 0, 0) };
+            Button addModuleButton = new Button() { Background = Brushes.Transparent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, Padding = new Thickness(5, 3, 5, 3), RenderTransform = null, Margin = new Thickness(5, 0, 0, 5) };
+            addModuleButton.Classes.Add("SideBarButton");
 
-            AddRemoveButton addTransformationModule = new AddRemoveButton();
+            StackPanel addButtonContainer = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
 
-            addTransformationModule.PointerReleased += async (s, e) =>
+            Avalonia.Controls.Shapes.Path addPlottingModule = new Avalonia.Controls.Shapes.Path() { Width = 8, Height = 8, Data = Geometry.Parse("M 4,0 L4,8 M0,4 L8,4"), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, StrokeThickness = 2 };
+
+            addModuleButton.Click += async (s, e) =>
             {
                 AddFurtherTransformationModuleWindow win = new AddFurtherTransformationModuleWindow(FurtherTransformations);
 
@@ -2944,41 +1562,75 @@ namespace TreeViewer
 
                 if (win.Result != null)
                 {
+                    List<string> childNames = null;
+
+                    if (this.IsSelectionAvailable)
+                    {
+                        childNames = this.SelectedNode.GetNodeNames();
+                    }
+
                     AddFurtherTransformation(win.Result);
                     await UpdateFurtherTransformations(FurtherTransformations.Count - 1);
+
+                    if (childNames?.Count > 0)
+                    {
+                        TreeNode candidate = this.TransformedTree.GetLastCommonAncestor(childNames);
+                        if (candidate != null && candidate.GetNodeNames().Count == childNames.Count)
+                        {
+                            this.SetSelection(candidate);
+                        }
+                        else
+                        {
+                            this.SetSelection(null);
+                        }
+                    }
+                    else
+                    {
+                        this.SetSelection(null);
+                    }
                 }
             };
 
-            addButtonContainer.Children.Add(addTransformationModule);
-            addButtonContainer.Children.Add(new TextBlock() { Text = "Add module", Foreground = new SolidColorBrush(Color.FromRgb(180, 180, 180)), FontStyle = FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0) });
+            addButtonContainer.Children.Add(addPlottingModule);
+            addButtonContainer.Children.Add(new TextBlock() { Text = "Add module", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0), FontSize = 13 });
 
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(addButtonContainer);
+            addModuleButton.Content = addButtonContainer;
+
+            this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Children.Add(addModuleButton);
         }
 
         public Action<Dictionary<string, object>> AddFurtherTransformation(FurtherTransformationModule module)
         {
             FurtherTransformations.Add(module);
 
-            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5), ArrowSize = 10 };
 
-            Grid modulePanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel) };
+            Grid modulePanel = new Grid() { Margin = new Thickness(0, 0, 0, 0) };
+            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(0, GridUnitType.Auto) };
 
-            Canvas alert = AlertPage.PaintToCanvas();
+            Control alert = GetAlertIcon();
+            alert.Width = 16;
+            alert.Height = 16;
             FurtherTransformationsAlerts.Add(alert);
-            alert.Margin = new Thickness(5, 0, 0, 0);
+            alert.Margin = new Thickness(0, 0, 5, 0);
             alert.IsVisible = false;
 
             modulePanel.Children.Add(alert);
 
-            TextBlock moduleName = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = module.Name, FontWeight = FontWeight.Bold };
+            DPIAwareBox icon = new DPIAwareBox(module.GetIcon) { Width = 16, Height = 16, Margin = new Thickness(0, 0, 5, 0) };
+            Grid.SetColumn(icon, 1);
+            modulePanel.Children.Add(icon);
+            AvaloniaBugFixes.SetToolTip(icon, module.Name);
 
-            Grid.SetColumn(moduleName, 1);
+            FillingControl<TrimmedTextBox2> moduleName = new FillingControl<TrimmedTextBox2>(new TrimmedTextBox2() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = module.Name, FontWeight = FontWeight.Bold, FontSize = 13 }, 5) { Margin = new Thickness(-5, 0, -5, 0) };
+            AvaloniaBugFixes.SetToolTip(moduleName, module.Name);
+
+            Grid.SetColumn(moduleName, 2);
 
             modulePanel.Children.Add(moduleName);
 
             AddRemoveButton moveUp = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Up };
-            Grid.SetColumn(moveUp, 3);
+            Grid.SetColumn(moveUp, 4);
             modulePanel.Children.Add(moveUp);
             if (FurtherTransformations.Count <= 1)
             {
@@ -2993,6 +1645,13 @@ namespace TreeViewer
 
                 if (index > 0)
                 {
+                    List<string> childNames = null;
+
+                    if (this.IsSelectionAvailable)
+                    {
+                        childNames = this.SelectedNode.GetNodeNames();
+                    }
+
                     FurtherTransformationModule mod = FurtherTransformations[index];
                     FurtherTransformations.RemoveAt(index);
                     FurtherTransformations.Insert(index - 1, mod);
@@ -3010,7 +1669,7 @@ namespace TreeViewer
                     FurtherTransformationsContainer.Children.RemoveAt(index);
                     FurtherTransformationsContainer.Children.Insert(index - 1, pan);
 
-                    Canvas alert = FurtherTransformationsAlerts[index];
+                    Control alert = FurtherTransformationsAlerts[index];
                     FurtherTransformationsAlerts.RemoveAt(index);
                     FurtherTransformationsAlerts.Insert(index - 1, alert);
 
@@ -3018,29 +1677,46 @@ namespace TreeViewer
                     {
                         if (i == 0)
                         {
-                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = false;
-                        }
-                        else
-                        {
-                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = true;
-                        }
-
-                        if (i == FurtherTransformationsContainer.Children.Count - 1)
-                        {
                             ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
                         }
                         else
                         {
                             ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
                         }
+
+                        if (i == FurtherTransformationsContainer.Children.Count - 1)
+                        {
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = false;
+                        }
+                        else
+                        {
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = true;
+                        }
                     }
 
                     await UpdateFurtherTransformations(index - 1);
+
+                    if (childNames?.Count > 0)
+                    {
+                        TreeNode candidate = this.TransformedTree.GetLastCommonAncestor(childNames);
+                        if (candidate != null && candidate.GetNodeNames().Count == childNames.Count)
+                        {
+                            this.SetSelection(candidate);
+                        }
+                        else
+                        {
+                            this.SetSelection(null);
+                        }
+                    }
+                    else
+                    {
+                        this.SetSelection(null);
+                    }
                 }
             };
 
             AddRemoveButton moveDown = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Down };
-            Grid.SetColumn(moveDown, 4);
+            Grid.SetColumn(moveDown, 5);
             modulePanel.Children.Add(moveDown);
             moveDown.IsVisible = false;
 
@@ -3052,6 +1728,13 @@ namespace TreeViewer
 
                 if (index < FurtherTransformationsContainer.Children.Count - 1)
                 {
+                    List<string> childNames = null;
+
+                    if (this.IsSelectionAvailable)
+                    {
+                        childNames = this.SelectedNode.GetNodeNames();
+                    }
+
                     FurtherTransformationModule mod = FurtherTransformations[index];
                     FurtherTransformations.RemoveAt(index);
                     FurtherTransformations.Insert(index + 1, mod);
@@ -3068,7 +1751,7 @@ namespace TreeViewer
                     UpdateFurtherTransformationParameters.RemoveAt(index);
                     UpdateFurtherTransformationParameters.Insert(index + 1, paramUpd);
 
-                    Canvas alert = FurtherTransformationsAlerts[index];
+                    Control alert = FurtherTransformationsAlerts[index];
                     FurtherTransformationsAlerts.RemoveAt(index);
                     FurtherTransformationsAlerts.Insert(index + 1, alert);
 
@@ -3076,34 +1759,61 @@ namespace TreeViewer
                     {
                         if (i == 0)
                         {
-                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = false;
-                        }
-                        else
-                        {
-                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[2].IsVisible = true;
-                        }
-
-                        if (i == FurtherTransformationsContainer.Children.Count - 1)
-                        {
                             ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
                         }
                         else
                         {
                             ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
                         }
+
+                        if (i == FurtherTransformationsContainer.Children.Count - 1)
+                        {
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = false;
+                        }
+                        else
+                        {
+                            ((Grid)((Accordion)FurtherTransformationsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = true;
+                        }
                     }
 
                     await UpdateFurtherTransformations(index);
+
+                    if (childNames?.Count > 0)
+                    {
+                        TreeNode candidate = this.TransformedTree.GetLastCommonAncestor(childNames);
+                        if (candidate != null && candidate.GetNodeNames().Count == childNames.Count)
+                        {
+                            this.SetSelection(candidate);
+                        }
+                        else
+                        {
+                            this.SetSelection(null);
+                        }
+                    }
+                    else
+                    {
+                        this.SetSelection(null);
+                    }
                 }
             };
 
-            AddRemoveButton remove = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Remove };
-            Grid.SetColumn(remove, 5);
+            Button remove = new Button() { Margin = new Thickness(0, 0, 4, 0), Width = 16, Height = 16, Background = Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 8, Height = 8, Data = Geometry.Parse("M0,0 L8,8 M8,0 L0,8"), StrokeThickness = 2, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center } };
+            remove.Classes.Add("SideBarButton");
+            AvaloniaBugFixes.SetToolTip(remove, new TextBlock() { Text = "Remove", Foreground = Brushes.Black });
+
+            Grid.SetColumn(remove, 6);
             modulePanel.Children.Add(remove);
 
             remove.Click += async (s, e) =>
             {
                 e.Handled = true;
+
+                List<string> childNames = null;
+
+                if (this.IsSelectionAvailable)
+                {
+                    childNames = this.SelectedNode.GetNodeNames();
+                }
 
                 int index = FurtherTransformationsContainer.Children.IndexOf(exp);
 
@@ -3115,11 +1825,28 @@ namespace TreeViewer
 
                 if (FurtherTransformations.Count > 0)
                 {
-                    ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[2].IsVisible = false;
-                    ((Grid)((Accordion)FurtherTransformationsContainer.Children.Last()).AccordionHeader).Children[3].IsVisible = false;
+                    ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[3].IsVisible = false;
+                    ((Grid)((Accordion)FurtherTransformationsContainer.Children.Last()).AccordionHeader).Children[4].IsVisible = false;
                 }
 
                 await UpdateFurtherTransformations(index);
+
+                if (childNames?.Count > 0)
+                {
+                    TreeNode candidate = this.TransformedTree.GetLastCommonAncestor(childNames);
+                    if (candidate != null && candidate.GetNodeNames().Count == childNames.Count)
+                    {
+                        this.SetSelection(candidate);
+                    }
+                    else
+                    {
+                        this.SetSelection(null);
+                    }
+                }
+                else
+                {
+                    this.SetSelection(null);
+                }
             };
 
             remove.PointerPressed += (s, e) =>
@@ -3138,10 +1865,10 @@ namespace TreeViewer
             };
 
             HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-            Grid.SetColumn(helpButton, 2);
+            Grid.SetColumn(helpButton, 3);
             modulePanel.Children.Add(helpButton);
 
-            ToolTip.SetTip(helpButton, module.HelpText);
+            AvaloniaBugFixes.SetToolTip(helpButton, module.HelpText);
 
             helpButton.PointerPressed += (s, e) =>
             {
@@ -3161,7 +1888,7 @@ namespace TreeViewer
 
             PointerPressedEventArgs pressEventArgs = null;
 
-            Avalonia.Threading.DispatcherTimer pressTimer = new Avalonia.Threading.DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(500) };
+            Avalonia.Threading.DispatcherTimer pressTimer = new Avalonia.Threading.DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(GlobalSettings.Settings.DragInterval) };
 
             if (!GlobalSettings.Settings.ShowLegacyUpDownArrows)
             {
@@ -3198,6 +1925,12 @@ namespace TreeViewer
 
                                 if (oldIndex != newIndex)
                                 {
+                                    List<string> childNames = null;
+
+                                    if (this.IsSelectionAvailable)
+                                    {
+                                        childNames = this.SelectedNode.GetNodeNames();
+                                    }
 
                                     FurtherTransformationModule mod = FurtherTransformations[oldIndex];
                                     FurtherTransformations.RemoveAt(oldIndex);
@@ -3212,11 +1945,28 @@ namespace TreeViewer
                                     UpdateFurtherTransformationParameters.RemoveAt(oldIndex);
                                     UpdateFurtherTransformationParameters.Insert(newIndex, paramUpd);
 
-                                    Canvas alert = FurtherTransformationsAlerts[oldIndex];
+                                    Control alert = FurtherTransformationsAlerts[oldIndex];
                                     FurtherTransformationsAlerts.RemoveAt(oldIndex);
                                     FurtherTransformationsAlerts.Insert(newIndex, alert);
 
                                     await UpdateFurtherTransformations(Math.Min(newIndex, oldIndex));
+
+                                    if (childNames?.Count > 0)
+                                    {
+                                        TreeNode candidate = this.TransformedTree.GetLastCommonAncestor(childNames);
+                                        if (candidate != null && candidate.GetNodeNames().Count == childNames.Count)
+                                        {
+                                            this.SetSelection(candidate);
+                                        }
+                                        else
+                                        {
+                                            this.SetSelection(null);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        this.SetSelection(null);
+                                    }
                                 }
                             }
                         }
@@ -3229,10 +1979,13 @@ namespace TreeViewer
 
                 exp.PointerPressed += (s, e) =>
                 {
-                    if (!helpButton.IsPointerOver && !remove.IsPointerOver)
+                    if (!helpButton.IsPointerOver && !remove.IsPointerOver && FurtherTransformations.Count > 1)
                     {
-                        pressEventArgs = e;
-                        pressTimer.Start();
+                        if (exp.FindControl<Grid>("HeaderGrid").IsPointerOver)
+                        {
+                            pressEventArgs = e;
+                            pressTimer.Start();
+                        }
                     }
                 };
 
@@ -3242,6 +1995,7 @@ namespace TreeViewer
                     pressTimer.Stop();
                 };
             }
+
 
 
             List<(string, string)> moduleParameters = module.GetParameters(TransformedTree);
@@ -3260,23 +2014,24 @@ namespace TreeViewer
                 }
             };
 
-            FurtherTransformationsParameters.Add(UpdateParameterPanel(exp, plottingParameterChange, moduleParameters, async () =>
+            FurtherTransformationsParameters.Add(UpdateParameterPanel(plottingParameterChange, moduleParameters, async () =>
             {
                 int index = FurtherTransformationsContainer.Children.IndexOf(exp);
                 await UpdateFurtherTransformations(index);
-            }, out Action<Dictionary<string, object>> tbr));
+            }, out Action<Dictionary<string, object>> tbr, out Control content));
+            exp.AccordionContent = content;
             UpdateFurtherTransformationParameters.Add(tbr);
 
             FurtherTransformationsContainer.Children.Add(exp);
 
             if (FurtherTransformations.Count > 1)
             {
-                ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[3].IsVisible = true;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[4].IsVisible = true;
             }
 
             if (FurtherTransformations.Count > 2)
             {
-                ((Grid)((Accordion)FurtherTransformationsContainer.Children[FurtherTransformationsContainer.Children.Count - 2]).AccordionHeader).Children[3].IsVisible = true;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children[FurtherTransformationsContainer.Children.Count - 2]).AccordionHeader).Children[4].IsVisible = true;
             }
 
             return tbr;
@@ -3284,6 +2039,13 @@ namespace TreeViewer
 
         public void RemoveFurtherTransformation(int index)
         {
+            List<string> childNames = null;
+
+            if (this.IsSelectionAvailable)
+            {
+                childNames = this.SelectedNode.GetNodeNames();
+            }
+
             FurtherTransformations.RemoveAt(index);
             FurtherTransformationsParameters.RemoveAt(index);
             UpdateFurtherTransformationParameters.RemoveAt(index);
@@ -3292,22 +2054,41 @@ namespace TreeViewer
 
             if (FurtherTransformations.Count > 0)
             {
-                ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[2].IsVisible = false;
-                ((Grid)((Accordion)FurtherTransformationsContainer.Children.Last()).AccordionHeader).Children[3].IsVisible = false;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children[0]).AccordionHeader).Children[3].IsVisible = false;
+                ((Grid)((Accordion)FurtherTransformationsContainer.Children.Last()).AccordionHeader).Children[4].IsVisible = false;
+            }
+
+            if (childNames?.Count > 0)
+            {
+                TreeNode candidate = this.TransformedTree.GetLastCommonAncestor(childNames);
+                if (candidate != null && candidate.GetNodeNames().Count == childNames.Count)
+                {
+                    this.SetSelection(candidate);
+                }
+                else
+                {
+                    this.SetSelection(null);
+                }
+            }
+            else
+            {
+                this.SetSelection(null);
             }
         }
 
         private void BuildCoordinatesPanel(string suggestedModuleId)
         {
-            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
+            this.FindControl<StackPanel>("CoordinatesModuleContainerPanel").Children.Add(new TextBlock() { Text = "Coordinates module", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 16, Margin = new Thickness(5, 0, 0, 5), Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) });
 
-            Grid coordinatesPanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-            coordinatesPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel) };
+            Grid coordinatesPanel = new Grid() { Margin = new Thickness(5, 5, 0, 5) };
+            coordinatesPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star) };
 
-            coordinatesPanel.Children.Add(new TextBlock() { Text = "Coordinates", FontWeight = Avalonia.Media.FontWeight.Bold, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 18 });
+            coordinatesPanel.Children.Add(new TextBlock() { Text = "Choose module:", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13 });
 
-            CoordinatesAlert = AlertPage.PaintToCanvas();
-            CoordinatesAlert.Margin = new Thickness(5, 0, 0, 0);
+            CoordinatesAlert = GetAlertIcon();
+            CoordinatesAlert.Width = 16;
+            CoordinatesAlert.Height = 16;
+            CoordinatesAlert.Margin = new Thickness(0, 0, 5, 0);
             CoordinatesAlert.IsVisible = false;
             Grid.SetColumn(CoordinatesAlert, 1);
 
@@ -3316,7 +2097,7 @@ namespace TreeViewer
             int moduleIndex = Math.Max(0, Modules.CoordinateModules.IndexOf(Modules.GetModule(Modules.CoordinateModules, suggestedModuleId)));
 
             List<string> coordinateModules = (from el in Modules.CoordinateModules select el.Name).ToList();
-            CoordinatesComboBox = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Padding = new Thickness(5, 0, 5, 0), Items = coordinateModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
+            CoordinatesComboBox = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Items = coordinateModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
             Grid.SetColumn(CoordinatesComboBox, 2);
             coordinatesPanel.Children.Add(CoordinatesComboBox);
 
@@ -3325,11 +2106,20 @@ namespace TreeViewer
                 e.Handled = true;
             };
 
-            HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-            Grid.SetColumn(helpButton, 3);
-            coordinatesPanel.Children.Add(helpButton);
+            this.FindControl<StackPanel>("CoordinatesModuleContainerPanel").Children.Add(coordinatesPanel);
 
-            ToolTip.SetTip(helpButton, Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].HelpText);
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 0), ArrowSize = 10 };
+
+            Grid parametersHeaderPanel = new Grid() { Margin = new Thickness(0, 0, 0, 0) };
+            parametersHeaderPanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(24, GridUnitType.Pixel) };
+
+            parametersHeaderPanel.Children.Add(new TextBlock() { Text = "Parameters", FontWeight = FontWeight.Bold, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13 });
+
+            HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            Grid.SetColumn(helpButton, 1);
+            parametersHeaderPanel.Children.Add(helpButton);
+
+            AvaloniaBugFixes.SetToolTip(helpButton, Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].HelpText);
 
             helpButton.PointerPressed += (s, e) =>
             {
@@ -3345,7 +2135,7 @@ namespace TreeViewer
                 win.Show(this);
             };
 
-            exp.AccordionHeader = coordinatesPanel;
+            exp.AccordionHeader = parametersHeaderPanel;
 
             List<(string, string)> coordinateParameters = Modules.CoordinateModules[moduleIndex].GetParameters(TransformedTree);
             coordinateParameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
@@ -3355,18 +2145,20 @@ namespace TreeViewer
                 return Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].OnParameterChange(TransformedTree, previousParameterValues, currentParameterValues, out controlStatus, out parametersToChange);
             };
 
-            CoordinatesComboBox.SelectionChanged += (s, e) =>
+            CoordinatesComboBox.SelectionChanged += async (s, e) =>
             {
-                ToolTip.SetTip(helpButton, Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].HelpText);
+                AvaloniaBugFixes.SetToolTip(helpButton, Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].HelpText);
                 List<(string, string)> parameters = Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].GetParameters(TransformedTree);
                 parameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
-                CoordinatesParameters = UpdateParameterPanel(exp, coordinateParameterChange, parameters, UpdateCoordinates, out UpdateCoordinatesParameters);
-                UpdateCoordinates();
+                CoordinatesParameters = UpdateParameterPanel(coordinateParameterChange, parameters, async () => await UpdateCoordinates(), out UpdateCoordinatesParameters, out Control content);
+                exp.AccordionContent = content;
+                await UpdateCoordinates();
             };
 
-            CoordinatesParameters = UpdateParameterPanel(exp, coordinateParameterChange, coordinateParameters, UpdateCoordinates, out UpdateCoordinatesParameters);
+            CoordinatesParameters = UpdateParameterPanel(coordinateParameterChange, coordinateParameters, async () => await UpdateCoordinates(), out UpdateCoordinatesParameters, out Control content);
+            exp.AccordionContent = content;
 
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(exp);
+            this.FindControl<StackPanel>("CoordinatesModuleContainerPanel").Children.Add(exp);
         }
 
         public Action<Dictionary<string, object>> SetCoordinateModule(CoordinateModule module)
@@ -3380,7 +2172,7 @@ namespace TreeViewer
             }
             else
             {
-                return arg => { UpdateCoordinatesParameters(arg); UpdateCoordinates(); };
+                return async arg => { UpdateCoordinatesParameters(arg); await UpdateCoordinates(); };
             }
         }
 
@@ -3402,49 +2194,49 @@ namespace TreeViewer
 
         private void BuildPlottingPanel(Colour backgroundColour)
         {
-            Grid plotElementsGrid = new Grid();
+            this.FindControl<StackPanel>("PlotActionsContainerPanel").Children.Add(new TextBlock() { Text = "Plot elements", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 5), FontSize = 16, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) });
+
+            Grid plotElementsGrid = new Grid() { Margin = new Thickness(5, 0, 0, 5) };
+            plotElementsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             plotElementsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             plotElementsGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-            plotElementsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-            plotElementsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-
-            plotElementsGrid.Children.Add(new TextBlock() { Text = "Plot elements", FontWeight = Avalonia.Media.FontWeight.Bold, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 5), FontSize = 18 });
 
             {
                 TextBlock blk = new TextBlock() { Text = "Background: ", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0), FontSize = 13 };
-                Grid.SetColumn(blk, 2);
                 plotElementsGrid.Children.Add(blk);
 
-                AvaloniaColorPicker.ColorButton btn = new AvaloniaColorPicker.ColorButton() { Color = backgroundColour.ToAvalonia(), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontFamily = this.FontFamily, FontSize = this.FontSize };
-                Grid.SetColumn(btn, 3);
+                ColorButton btn = new ColorButton() { Color = backgroundColour.ToAvalonia(), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontFamily = this.FontFamily, FontSize = this.FontSize };
+                btn.Classes.Add("PlainButton");
+                Grid.SetColumn(btn, 1);
                 plotElementsGrid.Children.Add(btn);
 
                 btn.PropertyChanged += (s, e) =>
                 {
-                    if (e.Property == AvaloniaColorPicker.ColorButton.ColorProperty)
+                    if (e.Property == ColorButton.ColorProperty)
                     {
                         GraphBackground = btn.Color.ToVectSharp();
                     }
                 };
             }
 
-
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(plotElementsGrid);
+            this.FindControl<StackPanel>("PlotActionsContainerPanel").Children.Add(plotElementsGrid);
 
             PlottingActions = new List<PlottingModule>();
-            PlottingAlerts = new List<Canvas>();
+            PlottingAlerts = new List<Control>();
             PlottingParameters = new List<Dictionary<string, object>>();
             UpdatePlottingParameters = new List<Action<Dictionary<string, object>>>();
-            //PlottingTimings = new List<TextBlock>();
 
             PlottingActionsContainer = new StackPanel();
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(PlottingActionsContainer);
+            this.FindControl<StackPanel>("PlotActionsContainerPanel").Children.Add(PlottingActionsContainer);
 
-            StackPanel addButtonContainer = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(2, 0, 0, 0) };
+            Button addModuleButton = new Button() { Background = Brushes.Transparent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, Padding = new Thickness(5, 3, 5, 3), RenderTransform = null, Margin = new Thickness(5, 0, 0, 5) };
+            addModuleButton.Classes.Add("SideBarButton");
 
-            AddRemoveButton addPlottingModule = new AddRemoveButton();
+            StackPanel addButtonContainer = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
 
-            addPlottingModule.PointerReleased += async (s, e) =>
+            Avalonia.Controls.Shapes.Path addPlottingModule = new Avalonia.Controls.Shapes.Path() { Width = 8, Height = 8, Data = Geometry.Parse("M 4,0 L4,8 M0,4 L8,4"), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, StrokeThickness = 2 };
+
+            addModuleButton.Click += async (s, e) =>
             {
                 AddPlottingModuleWindow win = new AddPlottingModuleWindow();
 
@@ -3457,15 +2249,18 @@ namespace TreeViewer
                     PlotCanvases.Add(null);
                     PlotBounds.Add((new VectSharp.Point(), new VectSharp.Point()));
                     SelectionCanvases.Add(null);
+                    LayerTransforms.Add(null);
 
-                    UpdatePlotLayer(PlotCanvases.Count - 1, false);
+                    await ActuallyUpdatePlotLayer(PlotCanvases.Count - 1, false);
                 }
             };
 
             addButtonContainer.Children.Add(addPlottingModule);
-            addButtonContainer.Children.Add(new TextBlock() { Text = "Add module", Foreground = new SolidColorBrush(Color.FromRgb(180, 180, 180)), FontStyle = FontStyle.Italic, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0) });
+            addButtonContainer.Children.Add(new TextBlock() { Text = "Add module", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0), FontSize = 13 });
 
-            this.FindControl<StackPanel>("ParameterContainerPanel").Children.Add(addButtonContainer);
+            addModuleButton.Content = addButtonContainer;
+
+            this.FindControl<StackPanel>("PlotActionsContainerPanel").Children.Add(addModuleButton);
         }
 
         public void RemovePlottingModule(int index)
@@ -3475,13 +2270,22 @@ namespace TreeViewer
             PlottingActionsContainer.Children.RemoveAt(index);
             PlottingAlerts.RemoveAt(index);
             UpdatePlottingParameters.RemoveAt(index);
-            //PlottingTimings.RemoveAt(index);
 
             if (PlottingActions.Count > 0)
             {
-                ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[2].IsVisible = false;
-                ((Grid)((Accordion)PlottingActionsContainer.Children.Last()).AccordionHeader).Children[3].IsVisible = false;
+                ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[4].IsVisible = false;
+                ((Grid)((Accordion)PlottingActionsContainer.Children.Last()).AccordionHeader).Children[5].IsVisible = false;
             }
+        }
+
+        public async void AddPlottingModuleAccessoriesAndUpdate()
+        {
+            PlotCanvases.Add(null);
+            PlotBounds.Add((new VectSharp.Point(), new VectSharp.Point()));
+            SelectionCanvases.Add(null);
+            LayerTransforms.Add(null);
+
+            await ActuallyUpdatePlotLayer(PlotCanvases.Count - 1, false);
         }
 
         public Action<Dictionary<string, object>> AddPlottingModule(PlottingModule module)
@@ -3493,35 +2297,38 @@ namespace TreeViewer
 
             PlottingActions.Add(module);
 
-            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5) };
+            Accordion exp = new Accordion() { Margin = new Thickness(5, 0, 0, 5), ArrowSize = 10 };
 
-            Grid modulePanel = new Grid() { Margin = new Thickness(0, 5, 0, 5) };
-            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(24, GridUnitType.Pixel) };
+            Grid modulePanel = new Grid() { Margin = new Thickness(0, 0, 0, 0) };
+            modulePanel.ColumnDefinitions = new ColumnDefinitions() { new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(1, GridUnitType.Star), new ColumnDefinition(0, GridUnitType.Auto), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(GlobalSettings.Settings.ShowLegacyUpDownArrows ? 24 : 0, GridUnitType.Pixel), new ColumnDefinition(16, GridUnitType.Pixel), new ColumnDefinition(0, GridUnitType.Auto) };
 
-            Canvas alert = AlertPage.PaintToCanvas();
+            Control alert = GetAlertIcon();
+            alert.Width = 16;
+            alert.Height = 16;
             PlottingAlerts.Add(alert);
-            alert.Margin = new Thickness(5, 0, 0, 0);
+            alert.Margin = new Thickness(0, 0, 5, 0);
             alert.IsVisible = false;
 
             modulePanel.Children.Add(alert);
 
-            TextBlock moduleName = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = module.Name, FontWeight = FontWeight.Bold };
+            DPIAwareBox icon = new DPIAwareBox(module.GetIcon) { Width = 16, Height = 16, Margin = new Thickness(0, 0, 5, 0) };
+            Grid.SetColumn(icon, 1);
+            modulePanel.Children.Add(icon);
+            AvaloniaBugFixes.SetToolTip(icon, module.Name);
 
-            Grid.SetColumn(moduleName, 1);
+            FillingControl<TrimmedTextBox2> moduleName = new FillingControl<TrimmedTextBox2>(new TrimmedTextBox2() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = module.Name, FontWeight = FontWeight.Bold, FontSize = 13 }, 5) { Margin = new Thickness(-5, 0, -5, 0) };
+
+            AvaloniaBugFixes.SetToolTip(moduleName, module.Name);
+
+            Grid.SetColumn(moduleName, 2);
 
             modulePanel.Children.Add(moduleName);
 
-            /*TextBlock timingBlock = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = "?ms", FontStyle = FontStyle.Italic, Foreground = new SolidColorBrush(0xFFC0C0C0), FontSize = 12 };
-
-            Grid.SetColumn(timingBlock, 2);
-            modulePanel.Children.Add(timingBlock);
-            PlottingTimings.Add(timingBlock);*/
-
             HelpButton helpButton = new HelpButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-            Grid.SetColumn(helpButton, 2);
+            Grid.SetColumn(helpButton, 3);
             modulePanel.Children.Add(helpButton);
 
-            ToolTip.SetTip(helpButton, module.HelpText);
+            AvaloniaBugFixes.SetToolTip(helpButton, module.HelpText);
 
             helpButton.PointerPressed += (s, e) =>
             {
@@ -3538,7 +2345,7 @@ namespace TreeViewer
             };
 
             AddRemoveButton moveUp = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Up };
-            Grid.SetColumn(moveUp, 3);
+            Grid.SetColumn(moveUp, 4);
             modulePanel.Children.Add(moveUp);
             if (PlottingActions.Count <= 1)
             {
@@ -3569,26 +2376,13 @@ namespace TreeViewer
                     PlottingActionsContainer.Children.RemoveAt(index);
                     PlottingActionsContainer.Children.Insert(index - 1, pan);
 
-                    Canvas alert = PlottingAlerts[index];
+                    Control alert = PlottingAlerts[index];
                     PlottingAlerts.RemoveAt(index);
                     PlottingAlerts.Insert(index - 1, alert);
-
-                    /*TextBlock timing = PlottingTimings[index];
-                    PlottingTimings.RemoveAt(index);
-                    PlottingTimings.Insert(index - 1, timing);*/
 
                     for (int i = 0; i < PlottingActionsContainer.Children.Count; i++)
                     {
                         if (i == 0)
-                        {
-                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
-                        }
-                        else
-                        {
-                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
-                        }
-
-                        if (i == PlottingActionsContainer.Children.Count - 1)
                         {
                             ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = false;
                         }
@@ -3596,9 +2390,18 @@ namespace TreeViewer
                         {
                             ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = true;
                         }
+
+                        if (i == PlottingActionsContainer.Children.Count - 1)
+                        {
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[5].IsVisible = false;
+                        }
+                        else
+                        {
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[5].IsVisible = true;
+                        }
                     }
 
-                    Canvas plotCanvas = PlotCanvases[index];
+                    SKRenderContext plotCanvas = PlotCanvases[index];
                     PlotCanvases.RemoveAt(index);
                     PlotCanvases.Insert(index - 1, plotCanvas);
 
@@ -3606,23 +2409,21 @@ namespace TreeViewer
                     PlotBounds.RemoveAt(index);
                     PlotBounds.Insert(index - 1, bounds);
 
-                    Canvas selectionCanvas = SelectionCanvases[index];
+                    SKRenderContext selectionCanvas = SelectionCanvases[index];
                     SelectionCanvases.RemoveAt(index);
                     SelectionCanvases.Insert(index - 1, selectionCanvas);
 
-                    Canvas parentCanvas = this.FindControl<Canvas>("PlotCanvas");
-                    parentCanvas.Children.RemoveAt(index);
-                    parentCanvas.Children.Insert(index - 1, plotCanvas);
+                    SKRenderAction transform = LayerTransforms[index];
+                    LayerTransforms.RemoveAt(index);
+                    LayerTransforms.Insert(index - 1, transform);
 
-                    SelectionCanvas.Children.RemoveAt(index);
-                    SelectionCanvas.Children.Insert(index - 1, selectionCanvas);
-
-                    //UpdateAllPlotLayers();
+                    FullPlotCanvas.MoveLayer(index, index - 1);
+                    FullSelectionCanvas.MoveLayer(index, index - 1);
                 }
             };
 
             AddRemoveButton moveDown = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Down };
-            Grid.SetColumn(moveDown, 4);
+            Grid.SetColumn(moveDown, 5);
             modulePanel.Children.Add(moveDown);
             moveDown.IsVisible = false;
 
@@ -3650,26 +2451,13 @@ namespace TreeViewer
                     PlottingActionsContainer.Children.RemoveAt(index);
                     PlottingActionsContainer.Children.Insert(index + 1, pan);
 
-                    Canvas alert = PlottingAlerts[index];
+                    Control alert = PlottingAlerts[index];
                     PlottingAlerts.RemoveAt(index);
                     PlottingAlerts.Insert(index + 1, alert);
-
-                    /*TextBlock timing = PlottingTimings[index];
-                    PlottingTimings.RemoveAt(index);
-                    PlottingTimings.Insert(index + 1, timing);*/
 
                     for (int i = 0; i < PlottingActionsContainer.Children.Count; i++)
                     {
                         if (i == 0)
-                        {
-                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = false;
-                        }
-                        else
-                        {
-                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[3].IsVisible = true;
-                        }
-
-                        if (i == PlottingActionsContainer.Children.Count - 1)
                         {
                             ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = false;
                         }
@@ -3677,9 +2465,18 @@ namespace TreeViewer
                         {
                             ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[4].IsVisible = true;
                         }
+
+                        if (i == PlottingActionsContainer.Children.Count - 1)
+                        {
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[5].IsVisible = false;
+                        }
+                        else
+                        {
+                            ((Grid)((Accordion)PlottingActionsContainer.Children[i]).AccordionHeader).Children[5].IsVisible = true;
+                        }
                     }
 
-                    Canvas plotCanvas = PlotCanvases[index];
+                    SKRenderContext plotCanvas = PlotCanvases[index];
                     PlotCanvases.RemoveAt(index);
                     PlotCanvases.Insert(index + 1, plotCanvas);
 
@@ -3687,19 +2484,16 @@ namespace TreeViewer
                     PlotBounds.RemoveAt(index);
                     PlotBounds.Insert(index + 1, bounds);
 
-                    Canvas selectionCanvas = SelectionCanvases[index];
+                    SKRenderContext selectionCanvas = SelectionCanvases[index];
                     SelectionCanvases.RemoveAt(index);
                     SelectionCanvases.Insert(index + 1, selectionCanvas);
 
+                    SKRenderAction transform = LayerTransforms[index];
+                    LayerTransforms.RemoveAt(index);
+                    LayerTransforms.Insert(index + 1, transform);
 
-                    Canvas parentCanvas = this.FindControl<Canvas>("PlotCanvas");
-                    parentCanvas.Children.RemoveAt(index);
-                    parentCanvas.Children.Insert(index + 1, plotCanvas);
-
-                    SelectionCanvas.Children.RemoveAt(index);
-                    SelectionCanvas.Children.Insert(index + 1, selectionCanvas);
-
-                    //UpdateAllPlotLayers();
+                    FullPlotCanvas.MoveLayer(index, index + 1);
+                    FullSelectionCanvas.MoveLayer(index, index + 1);
                 }
             };
 
@@ -3713,8 +2507,8 @@ namespace TreeViewer
                 moveDown.Opacity = 0;
             }
 
-
-            AddRemoveButton remove = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Remove };
+            Button remove = new Button() { Margin = new Thickness(0, 0, 2, 0), Width = 16, Height = 16, Background = Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 8, Height = 8, Data = Geometry.Parse("M0,0 L8,8 M8,0 L0,8"), StrokeThickness = 2, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center } };
+            remove.Classes.Add("SideBarButton");
 
             remove.PointerPressed += (s, e) =>
             {
@@ -3731,8 +2525,9 @@ namespace TreeViewer
                 e.Handled = true;
             };
 
+            AvaloniaBugFixes.SetToolTip(remove, new TextBlock() { Text = "Remove", Foreground = Brushes.Black });
 
-            Grid.SetColumn(remove, 5);
+            Grid.SetColumn(remove, 7);
             modulePanel.Children.Add(remove);
 
             remove.Click += (s, e) =>
@@ -3746,33 +2541,21 @@ namespace TreeViewer
                 PlottingActionsContainer.Children.RemoveAt(index);
                 PlottingAlerts.RemoveAt(index);
                 UpdatePlottingParameters.RemoveAt(index);
-                //PlottingTimings.RemoveAt(index);
 
                 if (PlottingActions.Count > 0)
                 {
-                    ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[3].IsVisible = false;
-                    ((Grid)((Accordion)PlottingActionsContainer.Children.Last()).AccordionHeader).Children[4].IsVisible = false;
+                    ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[4].IsVisible = false;
+                    ((Grid)((Accordion)PlottingActionsContainer.Children.Last()).AccordionHeader).Children[5].IsVisible = false;
                 }
 
-                Canvas plotCanvas = PlotCanvases[index];
                 PlotCanvases.RemoveAt(index);
-
+                LayerTransforms.RemoveAt(index);
                 PlotBounds.RemoveAt(index);
 
-                Canvas selectionCanvas = SelectionCanvases[index];
                 SelectionCanvases.RemoveAt(index);
 
-                Canvas parentCanvas = this.FindControl<Canvas>("PlotCanvas");
-
-                if (plotCanvas != null)
-                {
-                    parentCanvas.Children.Remove(plotCanvas);
-                }
-
-                if (selectionCanvas != null)
-                {
-                    SelectionCanvas.Children.Remove(selectionCanvas);
-                }
+                FullPlotCanvas.RemoveLayer(index);
+                FullSelectionCanvas.RemoveLayer(index);
 
                 UpdatePlotBounds();
             };
@@ -3781,7 +2564,7 @@ namespace TreeViewer
 
             PointerPressedEventArgs pressEventArgs = null;
 
-            Avalonia.Threading.DispatcherTimer pressTimer = new Avalonia.Threading.DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(500) };
+            Avalonia.Threading.DispatcherTimer pressTimer = new Avalonia.Threading.DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(GlobalSettings.Settings.DragInterval) };
 
             if (!GlobalSettings.Settings.ShowLegacyUpDownArrows)
             {
@@ -3824,11 +2607,11 @@ namespace TreeViewer
                                     UpdatePlottingParameters.RemoveAt(oldIndex);
                                     UpdatePlottingParameters.Insert(newIndex, updater);
 
-                                    Canvas alert = PlottingAlerts[oldIndex];
+                                    Control alert = PlottingAlerts[oldIndex];
                                     PlottingAlerts.RemoveAt(oldIndex);
                                     PlottingAlerts.Insert(newIndex, alert);
 
-                                    Canvas plotCanvas = PlotCanvases[oldIndex];
+                                    SKRenderContext plotCanvas = PlotCanvases[oldIndex];
                                     PlotCanvases.RemoveAt(oldIndex);
                                     PlotCanvases.Insert(newIndex, plotCanvas);
 
@@ -3836,16 +2619,16 @@ namespace TreeViewer
                                     PlotBounds.RemoveAt(oldIndex);
                                     PlotBounds.Insert(newIndex, bounds);
 
-                                    Canvas selectionCanvas = SelectionCanvases[oldIndex];
+                                    SKRenderContext selectionCanvas = SelectionCanvases[oldIndex];
                                     SelectionCanvases.RemoveAt(oldIndex);
                                     SelectionCanvases.Insert(newIndex, selectionCanvas);
 
-                                    Canvas parentCanvas = this.FindControl<Canvas>("PlotCanvas");
-                                    parentCanvas.Children.RemoveAt(oldIndex);
-                                    parentCanvas.Children.Insert(newIndex, plotCanvas);
+                                    SKRenderAction transform = LayerTransforms[oldIndex];
+                                    LayerTransforms.RemoveAt(oldIndex);
+                                    LayerTransforms.Insert(newIndex, transform);
 
-                                    SelectionCanvas.Children.RemoveAt(oldIndex);
-                                    SelectionCanvas.Children.Insert(newIndex, selectionCanvas);
+                                    FullPlotCanvas.MoveLayer(oldIndex, newIndex);
+                                    FullSelectionCanvas.MoveLayer(oldIndex, newIndex);
                                 }
                             }
                         }
@@ -3858,10 +2641,13 @@ namespace TreeViewer
 
                 exp.PointerPressed += (s, e) =>
                 {
-                    if (!helpButton.IsPointerOver && !remove.IsPointerOver)
+                    if (!helpButton.IsPointerOver && !remove.IsPointerOver && PlottingActions.Count > 1)
                     {
-                        pressEventArgs = e;
-                        pressTimer.Start();
+                        if (exp.FindControl<Grid>("HeaderGrid").IsPointerOver)
+                        {
+                            pressEventArgs = e;
+                            pressTimer.Start();
+                        }
                     }
                 };
 
@@ -3872,8 +2658,6 @@ namespace TreeViewer
                 };
             }
 
-            //exp.Transitions = new Avalonia.Animation.Transitions() { new Avalonia.Animation.ThicknessTransition() { Property = Accordion.MarginProperty, Duration = TimeSpan.FromMilliseconds(50) } };
-
             List<(string, string)> moduleParameters = module.GetParameters(TransformedTree);
             moduleParameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
 
@@ -3882,7 +2666,8 @@ namespace TreeViewer
                 return module.OnParameterChange(TransformedTree, previousParameterValues, currentParameterValues, out controlStatus, out parametersToChange);
             };
 
-            PlottingParameters.Add(UpdateParameterPanel(exp, plottingParameterChange, moduleParameters, () => { UpdatePlotLayer(PlottingActionsContainer.Children.IndexOf(exp), true); }, out Action<Dictionary<string, object>> updateParameterAction));
+            PlottingParameters.Add(UpdateParameterPanel(plottingParameterChange, moduleParameters, () => { _ = UpdatePlotLayer(PlottingActionsContainer.Children.IndexOf(exp), true); }, out Action<Dictionary<string, object>> updateParameterAction, out Control content));
+            exp.AccordionContent = content;
 
             UpdatePlottingParameters.Add(updateParameterAction);
 
@@ -3890,13 +2675,46 @@ namespace TreeViewer
 
             if (PlottingActions.Count > 1)
             {
-                ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[4].IsVisible = true;
+                ((Grid)((Accordion)PlottingActionsContainer.Children[0]).AccordionHeader).Children[5].IsVisible = true;
             }
 
             if (PlottingActions.Count > 2)
             {
-                ((Grid)((Accordion)PlottingActionsContainer.Children[PlottingActionsContainer.Children.Count - 2]).AccordionHeader).Children[4].IsVisible = true;
+                ((Grid)((Accordion)PlottingActionsContainer.Children[PlottingActionsContainer.Children.Count - 2]).AccordionHeader).Children[5].IsVisible = true;
             }
+
+            Button duplicate = new Button() { Width = 16, Height = 16, Background = Brushes.Transparent, Content = new DPIAwareBox(Icons.GetDuplicateIcon) { Width = 10, Height = 10 }, Padding = new Thickness(0) };
+            duplicate.Classes.Add("SideBarButton");
+
+            duplicate.PointerPressed += (s, e) =>
+            {
+                e.Handled = true;
+            };
+
+            AvaloniaBugFixes.SetToolTip(duplicate, new TextBlock() { Text = "Duplicate", Foreground = Brushes.Black });
+
+            Grid.SetColumn(duplicate, 6);
+            modulePanel.Children.Add(duplicate);
+
+            duplicate.Click += async (s, e) =>
+            {
+                int index = PlottingActionsContainer.Children.IndexOf(exp);
+
+                Dictionary<string, object> parameters = PlottingParameters[index].ShallowClone();
+
+                Action<Dictionary<string, object>> updater = this.StateData.AddPlottingModule(module);
+
+                parameters[Modules.ModuleIDKey] = this.PlottingParameters[this.PlottingParameters.Count - 1][Modules.ModuleIDKey];
+
+                updater(parameters);
+
+                PlotCanvases.Add(null);
+                PlotBounds.Add((new VectSharp.Point(), new VectSharp.Point()));
+                SelectionCanvases.Add(null);
+                LayerTransforms.Add(null);
+
+                await ActuallyUpdatePlotLayer(PlotCanvases.Count - 1, false);
+            };
 
             return updateParameterAction;
         }
@@ -3910,64 +2728,6 @@ namespace TreeViewer
                 SetZoom(zoom, zoom == this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX);
             }
         }
-
-        bool IsSelectionExpanded = false;
-
-        public void ExpandSelection()
-        {
-            ((TranslateTransform)this.FindControl<Grid>("SelectionGrid").RenderTransform).X = 0;
-            ((TranslateTransform)this.FindControl<Button>("ShowHideSelectionButton").RenderTransform).X = 0;
-            ((RotateTransform)this.FindControl<Canvas>("ShowHideSelectionIconCanvas").RenderTransform).Angle = 0;
-            IsSelectionExpanded = true;
-        }
-
-        public void ReduceSelection()
-        {
-            ((TranslateTransform)this.FindControl<Grid>("SelectionGrid").RenderTransform).X = 300;
-            ((TranslateTransform)this.FindControl<Button>("ShowHideSelectionButton").RenderTransform).X = 300;
-            ((RotateTransform)this.FindControl<Canvas>("ShowHideSelectionIconCanvas").RenderTransform).Angle = 180;
-            IsSelectionExpanded = false;
-        }
-
-        private void ShowHideSelectionClicked(object sender, RoutedEventArgs e)
-        {
-            if (IsSelectionExpanded)
-            {
-                ReduceSelection();
-            }
-            else
-            {
-                ExpandSelection();
-            }
-        }
-
-        private void TranslationPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            if (e.Property == TranslateTransform.XProperty)
-            {
-                if ((double)e.NewValue == 300)
-                {
-                    Grid.SetColumnSpan(this.FindControl<StackPanel>("ActionsPanel"), 3);
-                    this.FindControl<StackPanel>("ActionsPanel").Margin = new Thickness(10, 0, 20, 0);
-                    Grid.SetColumnSpan(this.FindControl<Grid>("ZoomPanel"), 3);
-                    this.FindControl<Grid>("ZoomPanel").Margin = new Thickness(10, 0, 20, 0);
-
-                }
-                else
-                {
-                    Grid.SetColumnSpan(this.FindControl<StackPanel>("ActionsPanel"), 1);
-                    this.FindControl<StackPanel>("ActionsPanel").Margin = new Thickness(10, 0, 10, 0);
-                    if (this.Width >= 976)
-                    {
-                        Grid.SetColumnSpan(this.FindControl<Grid>("ZoomPanel"), 1);
-                        this.FindControl<Grid>("ZoomPanel").Margin = new Thickness(10, 0, 10, 0);
-
-                    }
-                }
-            }
-        }
-
-
         private async void KeyPressed(object sender, KeyEventArgs e)
         {
             if (!(e.Device.FocusedElement is TextBox element && element.IsEffectivelyVisible == true) && !(e.Device.FocusedElement is NumericUpDown element2 && element2.IsEffectivelyVisible == true))
@@ -3986,19 +2746,51 @@ namespace TreeViewer
 
                 for (int i = 0; i < Modules.ActionModules.Count; i++)
                 {
-                    if (e.Key == Modules.ActionModules[i].ShortcutKey && e.KeyModifiers == Modules.GetModifier(Modules.ActionModules[i].ShortcutModifier))
+                    if (Modules.ActionModules[i].SubItems.Count == 0)
                     {
-                        Modules.ActionModules[i].PerformAction(this, this.StateData);
-                        e.Handled = true;
+                        if (e.Key == Modules.ActionModules[i].ShortcutKeys[0].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.ActionModules[i].ShortcutKeys[0].Item2))
+                        {
+                            Modules.ActionModules[i].PerformAction(0, this, this.StateData);
+                            e.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        int shift = string.IsNullOrEmpty(Modules.ActionModules[i].SubItems[0].Item1) ? -1 : 0;
+
+                        for (int j = 0; j < Modules.ActionModules[i].SubItems.Count; j++)
+                        {
+                            if (e.Key == Modules.ActionModules[i].ShortcutKeys[j].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.ActionModules[i].ShortcutKeys[j].Item2))
+                            {
+                                Modules.ActionModules[i].PerformAction(j + shift, this, this.StateData);
+                                e.Handled = true;
+                            }
+                        }
                     }
                 }
 
                 for (int i = 0; i < Modules.MenuActionModules.Count; i++)
                 {
-                    if (e.Key == Modules.MenuActionModules[i].ShortcutKey && e.KeyModifiers == Modules.GetModifier(Modules.MenuActionModules[i].ShortcutModifier))
+                    if (Modules.MenuActionModules[i].SubItems.Count == 0)
                     {
-                        await Modules.MenuActionModules[i].PerformAction(this);
-                        e.Handled = true;
+                        if (e.Key == Modules.MenuActionModules[i].ShortcutKeys[0].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.MenuActionModules[i].ShortcutKeys[0].Item2))
+                        {
+                            await Modules.MenuActionModules[i].PerformAction(0, this);
+                            e.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        int shift = string.IsNullOrEmpty(Modules.MenuActionModules[i].SubItems[0].Item1) ? -1 : 0;
+
+                        for (int j = 0; j < Modules.MenuActionModules[i].SubItems.Count; j++)
+                        {
+                            if (e.Key == Modules.MenuActionModules[i].ShortcutKeys[j].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.MenuActionModules[i].ShortcutKeys[j].Item2))
+                            {
+                                await Modules.MenuActionModules[i].PerformAction(j + shift, this);
+                                e.Handled = true;
+                            }
+                        }
                     }
                 }
             }
@@ -4018,33 +2810,80 @@ namespace TreeViewer
 
                 for (int i = 0; i < Modules.ActionModules.Count; i++)
                 {
-                    if (Modules.ActionModules[i].TriggerInTextBox && e.Key == Modules.ActionModules[i].ShortcutKey && e.KeyModifiers == Modules.GetModifier(Modules.ActionModules[i].ShortcutModifier))
+                    if (Modules.ActionModules[i].TriggerInTextBox)
                     {
-                        Modules.ActionModules[i].PerformAction(this, this.StateData);
-                        e.Handled = true;
+                        if (Modules.ActionModules[i].SubItems.Count == 0)
+                        {
+                            if (e.Key == Modules.ActionModules[i].ShortcutKeys[0].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.ActionModules[i].ShortcutKeys[0].Item2))
+                            {
+                                Modules.ActionModules[i].PerformAction(0, this, this.StateData);
+                                e.Handled = true;
+                            }
+                        }
+                        else
+                        {
+                            int shift = string.IsNullOrEmpty(Modules.ActionModules[i].SubItems[0].Item1) ? -1 : 0;
+
+                            for (int j = 0; j < Modules.ActionModules[i].SubItems.Count; j++)
+                            {
+                                if (e.Key == Modules.ActionModules[i].ShortcutKeys[j].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.ActionModules[i].ShortcutKeys[j].Item2))
+                                {
+                                    Modules.ActionModules[i].PerformAction(j + shift, this, this.StateData);
+                                    e.Handled = true;
+                                }
+                            }
+                        }
                     }
                 }
 
                 for (int i = 0; i < Modules.MenuActionModules.Count; i++)
                 {
-                    if (Modules.MenuActionModules[i].TriggerInTextBox && e.Key == Modules.MenuActionModules[i].ShortcutKey && e.KeyModifiers == Modules.GetModifier(Modules.MenuActionModules[i].ShortcutModifier))
+                    if (Modules.MenuActionModules[i].TriggerInTextBox)
                     {
-                        await Modules.MenuActionModules[i].PerformAction(this);
-                        e.Handled = true;
+                        if (Modules.MenuActionModules[i].SubItems.Count == 0)
+                        {
+                            if (e.Key == Modules.MenuActionModules[i].ShortcutKeys[0].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.MenuActionModules[i].ShortcutKeys[0].Item2))
+                            {
+                                await Modules.MenuActionModules[i].PerformAction(0, this);
+                                e.Handled = true;
+                            }
+                        }
+                        else
+                        {
+                            int shift = string.IsNullOrEmpty(Modules.MenuActionModules[i].SubItems[0].Item1) ? -1 : 0;
+
+                            for (int j = 0; j < Modules.MenuActionModules[i].SubItems.Count; j++)
+                            {
+                                if (e.Key == Modules.MenuActionModules[i].ShortcutKeys[j].Item1 && e.KeyModifiers == Modules.GetModifier(Modules.MenuActionModules[i].ShortcutKeys[j].Item2))
+                                {
+                                    await Modules.MenuActionModules[i].PerformAction(j + shift, this);
+                                    e.Handled = true;
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             if (!e.Handled)
             {
-                if (e.Key == Key.A && e.KeyModifiers == (Modules.ControlModifier | KeyModifiers.Shift))
+                if (e.Key == Key.H && e.KeyModifiers == (Modules.ControlModifier | KeyModifiers.Shift))
                 {
-                    AutosaveWindow window = new AutosaveWindow(this);
-                    await window.ShowDialog(this);
+                    this.RibbonBar.SelectedIndex = 0;
+                    this.RibbonFilePage.SelectedIndex = 0;
+                }
+                else if (e.Key == Key.A && e.KeyModifiers == (Modules.ControlModifier | KeyModifiers.Shift))
+                {
+                    this.RibbonBar.SelectedIndex = 0;
+                    AutosavesPage page = this.GetFilePage<AutosavesPage>(out int ind);
+                    this.RibbonFilePage.SelectedIndex = ind;
+                    ((RibbonFilePageContentTabbedWithButtons)page.PageContent).SelectedIndex = 0;
                 }
                 else if (e.Key == Key.R && e.KeyModifiers == Modules.ControlModifier)
                 {
-                    await GlobalSettings.Settings.ShowGlobalSettingsWindow(this);
+                    this.RibbonBar.SelectedIndex = 0;
+                    this.GetFilePage<PreferencesPage>(out int ind);
+                    this.RibbonFilePage.SelectedIndex = ind;
                 }
                 else if (e.Key == Key.M && e.KeyModifiers == Modules.ControlModifier)
                 {
@@ -4059,13 +2898,17 @@ namespace TreeViewer
                 else if (e.Key == Key.M && e.KeyModifiers == (Modules.ControlModifier | KeyModifiers.Shift))
                 {
                     MessageBox box = new MessageBox("Attention", "The program will now be rebooted to open the module creator (we will do our best to recover the files that are currently open). Do you wish to proceed?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
-                    await box.ShowDialog(this);
+                    await box.ShowDialog2(this);
 
                     if (box.Result == MessageBox.Results.Yes)
                     {
                         Program.Reboot(new string[] { "--module-creator" }, true);
                         ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
                     }
+                }
+                else if (e.Key == Key.K && e.KeyModifiers == Modules.ControlModifier)
+                {
+                    this.FindControl<TextBox>("CommandBox").Focus();
                 }
             }
         }
@@ -4095,32 +2938,43 @@ namespace TreeViewer
             this.FindControl<Slider>("ZoomSlider").Value = Math.Log10(zoom);
             if (!skipActualZoom)
             {
-                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomTo(zoom / this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Width * 0.5, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Height * 0.5, true);
+                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomTo(zoom / this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Width * 0.5, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Height * 0.5);
             }
             UpdateSelectionWidth();
             programmaticZoomUpdate = false;
         }
 
+        private static bool WasAutoFitted = false;
+
         public void AutoFit()
         {
-            double availableWidth = this.Width - (IsSelectionExpanded ? 633 : 333) - 30;
-            double availableHeight = this.Height - 265 - 10;
+            double availableWidth = this.FindControl<Canvas>("PlotBackground").Bounds.Width;
+            double availableHeight = this.FindControl<Canvas>("PlotBackground").Bounds.Height;
+
+            double marginLeft = this.IsModulesPanelOpen ? this.FindControl<Grid>("ParameterContainerGrid").Bounds.Width + 6 : 0;
+            double marginRight = this.IsSelectionPanelOpen ? this.FindControl<Grid>("SelectionGrid").Bounds.Width + 16 : 0;
+
+            availableWidth -= marginLeft + marginRight;
 
             double maxZoomX = availableWidth / this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Width;
             double maxZoomY = availableHeight / this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Height;
 
-            double deltaX = IsSelectionExpanded ? -150 : 0;
+            double deltaX = (marginLeft - marginRight) * 0.5;
 
             double zoom = Math.Min(maxZoomX, maxZoomY);
 
             if (!double.IsNaN(zoom) && !double.IsInfinity(zoom) && zoom > 0)
             {
-                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomTo(1 / this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Width * 0.5, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Height * 0.5, true);
+                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomTo(1 / this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Width * 0.5, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Height * 0.5);
                 this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").BeginPanTo(0, 0);
-                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ContinuePanTo(-this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetX + deltaX, -this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetY, true);
+                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ContinuePanTo(-this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetX + deltaX, -this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetY);
 
                 SetZoom(zoom, false);
             }
+
+            this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Transitions = null;
+
+            WasAutoFitted = true;
         }
 
         private async void AddAttachmentClicked(object sender, PointerReleasedEventArgs e)
@@ -4158,7 +3012,7 @@ namespace TreeViewer
                 while (!validResult)
                 {
                     AddAttachmentWindow win = new AddAttachmentWindow(defaultName, loadInMemory, cacheResults);
-                    await (win.ShowDialog(this));
+                    await (win.ShowDialog2(this));
 
                     if (win.Result)
                     {
@@ -4181,7 +3035,7 @@ namespace TreeViewer
 
                             MessageBox box = new MessageBox("Attention", "There is another attachment with the same name!");
 
-                            await box.ShowDialog(this);
+                            await box.ShowDialog2(this);
                         }
 
                     }
@@ -4195,21 +3049,47 @@ namespace TreeViewer
 
         public void BuildAttachmentList()
         {
-            this.FindControl<StackPanel>("AttachmentContainerPanel").Children.Clear();
+            BuildRibbonAttachmentPanel();
 
-            foreach (KeyValuePair<string, Attachment> kvp in StateData.Attachments)
+            TransformOperations.Builder builder = new TransformOperations.Builder(1);
+            builder.AppendTranslate(-16, 0);
+            TransformOperations offScreen = builder.Build();
+
+            int newIndex = RibbonBar.SelectedIndex;
+            if (newIndex == 0)
             {
-                AttachmentItem attachmentPanel = new AttachmentItem(kvp.Key);
-                attachmentPanel.ItemDeleted += async (s, e) => { await UpdateTransformedTree(); UpdateAttachmentSelectors(); };
-                attachmentPanel.ItemReplaced += async (s, e) =>
+                this.HomePage.UpdateRecentFiles();
+
+                this.RibbonFilePage.IsVisible = true;
+                this.RibbonFilePage.Opacity = 1;
+                this.RibbonFilePage.RenderTransform = TransformOperations.Identity;
+                this.RibbonFilePage.FindControl<Grid>("ThemeGrid").RenderTransform = TransformOperations.Identity;
+
+                this.FindControl<Grid>("TitleBarContainer2").IsVisible = true;
+                this.FindControl<Grid>("TitleBarContainer2").Opacity = 1;
+            }
+            else
+            {
+                for (int i = 0; i < RibbonTabs.Length; i++)
                 {
-                    await UpdateOnlyTransformedTree();
-                    RefreshAttachmentSelectors(e.ItemName);
-                };
-
-                this.FindControl<StackPanel>("AttachmentContainerPanel").Children.Add(attachmentPanel);
-
-                UpdateAttachmentSelectors();
+                    if (RibbonTabs[i] != null)
+                    {
+                        if (i != newIndex)
+                        {
+                            RibbonTabs[i].ZIndex = 0;
+                            RibbonTabs[i].RenderTransform = offScreen;
+                            RibbonTabs[i].Opacity = 0;
+                            RibbonTabs[i].IsHitTestVisible = false;
+                        }
+                        else
+                        {
+                            RibbonTabs[i].ZIndex = 1;
+                            RibbonTabs[i].RenderTransform = TransformOperations.Identity;
+                            RibbonTabs[i].Opacity = 1;
+                            RibbonTabs[i].IsHitTestVisible = true;
+                        }
+                    }
+                }
             }
         }
 
@@ -4251,6 +3131,25 @@ namespace TreeViewer
         private void FitZoomButtonClicked(object sender, RoutedEventArgs e)
         {
             AutoFit();
+        }
+
+        private void ZoomPointerWheelChanged(object sender, PointerWheelEventArgs e)
+        {
+            if (this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX >= 100 && e.Delta.Y > 0)
+            {
+                e.Handled = true;
+            }
+        }
+
+
+        private void ZoomPlusClicked(object sender, RoutedEventArgs e)
+        {
+            this.FindControl<NumericUpDown>("ZoomNud").Value *= 1.15;
+        }
+
+        private void ZoomMinusClicked(object sender, RoutedEventArgs e)
+        {
+            this.FindControl<NumericUpDown>("ZoomNud").Value /= 1.15;
         }
     }
 }

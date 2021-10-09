@@ -21,7 +21,7 @@ using Avalonia.Markup.Xaml;
 
 namespace TreeViewer
 {
-    public class NewAttributeWindow : Window
+    public class NewAttributeWindow : ChildWindow
     {
         public NewAttributeWindow()
         {
@@ -51,6 +51,8 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+
+            this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.AddAttribute")) { Width = 32, Height = 32 });
         }
 
         private void OKClicked(object sender, RoutedEventArgs e)

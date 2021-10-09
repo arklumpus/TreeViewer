@@ -1,0 +1,69 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+             x:Class="TreeViewer.Accordion" FontSize="13">
+  <StackPanel VerticalAlignment="Top">
+    <Grid Name="HeaderGrid" Cursor="Hand">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <Viewbox Width="18" ClipToBounds="False" Margin="5, 3, 5, 3" Name="LeftArrowViewBox">
+        <Canvas Width="16" Height="16" ClipToBounds="False">
+          <Path Data="M2,6 L8,12 L14,6" StrokeThickness="2" Stroke="Black" StrokeLineCap="Round" StrokeJoin="Round" Width="16" Height="16" ClipToBounds="False" Name="ArrowPathLeft">
+            <Path.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" />
+              </Transitions>
+            </Path.Transitions>
+          </Path>
+        </Canvas>
+      </Viewbox>
+      <ContentControl Grid.Column="1" Name="HeaderPresenter" />
+      <Viewbox Width="18" ClipToBounds="False" Margin="5, 3, 5, 3" Grid.Column="2" IsVisible="False" Name="RightArrowViewBox">
+        <Canvas Width="16" Height="16" ClipToBounds="False">
+          <Path Data="M2,6 L8,12 L14,6" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" Width="16" Height="16" ClipToBounds="False" Name="ArrowPathRight">
+            <Path.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" />
+              </Transitions>
+            </Path.Transitions>
+          </Path>
+        </Canvas>
+      </Viewbox>
+    </Grid>
+    <Grid Height="0" Background="Transparent" ClipToBounds="True" Name="ContentGridParent" IsVisible="False">
+      <Grid.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Grid.Height"></DoubleTransition>
+        </Transitions>
+      </Grid.Transitions>
+      <Border Name="ContentGrid" ClipToBounds="True" VerticalAlignment="Top" Margin="20,0,0,0">
+      </Border>
+    </Grid>
+  </StackPanel>
+
+
+</UserControl>
+

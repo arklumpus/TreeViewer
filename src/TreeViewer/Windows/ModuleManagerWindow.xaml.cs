@@ -17,8 +17,11 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
+using Avalonia.Styling;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,7 +32,7 @@ using VectSharp.MarkdownCanvas;
 
 namespace TreeViewer
 {
-    public class ModuleManagerWindow : Window
+    public class ModuleManagerWindow : ChildWindow
     {
         public ModuleManagerWindow()
         {
@@ -43,38 +46,112 @@ namespace TreeViewer
         private TextBox[] idContainers;
         private TextBlock[] authorContainers;
         private TextBlock[] versionContainers;
-        private AddRemoveButton[] verifiedIcons;
+        private Canvas[] verifiedIcons;
         private TextBlock[] helpContainers;
         private TextBox[] sourceContainers;
-        //private MarkdownCanvasControl[] sourceContainers;
         private MarkdownCanvasControl[] manualContainers;
         private string[] selectedModules;
         private Grid[] noModuleGrids;
+        private RibbonBar bar;
 
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
 
-            /*  <NativeMenu.Menu>
-    <NativeMenu>
-      <NativeMenuItem Header="Module">
-        <NativeMenuItem.Menu>
-          <NativeMenu>
-            <NativeMenuItem Header="Load from source..." Clicked="LoadFromSourceClicked"></NativeMenuItem>
-            <NativeMenuItem Header="Load..." Clicked="LoadClicked"></NativeMenuItem>
-            <NativeMenuItem Header="Load from repository..."></NativeMenuItem>
-            <NativeMenuItemSeperator></NativeMenuItemSeperator>
-            <NativeMenuItem Header="Install..." Clicked="InstallClicked"></NativeMenuItem>
-            <NativeMenuItem Header="Install from repository..."></NativeMenuItem>
-            <NativeMenuItemSeperator></NativeMenuItemSeperator>
-            <NativeMenuItem Header="Export..." Clicked="ExportClicked"></NativeMenuItem>
-            <NativeMenuItemSeperator></NativeMenuItemSeperator>
-            <NativeMenuItem Header="Uninstall..." Clicked="UninstallClicked"></NativeMenuItem>
-          </NativeMenu>
-        </NativeMenuItem.Menu>
-      </NativeMenuItem>
-    </NativeMenu>
-  </NativeMenu.Menu>*/
+            bar = new RibbonBar((from el in headers select (el, false)).ToArray());
+
+            bar.FontSize = 14;
+
+            if (GlobalSettings.Settings.InterfaceStyle == GlobalSettings.InterfaceStyles.MacOSStyle)
+            {
+                this.Classes.Add("MacOSStyle");
+            }
+            else if (GlobalSettings.Settings.InterfaceStyle == GlobalSettings.InterfaceStyles.WindowsStyle)
+            {
+                this.Classes.Add("WindowsStyle");
+            }
+
+            if (GlobalSettings.Settings.RibbonStyle == GlobalSettings.RibbonStyles.Colourful)
+            {
+                bar.Background = new SolidColorBrush(Color.FromRgb(0, 114, 178));
+                bar.Margin = new Thickness(-1, 0, -1, 0);
+                bar.Classes.Add("Colorful");
+            }
+            else
+            {
+                bar.Classes.Add("Grey");
+            }
+
+            this.FindControl<Grid>("RibbonBarContainer").Children.Add(bar);
+
+            RibbonTabContent moduleTab = new RibbonTabContent(new List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)>)>()
+            {
+                ("Module",
+                new List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)>()
+                {
+                    ("Load", new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.LoadModule")), null, new List<(string, Control, string)>(){
+                        ( "", null, null ),
+                        ( "Load from source", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.LoadModule")), null ),
+                        ( "Load from file", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.LoadModule")), null ),
+                        ( "Load from repository", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ModuleRepository")), null )
+                    }, true, 0, (Action<int>)(async ind =>
+                    {
+                        if (ind < 0)
+                        {
+                            ind = 2;
+                        }
+
+                        switch (ind)
+                        {
+                            case 0:
+                                LoadFromSourceClicked(null, new EventArgs());
+                                break;
+                            case 1:
+                                LoadClicked(null, new EventArgs());
+                                break;
+                            case 2:
+                                await LoadFromRepositoryClicked();
+                                break;
+                        }
+                    }), "Loads a new module for the current session."),
+
+                     ("Install", new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.InstallModule")), null, new List<(string, Control, string)>(){
+                        ( "", null, null ),
+                        ( "Install from file", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.InstallModule")), null ),
+                        ( "Install from repository", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ModuleRepository")), null )
+                    }, true, 0, (Action<int>)(async ind =>
+                    {
+                        if (ind < 0)
+                        {
+                            ind = 1;
+                        }
+
+                        switch (ind)
+                        {
+                            case 0:
+                                InstallClicked(null, new EventArgs());
+                                break;
+                            case 1:
+                                await InstallFromRepositoryClicked();
+                                break;
+                        }
+                    }), "Permanently installs a new module."),
+
+                    ("Export", new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.ExportModule")), null, new List<(string, Control, string)>(), true, 0, (Action<int>)(ind =>
+                    {
+                        ExportClicked(null, new EventArgs());
+                    }), "Exports a module as a json.zip file."),
+
+                    ("Uninstall", new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.UninstallModule")), null, new List<(string, Control, string)>(), true, 0, (Action<int>)(ind =>
+                    {
+                        UninstallClicked(null, new EventArgs());
+                    }), "Uninstalls a module that is currently installed.")
+                }),
+
+            })
+            { Height = 80 };
+
+            this.FindControl<Grid>("RibbonTabContainer").Children.Add(moduleTab);
 
             NativeMenu menu = new NativeMenu();
             NativeMenuItem moduleMenu = new NativeMenuItem() { Header = "Module" };
@@ -103,31 +180,34 @@ namespace TreeViewer
 
             NativeMenu.SetMenu(this, menu);
 
-
-
             moduleContainers = new StackPanel[headers.Length];
             nameContainers = new TextBlock[headers.Length];
             idContainers = new TextBox[headers.Length];
             authorContainers = new TextBlock[headers.Length];
             versionContainers = new TextBlock[headers.Length];
-            verifiedIcons = new AddRemoveButton[headers.Length];
+            verifiedIcons = new Canvas[headers.Length];
             helpContainers = new TextBlock[headers.Length];
             sourceContainers = new TextBox[headers.Length];
-            //sourceContainers = new MarkdownCanvasControl[headers.Length];
             manualContainers = new MarkdownCanvasControl[headers.Length];
             selectedModules = new string[headers.Length];
             noModuleGrids = new Grid[headers.Length];
 
-            List<TabItem> tabItems = new List<TabItem>();
+            TransformOperations.Builder builder = new TransformOperations.Builder(1);
+            builder.AppendTranslate(-16, 0);
+            TransformOperations offScreen = builder.Build();
+
+            List<Grid> tabItems = new List<Grid>();
 
             for (int i = 0; i < headers.Length; i++)
             {
-                TabItem item = new TabItem() { Header = headers[i], FontSize = 20 };
-                tabItems.Add(item);
-
                 Grid content = new Grid();
                 content.ColumnDefinitions.Add(new ColumnDefinition(250, GridUnitType.Pixel));
+                content.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                 content.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+                Canvas separator = new Canvas() { Margin = new Thickness(5, 10, 5, 10), Background = new SolidColorBrush(Color.FromRgb(191, 191, 191)), Width = 1 };
+                Grid.SetColumn(separator, 1);
+                content.Children.Add(separator);
 
                 ScrollViewer scr = new ScrollViewer() { Margin = new Thickness(0, 5, 0, 5), VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, Padding = new Thickness(0, 0, 10, 0) };
 
@@ -138,35 +218,37 @@ namespace TreeViewer
                 content.Children.Add(scr);
 
                 Grid grd = new Grid() { Margin = new Thickness(10, 0, 5, 5) };
-                Grid.SetColumn(grd, 1);
+                Grid.SetColumn(grd, 2);
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
 
-                TextBlock nameContainer = new TextBlock() { FontSize = 24, FontWeight = Avalonia.Media.FontWeight.Bold };
+                TextBlock nameContainer = new TextBlock() { FontSize = 20, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) };
                 nameContainers[i] = nameContainer;
                 grd.Children.Add(nameContainer);
 
-                TextBox idContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Background = null, BorderBrush = null, BorderThickness = new Thickness(0, 0, 0, 0), IsReadOnly = true, Padding = new Thickness(0), MinHeight = 0 };
+                TextBox idContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), Foreground = new Avalonia.Media.SolidColorBrush(0xFF707070), Background = null, BorderBrush = null, BorderThickness = new Thickness(0, 0, 0, 0), IsReadOnly = true, Padding = new Thickness(0), MinHeight = 0, FontSize = 12 };
                 idContainers[i] = idContainer;
                 Grid.SetRow(idContainer, 1);
                 grd.Children.Add(idContainer);
 
                 StackPanel pnl = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(0, 10, 0, 0) };
-                TextBlock versionContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF808080) };
+                TextBlock versionContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060) };
                 versionContainers[i] = versionContainer;
                 pnl.Children.Add(versionContainer);
 
-                pnl.Children.Add(new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontStyle = Avalonia.Media.FontStyle.Italic, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF808080), Text = "by" });
+                pnl.Children.Add(new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontStyle = Avalonia.Media.FontStyle.Italic, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060), Text = "by" });
 
-                TextBlock authorContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF808080) };
+                TextBlock authorContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060) };
                 authorContainers[i] = authorContainer;
                 pnl.Children.Add(authorContainer);
 
-                AddRemoveButton verifiedIcon = new AddRemoveButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, ButtonType = AddRemoveButton.ButtonTypes.Cancel };
-                ToolTip.SetTip(verifiedIcon, "Code signature not verified!");
+                Canvas verifiedIcon = new Canvas() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Width = 16, Height = 16, Background = Brushes.Transparent };
+                verifiedIcon.Children.Add(new Avalonia.Controls.Shapes.Path() { Data = Icons.CrossGeometry, Stroke = new SolidColorBrush(Color.FromRgb(213, 94, 0)), Margin = new Thickness(3), StrokeThickness = 2 });
+                AvaloniaBugFixes.SetToolTip(verifiedIcon, "Code signature not verified!");
                 verifiedIcons[i] = verifiedIcon;
                 pnl.Children.Add(verifiedIcon);
                 Grid.SetRow(pnl, 2);
@@ -177,61 +259,95 @@ namespace TreeViewer
                 Grid.SetRow(helpContainer, 3);
                 grd.Children.Add(helpContainer);
 
-                TabControl modulePreviewSelector = new TabControl();
+                RibbonBar modulePreviewSelector = new RibbonBar(new (string, bool)[] { ("Manual", false), ("Source code", false) }) { FontSize = 14, Margin = new Thickness(0, 5, 0, 0) };
                 Grid.SetRow(modulePreviewSelector, 4);
                 grd.Children.Add(modulePreviewSelector);
 
-                TabItem moduleManualItem = new TabItem() { Header = "Manual", FontSize = 18, Height = 30, MinHeight = 30 };
+                ((Grid)modulePreviewSelector.Content).Background = Brushes.Transparent;
+                modulePreviewSelector.Classes.Add("Grey");
 
-                MarkdownCanvasControl manualContainer = new MarkdownCanvasControl() { Background = Avalonia.Media.Brushes.White, Margin = new Thickness(-12, -2, -12, -2), VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Top, MaxRenderWidth = 1000 };
-                manualContainer.Renderer.ImageUnitMultiplier /= 1.8;
-                manualContainer.Renderer.ImageMultiplier *= 1.8;
-                manualContainer.FontSize = 18;
+                Border manualContainerContainer = new Border() { Margin = new Thickness(5), BorderBrush = Brushes.Black, BorderThickness = new Thickness(1) };
+                Grid.SetRow(manualContainerContainer, 5);
+                manualContainerContainer.Classes.Add("TabItem");
+                grd.Children.Add(manualContainerContainer);
+
+                MarkdownCanvasControl manualContainer = new MarkdownCanvasControl() { Background = Avalonia.Media.Brushes.White, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Top, MaxRenderWidth = 1000 };
+                manualContainer.Renderer.ImageUnitMultiplier /= 1.4;
+                manualContainer.Renderer.ImageMultiplier *= 1.4;
+                manualContainer.FontSize = 14;
+                manualContainer.Renderer.HeaderFontSizeMultipliers[0] *= 1.3;
                 manualContainer.Renderer.CodeFont = Modules.CodeFontFamily;
                 manualContainer.Renderer.Margins = new VectSharp.Markdown.Margins(0, 10, 0, 0);
                 manualContainer.Renderer.RasterImageLoader = image => new VectSharp.MuPDFUtils.RasterImageFile(image);
-
+                Grid.SetRow(manualContainer, 5);
                 manualContainers[i] = manualContainer;
-                moduleManualItem.Content = manualContainer;
 
-                StackPanel sourceCodeHeader = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
-                sourceCodeHeader.Children.Add(new TextBlock() { Text = "Source code", FontSize = 18 });
+                manualContainerContainer.Child = manualContainer;
 
-                OpenWindowButton openWindowButton = new OpenWindowButton() { Width = 24, Height = 24, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0) };
-                sourceCodeHeader.Children.Add(openWindowButton);
+                OpenWindowButton openWindowButton = new OpenWindowButton() { Width = 20, Height = 20, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 0, 4), Padding = new Thickness(2) };
+                openWindowButton.Classes.Add("PlainButton");
+                ((StackPanel)modulePreviewSelector.GridItems[1].Parent).Children.Add(openWindowButton);
                 openWindowButton.Click += async (s, e) =>
                 {
                     await OpenSourceCodeWindow();
                 };
 
-                TabItem moduleSourceItem = new TabItem() { Header = sourceCodeHeader, Height = 30, MinHeight = 30 };
+                Grid sourceContainerContainer = new Grid() { Opacity = 0, RenderTransform = offScreen, IsHitTestVisible = false };
+                Grid.SetRow(sourceContainerContainer, 5);
+                sourceContainerContainer.Classes.Add("TabItem");
+                grd.Children.Add(sourceContainerContainer);
 
-                /*MarkdownCanvasControl sourceContainer = new MarkdownCanvasControl() { Background = Avalonia.Media.Brushes.White, MinRenderWidth = 800, Margin = new Thickness(-12, -2, -12, -2), VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Top };
-                sourceContainer.Renderer.BaseFontSize = 16;
-                sourceContainer.Renderer.CodeFont = Modules.CodeFontFamily;
-                sourceContainer.Renderer.Margins = new VectSharp.Markdown.Margins(0, 10, 0, 0);
-                sourceContainer.Renderer.CodeBlockBackgroundColour = VectSharp.Colour.FromRgb(255, 255, 255);*/
-                //sourceContainers[i] = sourceContainer;
-                //moduleSourceItem.Content = sourceContainer;
-
-                TextBox sourceContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontSize = 12, IsReadOnly = true, Margin = new Thickness(0, 5, 0, 0) };
+                TextBox sourceContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontSize = 12, IsReadOnly = true, Margin = new Thickness(5) };
                 sourceContainers[i] = sourceContainer;
-                moduleSourceItem.Content = sourceContainer;
+                sourceContainerContainer.Children.Add(sourceContainer);
 
-                modulePreviewSelector.Items = new List<TabItem>() { moduleManualItem, moduleSourceItem };
 
-                /*Grid.SetRow(sourceContainer, 4);
-                grd.Children.Add(sourceContainer);*/
+                modulePreviewSelector.PropertyChanged += (s, e) =>
+                {
+                    if (e.Property == RibbonBar.SelectedIndexProperty)
+                    {
+                        int newIndex = (int)e.NewValue;
+                        if (newIndex == 0)
+                        {
+                            sourceContainerContainer.ZIndex = 0;
+                            sourceContainerContainer.RenderTransform = offScreen;
+                            sourceContainerContainer.Opacity = 0;
+                            sourceContainerContainer.IsHitTestVisible = false;
+
+                            manualContainerContainer.ZIndex = 1;
+                            manualContainerContainer.RenderTransform = TransformOperations.Identity;
+                            manualContainerContainer.Opacity = 1;
+                            manualContainerContainer.IsHitTestVisible = true;
+                        }
+                        else
+                        {
+                            manualContainerContainer.ZIndex = 0;
+                            manualContainerContainer.RenderTransform = offScreen;
+                            manualContainerContainer.Opacity = 0;
+                            manualContainerContainer.IsHitTestVisible = false;
+
+                            sourceContainerContainer.ZIndex = 1;
+                            sourceContainerContainer.RenderTransform = TransformOperations.Identity;
+                            sourceContainerContainer.Opacity = 1;
+                            sourceContainerContainer.IsHitTestVisible = true;
+                        }
+                    }
+                };
 
                 content.Children.Add(grd);
 
-                Grid noModuleGrid = new Grid() { Background = new Avalonia.Media.SolidColorBrush(0xFFF5F5F5) };
-                Grid.SetColumnSpan(noModuleGrid, 2);
+                Grid noModuleGrid = new Grid() { Background = new Avalonia.Media.SolidColorBrush(0xFFE7E7E7) };
+                Grid.SetColumnSpan(noModuleGrid, 3);
                 content.Children.Add(noModuleGrid);
                 noModuleGrid.Children.Add(new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = "No module available!" });
                 noModuleGrids[i] = noModuleGrid;
 
-                item.Content = content;
+                content.Opacity = 0;
+                tabItems.Add(content);
+                content.IsHitTestVisible = false;
+                content.Classes.Add("TabItem");
+
+                this.FindControl<Grid>("MainGrid").Children.Add(content);
             }
 
             foreach (KeyValuePair<string, ModuleMetadata> module in Modules.LoadedModulesMetadata)
@@ -239,12 +355,59 @@ namespace TreeViewer
                 BuildModuleButton(module);
             }
 
-            this.FindControl<TabControl>("MainTabControl").Items = tabItems;
+            bar.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == RibbonBar.SelectedIndexProperty)
+                {
+                    int newIndex = (int)e.NewValue;
+                    for (int i = 0; i < tabItems.Count; i++)
+                    {
+                        if (tabItems[i] != null)
+                        {
+                            if (i != newIndex)
+                            {
+                                tabItems[i].ZIndex = 0;
+                                tabItems[i].RenderTransform = offScreen;
+                                tabItems[i].Opacity = 0;
+                                tabItems[i].IsHitTestVisible = false;
+                            }
+                            else
+                            {
+                                tabItems[i].ZIndex = 1;
+                                tabItems[i].RenderTransform = TransformOperations.Identity;
+                                tabItems[i].Opacity = 1;
+                                tabItems[i].IsHitTestVisible = true;
+                            }
+                        }
+                    }
+                }
+            };
+
+            for (int i = 0; i < tabItems.Count; i++)
+            {
+                if (tabItems[i] != null)
+                {
+                    if (i != 0)
+                    {
+                        tabItems[i].ZIndex = 0;
+                        tabItems[i].RenderTransform = offScreen;
+                        tabItems[i].Opacity = 0;
+                        tabItems[i].IsHitTestVisible = false;
+                    }
+                    else
+                    {
+                        tabItems[i].ZIndex = 1;
+                        tabItems[i].RenderTransform = TransformOperations.Identity;
+                        tabItems[i].Opacity = 1;
+                        tabItems[i].IsHitTestVisible = true;
+                    }
+                }
+            }
         }
 
         internal async Task OpenSourceCodeWindow()
         {
-            int tabInd = this.FindControl<TabControl>("MainTabControl").SelectedIndex;
+            int tabInd = bar.SelectedIndex;
             if (string.IsNullOrEmpty(selectedModules[tabInd]))
             {
                 return;
@@ -257,29 +420,39 @@ namespace TreeViewer
             await window.ShowDialog2(this);
         }
 
-        Dictionary<string, CoolButton> ModuleButtons = new Dictionary<string, CoolButton>();
+        Dictionary<string, Button> ModuleButtons = new Dictionary<string, Button>();
 
         internal void BuildModuleButton(KeyValuePair<string, ModuleMetadata> module)
         {
-            CoolButton button = new CoolButton() { CornerRadius = new CornerRadius(10), Margin = new Thickness(-5, 0, 0, 0) };
+            Button button = new Button() { Margin = new Thickness(0, 0, 0, 5), Background = Brushes.Transparent, Padding = new Thickness(0) };
+            button.Classes.Add("PlainButton");
 
-            button.Title = new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = module.Value.Name, Foreground = Brushes.White, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Thickness(10, 5), TextWrapping = TextWrapping.Wrap, TextAlignment = TextAlignment.Center };
+            Style blackForeground = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().OfType<TextBlock>());
+            blackForeground.Setters.Add(new Setter(TextBlock.ForegroundProperty, new SolidColorBrush(Color.FromRgb(0, 114, 178))));
 
-            StackPanel pnl = new StackPanel() { Margin = new Thickness(10, 5) };
-            pnl.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = module.Value.Id.Substring(Math.Max(0, module.Value.Id.Length - 22)) });
-            pnl.Children.Add(new TextBlock() { Text = module.Value.Author });
-            button.ButtonContent = pnl;
+            button.Styles.Add(blackForeground);
+
+            Border brd = new Border() { BorderBrush = Brushes.Transparent, BorderThickness = new Thickness(2), Padding = new Thickness(5) };
+
+            StackPanel pnl = new StackPanel() { Margin = new Thickness(0, 0, 0, 0) };
+            pnl.Children.Add(new TextBlock() { FontSize = 14, FontWeight = FontWeight.Bold, Text = module.Value.Name, Margin = new Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap });
+            pnl.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontSize = 10, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = module.Value.Id });
+            pnl.Children.Add(new TextBlock() { Text = module.Value.Author, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060) });
+            brd.Child = pnl;
+
+            button.Content = brd;
+
 
             button.Click += (s, e) => { SelectModule(module.Key); };
 
             moduleContainers[(int)module.Value.ModuleType].Children.Add(button);
 
+            ModuleButtons[module.Key] = button;
+
             if (string.IsNullOrEmpty(selectedModules[(int)module.Value.ModuleType]))
             {
                 SelectModule(module.Key);
             }
-
-            ModuleButtons[module.Key] = button; 
         }
 
         private void SelectModule(string moduleId)
@@ -293,19 +466,20 @@ namespace TreeViewer
             authorContainers[tabInd].Text = module.Author;
             versionContainers[tabInd].Text = "Version " + module.Version.ToString();
             bool isVerified = module.VerifySignature();
-            verifiedIcons[tabInd].ButtonType = isVerified ? AddRemoveButton.ButtonTypes.OK : AddRemoveButton.ButtonTypes.Cancel;
+            verifiedIcons[tabInd].Children.Clear();
+
             if (isVerified)
             {
-                ToolTip.SetTip(verifiedIcons[tabInd], "Code signature verified!");
+                verifiedIcons[tabInd].Children.Add(new Avalonia.Controls.Shapes.Path() { Data = Icons.TickGeometry, Stroke = new SolidColorBrush(Color.FromRgb(0, 158, 115)), Margin = new Thickness(3), StrokeThickness = 2 });
+                AvaloniaBugFixes.SetToolTip(verifiedIcons[tabInd], "Code signature verified!");
             }
             else
             {
-                ToolTip.SetTip(verifiedIcons[tabInd], "Code signature not verified!");
+                verifiedIcons[tabInd].Children.Add(new Avalonia.Controls.Shapes.Path() { Data = Icons.CrossGeometry, Stroke = new SolidColorBrush(Color.FromRgb(213, 94, 0)), Margin = new Thickness(3), StrokeThickness = 2 });
+                AvaloniaBugFixes.SetToolTip(verifiedIcons[tabInd], "Code signature not verified!");
             }
             helpContainers[tabInd].Text = module.HelpText;
             sourceContainers[tabInd].Text = module.SourceCode;
-            //sourceContainers[tabInd].DocumentSource = "```CSharp\n" + module.SourceCode + "\n```\n";
-
 
             int imageIndex = 0;
 
@@ -340,11 +514,28 @@ namespace TreeViewer
 
             manualContainers[tabInd].DocumentSource = mardownSource;
             noModuleGrids[tabInd].IsVisible = false;
+
+            foreach (KeyValuePair<string, Button> kvp in ModuleButtons)
+            {
+                if (Modules.LoadedModulesMetadata[kvp.Key].ModuleType == module.ModuleType)
+                {
+                    if (kvp.Key == module.Id)
+                    {
+                        kvp.Value.Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
+                        ((Border)kvp.Value.Content).BorderBrush = new SolidColorBrush(Color.FromRgb(114, 114, 114));
+                    }
+                    else
+                    {
+                        kvp.Value.Background = Brushes.Transparent;
+                        ((Border)kvp.Value.Content).BorderBrush = Brushes.Transparent;
+                    }
+                }
+            }
         }
 
         private async void ExportClicked(object sender, EventArgs e)
         {
-            int tabInd = this.FindControl<TabControl>("MainTabControl").SelectedIndex;
+            int tabInd = bar.SelectedIndex;
             ModuleMetadata selectedMetadata = Modules.LoadedModulesMetadata[selectedModules[tabInd]];
 
 
@@ -741,7 +932,7 @@ namespace TreeViewer
 
         private async void UninstallClicked(object sender, EventArgs e)
         {
-            int tabInd = this.FindControl<TabControl>("MainTabControl").SelectedIndex;
+            int tabInd = bar.SelectedIndex;
             if (string.IsNullOrEmpty(selectedModules[tabInd]))
             {
                 await new MessageBox("Attention!", "No module module has been selected!").ShowDialog2(this);
@@ -758,41 +949,6 @@ namespace TreeViewer
                     return;
                 }
             }
-
-            /*bool removeReferences = false;
-            List<string> unneededReferences = new List<string>(selectedMetadata.AdditionalReferences);
-
-            if (selectedMetadata.AdditionalReferences.Length > 0)
-            {
-                List<string> neededReferences = new List<string>();
-
-                for (int i = 0; i < selectedMetadata.AdditionalReferences.Length; i++)
-                {
-                    foreach (KeyValuePair<string, ModuleMetadata> kvp in Modules.LoadedModulesMetadata)
-                    {
-                        if (kvp.Key != selectedMetadata.Id)
-                        {
-                            if ((from el in kvp.Value.AdditionalReferences where Path.GetFileName(el) == Path.GetFileName(selectedMetadata.AdditionalReferences[i]) select el).Any())
-                            {
-                                neededReferences.Add(selectedMetadata.AdditionalReferences[i]);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                for (int i = 0; i < neededReferences.Count; i++)
-                {
-                    unneededReferences.Remove(neededReferences[i]);
-                }
-
-                if (unneededReferences.Count > 0)
-                {
-                    MessageBox box = new MessageBox("Question", "Do you wish to remove unnecessary references?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
-                    await box.ShowDialog2(this);
-                    removeReferences = box.Result == MessageBox.Results.Yes;
-                }
-            }*/
 
             Modules.LoadedModulesMetadata.Remove(selectedMetadata.Id);
             ((IPanel)ModuleButtons[selectedMetadata.Id].Parent).Children.Remove(ModuleButtons[selectedMetadata.Id]);
@@ -821,18 +977,7 @@ namespace TreeViewer
                 List<string> filesToCopy = new List<string>();
                 filesToCopy.Add(newModuleList);
                 filesToCopy.Add(Path.GetFullPath(Modules.ModuleListPath));
-                /*filesToCopy.Add(Path.Combine(Modules.ModulePath, selectedMetadata.Id + ".dll"));
-                filesToCopy.Add("-");*/
-
-                /*if (removeReferences)
-                {
-                    for (int i = 0; i < unneededReferences.Count; i++)
-                    {
-                        filesToCopy.Add(ModuleMetadata.LocateReference(unneededReferences[i]));
-                        filesToCopy.Add("-");
-                    }
-                }*/
-
+                
                 for (int i = 0; i < filesToCopy.Count; i += 2)
                 {
                     if (filesToCopy[i + 1] != "-")
@@ -880,7 +1025,7 @@ namespace TreeViewer
             try
             {
                 ModuleRepositoryWindow win = new ModuleRepositoryWindow(ModuleRepositoryWindow.Modes.Install, this);
-                await win.ShowDialog(this);
+                await win.ShowDialog2(this);
             }
             catch (Exception ex)
             {
@@ -893,7 +1038,7 @@ namespace TreeViewer
             try
             {
                 ModuleRepositoryWindow win = new ModuleRepositoryWindow(ModuleRepositoryWindow.Modes.Load, this);
-                await win.ShowDialog(this);
+                await win.ShowDialog2(this);
             }
             catch (Exception ex)
             {

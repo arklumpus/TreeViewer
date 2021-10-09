@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using PhyloTree;
 using TreeViewer;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace TransformLengths
 {
@@ -18,6 +20,52 @@ namespace TransformLengths
         public const string Id = "f9241a42-c0cb-41a5-a1ee-a68fc339dee8";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
         public static bool Repeatable { get; } = false;
+		
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACHSURBVDhPY6AUMEJpMCgqKvoPZeIEfX19KHpQADEGoAMWUjR51W78v63Zn3wXgAyAMuGABUrDAbIheP0LBQQVgADUZkcg3g+jYV5hAhFEAJhmEIAZAgZEuQAEgK5wAFJgzUDbD4AFqQFQXEBOOkAB5BjAiK6JmKjDCchyAZQGA4rDgHTAwAAAcB8v28nDln4AAAAASUVORK5CYII=";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADKSURBVEhL1ZTBDoMgDIZxTzavu+xduC9qdudddtl1vtnWanWIRSkgiV9CWkJo6V+tOpqK7AKtdQumGXdhGGPYWBeyLqLgYqCCLy7aJlFtBfKVbXN7vIb77+ddJNGxSCTCCqYqOHxfEXuBkyxWoo5sMrtN5LAkqWF9Rvfv29WkNnkKjtj+TGwCfK2PxVmURAjIdAXjvroGeXryB6ITIE6SVfAirCqAf0A8SbfgmnyeSYp4p2nIJA2h/DTNLhHZmZzBEU6ibJO0AEr9ADDQSFp89flJAAAAAElFTkSuQmCC";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD3SURBVFhH5ZbNDsIgDMc3n8xdvfgu3I0a77yLF6/zzSbdSrIJLV91OP0lpCsj6Z9SSJvatGi9KKUuxpwnLw+tNRtjh5aiKHgxJgMDDHQ/QigD2RxO9wEGuiRtzA5D5+jDBn/cjkU1UJeSGog9guoZCL0D7A642pCqgSva7bFqDdhgZuxxygH+2XU4NSJdhL1PBM71k7dESkCHFliI8ASfr+VvQQrcLmd05lY88XtETAAQEOEEB0QFAIQIb3BAXADwJoIM/hWQGTDPcHE7FgN3DX+/HQOkX8Jkgi1ZTjuWQvUMkPxNDdQvQrQOa6Qf4DKw3X4wnqZ5AUcPa+0GK3ETAAAAAElFTkSuQmCC";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -40,7 +88,7 @@ namespace TransformLengths
             return (int)currentParameterValues["Transform:"] != (int)previousParameterValues["Transform:"];
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             List<TreeNode> nodes = tree.GetChildrenRecursive();
 

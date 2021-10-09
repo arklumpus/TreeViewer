@@ -19,6 +19,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using System;
 using VectSharp;
 using VectSharp.Canvas;
@@ -27,6 +28,8 @@ namespace TreeViewer
 {
     public class FontButton : UserControl
     {
+        private bool IncludeAttachedFonts = false;
+
         private Font font;
 
         public Font Font
@@ -75,6 +78,13 @@ namespace TreeViewer
             this.InitializeComponent();
         }
 
+        public FontButton(bool includeAttachedFonts)
+        {
+            this.InitializeComponent();
+
+            this.IncludeAttachedFonts = includeAttachedFonts;
+        }
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
@@ -82,7 +92,7 @@ namespace TreeViewer
 
         private async void ButtonClicked(object sender, RoutedEventArgs e)
         {
-            FontChoiceWindow win = new FontChoiceWindow(this.Font);
+            FontChoiceWindow win = new FontChoiceWindow(this.Font, IncludeAttachedFonts ? this.FindAncestorOfType<MainWindow>().StateData : null);
 
             IControl windowParent = this.Parent;
 

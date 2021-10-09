@@ -1,15 +1,19 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using PhyloTree;
 using TreeViewer;
+using VectSharp;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Threading;
+
 
 namespace SetUpAgeDistributions
 {
     /// <summary>
-    /// This module is used to set up the age distributions for the nodes, that can then be plotted using the _Plot age distributions_ (id ``) Plot
+    /// This module is used to set up the age distributions for the nodes, that can then be plotted using the _Plot age distributions_ (id `5dbe1f3c-dbea-49b3-8f04-f319aefca534`) Plot
     /// Action module.
     /// 
     /// To use this module, you should open a tree file containing e.g. a sample from the posterior distribution of dated trees. This module will use
@@ -27,6 +31,52 @@ namespace SetUpAgeDistributions
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = false;
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADDSURBVDhPnZFhDsIgDIXB400T78L/ZS7+5y4mm9fTvkLNW7PB4pcMCl3b1xIDMYyvh2xTOYX5/bzj3ORSd8OCwVQTNvEJPN0k2oKTfsRuS1GCP9X+i1MJpLIf9i+m1cJGckoJQWvO+VZuCjpE/Oir4E6C8LHCKxbcwQe7+wpYOAnZ6vMJZiymRuSaKkiP9bziwnwb2YxUWmRTyZRIYUWtFjS4g6ppgmpVjQKbFRy2APjHPdBa7xV0qDwDstV3Gi+9EMIXKnxdPWrCJUAAAAAASUVORK5CYII=";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAE8SURBVEhLzZQxrsIwDIZTOAuH6ERnQGLmGt1Rid7ec7AiASuIpQs34DA823WqNE5DE1GJT0qdOPR3YptmaoDV/nQAU8HQ178tzpOYs+1hiSPFYrnLXo/jnddRzNi6GHFDxUGjEQECQklBeilyUuMjOl1U5BHCQ1xgPENNkIH4m+eTMFTkrzF5gOlrwJYYGSjqn91rU2w/bEOYFq1HIMTLsjzkeX6DkTVNI9pX1CBwOhJHQRhvtOw3Nybr7nu/RZ5bdCfH05IH9vHUaNsl7eHaBCzgRtrbRSym25VIi/Ejbr3sNf2uV+Sx8PVR7FLX9YacAPjPYNYwNPjpUFEBLGECRMT7mH+eIv4UBXBT8okqNoCd/zHo36oB4tYhAAVJ+djZ4m7KRAunBDAiXRoMvO728ZFUAxsrZSKgUkr9AzIljLd4qVvLAAAAAElFTkSuQmCC";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHSSURBVFhHxZZNTsMwEIUTOAs3YNEd7ZYiseYa2SOI2OccbJEo21asuugNOAy858xETjKO8+PSTxo5cRLP83g8Tp5FuH/+eEXzAiu/3h55nZQraYegc9eKmKQMCjAcJhcRi4DO3iepiKCAiJNkIq6lbSGDW7P3Wd/cPeU/3+8HuZ9FT8BI58piEc02nOg4xA52mrJdnYBEzocICsvh/FeuL8KYQnRWki8Bwtwq7xLh8BJIm0SEOi+K4si2qqoV2yFaaslYId2ZKnD+iWZb32U7iHiQaxNzkJgIb6Ya0gMcuVqAvlZSo1/fXaOhsa9ZCjMJZa3K+s5GnFMkbS8zN5Fne5h7X751BHeBlTARthi4t6WlT5ekR2wbWlHQviVnQPOtmQM+so2U1l+RhLY7O7fl6svsFtZ77ifmGAG61uYvWSfspZ9gRNa7SWhNSiUqwCI0c39mPkPvTy7FGIxFxkoqDbuF9YxJe7z4WTBZAMLG8spE68KEC2E94xKsZuWAD8L4/0mohJILlm4bhoBz1nWW1zlsIMIVoyVJ6A6WmTTfptwFDG0votJnJa1jtgAMzOTiuUBjSIPnvjzbwNz78q1jURJadBIzWB3PCkQcaXI7QJb9AbxO0TY21g8YAAAAAElFTkSuQmCC";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -108,7 +158,7 @@ namespace SetUpAgeDistributions
             return !list1.Except(list2).Any();
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             bool fromLeft = (int)parameterValues["Age type:"] == 1;
             double threshold = (double)parameterValues["Threshold:"];
@@ -126,32 +176,48 @@ namespace SetUpAgeDistributions
                 ageSamples.Add(nodes[i].Id, new List<double>());
             }
 
-            foreach (TreeNode sampledTree in treeCollection)
-            {
-                double treeHeight = -1;
+            int sampleIndex = 0;
 
-                if (!fromLeft)
-                {
-                    treeHeight = sampledTree.LongestDownstreamLength();
-                }
+            TreeNode treeClone = tree;
 
-                foreach (TreeNode node in sampledTree.GetChildrenRecursiveLazy())
-                {
-                    TreeNode LCA = tree.GetLastCommonAncestor(node.GetLeafNames());
+            object progressLock = new object();
+            object addLock = new object();
 
-                    if (Compare(LCA.GetLeafNames(), node.GetLeafNames()))
-                    {
-                        double age = node.UpstreamLength();
+            System.Threading.Tasks.Parallel.ForEach(treeCollection, new ParallelOptions() { MaxDegreeOfParallelism = 6 }, sampledTree =>
+              {
+                  double treeHeight = -1;
 
-                        if (!fromLeft)
-                        {
-                            age = treeHeight - age;
-                        }
+                  if (!fromLeft)
+                  {
+                      treeHeight = sampledTree.LongestDownstreamLength();
+                  }
 
-                        ageSamples[LCA.Id].Add(age);
-                    }
-                }
-            }
+                  foreach (TreeNode node in sampledTree.GetChildrenRecursiveLazy())
+                  {
+                      TreeNode LCA = treeClone.GetLastCommonAncestor(node.GetLeafNames());
+
+                      if (Compare(LCA.GetLeafNames(), node.GetLeafNames()))
+                      {
+                          double age = node.UpstreamLength();
+
+                          if (!fromLeft)
+                          {
+                              age = treeHeight - age;
+                          }
+
+                          lock (addLock)
+                          {
+                              ageSamples[LCA.Id].Add(age);
+                          }
+                      }
+                  }
+
+                  lock (progressLock)
+                  {
+                      sampleIndex++;
+                      progressAction((double)sampleIndex / treeCollection.Count);
+                  }
+              });
 
             if (ciType > 0 || computeMean)
             {

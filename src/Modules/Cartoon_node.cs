@@ -5,6 +5,8 @@ using PhyloTree;
 using TreeViewer;
 using VectSharp;
 using System.Text.Json;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace CartoonNode
 {
@@ -39,6 +41,51 @@ namespace CartoonNode
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = true;
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACDSURBVDhPY2SAgqKiov9QJnmAXAOYoDTZgGIDWKA00cCrdmMDkKqH8BgaWYj1O5rGg1C6HiUW+vr64HwYwKLxAIQJBvU4vUBAIxxgGECsRhjASEg3uO1BFEGNUIAIAxgg0QWYBsAAkQbhNgAGCMUCQQNgAM2gRihNvAEwgMMgcgEDAwAFHzd9VMnTCAAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADISURBVEhL7ZTBDcIwDEVTJFgDNuHOOLmj0AWySzeg81TMUOw0LlbVKInd3HhSZOfyn6y47UzEWvuC4pZbA0Awx/ZQTrE24y/Iwrdo9t6vdymP58C3se/49mgEm+Ax1rt6gp3g99IGnPgNMBgOTo/hGNzD4eGBakFpMFEsqA0msgJpMJEUaIMJvkXrNkznq/lcbthicHUowyXXEieAEoSAVJQWEEpRXkAIReUColJULyAKRXIBkRHpBcSOCPn9TY9iI8KPsyXGfAEQemYQ4Nk4pQAAAABJRU5ErkJggg==";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAFVSURBVFhHvZTNccMgEEZFrikqPsdFuAfp7B8VoCJcglNNjulE2Q/p86wYg5BZ9GZ2AFv2vl1ArlG0bXuT4Tqt9uFjHsmuyUHYgRHjMAyLz2viOzCOo48cnHOm4QW4eIV+OPbMVlgwIjwDVXnV6dUzYFk1OF5+9E3rq3aAFSOQWAIW+qZdqwgwKYgkvs9j49h2TckW6MQyhO8VJP6bptN3Jh1gxYhExb0Ekz9xNAZd1/lFbgf0bzMqDpk6wPtd0uotFYcktyAlVZqYJAV0iwHW3+fHTaI4MVk9hEjKxBYVh6wKWLU6xlMgbLckPSC5TKskJotTpl9Kv59f88yDxGZJZ3xh4Ragul2J3jM5dAcZEOEWWHXC/+/q2wenXwYtASxE8gRIBZFtAsRQ5D0BYiBSJkAKRGwEyBsitgJkg0gdAZIhUleAJEROmFQXIBGR/QTIUqTp/wGoudwIQ454rgAAAABJRU5ErkJggg==";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetGlobalSettings()
         {
@@ -106,7 +153,7 @@ namespace CartoonNode
             return !((string[])previousParameterValues["Node:"]).SequenceEqual((string[])currentParameterValues["Node:"]) || !((VectSharp.Colour)currentParameterValues["Fill colour:"]).Equals(((VectSharp.Colour)previousParameterValues["Fill colour:"])) || ((bool)currentParameterValues["Equalise lengths"] != (bool)previousParameterValues["Equalise lengths"]);
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             string[] nodeElements = (string[])parameterValues["Node:"];
 

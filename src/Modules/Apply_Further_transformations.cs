@@ -5,6 +5,8 @@ using System.IO;
 using System.Collections.Generic;
 using PhyloTree;
 using PhyloTree.Formats;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace a9b49587c3d024fbe859ffeed56dca92d
 {
@@ -23,27 +25,76 @@ namespace a9b49587c3d024fbe859ffeed56dca92d
         public const string Name = "Apply Further transformations";
         public const string HelpText = "Applies the actions performed by the Further transformation modules.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
         public const string Id = "9b49587c-3d02-4fbe-859f-feed56dca92d";
 
-        public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
-        public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.None;
+        public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { ( Avalonia.Input.Key.None, Avalonia.Input.KeyModifiers.None ) };
         public static bool TriggerInTextBox { get; } = false;
 
-        public static string ItemText { get; } = "Apply Further transformations";
+        public static string ItemText { get; } = "Apply further transformations";
         public static string ParentMenu { get; } = "Edit";
-        public static string GroupId { get; } = "cdd01933-9e17-438a-ae45-57178e3d30cd";
+        public static string GroupName { get; } = "Apply";
 
         public static Avalonia.AvaloniaProperty PropertyAffectingEnabled { get; } = MainWindow.IsTreeOpenedProperty;
 
-        public static bool IsEnabled(MainWindow window)
+        public static double GroupIndex { get; } = 2;
+        public static bool IsLargeButton { get; } = false;
+        public static List<(string, Func<double, VectSharp.Page>)> SubItems { get; } = new List<(string, Func<double, VectSharp.Page>)>();
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACQSURBVDhPpZJNCoAgEEa14xXUXdzXotZ6l4K6njWDE2Xjbw8kRf3mOSTFA6WUdVMWrfXr/AcIuBAwUtA56VelKlLGiwGfQjGDdlwtDLdE0MDNEa4HZNRNG+7tc59W4+AMgMZ9q0nqcFWBYxnwbtZ7/BC6XESoB7+5VWK/sTGmXJmIBQPJ5FBAtlW2QV0PhDgBSulUC+7ANwAAAAAASUVORK5CYII=";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADxSURBVEhLxZVbDgIhDEXB5Wmie4FvH6PfsBdNdHtIGWqA8CiQiSeZQCeh5ZYWOKsghLjZ4bpafWitne+ds8oMOQ+JFBhj/GxFSul+4G5G4OgUneWYCdBK0TyoIE0PYA/ZwOfNIrm1SKuKms4BpRS3eCumlaLFj8NUFdSkp5QUkKoDAx0uLzd5349uXclpCKmKwFHoLLVrbF6mpG3sz8/sYXwep+Z6mk5LGoTivBsIUlLzN34yqV0bsNhLEN6LKjNVRHorooOidm7POzFUCa10wuUHIzTjJo0WdnpWQZiq3JWACrpSNFBFpAAzKSK8FYx9AdSPV79zHIMfAAAAAElFTkSuQmCC";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEOSURBVFhH1ZfNDoMgDIBlj7fL3kXPizM7w7vsstdjVItxzcBSQNyXEO1B6D9VdQGstfi2MAzDwz3GRcrHGDOffZmlHyilvpaj2OEi+r63sFAsRtADR7HmANc6H7tSNPcAm6Y5QEuyBH5PdjxTrdda7+4N5Z2SAxM+i4C9he8BCbHQeQWyuN5fFhaKQbaKUKUOKcOttdTy5n3gPxWAONK40thyESkAcaRxpbHlkvzVXta/n7ekPUVqh5RIPRyQ+c1BlZAcng23EZ2a1W0V7vrJTU8wSUep2YhGaW/Ixk9PHAWat+IqpcPJJ5iYoHs290AVfA6gGOUcOQDZ6v5+i9eMn4xjN2VND8xTdPya7roPeHJqs36CU1MAAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
         {
-            return window.IsTreeOpened;
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
         }
 
-        public static async Task PerformAction(MainWindow window)
+        public static List<bool> IsEnabled(MainWindow window)
+        {
+            return new List<bool>() { window.IsTreeOpened };
+        }
+
+        public static async Task PerformAction(int index, MainWindow window)
         {
             string tempFileName = Path.GetTempFileName();
 
@@ -90,11 +141,11 @@ namespace a9b49587c3d024fbe859ffeed56dca92d
                 System.IO.File.Delete(tempFile);
             }
 
-            await window.LoadFile(tempFileName, true);
+            Avalonia.Controls.Window targetWindow = await window.LoadFile(tempFileName, true);
 
             MessageBox box = new MessageBox("Question", "Would you like to close the window with the original file?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
 
-            await box.ShowDialog(window);
+            await box.ShowDialog2(targetWindow);
 
             if (box.Result == MessageBox.Results.Yes)
             {

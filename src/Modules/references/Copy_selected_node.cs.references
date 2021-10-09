@@ -8,3 +8,13 @@ Avalonia.Input.dll
 Avalonia.Controls.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
+System.Collections.dll
+Avalonia.Visuals.dll
+Avalonia.Interactivity.dll
+Avalonia.Base.dll
+Avalonia.Layout.dll
+Avalonia.Animation.dll
+Avalonia.Styling.dll
+System.ComponentModel.Primitives.dll
+System.ObjectModel.dll
+System.Linq.dll

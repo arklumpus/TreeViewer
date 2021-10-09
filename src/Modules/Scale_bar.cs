@@ -4,6 +4,7 @@ using System.Linq;
 using PhyloTree;
 using TreeViewer;
 using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace ScaleBar
 {
@@ -19,6 +20,52 @@ namespace ScaleBar
         public static Version Version = new Version("1.0.0");
         public const string Id = "195bdabf-c5cf-4daf-992f-7a86a600beec";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
+		
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA+SURBVDhPYxgFVAJFRUX/QRjKJQiQ1TOBRSgAjCCCFNuRQV9fHyPFLmCB0mAAMhHKxAuQXUyxC0YBxYCBAQAocRFg/ulkfQAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA9SURBVEhLYxgFo2AUQEBRUdF/EIZyKQbI5jGBRWgIaG4BI4igZvAgg76+Pkaa+wAMRiN5FIyCUYAPMDAAACgiFrQoEMCjAAAAAElFTkSuQmCC";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABESURBVFhH7dPBCQAgCEBRbWQHceVC6eACpYf/wKAuipoAAEYwsx1xr8/VfCtfGlGAxvFz/pW7a3sHEr+g04wdAAD0ETl04xa4X+VUYAAAAABJRU5ErkJggg==";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {

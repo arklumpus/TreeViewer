@@ -120,6 +120,16 @@ namespace TreeViewer
             }
         }
 
+        public static string GetShortcutString((Avalonia.Input.Key key, Avalonia.Input.KeyModifiers modifier) shortcut)
+        {
+            if (shortcut.key == Avalonia.Input.Key.None)
+            {
+                return null;
+            }
+
+            return GetModifier(shortcut.modifier).ToString().Replace(", ", " + ") + " + " + shortcut.key.ToString();
+        }
+
 
         static Modules()
         {
@@ -216,6 +226,8 @@ namespace TreeViewer
 
         public const string RootNodeId = "650a0ef5-5322-4511-ae86-68bd87b47ecd";
         public const string ModuleIDKey = "eee4a077-63b2-4126-9f35-5f66d40aa2cf";
+        public const string FileMenuFirstAreaId = "638a680b-fbc4-4ed5-adca-b2819b71b986";
+        public const string FileMenuThirdAreaId = "c46dd264-4831-4a8a-a979-0884e293c6c8";
         public static readonly string[] AttributeTypes = { "String", "Number" };
 
         public static readonly string[] DefaultAttributeConverters = { @"public static string Format(object attribute)
@@ -224,7 +236,8 @@ namespace TreeViewer
 }",
             @"public static string Format(object attribute)
 {
-    if (attribute is double attributeValue && !double.IsNaN(attributeValue))
+    if (attribute is double attributeValue &&
+        !double.IsNaN(attributeValue))
     {
         if (attributeValue >= 0)
         {
@@ -270,15 +283,17 @@ namespace TreeViewer
         return null;
     }
 }",
-            @"static Gradient gradient = new Gradient(new List<GradientStop>()
+            @"static Gradient gradient = new Gradient(
+new List<TreeViewer.GradientStop>()
 {
-    new GradientStop(0, Colour.FromRgba(0d, 0d, 0d, 0d)),
-    new GradientStop(1, Colour.FromRgba(0d, 0d, 0d, 1d))
+    new TreeViewer.GradientStop(0, Colour.FromRgba(0d, 0d, 0d, 0d)),
+    new TreeViewer.GradientStop(1, Colour.FromRgba(0d, 0d, 0d, 1d))
 });
 
 public static Colour? Format(object attribute)
 {
-    if (attribute is double attributeValue && !double.IsNaN(attributeValue))
+    if (attribute is double attributeValue &&
+        !double.IsNaN(attributeValue))
     {
         double position = (attributeValue - 0) / 1;
         position = Math.Max(Math.Min(position, 1), 0);
@@ -339,7 +354,8 @@ public static Colour? Format(object attribute)
 }",
             @"public static double? Format(object attribute)
 {
-    if (attribute is double attributeValue && !double.IsNaN(attributeValue))
+    if (attribute is double attributeValue &&
+        !double.IsNaN(attributeValue))
     {
         return attributeValue;
     }
@@ -359,15 +375,31 @@ public static Colour? Format(object attribute)
             { "RedToGreen", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(237, 28, 36)), new GradientStop(1, Colour.FromRgb(34, 177, 76)) }) },
             { "Rainbow", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(237, 28, 36)), new GradientStop(1.0 / 6, Colour.FromRgb(255, 127, 39)), new GradientStop(1.0 / 3, Colour.FromRgb(255, 242, 0)),
                                                                  new GradientStop(0.5, Colour.FromRgb(34, 177, 76)), new GradientStop(2.0 / 3, Colour.FromRgb(0, 162, 232)), new GradientStop(5.0 / 6, Colour.FromRgb(63, 72, 204)), new GradientStop(1, Colour.FromRgb(163, 73, 164)) }) },
-            { "Viridis", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(0.267004, 0.004874, 0.329415)), new GradientStop(0.09803921568627451, Colour.FromRgb(0.282623, 0.140926, 0.457517)), new GradientStop(0.2, Colour.FromRgb(0.253935, 0.265254, 0.529983)), new GradientStop(0.2980392156862745, Colour.FromRgb(0.206756, 0.371758, 0.553117)), new GradientStop(0.4, Colour.FromRgb(0.163625, 0.471133, 0.558148)), new GradientStop(0.4980392156862745, Colour.FromRgb(0.128729, 0.563265, 0.551229)), new GradientStop(0.6, Colour.FromRgb(0.134692, 0.658636, 0.517649)), new GradientStop(0.6980392156862745, Colour.FromRgb(0.259857, 0.745492, 0.444467)), new GradientStop(0.796078431372549, Colour.FromRgb(0.468053, 0.818921, 0.323998)), new GradientStop(0.8980392156862745, Colour.FromRgb(0.730889, 0.871916, 0.156029)), new GradientStop(1, Colour.FromRgb(0.993248, 0.906157, 0.143936)) }) }
-        };
+            { "Viridis", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(0.267004, 0.004874, 0.329415)), new GradientStop(0.09803921568627451, Colour.FromRgb(0.282623, 0.140926, 0.457517)), new GradientStop(0.2, Colour.FromRgb(0.253935, 0.265254, 0.529983)), new GradientStop(0.2980392156862745, Colour.FromRgb(0.206756, 0.371758, 0.553117)), new GradientStop(0.4, Colour.FromRgb(0.163625, 0.471133, 0.558148)), new GradientStop(0.4980392156862745, Colour.FromRgb(0.128729, 0.563265, 0.551229)), new GradientStop(0.6, Colour.FromRgb(0.134692, 0.658636, 0.517649)), new GradientStop(0.6980392156862745, Colour.FromRgb(0.259857, 0.745492, 0.444467)), new GradientStop(0.796078431372549, Colour.FromRgb(0.468053, 0.818921, 0.323998)), new GradientStop(0.8980392156862745, Colour.FromRgb(0.730889, 0.871916, 0.156029)), new GradientStop(1, Colour.FromRgb(0.993248, 0.906157, 0.143936)) }) },
 
-        //public static string ModulePath { get; set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "modules");
-        //public static string ModuleListPath { get; set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "modules.json");
+
+            { "RedYellowGreen", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(237, 28, 36)), new GradientStop(0.5, Colour.FromRgb(255, 242, 0)), new GradientStop(1, Colour.FromRgb(34, 177, 76)) }) },
+
+            { "WongRainbow", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(204, 121, 167)), new GradientStop(1.0 / 6, Colour.FromRgb(213, 94, 0)), new GradientStop(1.0 / 3, Colour.FromRgb(230, 159, 0)),
+                                                                 new GradientStop(0.5, Colour.FromRgb(240, 228, 66)), new GradientStop(2.0 / 3, Colour.FromRgb(0, 158, 115)), new GradientStop(5.0 / 6, Colour.FromRgb(0, 114, 178)), new GradientStop(1, Colour.FromRgb(86, 180, 233)) }) },
+
+            { "WongDiscrete", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(204, 121, 167)), new GradientStop(0.2, Colour.FromRgb(204, 121, 167)), new GradientStop(0.201, Colour.FromRgb(230, 159, 0)), new GradientStop(0.4, Colour.FromRgb(230, 159, 0)),
+                                                                 new GradientStop(0.401, Colour.FromRgb(0, 158, 115)), new GradientStop(0.6, Colour.FromRgb(0, 158, 115)), new GradientStop(0.601, Colour.FromRgb(0, 114, 178)), new GradientStop(0.8, Colour.FromRgb(0, 114, 178)), new GradientStop(0.801, Colour.FromRgb(86, 180, 233)), new GradientStop(1, Colour.FromRgb(86, 180, 233)) }) },
+
+            { "Muted", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgb(221, 204, 119)), new GradientStop(0.125, Colour.FromRgb(153, 153, 51)), new GradientStop(0.25, Colour.FromRgb(17, 119, 51)),
+                                                               new GradientStop(0.375, Colour.FromRgb(68, 170, 153)), new GradientStop(0.5, Colour.FromRgb(136, 204, 238)), new GradientStop(0.625, Colour.FromRgb(51, 34, 136)),
+                                                               new GradientStop(0.75, Colour.FromRgb(170, 68, 153)), new GradientStop(0.875, Colour.FromRgb(136, 34, 85)), new GradientStop(1, Colour.FromRgb(204, 102, 119)) }) },
+
+            { "MutedDiscrete", new Gradient(new List<GradientStop>() { new GradientStop(0.101, Colour.FromRgb(187, 187, 187)), new GradientStop(0.1, Colour.FromRgb(187, 187, 187)), new GradientStop(0.101, Colour.FromRgb(221, 204, 119)), new GradientStop(0.2, Colour.FromRgb(221, 204, 119)), new GradientStop(0.201, Colour.FromRgb(153, 153, 51)), new GradientStop(0.3, Colour.FromRgb(153, 153, 51)),
+                                                               new GradientStop(0.301, Colour.FromRgb(17, 119, 51)), new GradientStop(0.4, Colour.FromRgb(17, 119, 51)), new GradientStop(0.401, Colour.FromRgb(68, 170, 153)), new GradientStop(0.5, Colour.FromRgb(68, 170, 153)),
+                                                                new GradientStop(0.501, Colour.FromRgb(136, 204, 238)), new GradientStop(0.6, Colour.FromRgb(136, 204, 238)), new GradientStop(0.601, Colour.FromRgb(51, 34, 136)), new GradientStop(0.7, Colour.FromRgb(51, 34, 136)),
+                                                               new GradientStop(0.701, Colour.FromRgb(170, 68, 153)), new GradientStop(0.8, Colour.FromRgb(170, 68, 153)), new GradientStop(0.801, Colour.FromRgb(136, 34, 85)), new GradientStop(0.9, Colour.FromRgb(136, 34, 85)), new GradientStop(0.901, Colour.FromRgb(204, 102, 119)), new GradientStop(1, Colour.FromRgb(204, 102, 119))}) },
+        };
 
         public static string ModulePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TreeViewer", "modules");
         public static string ModuleListPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TreeViewer", "modules.json");
 
+        public static Avalonia.Media.FontFamily UIFontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans");
 
         public static List<FileTypeModule> FileTypeModules { get; } = new List<FileTypeModule>();
         public static List<LoadFileModule> LoadFileModules { get; } = new List<LoadFileModule>();
@@ -396,7 +428,28 @@ public static Colour? Format(object attribute)
 
         public static T GetModule<T>(List<T> moduleCollection, string id) where T : Module
         {
-            return (from el in moduleCollection where el.Id == id select el).FirstOrDefault();
+            for (int i = 0; i < moduleCollection.Count; i++)
+            {
+                if (moduleCollection[i].Id == id)
+                {
+                    return moduleCollection[i];
+                }
+            }
+
+            return null;
+        }
+
+        public static bool HasModule<T>(List<T> moduleCollection, string id) where T : Module
+        {
+            for (int i = 0; i < moduleCollection.Count; i++)
+            {
+                if (moduleCollection[i].Id == id)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static Dictionary<string, ModuleMetadata> LoadedModulesMetadata { get; } = new Dictionary<string, ModuleMetadata>();
@@ -500,60 +553,51 @@ public static Colour? Format(object attribute)
 
         public static List<ModuleMetadata> MissingModules;
 
-        public static async Task LoadInstalledModules(bool updateGlobalSettings)
+        public static async Task LoadInstalledModules(bool updateGlobalSettings, SplashScreen splash)
         {
-            //FileTypeModules.Add(new FileTypeModule() { Id = "79dfb9b2-ff10-4ed9-aa74-f7b3ae93c3d2", Name = "Newick", HelpText = "Opens a file containing one or more trees in the (extendend) Newick format.\nSafe even when opening huge files.", Extensions = NewickOpener.Extensions, IsSupported = NewickOpener.IsSupported, OpenFile = NewickOpener.Open });
-            //FileTypeModules.Add(new FileTypeModule() { Id = "31fdfc2f-1921-432e-bb47-51362dd4fabb", Name = "NEXUS", HelpText = "Opens a file in the NEXUS format, reading the trees in the \"Trees\" blocks.\nSafe even when opening huge files.", Extensions = OpenNexus.MyModule.Extensions, IsSupported = OpenNexus.MyModule.IsSupported, OpenFile = OpenNexus.MyModule.OpenFile });
-            //FileTypeModules.Add(new FileTypeModule() { Id = "8ccec519-3d83-4617-824f-dd474c88bdea", Name = "Binary tree", HelpText = "Opens a file in the NEXUS format, reading the trees in the \"Trees\" blocks.\nSafe even when opening huge files.", Extensions = OpenBinaryTree.MyModule.Extensions, IsSupported = OpenBinaryTree.MyModule.IsSupported, OpenFile = OpenBinaryTree.MyModule.OpenFile });
-            //FileTypeModules.Add(new FileTypeModule() { Id = OpenSimmap.MyModule.Id, Name = OpenSimmap.MyModule.Name, HelpText = OpenSimmap.MyModule.HelpText, Extensions = OpenSimmap.MyModule.Extensions, IsSupported = OpenSimmap.MyModule.IsSupported, OpenFile = OpenSimmap.MyModule.OpenFile });
-
-
-            //LoadFileModules.Add(new LoadFileModule() { Id = "a22ff194-c486-4215-a4bf-7a006d6f88fa", Name = "Memory loader", HelpText = "Loads all the trees from the file into memory.\nHuge files may cause the program to run out of memory.", IsSupported = MemoryLoader.IsSupported, Load = MemoryLoader.Load });
-
-            //TransformerModules.Add(new TransformerModule() { Id = "32914d41-b182-461e-b7c6-5f0263cc1ccd", Name = "Consensus", GetParameters = StandardTransformer.GetTransformerParameters, OnParameterChange = StandardTransformer.TransformerParametersChanged, Transform = StandardTransformer.Transform });
-
-            //FurtherTransformationModules.Add(new FurtherTransformationModule() { Id = "c6f96861-11c0-4853-9738-6a90cc81d660", Name = "Root tree", HelpText = "Re-roots the tree using the specified outgroup.", Repeatable = false, GetParameters = RerootTree.GetParameters, OnParameterChange = RerootTree.TransformerParametersChanged, Transform = RerootTree.Transform }); ;
-            //FurtherTransformationModules.Add(new FurtherTransformationModule() { Id = "f06dce2a-794b-4897-a154-82f7f44c125d", Name = "Unroot tree", HelpText = "Unroots the tree.", Repeatable = false, GetParameters = UnrootTree.GetParameters, OnParameterChange = UnrootTree.TransformerParametersChanged, Transform = UnrootTree.Transform });
-            //FurtherTransformationModules.Add(new FurtherTransformationModule() { Id = "8de06406-68e4-4bd8-97eb-2185a0dd1127", Name = "Change attribute", HelpText = "Changes the value of an already existing attribute.", Repeatable = true, GetParameters = ChangeAttribute.GetParameters, OnParameterChange = ChangeAttribute.TransformerParametersChanged, Transform = ChangeAttribute.Transform });
-            //FurtherTransformationModules.Add(new FurtherTransformationModule() { Id = CustomScript.MyModule.Id, Name = CustomScript.MyModule.Name, HelpText = CustomScript.MyModule.HelpText, Repeatable = true, GetParameters = CustomScript.MyModule.GetParameters, OnParameterChange = CustomScript.MyModule.OnParameterChange, Transform = CustomScript.MyModule.Transform });
-
-            //CoordinateModules.Add(new CoordinateModule() { Id = "68e25ec6-5911-4741-8547-317597e1b792", Name = "Rectangular", GetParameters = RectangularCoordinates.MyModule.GetParameters, GetCoordinates = RectangularCoordinates.MyModule.GetCoordinates, OnParameterChange = RectangularCoordinates.MyModule.OnParameterChange });
-            //CoordinateModules.Add(new CoordinateModule() { Id = CircularCoordinates.MyModule.Id, Name = "Circular", GetParameters = CircularCoordinates.MyModule.GetParameters, GetCoordinates = CircularCoordinates.MyModule.GetCoordinates, OnParameterChange = CircularCoordinates.MyModule.OnParameterChange });
-            //CoordinateModules.Add(new CoordinateModule() { Id = "95b61284-b870-48b9-b51c-3276f7d89df1", Name = "Radial", GetParameters = RadialCoordinates.GetParameters, GetCoordinates = RadialCoordinates.GetCoordinates, OnParameterChange = RadialCoordinates.ParametersChanged });
-
-            //PlottingModules.Add(new PlottingModule() { Id = "7c767b07-71be-48b2-8753-b27f3e973570", Name = "Simple branches", HelpText = "Plot tree branches as simple lines.", GetParameters = Branches.MyModule.GetParameters, OnParameterChange = Branches.MyModule.OnParameterChange, PlotAction = Branches.MyModule.PlotAction });
-            //PlottingModules.Add(new PlottingModule() { Id = NodeShapes.MyModule.Id, Name = NodeShapes.MyModule.Name, HelpText = NodeShapes.MyModule.HelpText, GetParameters = NodeShapes.MyModule.GetParameters, OnParameterChange = NodeShapes.MyModule.OnParameterChange, PlotAction = NodeShapes.MyModule.PlotAction });
-
-            //SelectionActionModules.Add(new SelectionActionModule() { Id = "77f387fb-c843-4164-aed2-bd5b8f325809", Name = "Root tree on selection", HelpText = "Re-roots the tree using the selection as outgroup.", GetIcon = RerootTreeSelectionAction.GetIcon, IsAvailable = RerootTreeSelectionAction.IsAvailable, PerformAction = RerootTreeSelectionAction.PerformAction, ButtonText = RerootTreeSelectionAction.ButtonText });
-            //SelectionActionModules.Add(new SelectionActionModule() { Id = "debd9130-8451-4413-88f0-6357ec817021", Name = "Copy selected node", HelpText = "Copies the selected node to the clipboard.", GetIcon = CopyTreeAction.GetIcon, IsAvailable = CopyTreeAction.IsAvailable, PerformAction = CopyTreeAction.PerformAction, ButtonText = CopyTreeAction.ButtonText, ShortcutKey = Avalonia.Input.Key.C, ShortcutModifier = Avalonia.Input.KeyModifiers.Control });
-
-            //ActionModules.Add(new ActionModule() { Id = "e56b8297-4417-4494-9369-cbe9e5d25397", Name = "Display tree as rooted", HelpText = "Sets the plot actions to display the tree as a rooted tree", GetIcon = DisplayRootedTreeAction.GetIcon, PerformAction = DisplayRootedTreeAction.PerformAction, ButtonText = DisplayRootedTreeAction.ButtonText });
-            //ActionModules.Add(new ActionModule() { Id = PasteTreeAction.MyModule.Id, Name = PasteTreeAction.MyModule.Name, HelpText = PasteTreeAction.MyModule.HelpText, GetIcon = PasteTreeAction.MyModule.GetIcon, PerformAction = PasteTreeAction.MyModule.PerformAction, ButtonText = PasteTreeAction.MyModule.ButtonText, ShortcutKey = Avalonia.Input.Key.V, ShortcutModifier = Avalonia.Input.KeyModifiers.Control });
-            //ActionModules.Add(new ActionModule() { Id = "f90b3794-ffe5-44ff-9f62-859c61438713", Name = "Search", HelpText = "Highlights nodes in the tree.", GetIcon = Search.MyModule.GetIcon, PerformAction = Search.MyModule.PerformAction, ButtonText = Search.MyModule.ButtonText });
-            //ActionModules.Add(new ActionModule() { Id = "a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6", Name = "Lasso selection", HelpText = "Select tips from the tree.", GetIcon = LassoSelection.GetIcon, PerformAction = LassoSelection.PerformAction, ButtonText = LassoSelection.ButtonText });
-            //ActionModules.Add(new ActionModule() { Id = CircularStyleAction.MyModule.Id, Name = CircularStyleAction.MyModule.Name, HelpText = CircularStyleAction.MyModule.HelpText, GetIcon = CircularStyleAction.MyModule.GetIcon, PerformAction = CircularStyleAction.MyModule.PerformAction, ButtonText = CircularStyleAction.MyModule.ButtonText });
-
-            //MenuActionModules.Add(new MenuActionModule() { Id = "078318bc-907f-4ada-b1e5-171799957b2a", Name = "Open file", HelpText = "Opens a tree file.", ItemText = StandardOpenMenuItem.ItemText, ParentMenu = StandardOpenMenuItem.ParentMenu, GroupId = StandardOpenMenuItem.GroupId, ShortcutKey = Avalonia.Input.Key.O, ShortcutModifier = Avalonia.Input.KeyModifiers.Control, IsEnabled = StandardOpenMenuItem.IsEnabled, PerformAction = StandardOpenMenuItem.PerformAction, PropertyAffectingEnabled = StandardOpenMenuItem.AffectedProperty });
-            //MenuActionModules.Add(new MenuActionModule() { Id = "98804064-922f-4395-8a96-216d4b3ff259", Name = "Open file (advanced)", HelpText = "Opens a tree file, specifying which modules should be used for the reading and loading of the file.", GroupId = StandardAdvancedOpenMenuItem.GroupId, ItemText = StandardAdvancedOpenMenuItem.ItemText, ParentMenu = StandardAdvancedOpenMenuItem.ParentMenu, ShortcutKey = Avalonia.Input.Key.O, ShortcutModifier = Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Shift, IsEnabled = StandardAdvancedOpenMenuItem.IsEnabled, PerformAction = StandardAdvancedOpenMenuItem.PerformAction, PropertyAffectingEnabled = StandardAdvancedOpenMenuItem.AffectedProperty });
-            //MenuActionModules.Add(new MenuActionModule() { Id = "d8d189b2-98ab-4630-ab25-4aad94bd10c3", Name = "Exit", HelpText = "Closes the current window.", ItemText = StandardExitMenuItem.ItemText, ParentMenu = StandardExitMenuItem.ParentMenu, GroupId = StandardExitMenuItem.GroupId, ShortcutKey = Avalonia.Input.Key.F4, ShortcutModifier = Avalonia.Input.KeyModifiers.Alt, IsEnabled = StandardExitMenuItem.IsEnabled, PerformAction = StandardExitMenuItem.PerformAction, PropertyAffectingEnabled = StandardExitMenuItem.AffectedProperty });
-            //MenuActionModules.Add(new MenuActionModule() { Id = "650a0ef5-5322-4511-ae86-68bd87b47ecd", Name = "Copy selected node (menu item)", HelpText = "Copies the selected node to the clipboard.", ItemText = StandardCopyMenuItem.ItemText, ParentMenu = StandardCopyMenuItem.ParentMenu, GroupId = StandardCopyMenuItem.GroupId, IsEnabled = StandardCopyMenuItem.IsEnabled, PerformAction = StandardCopyMenuItem.PerformAction, PropertyAffectingEnabled = StandardCopyMenuItem.AffectedProperty });
-
             try
             {
                 List<ModuleMetadata> installedModules = JsonSerializer.Deserialize<List<ModuleMetadata>>(File.ReadAllText(ModuleListPath), Modules.DefaultSerializationOptions);
                 MissingModules = new List<ModuleMetadata>();
 
-                for (int i = 0; i < installedModules.Count; i++)
+                if (splash != null)
                 {
-                    string modulePath = Path.Combine(ModulePath, installedModules[i].Id + ".dll");
-                    if (File.Exists(modulePath))
+                    for (int i = 0; i < installedModules.Count; i++)
                     {
-                        installedModules[i].IsInstalled = true;
-                        LoadPreCompiledModule(installedModules[i], modulePath);
+                        splash.SetProgress((double)(i) / installedModules.Count, installedModules[i].Name);
+                        await Task.Run(() =>
+                        {
+                            string modulePath = Path.Combine(ModulePath, installedModules[i].Id + ".dll");
+                            if (File.Exists(modulePath))
+                            {
+                                installedModules[i].IsInstalled = true;
+                                LoadPreCompiledModule(installedModules[i], modulePath);
+                            }
+                            else
+                            {
+                                MissingModules.Add(installedModules[i]);
+                            }
+                        });
+                        splash.SetProgress((double)(i + 1) / installedModules.Count, installedModules[i].Name);
                     }
-                    else
+
+                    splash.SetProgress(1, "");
+                    await Task.Delay(100);
+                }
+                else
+                {
+                    for (int i = 0; i < installedModules.Count; i++)
                     {
-                        MissingModules.Add(installedModules[i]);
+                        string modulePath = Path.Combine(ModulePath, installedModules[i].Id + ".dll");
+                        if (File.Exists(modulePath))
+                        {
+                            installedModules[i].IsInstalled = true;
+                            LoadPreCompiledModule(installedModules[i], modulePath);
+                        }
+                        else
+                        {
+                            MissingModules.Add(installedModules[i]);
+                        }
                     }
                 }
 
@@ -720,7 +764,7 @@ public static Colour? Format(object attribute)
     {
         public Func<TreeCollection, List<(string, string)>> GetParameters { get; set; }
         public ParameterChangeDelegate OnParameterChange { get; set; }
-        public Func<TreeCollection, Dictionary<string, object>, TreeNode> Transform { get; set; }
+        public Func<TreeCollection, Dictionary<string, object>, Action<double>, TreeNode> Transform { get; set; }
 
         public TransformerModule()
         {
@@ -747,6 +791,7 @@ public static Colour? Format(object attribute)
         public Func<TreeNode, List<(string, string)>> GetParameters { get; set; }
         public ParameterChangeDelegate OnParameterChange { get; set; }
         public Func<TreeNode, Dictionary<string, object>, Dictionary<string, Point>, Graphics, Point[]> PlotAction { get; set; }
+        public Func<double, Page> GetIcon { get; set; }
 
         public PlottingModule()
         {
@@ -757,11 +802,12 @@ public static Colour? Format(object attribute)
 
     public class FurtherTransformationModule : Module
     {
-        public delegate void TreeTransformDelegate(ref TreeNode tree, Dictionary<string, object> parameterValues);
+        public delegate void TreeTransformDelegate(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction);
 
         public Func<TreeNode, List<(string, string)>> GetParameters { get; set; }
         public ParameterChangeDelegate OnParameterChange { get; set; }
         public TreeTransformDelegate Transform { get; set; }
+        public Func<double, Page> GetIcon { get; set; }
 
         public bool Repeatable { get; set; }
 
@@ -775,13 +821,19 @@ public static Colour? Format(object attribute)
     public class SelectionActionModule : Module
     {
         public string ButtonText { get; set; }
-        public Func<Page> GetIcon { get; set; }
-        public Action<TreeNode, MainWindow, InstanceStateData> PerformAction { get; set; }
-        public Func<TreeNode, MainWindow, InstanceStateData, bool> IsAvailable { get; set; }
+        public Action<int, TreeNode, MainWindow, InstanceStateData> PerformAction { get; set; }
+        public Func<TreeNode, MainWindow, InstanceStateData, List<bool>> IsAvailable { get; set; }
         public Avalonia.Input.Key ShortcutKey { get; set; }
         public Avalonia.Input.KeyModifiers ShortcutModifier { get; set; }
         public bool TriggerInTextBox { get; set; }
         public bool IsAvailableInCommandLine { get; set; }
+
+        public string GroupName { get; set; }
+        public double GroupIndex { get; set; }
+        public Func<double, Page> GetIcon { get; set; }
+        public bool IsLargeButton { get; set; }
+        public List<(string, Func<double, Page>)> SubItems { get; set; }
+
         public SelectionActionModule()
         {
 
@@ -791,12 +843,15 @@ public static Colour? Format(object attribute)
     public class ActionModule : Module
     {
         public string ButtonText { get; set; }
-        public Func<Page> GetIcon { get; set; }
-        public Action<MainWindow, InstanceStateData> PerformAction { get; set; }
-        public Avalonia.Input.Key ShortcutKey { get; set; }
-        public Avalonia.Input.KeyModifiers ShortcutModifier { get; set; }
+        public Func<double, Page> GetIcon { get; set; }
+        public Action<int, MainWindow, InstanceStateData> PerformAction { get; set; }
+        public List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; set; }
         public bool TriggerInTextBox { get; set; }
         public bool IsAvailableInCommandLine { get; set; }
+        public string GroupName { get; set; }
+        public bool IsLargeButton { get; set; }
+        public double GroupIndex { get; set; }
+        public List<(string, Func<double, Page>)> SubItems { get; set; }
         public ActionModule()
         {
 
@@ -808,13 +863,18 @@ public static Colour? Format(object attribute)
     {
         public string ItemText { get; set; }
         public string ParentMenu { get; set; }
-        public string GroupId { get; set; }
-        public Func<MainWindow, Task> PerformAction { get; set; }
-        public Func<MainWindow, bool> IsEnabled { get; set; }
-        public Avalonia.Input.Key ShortcutKey { get; set; }
-        public Avalonia.Input.KeyModifiers ShortcutModifier { get; set; }
+        public string GroupName { get; set; }
+        public Func<int, MainWindow, Task> PerformAction { get; set; }
+        public Func<MainWindow, List<bool>> IsEnabled { get; set; }
+        public List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; set; }
         public bool TriggerInTextBox { get; set; }
         public Avalonia.AvaloniaProperty PropertyAffectingEnabled { get; set; }
+
+        public double GroupIndex { get; set; }
+        public Func<double, Page> GetIcon { get; set; }
+        public bool IsLargeButton { get; set; }
+        public List<(string, Func<double, Page>)> SubItems { get; set; }
+        public Func<Avalonia.Controls.Control> GetFileMenuPage { get; set; }
 
         public MenuActionModule()
         {
@@ -909,11 +969,14 @@ public static Colour? Format(object attribute)
                     HelpText = this.HelpText,
                     ButtonText = (string)GetProperty(compiledModule, "ButtonText"),
                     IsAvailableInCommandLine = (bool)GetProperty(compiledModule, "IsAvailableInCommandLine"),
-                    ShortcutKey = (Avalonia.Input.Key)GetProperty(compiledModule, "ShortcutKey"),
-                    ShortcutModifier = (Avalonia.Input.KeyModifiers)GetProperty(compiledModule, "ShortcutModifier"),
+                    ShortcutKeys = (List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>)GetProperty(compiledModule, "ShortcutKeys"),
                     TriggerInTextBox = (bool)GetProperty(compiledModule, "TriggerInTextBox"),
-                    GetIcon = (Func<Page>)Delegate.CreateDelegate(typeof(Func<Page>), compiledModule, "GetIcon"),
-                    PerformAction = (Action<MainWindow, InstanceStateData>)Delegate.CreateDelegate(typeof(Action<MainWindow, InstanceStateData>), compiledModule, "PerformAction"),
+                    GetIcon = (Func<double, Page>)Delegate.CreateDelegate(typeof(Func<double, Page>), compiledModule, "GetIcon"),
+                    PerformAction = (Action<int, MainWindow, InstanceStateData>)Delegate.CreateDelegate(typeof(Action<int, MainWindow, InstanceStateData>), compiledModule, "PerformAction"),
+                    SubItems = (List<(string, Func<double, Page>)>)GetProperty(compiledModule, "SubItems"),
+                    GroupIndex = (double)GetProperty(compiledModule, "GroupIndex"),
+                    GroupName = (string)GetProperty(compiledModule, "GroupName"),
+                    IsLargeButton = (bool)GetProperty(compiledModule, "IsLargeButton")
                 };
 
                 return mod;
@@ -956,7 +1019,8 @@ public static Colour? Format(object attribute)
                     Repeatable = (bool)GetProperty(compiledModule, "Repeatable"),
                     GetParameters = (Func<TreeNode, List<(string, string)>>)Delegate.CreateDelegate(typeof(Func<TreeNode, List<(string, string)>>), compiledModule, "GetParameters"),
                     OnParameterChange = (ParameterChangeDelegate)Delegate.CreateDelegate(typeof(ParameterChangeDelegate), compiledModule, "OnParameterChange"),
-                    Transform = (FurtherTransformationModule.TreeTransformDelegate)Delegate.CreateDelegate(typeof(FurtherTransformationModule.TreeTransformDelegate), compiledModule, "Transform")
+                    Transform = (FurtherTransformationModule.TreeTransformDelegate)Delegate.CreateDelegate(typeof(FurtherTransformationModule.TreeTransformDelegate), compiledModule, "Transform"),
+                    GetIcon = (Func<double, Page>)Delegate.CreateDelegate(typeof(Func<double, Page>), compiledModule, "GetIcon"),
                 };
 
                 return mod;
@@ -983,14 +1047,22 @@ public static Colour? Format(object attribute)
                     HelpText = this.HelpText,
                     ItemText = (string)GetProperty(compiledModule, "ItemText"),
                     ParentMenu = (string)GetProperty(compiledModule, "ParentMenu"),
-                    GroupId = (string)GetProperty(compiledModule, "GroupId"),
+                    GroupName = (string)GetProperty(compiledModule, "GroupName"),
                     PropertyAffectingEnabled = (Avalonia.AvaloniaProperty)GetProperty(compiledModule, "PropertyAffectingEnabled"),
-                    ShortcutKey = (Avalonia.Input.Key)GetProperty(compiledModule, "ShortcutKey"),
-                    ShortcutModifier = (Avalonia.Input.KeyModifiers)GetProperty(compiledModule, "ShortcutModifier"),
+                    ShortcutKeys = (List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>)GetProperty(compiledModule, "ShortcutKeys"),
                     TriggerInTextBox = (bool)GetProperty(compiledModule, "TriggerInTextBox"),
-                    IsEnabled = (Func<MainWindow, bool>)Delegate.CreateDelegate(typeof(Func<MainWindow, bool>), compiledModule, "IsEnabled"),
-                    PerformAction = (Func<MainWindow, Task>)Delegate.CreateDelegate(typeof(Func<MainWindow, Task>), compiledModule, "PerformAction")
+                    IsEnabled = (Func<MainWindow, List<bool>>)Delegate.CreateDelegate(typeof(Func<MainWindow, List<bool>>), compiledModule, "IsEnabled"),
+                    PerformAction = (Func<int, MainWindow, Task>)Delegate.CreateDelegate(typeof(Func<int, MainWindow, Task>), compiledModule, "PerformAction"),
+                    GetIcon = (Func<double, Page>)Delegate.CreateDelegate(typeof(Func<double, Page>), compiledModule, "GetIcon"),
+                    GroupIndex = (double)GetProperty(compiledModule, "GroupIndex"),
+                    IsLargeButton = (bool)GetProperty(compiledModule, "IsLargeButton"),
+                    SubItems = (List<(string, Func<double, Page>)>)GetProperty(compiledModule, "SubItems")
                 };
+
+                if (compiledModule.GetMethod("GetFileMenuPage") != null)
+                {
+                    mod.GetFileMenuPage = (Func<Avalonia.Controls.Control>)Delegate.CreateDelegate(typeof(Func<Avalonia.Controls.Control>), compiledModule, "GetFileMenuPage");
+                }
 
                 return mod;
             }
@@ -1003,7 +1075,8 @@ public static Colour? Format(object attribute)
                     HelpText = this.HelpText,
                     GetParameters = (Func<TreeNode, List<(string, string)>>)Delegate.CreateDelegate(typeof(Func<TreeNode, List<(string, string)>>), compiledModule, "GetParameters"),
                     OnParameterChange = (ParameterChangeDelegate)Delegate.CreateDelegate(typeof(ParameterChangeDelegate), compiledModule, "OnParameterChange"),
-                    PlotAction = (Func<TreeNode, Dictionary<string, object>, Dictionary<string, Point>, Graphics, Point[]>)Delegate.CreateDelegate(typeof(Func<TreeNode, Dictionary<string, object>, Dictionary<string, Point>, Graphics, Point[]>), compiledModule, "PlotAction")
+                    PlotAction = (Func<TreeNode, Dictionary<string, object>, Dictionary<string, Point>, Graphics, Point[]>)Delegate.CreateDelegate(typeof(Func<TreeNode, Dictionary<string, object>, Dictionary<string, Point>, Graphics, Point[]>), compiledModule, "PlotAction"),
+                    GetIcon = (Func<double, Page>)Delegate.CreateDelegate(typeof(Func<double, Page>), compiledModule, "GetIcon")
                 };
 
                 return mod;
@@ -1020,9 +1093,13 @@ public static Colour? Format(object attribute)
                     ShortcutModifier = (Avalonia.Input.KeyModifiers)GetProperty(compiledModule, "ShortcutModifier"),
                     TriggerInTextBox = (bool)GetProperty(compiledModule, "TriggerInTextBox"),
                     IsAvailableInCommandLine = (bool)GetProperty(compiledModule, "IsAvailableInCommandLine"),
-                    GetIcon = (Func<Page>)Delegate.CreateDelegate(typeof(Func<Page>), compiledModule, "GetIcon"),
-                    IsAvailable = (Func<TreeNode, MainWindow, InstanceStateData, bool>)Delegate.CreateDelegate(typeof(Func<TreeNode, MainWindow, InstanceStateData, bool>), compiledModule, "IsAvailable"),
-                    PerformAction = (Action<TreeNode, MainWindow, InstanceStateData>)Delegate.CreateDelegate(typeof(Action<TreeNode, MainWindow, InstanceStateData>), compiledModule, "PerformAction"),
+                    GetIcon = (Func<double, Page>)Delegate.CreateDelegate(typeof(Func<double, Page>), compiledModule, "GetIcon"),
+                    IsAvailable = (Func<TreeNode, MainWindow, InstanceStateData, List<bool>>)Delegate.CreateDelegate(typeof(Func<TreeNode, MainWindow, InstanceStateData, List<bool>>), compiledModule, "IsAvailable"),
+                    PerformAction = (Action<int, TreeNode, MainWindow, InstanceStateData>)Delegate.CreateDelegate(typeof(Action<int, TreeNode, MainWindow, InstanceStateData>), compiledModule, "PerformAction"),
+                    GroupName = (string)GetProperty(compiledModule, "GroupName"),
+                    GroupIndex = (double)GetProperty(compiledModule, "GroupIndex"),
+                    IsLargeButton = (bool)GetProperty(compiledModule, "IsLargeButton"),
+                    SubItems = (List<(string, Func<double, Page>)>)GetProperty(compiledModule, "SubItems")
                 };
 
                 return mod;
@@ -1036,7 +1113,7 @@ public static Colour? Format(object attribute)
                     HelpText = this.HelpText,
                     GetParameters = (Func<TreeCollection, List<(string, string)>>)Delegate.CreateDelegate(typeof(Func<TreeCollection, List<(string, string)>>), compiledModule, "GetParameters"),
                     OnParameterChange = (ParameterChangeDelegate)Delegate.CreateDelegate(typeof(ParameterChangeDelegate), compiledModule, "OnParameterChange"),
-                    Transform = (Func<TreeCollection, Dictionary<string, object>, TreeNode>)Delegate.CreateDelegate(typeof(Func<TreeCollection, Dictionary<string, object>, TreeNode>), compiledModule, "Transform")
+                    Transform = (Func<TreeCollection, Dictionary<string, object>, Action<double>, TreeNode>)Delegate.CreateDelegate(typeof(Func<TreeCollection, Dictionary<string, object>, Action<double>, TreeNode>), compiledModule, "Transform")
                 };
 
                 return mod;
@@ -1242,8 +1319,6 @@ public static Colour? Format(object attribute)
 
                     using FileStream fs = new FileStream(actualPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     ReferenceSignatures[i] = Convert.ToBase64String(crypto.SignData(fs, HashAlgorithmName.SHA512, RSASignaturePadding.Pkcs1));
-                    /*fs.Seek(0, SeekOrigin.Begin);
-                    bool verified = CryptoUtils.ModuleRSADecrypters[1].VerifyData(fs, Convert.FromBase64String(ReferenceSignatures[i]), HashAlgorithmName.SHA512, RSASignaturePadding.Pkcs1);*/
                 }
             }
         }
@@ -1399,11 +1474,6 @@ public static Colour? Format(object attribute)
                 ModuleMetadata metaData;
 
                 string jsonText = File.ReadAllText(Path.Combine(tempDir, "Module.json"));
-
-                /*using (FileStream fs = new FileStream(Path.Combine(tempDir, "Module.json"), FileMode.Open))
-                {
-                    metaData = await System.Text.Json.JsonSerializer.DeserializeAsync<ModuleMetadata>(fs, Modules.DefaultSerializationOptions);
-                }*/
 
                 metaData = System.Text.Json.JsonSerializer.Deserialize<ModuleMetadata>(jsonText, Modules.DefaultSerializationOptions);
 
@@ -1567,17 +1637,23 @@ public static Colour? Format(object attribute)
             {
                 case ModuleTypes.Action:
                     {
-                        Page icon = ((ActionModule)loadedModule).GetIcon();
+                        Page icon;
 
-                        Page pag = new Page(42 / icon.Height * icon.Width + 20, 62);
+                        Page pag;
 
-                        GraphicsPath button = new GraphicsPath().MoveTo(5, 0).LineTo(pag.Width - 5, 0).Arc(pag.Width - 5, 5, 5, -Math.PI / 2, 0).LineTo(pag.Width, pag.Height - 5).Arc(pag.Width - 5, pag.Height - 5, 5, 0, Math.PI / 2);
-                        button.LineTo(5, pag.Height).Arc(5, pag.Height - 5, 5, Math.PI / 2, Math.PI).LineTo(0, 5).Arc(5, 5, 5, Math.PI, Math.PI / 2 * 3).Close();
+                        if (((ActionModule)loadedModule).IsLargeButton)
+                        {
+                            icon = ((ActionModule)loadedModule).GetIcon(1);
+                        }
+                        else
+                        {
+                            icon = ((ActionModule)loadedModule).GetIcon(2);
+                        }
 
-                        pag.Graphics.FillPath(button, Colour.FromRgb(217, 217, 217));
+                        pag = new Page(32, 32);
+                        customIconHeight = 52.706;
 
-                        pag.Graphics.Translate(10, 10);
-                        pag.Graphics.Scale(42 / icon.Height, 42 / icon.Height);
+                        pag.Graphics.Scale(pag.Width / icon.Width, pag.Height / icon.Height);
                         pag.Graphics.DrawGraphics(0, 0, icon.Graphics);
 
                         byte[] bytes;
@@ -1594,7 +1670,7 @@ public static Colour? Format(object attribute)
                         }
 
                         customIconSource = "data:image/svg+xml;base64," + System.Convert.ToBase64String(bytes);
-                        customIconHeight = 102;
+
                     }
                     break;
                 case ModuleTypes.Coordinate:
@@ -1603,28 +1679,13 @@ public static Colour? Format(object attribute)
                 case ModuleTypes.FileType:
                     break;
                 case ModuleTypes.FurtherTransformation:
-                    parameters.AddRange(from el in ((FurtherTransformationModule)loadedModule).GetParameters(testTree) select (el.Item1, el.Item2, false));
-                    break;
-                case ModuleTypes.LoadFile:
-                    break;
-                case ModuleTypes.MenuAction:
-                    break;
-                case ModuleTypes.Plotting:
-                    parameters.AddRange(from el in ((PlottingModule)loadedModule).GetParameters(testTree) select (el.Item1, el.Item2, false));
-                    break;
-                case ModuleTypes.SelectionAction:
                     {
-                        Page icon = ((SelectionActionModule)loadedModule).GetIcon();
+                        Page icon = ((FurtherTransformationModule)loadedModule).GetIcon(2);
 
-                        Page pag = new Page(42 / icon.Height * icon.Width + 20, 62);
+                        Page pag = new Page(32, 32);
+                        customIconHeight = 52.706;
 
-                        GraphicsPath button = new GraphicsPath().MoveTo(5, 0).LineTo(pag.Width - 5, 0).Arc(pag.Width - 5, 5, 5, -Math.PI / 2, 0).LineTo(pag.Width, pag.Height - 5).Arc(pag.Width - 5, pag.Height - 5, 5, 0, Math.PI / 2);
-                        button.LineTo(5, pag.Height).Arc(5, pag.Height - 5, 5, Math.PI / 2, Math.PI).LineTo(0, 5).Arc(5, 5, 5, Math.PI, Math.PI / 2 * 3).Close();
-
-                        pag.Graphics.FillPath(button, Colour.FromRgb(217, 217, 217));
-
-                        pag.Graphics.Translate(10, 10);
-                        pag.Graphics.Scale(42 / icon.Height, 42 / icon.Height);
+                        pag.Graphics.Scale(pag.Width / icon.Width, pag.Height / icon.Height);
                         pag.Graphics.DrawGraphics(0, 0, icon.Graphics);
 
                         byte[] bytes;
@@ -1641,7 +1702,127 @@ public static Colour? Format(object attribute)
                         }
 
                         customIconSource = "data:image/svg+xml;base64," + System.Convert.ToBase64String(bytes);
-                        customIconHeight = 102;
+                    }
+                    parameters.AddRange(from el in ((FurtherTransformationModule)loadedModule).GetParameters(testTree) select (el.Item1, el.Item2, false));
+                    break;
+                case ModuleTypes.LoadFile:
+                    break;
+                case ModuleTypes.MenuAction:
+                    {
+                        Page icon;
+
+                        Page pag = new Page(32, 32);
+
+
+                        if (((MenuActionModule)loadedModule).ParentMenu == "File")
+                        {
+                            pag.Background = Colour.FromRgb(0, 114, 178);
+                            icon = ((MenuActionModule)loadedModule).GetIcon(1.5);
+                        }
+                        else if (((MenuActionModule)loadedModule).IsLargeButton)
+                        {
+                            icon = ((MenuActionModule)loadedModule).GetIcon(1);
+                        }
+                        else
+                        {
+                            icon = ((MenuActionModule)loadedModule).GetIcon(2);
+                        }
+
+                        customIconHeight = 52.706;
+
+
+
+                        if (((MenuActionModule)loadedModule).ParentMenu == "File")
+                        {
+                            pag.Graphics.Translate(4, 4);
+                            pag.Graphics.Scale(24 / icon.Width, 24 / icon.Height);
+                            pag.Graphics.DrawGraphics(0, 0, icon.Graphics);
+                        }
+                        else
+                        {
+                            pag.Graphics.Scale(pag.Width / icon.Width, pag.Height / icon.Height);
+                            pag.Graphics.DrawGraphics(0, 0, icon.Graphics);
+                        }
+
+                        byte[] bytes;
+
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            pag.SaveAsSVG(stream);
+                            stream.Seek(0, SeekOrigin.Begin);
+
+                            using (StreamReader reader = new StreamReader(stream))
+                            {
+                                bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
+                            }
+                        }
+
+                        customIconSource = "data:image/svg+xml;base64," + System.Convert.ToBase64String(bytes);
+
+                    }
+                    break;
+                case ModuleTypes.Plotting:
+                    {
+                        Page icon = ((PlottingModule)loadedModule).GetIcon(2);
+
+                        Page pag = new Page(32, 32);
+                        customIconHeight = 52.706;
+
+                        pag.Graphics.Scale(pag.Width / icon.Width, pag.Height / icon.Height);
+                        pag.Graphics.DrawGraphics(0, 0, icon.Graphics);
+
+                        byte[] bytes;
+
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            pag.SaveAsSVG(stream);
+                            stream.Seek(0, SeekOrigin.Begin);
+
+                            using (StreamReader reader = new StreamReader(stream))
+                            {
+                                bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
+                            }
+                        }
+
+                        customIconSource = "data:image/svg+xml;base64," + System.Convert.ToBase64String(bytes);
+                    }
+                    parameters.AddRange(from el in ((PlottingModule)loadedModule).GetParameters(testTree) select (el.Item1, el.Item2, false));
+                    break;
+                case ModuleTypes.SelectionAction:
+                    {
+                        Page icon;
+
+                        Page pag;
+
+                        if (((SelectionActionModule)loadedModule).IsLargeButton)
+                        {
+                            icon = ((SelectionActionModule)loadedModule).GetIcon(1);
+                        }
+                        else
+                        {
+                            icon = ((SelectionActionModule)loadedModule).GetIcon(2);
+                        }
+
+                        pag = new Page(32, 32);
+                        customIconHeight = 52.706;
+
+                        pag.Graphics.Scale(pag.Width / icon.Width, pag.Height / icon.Height);
+                        pag.Graphics.DrawGraphics(0, 0, icon.Graphics);
+
+                        byte[] bytes;
+
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            pag.SaveAsSVG(stream);
+                            stream.Seek(0, SeekOrigin.Begin);
+
+                            using (StreamReader reader = new StreamReader(stream))
+                            {
+                                bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
+                            }
+                        }
+
+                        customIconSource = "data:image/svg+xml;base64," + System.Convert.ToBase64String(bytes);
                     }
                     break;
                 case ModuleTypes.Transformer:
@@ -1679,12 +1860,9 @@ public static Colour? Format(object attribute)
 
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendLine("# " + this.Name);
-            builder.AppendLine();
-
             string iconSource = "";
 
-            double iconHeight = 210;
+            double iconHeight = 52.706;
 
             switch (this.ModuleType)
             {
@@ -1693,7 +1871,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.FileTypeTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.FileType-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1705,7 +1883,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.LoadFileTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.LoadFile-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1717,7 +1895,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.TransformerTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.Transformer-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1729,7 +1907,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.FurtherTransformationTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.FurtherTransformations-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1741,7 +1919,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.CoordinatesTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.Coordinates-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1753,7 +1931,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.PlotActionTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.PlotActions-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1765,7 +1943,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.SelectionActionTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.SelectionAction-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1777,7 +1955,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.ActionTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.Action-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1789,7 +1967,7 @@ public static Colour? Format(object attribute)
                         byte[] bytes;
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.MenuActionTemplate.png").CopyTo(stream);
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.MenuAction-32.png").CopyTo(stream);
                             bytes = stream.ToArray();
                         }
 
@@ -1810,7 +1988,15 @@ public static Colour? Format(object attribute)
 
             if (!string.IsNullOrEmpty(iconSource))
             {
-                builder.AppendLine("<img src=\"" + iconSource + "\" height=\"" + iconHeight.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\" align=\"right\"/>");
+                builder.Append("# ");
+                builder.Append("<img src=\"" + iconSource + "\" height=\"" + iconHeight.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\" /> ");
+
+                builder.AppendLine(this.Name);
+                builder.AppendLine();
+            }
+            else
+            {
+                builder.AppendLine("# " + this.Name);
                 builder.AppendLine();
             }
 
@@ -2061,8 +2247,6 @@ public static Colour? Format(object attribute)
 
                             string leftParen = "\\[";
                             string rightParen = "\\]";
-                            /* string min = minRange.ToString(formatString, System.Globalization.CultureInfo.InvariantCulture);
-                             string max = maxRange.ToString(formatString, System.Globalization.CultureInfo.InvariantCulture);*/
                             string min = string.Format(System.Globalization.CultureInfo.InvariantCulture, formatString, minRange);
                             string max = string.Format(System.Globalization.CultureInfo.InvariantCulture, formatString, maxRange);
 

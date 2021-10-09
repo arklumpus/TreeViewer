@@ -16,3 +16,4 @@ VectSharp.dll
 System.Console.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
+System.Linq.dll

@@ -1,51 +1,74 @@
-<Window xmlns="https://github.com/avaloniaui"
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="600" Height="500"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" Width="410" Height="500"
         x:Class="TreeViewer.FileAssociationWindow"
-        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
         Title="File associations" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Grid Margin="10">
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="1*" />
-      <ColumnDefinition Width="Auto" />
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="1*"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
-    <Image Grid.Column="1" Source="resm:TreeViewer.Assets.GenericFileType.png" MaxHeight="256" Grid.Row="2" />
-    <TextBlock FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" Margin="10" Grid.ColumnSpan="2">Set up file associations</TextBlock>
-    <TextBlock TextWrapping="Wrap" Grid.Row="1" Grid.ColumnSpan="2">Set TreeViewer as the default viewer for the following file types:</TextBlock>
-    <ScrollViewer Grid.Row="2" Padding="30,0,0,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Center">
-      <StackPanel Name="ExtensionsContainer">
+  <local:ChildWindow.Content>
+    <Grid Margin="10">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
 
-      </StackPanel>
-    </ScrollViewer>
-    <Button Grid.ColumnSpan="2" Grid.Row="3" HorizontalAlignment="Center" Margin="0,5,0,0" Background="#0F000000" Name="AdminButton">
-      <Grid>
+      <Grid Name="HeaderGrid" Margin="0,0,0,10" Grid.ColumnSpan="2">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="32"/>
-          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Image Source="resm:TreeViewer.Assets.Shield.png" Height="32" Margin="0,0,5,0"/>
-        <TextBlock Grid.Column="1" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,5,0">You need to provide administrator permission to change file associations.</TextBlock>
+
+        <TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Set up file associations" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
       </Grid>
-    </Button>
-    <Grid Grid.Row="4" Grid.ColumnSpan="2" Margin="0,10,0,0">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="1*"/>
-      </Grid.ColumnDefinitions>
-      <Button Name="OKButton" Grid.Column="1" Width="100" HorizontalContentAlignment="Center">OK</Button>
-      <Button Name="CancelButton" Grid.Column="3" Width="100" HorizontalContentAlignment="Center">Ignore</Button>
+      <TextBlock TextWrapping="Wrap" Grid.Row="1" Grid.ColumnSpan="2">Set TreeViewer as the default viewer for the following file types:</TextBlock>
+      <ScrollViewer Grid.Row="2" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Center" AllowAutoHide="False" Margin="5">
+        <StackPanel Name="ExtensionsContainer">
+
+        </StackPanel>
+      </ScrollViewer>
+      <Button Grid.ColumnSpan="2" Grid.Row="3" HorizontalAlignment="Center" Margin="0,5,0,0" Background="#0F000000" Name="AdminButton" FontSize="13" Classes="PlainButton">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="32"/>
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+          <Image Source="resm:TreeViewer.Assets.Shield.png" Height="32" Margin="0,0,5,0"/>
+          <TextBlock Grid.Column="1" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,5,0">You need to provide administrator permission to change file associations.</TextBlock>
+        </Grid>
+      </Button>
+      <Grid Grid.Row="4" Grid.ColumnSpan="2" Margin="0,10,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Button Name="OKButton" Grid.Column="1" Width="100" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">OK</Button>
+        <Button Name="CancelButton" Grid.Column="3" Width="100" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">Ignore</Button>
+      </Grid>
     </Grid>
-  </Grid>
-</Window>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

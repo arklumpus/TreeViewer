@@ -15,48 +15,72 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
-        mc:Ignorable="d" Width="260" Height="130"
+        mc:Ignorable="d" SizeToContent="Height" Width="320"
         x:Class="TreeViewer.AddAttachmentWindow"
-        Title="Add attachment" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15" WindowStartupLocation="CenterOwner" CanResize="False"
+        Title="Add attachment" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" WindowStartupLocation="CenterOwner" CanResize="False"
         Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Grid Margin="10">
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="Auto"/>
-      <ColumnDefinition Width="1*" />
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="2*" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <TextBlock VerticalAlignment="Center" Margin="0,5,0,6">Name:</TextBlock>
-    <TextBox Name="NameBox" Grid.Column="1" VerticalAlignment="Center" Margin="5,5,0,5"></TextBox>
-    <local:Expander Grid.Row="1" Grid.ColumnSpan="2" IsExpanded="False" VerticalAlignment="Center" Name="AdvancedExpander">
-      <local:Expander.Label>
-        <TextBlock FontWeight="Bold">Advanced</TextBlock>
-      </local:Expander.Label>
-      <local:Expander.Child>
-        <StackPanel>
-          <CheckBox Grid.ColumnSpan="2" Name="LoadInMemoryBox" IsChecked="True" Margin="0,5,0,5" VerticalContentAlignment="Center">Load in memory</CheckBox>
-          <CheckBox Grid.ColumnSpan="2" Name="CacheResultsBox" IsChecked="True" Margin="0,5,0,5" VerticalContentAlignment="Center">Cache parsed results</CheckBox>
-        </StackPanel>
-      </local:Expander.Child>
-    </local:Expander>
-    <Grid Grid.Row="2" Grid.ColumnSpan="3" Margin="0,5,0,0">
+  <local:ChildWindow.Styles>
+    <Style Selector="local|Accordion Grid#HeaderGrid">
+      <Setter Property="Background" Value="{Binding $parent[1].HeaderBackground}"/>
+    </Style>
+
+    <Style Selector="local|Accordion Grid#HeaderGrid:pointerover">
+      <Setter Property="Background" Value="{Binding $parent[1].HeaderHoverBackground}"/>
+    </Style>
+
+    <Style Selector="local|Accordion Grid#HeaderGrid.Pressed">
+      <Setter Property="Background" Value="{Binding $parent[1].HeaderPressedBackground}"/>
+    </Style>
+  </local:ChildWindow.Styles>
+  <local:ChildWindow.Content>
+    <Grid Margin="10">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="1*" />
       </Grid.ColumnDefinitions>
-      <Button Grid.Column="1" Width="100" Name="OKButton" HorizontalContentAlignment="Center">OK</Button>
-      <Button Grid.Column="3" Width="100" Name="CancelButton" HorizontalContentAlignment="Center">Cancel</Button>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid Name="HeaderGrid" Grid.ColumnSpan="2" Margin="0,0,0,5">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Add attachment" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
+      </Grid>
+      <TextBlock Grid.Row="1" VerticalAlignment="Center" Margin="0,5,0,6">Name:</TextBlock>
+      <TextBox Name="NameBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5,5,0,5" FontSize="13" Padding="5,2,5,2"></TextBox>
+      <local:Accordion Grid.Row="2" Grid.ColumnSpan="2" IsOpen="False" VerticalAlignment="Center" Name="AdvancedExpander" ArrowSize="12">
+        <local:Accordion.AccordionHeader>
+          <TextBlock FontWeight="Bold">Advanced</TextBlock>
+        </local:Accordion.AccordionHeader>
+        <local:Accordion.AccordionContent>
+          <StackPanel>
+            <CheckBox Grid.ColumnSpan="2" Name="LoadInMemoryBox" IsChecked="True" VerticalContentAlignment="Center" FontSize="13">Load in memory</CheckBox>
+            <CheckBox Grid.ColumnSpan="2" Name="CacheResultsBox" IsChecked="True" Margin="0,0,0,2" VerticalContentAlignment="Center" FontSize="13">Cache parsed results</CheckBox>
+          </StackPanel>
+        </local:Accordion.AccordionContent>
+      </local:Accordion>
+      <Grid Grid.Row="3" Grid.ColumnSpan="3" Margin="0,5,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="1" Width="100" Name="OKButton" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">OK</Button>
+        <Button Grid.Column="3" Width="100" Name="CancelButton" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">Cancel</Button>
+      </Grid>
     </Grid>
-  </Grid>
-</Window>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

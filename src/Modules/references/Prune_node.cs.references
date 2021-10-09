@@ -6,3 +6,6 @@ TreeViewer.dll
 PhyloTree.TreeNode.dll
 System.Linq.dll
 System.Text.RegularExpressions.dll
+VectSharp.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

@@ -4,6 +4,7 @@ using PhyloTree;
 using TreeViewer;
 using VectSharp;
 using VectSharp.Markdown;
+using System.Runtime.InteropServices;
 
 namespace a06888353e9304d08ab245727bced8cd6
 {
@@ -123,6 +124,52 @@ namespace a06888353e9304d08ab245727bced8cd6
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "06888353-e930-4d08-ab24-5727bced8cd6";
+		
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACFSURBVDhPY/Sq3fifAQ1sa/ZnhDIJAiYoTTbA64KioiIMOXQw8F6gGIC84ACkS4DYG4i3AnEP0AsHgDRRAOQFmGYQANEgPtGAKrGwBUjDXAACW4EG+EDZBAHICz1ADPI7CIDDAMKkEwD7FRoT+4HYkZQYAAFYQgJpRqaJBngDkQ55gYEBAFoxNZFPm+qKAAAAAElFTkSuQmCC";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAClSURBVEhLY6A1YAQRXrUb/4N5aGBbsz9YnhLABKVpBojyQVFREVZ5QqCvr49xcPiAEkBzHwx9AA9jYDw0AKl6CI+hERj+ID7FgBlEoBkOAg6q9pGMtw+tOADlkw2GTz5ADyIQoEo8gOMAFNagMAcyHUB8IKBaJA8zAIoLaHxQDYDjAASQIppqeQAEkHMySlpHLkkpzgfYgoVaQQXLB6P1AQ7AwAAAjYtJfqvEEngAAAAASUVORK5CYII=";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADbSURBVFhHYxhowAgivGo3/gfzcIBtzf5gdbQATFB6wMCAO4DkKCgqKsKrlhTQ19fHOPRCgNpgNBGOggEHKKkbmBsagFQ9hMfQCEz9ID5NAdwBQMu3AClvCA8OtgId4QNl0wSAcwHU5+iWg4A3VI5mgOSCaNgWxciJDx3QNDEOjkQIAlCLGiE8MAD5nKaWj4LBCUA5gtaFDzJghtJggJQdHVTtIxlvH1pxACxBQ4BeECGXBbjKBaoC5HIAW2GEUQjRsijG5mOah8KAF8WwEMDnU5qGwoDXhgMMGBgAt8lQukQ7VMUAAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {

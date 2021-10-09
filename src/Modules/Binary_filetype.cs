@@ -40,6 +40,8 @@ namespace OpenBinaryTree
         public static IEnumerable<TreeNode> OpenFile(string fileName, List<(string, Dictionary<string, object>)> moduleSuggestions, Action<double> progressAction, Func<RSAParameters?, bool> askForCodePermission)
         {
             FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+			
+			List<Attachment> attachments = new List<Attachment>();
 
             if (BinaryTree.HasValidTrailer(fs, true))
             {
@@ -55,11 +57,38 @@ namespace OpenBinaryTree
                         {
                             fs.Seek(labelAddress - 8 - dataLength, SeekOrigin.Begin);
                             string header = reader.ReadString();
+							string serializedModules = null; 
+							
                             if (header == "#TreeViewer")
                             {
-                                string serializedModules = reader.ReadString();
+                                serializedModules = reader.ReadString();
 
-                                List<List<(string, Dictionary<string, object>)>> modules = ModuleUtils.DeserializeModules(serializedModules, askForCodePermission);
+                                if (reader.BaseStream.Position - (labelAddress - 8 - dataLength) < dataLength)
+                                {
+                                    try
+                                    {
+                                        header = reader.ReadString();
+                                    }
+                                    catch { }
+                                }
+                            }
+
+
+                            if (header == "#Attachments")
+                            {
+                                int attachmentCount = reader.ReadInt32();
+
+                                for (int i = 0; i < attachmentCount; i++)
+                                {
+                                    Attachment att = ReadAttachment(reader, fileName);
+									attachments.Add(att);
+                                    moduleSuggestions.Add(("@Attachment", new Dictionary<string, object>() { { "Attachment", att } }));
+                                }
+                            }
+							
+							if (serializedModules != null)
+							{
+								List<List<(string, Dictionary<string, object>)>> modules = ModuleUtils.DeserializeModules(serializedModules, attachments, askForCodePermission);
 
                                 if (modules[0].Count > 0)
                                 {
@@ -80,29 +109,7 @@ namespace OpenBinaryTree
                                 {
                                     moduleSuggestions.Add(modules[3][i]);
                                 }
-
-                                if (reader.BaseStream.Position - (labelAddress - 8 - dataLength) < dataLength)
-                                {
-                                    try
-                                    {
-                                        header = reader.ReadString();
-                                    }
-                                    catch { }
-                                }
-                            }
-
-
-                            if (header == "#Attachments")
-                            {
-                                int attachmentCount = reader.ReadInt32();
-
-                                for (int i = 0; i < attachmentCount; i++)
-                                {
-                                    Attachment att = ReadAttachment(reader, fileName);
-
-                                    moduleSuggestions.Add(("@Attachment", new Dictionary<string, object>() { { "Attachment", att } }));
-                                }
-                            }
+							}
                         }
                     }
                 }

@@ -459,3 +459,6 @@ Icons\asn.ico	55f8d9f5-b401-4c9c-af50-06abd4ab5e2d
 Icons\asnb.ico	9ce6be2c-f79d-40a6-b9fb-f564ad102eda
 MathNet.Numerics.dll	17749cc3-3065-420d-aef3-07ecc318dc95
 MathNet.Numerics.xml	ff3e581e-fafe-41c2-8103-b8e6f859284c
+mscordaccore_amd64_amd64_5.0.721.25508.dll	28db6b03-065f-438b-ba15-4cba3ea5d1ff
+VectSharp.Raster.dll	59bc2059-c5e0-4724-a05c-dd274d61e6b9
+VectSharp.Raster.xml	7a4e778a-c26b-4930-96c4-a5946c825896

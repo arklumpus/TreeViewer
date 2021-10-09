@@ -8,7 +8,6 @@ System.Linq.dll
 VectSharp.Canvas.dll
 System.IO.FileSystem.dll
 Avalonia.Base.dll
-VectSharp.dll
 Avalonia.Controls.dll
 Avalonia.Input.dll
 Avalonia.Visuals.dll

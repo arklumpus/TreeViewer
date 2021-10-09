@@ -15,72 +15,66 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeViewer.WelcomeWindow" SizeToContent="WidthAndHeight" CanResize="False"
-        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
         Title="Welcome" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Grid Margin="10" Width="800">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="250" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <Image Source="resm:TreeViewer.Assets.Banner.png?assembly=TreeViewer"></Image>
-    <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontSize="40" FontWeight="Bold">Welcome to TreeViewer!</TextBlock>
-    <TextBlock Grid.Row="2" TextWrapping="Wrap" >
-      TreeViewer is based on a "modular" structure: small modules perform individual actions, such as computing the coordinates of the nodes in the tree, or drawing the tree branches. Together, these actions constitute the complete plot.
-    </TextBlock>
-    <TextBlock Grid.Row="3" TextWrapping="Wrap" Margin="0,10,0,0">
-      We can install these modules now, or you can install them individually later, using the "Module manager" window.
-    </TextBlock>
-    <TextBlock Grid.Row="4" TextWrapping="Wrap" Margin="0,10,0,0">
-      Please make sure that you have a working Internet connection and choose one of the following options:
-    </TextBlock>
-    <StackPanel Grid.Row="5" Margin="40,10,0,0">
-      <StackPanel Orientation="Horizontal">
-        <RadioButton GroupName="ModuleChoice" Name="NoModulesRadio">Do not install any module</RadioButton>
-        <local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
-          <ToolTip.Tip>
-            Does not install any module. The program will not work properly until at least the required modules are installed. These can be installed using the "Module manager" window.
-          </ToolTip.Tip>
-        </local:HelpButton>
+  <local:ChildWindow.Content>
+    <Grid Margin="10" Width="800">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="250" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Image Source="resm:TreeViewer.Assets.Banner.png?assembly=TreeViewer"></Image>
+      <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontSize="40" FontWeight="Bold" Foreground="#0072b2">Welcome to TreeViewer!</TextBlock>
+      <TextBlock Grid.Row="2" TextWrapping="Wrap" >
+        TreeViewer is based on a "modular" structure: small modules perform individual actions, such as computing the coordinates of the nodes in the tree, or drawing the tree branches. Together, these actions constitute the complete plot.
+      </TextBlock>
+      <TextBlock Grid.Row="3" TextWrapping="Wrap" Margin="0,10,0,0">
+        We can install these modules now, or you can install them individually later, using the "Module manager" window.
+      </TextBlock>
+      <TextBlock Grid.Row="4" TextWrapping="Wrap" Margin="0,10,0,0">
+        Please make sure that you have a working Internet connection and choose one of the following options:
+      </TextBlock>
+      <StackPanel Grid.Row="5" Margin="40,10,0,0">
+        <StackPanel Orientation="Horizontal">
+          <RadioButton GroupName="ModuleChoice" Name="NoModulesRadio" FontSize="13">Do not install any module</RadioButton>
+          <local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
+            <ToolTip.Tip>
+              Does not install any module. The program will not work properly until the required modules are installed. These can be installed using the "Module manager" window.
+            </ToolTip.Tip>
+          </local:HelpButton>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+          <RadioButton IsChecked="True" GroupName="ModuleChoice" Name="AllModulesRadio" FontSize="13">Install all available modules (recommended)</RadioButton>
+          <local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
+            <ToolTip.Tip>
+              Installs all the available modules. This ensures that all the features of the program can be used fully. Modules can be later uninstalled using the "Module manager" window.
+            </ToolTip.Tip>
+          </local:HelpButton>
+        </StackPanel>
       </StackPanel>
-      <StackPanel Orientation="Horizontal">
-        <RadioButton GroupName="ModuleChoice" Name="RequiredModulesRadio">Install only the required modules</RadioButton>
-        <local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
-          <ToolTip.Tip>
-            Installs only the minimum set of modules required for program operation. Advanced operations will not be available. Additional modules may be installed using the "Module manager" window.
-          </ToolTip.Tip>
-        </local:HelpButton>
-      </StackPanel>
-      <StackPanel Orientation="Horizontal">
-        <RadioButton IsChecked="True" GroupName="ModuleChoice" Name="AllModulesRadio">Install all available modules (recommended)</RadioButton>
-        <local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
-          <ToolTip.Tip>
-            Installs all the available modules. This ensures that all the features of the program can be used fully. Modules can be later uninstalled using the "Module manager" window.
-          </ToolTip.Tip>
-        </local:HelpButton>
-      </StackPanel>
-    </StackPanel>
-    <Grid Grid.Row="6" Margin="0,10,0,0">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="1*"/>
-      </Grid.ColumnDefinitions>
-      <Button Grid.Column="1" Width="100" HorizontalContentAlignment="Center" Name="OKButton">OK</Button>
-      <Button Grid.Column="3" Width="100" HorizontalContentAlignment="Center" Name="CancelButton">Cancel</Button>
+      <Grid Grid.Row="6" Margin="0,10,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="1" Width="100" HorizontalContentAlignment="Center" Name="OKButton" FontSize="13" Classes="PlainButton">OK</Button>
+        <Button Grid.Column="3" Width="100" HorizontalContentAlignment="Center" Name="CancelButton" FontSize="13" Classes="PlainButton">Cancel</Button>
+      </Grid>
     </Grid>
-  </Grid>
-</Window>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

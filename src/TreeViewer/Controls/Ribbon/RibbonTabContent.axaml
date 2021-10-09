@@ -1,0 +1,54 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TreeViewer.RibbonTabContent" Focusable="True" HorizontalAlignment="Left">
+  <UserControl.Styles>
+    <Style Selector=".WindowsStyle ScrollViewer#Scroller">
+      <Setter Property="Background" Value="#F3F3F3" />
+    </Style>
+
+    <Style Selector=".MacOSStyle ScrollViewer#Scroller">
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0,-30" EndPoint="0,100" >
+            <LinearGradientBrush.GradientStops>
+              <GradientStop Offset="0" Color="#F8F8F8"/>
+              <GradientStop Offset="0.087" Color="#F3F3F3"/>
+              <GradientStop Offset="0.96" Color="#EDEDED"/>
+              <GradientStop Offset="1" Color="#E8E8E8" />
+            </LinearGradientBrush.GradientStops>
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </UserControl.Styles>
+  <UserControl.Transitions>
+    <Transitions>
+      <TransformOperationsTransition Property="RenderTransform" Duration="0.1" />
+      <DoubleTransition Property="Opacity" Duration="0.1" />
+    </Transitions>
+  </UserControl.Transitions>
+  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Name="Scroller" >
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" Name="MainContainer">
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

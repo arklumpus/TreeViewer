@@ -1,0 +1,167 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TreeViewer.ChildWindow"
+        Title="ChildWindow" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#F3F3F3">
+  <Window.Styles>
+    <Style Selector=".MacOSStyle ScrollBar[IsExpanded=true] /template/ Rectangle#TrackRect">
+      <Setter Property="Fill" Value="#00000000" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Rectangle#TrackRect">
+      <Setter Property="Fill" Value="#DADADA" />
+    </Style>
+
+    <Style Selector=".MacOSStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb /template/ Border#ThumbVisual">
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Margin" Value="2,0,2,0" />
+    </Style>
+
+    <Style Selector=".MacOSStyle ScrollBar /template/ RepeatButton.line">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb /template/ Border#ThumbVisual">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="BorderBrush" Value="#B1B1B1" />
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb:pointerover /template/ Border#ThumbVisual">
+      <Setter Property="Background" Value="#F3F3F3" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb:pressed /template/ Border#ThumbVisual">
+      <Setter Property="Background" Value="#F3F3F3" />
+      <Setter Property="BorderBrush" Value="#737373" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar /template/ RepeatButton.line /template/ Border#Root">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="BorderBrush" Value="#B1B1B1" />
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar /template/ RepeatButton.line /template/ Path">
+      <Setter Property="Fill" Value="#737373" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:vertical /template/ RepeatButton.line.up /template/ Path">
+      <Setter Property="Data" Value="M 19.091797 14.970703 L 10 5.888672 L 0.908203 14.970703 Z" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:vertical /template/ RepeatButton.line.down /template/ Path">
+      <Setter Property="Data" Value="M 19.814453 5.439453 L 10 15.253906 L 0.185547 5.439453 Z" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:horizontal /template/ RepeatButton.line.up /template/ Path">
+      <Setter Property="Data" Value="M 14.970703 0.908203 L 5.888672 10 L 14.970703 19.091797 Z" />
+
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:horizontal /template/ RepeatButton.line.down /template/ Path">
+      <Setter Property="Data" Value="M 5.029297 19.091797 L 14.111328 10 L 5.029297 0.908203 Z" />
+
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ RepeatButton.line:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="#F3F3F3" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ RepeatButton.line:pressed /template/ Border#Root">
+      <Setter Property="Background" Value="#F3F3F3" />
+      <Setter Property="BorderBrush" Value="#737373" />
+    </Style>
+
+    <Style Selector="Grid.TitleBarBG">
+      <Setter Property="Background" Value="#0072b2" />
+    </Style>
+
+    <Style Selector=".LightWindow Grid.TitleBarBG">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="TextBlock#TitleBlock">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector=".LightWindow TextBlock#TitleBlock">
+      <Setter Property="Foreground" Value="#0072b2" />
+    </Style>
+
+    <Style Selector="local|WindowsChrome#WindowsChromeLight">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector=".LightWindow local|WindowsChrome#WindowsChromeLight">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <Style Selector=".LightWindow local|WindowsChrome#WindowsChromeDark">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="Window[IsActive=false] Grid#TitleBar">
+      <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
+  </Window.Styles>
+  <Border BorderThickness="1" Name="MainBorder" BorderBrush="#0072b2">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="1*"/>
+      </Grid.RowDefinitions>
+      <Grid Grid.Row="0" Margin="-1,-1,-1,-1" Classes="TitleBarBG" Name="TitleBarBG">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="31"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="1"/>
+        </Grid.RowDefinitions>
+        <Grid Name="TitleBarContainer" Margin="1,1,1,0" Focusable="True">
+          <Grid Name="TitleBar" Background="Transparent">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="31" />
+              <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Name="TitleBlock" Text="{ Binding $parent[Window].Title }" Margin="10,0,0,0" FontSize="14" />
+          </Grid>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="1*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <local:WindowsChrome Grid.Column="2" VerticalAlignment="Top" Classes="Dark" Name="WindowsChromeDark"></local:WindowsChrome>
+            <local:WindowsChrome Grid.Column="2" VerticalAlignment="Top" Classes="Light" Name="WindowsChromeLight"></local:WindowsChrome>
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <ContentPresenter Grid.Row="1" Name="ContentPresenter" /> 
+    </Grid>
+  </Border>
+</Window>

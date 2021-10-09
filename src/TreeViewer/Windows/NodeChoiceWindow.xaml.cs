@@ -26,7 +26,7 @@ using PhyloTree;
 
 namespace TreeViewer
 {
-    public class NodeChoiceWindow : Window
+    public class NodeChoiceWindow : ChildWindow
     {
         public string[] Result = null;
 
@@ -61,20 +61,21 @@ namespace TreeViewer
 
         private void AddNodeItem(int index)
         {
-            Grid pnl = new Grid() { Margin = new Thickness(0, 0, 17, 5) };
+            Grid pnl = new Grid() { Margin = new Thickness(0, 0, 0, 5) };
 
             pnl.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridUnitType.Star)));
             pnl.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridUnitType.Pixel)));
             pnl.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(0, GridUnitType.Auto)));
 
-            ComboBox box = new ComboBox() { Items = names, Margin = new Thickness(0, 0, 5, 0), SelectedIndex = index, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, ClipToBounds = false };
+            ComboBox box = new ComboBox() { Items = names, Margin = new Thickness(0, 0, 5, 0), SelectedIndex = index, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, ClipToBounds = false, FontSize = 13, Padding = new Thickness(5, 2, 5, 2) };
             pnl.Children.Add(box);
 
-            AddRemoveButton but = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Remove, Margin = new Thickness(5, 0, 0, 0) };
-            Grid.SetColumn(but, 2);
-            pnl.Children.Add(but);
+            Button deleteButton = new Button() { Width = 20, Height = 20, Background = Avalonia.Media.Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Data = Icons.CrossGeometry, StrokeThickness = 2 }, Padding = new Avalonia.Thickness(2) };
+            deleteButton.Classes.Add("SideBarButton");
+            Grid.SetColumn(deleteButton, 2);
+            pnl.Children.Add(deleteButton);
 
-            but.PointerReleased += (s, e) =>
+            deleteButton.Click += (s, e) =>
             {
                 nodeNameContainers.Remove(pnl);
                 this.FindControl<StackPanel>("NodeContainer").Children.Remove(pnl);
@@ -88,9 +89,10 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.SelectNode")) { Width = 32, Height = 32 });
         }
 
-        private void AddButtonClicked(object sender, PointerReleasedEventArgs e)
+        private void AddButtonClicked(object sender, RoutedEventArgs e)
         {
             AddNodeItem(0);
         }

@@ -21,3 +21,4 @@ Avalonia.Controls.PanAndZoom.dll
 System.Linq.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
+SkiaSharp.dll

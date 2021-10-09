@@ -150,13 +150,13 @@ namespace TreeViewerCommandLine
                             Process proc = System.Diagnostics.Process.Start(info);
                             proc.WaitForExit();
 
-                            string output = proc.StandardOutput.ReadToEnd();
+                            string output = proc.StandardOutput.ReadToEnd().Trim();
 
                             ConsoleWrapper.TreatControlCAsInput = true;
                             Console.OutputEncoding = Encoding.UTF8;
                             ConsoleWrapper.SetOutputMode(ConsoleWrapper.OutputModes.Error);
 
-                            return Path.GetFileName(output);
+                            return Path.GetFileName(output.Trim());
                         }
                         catch
                         {
@@ -521,10 +521,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                ////programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                ////programmaticUpdate = false;
-
                             });
 
 
@@ -581,10 +578,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
                         }
                         else if (controlType == "AttributeSelector")
@@ -617,10 +611,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
                         }
                         else if (controlType == "Attachment")
@@ -651,9 +642,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
                             });
                         }
                         else if (controlType == "Node")
@@ -728,10 +717,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -799,10 +785,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -852,10 +835,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -890,10 +870,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -930,10 +907,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -969,10 +943,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -1007,10 +978,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -1082,10 +1050,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -1137,14 +1102,11 @@ namespace TreeViewerCommandLine
                                 formatterParams[4] = Convert.ToBoolean(colour[10]);
                             }
 
-                            tbr.Add(parameters[i].Item1, new ColourFormatterOptions(colour[0]) { AttributeName = colour[1], AttributeType = attrType, DefaultColour = col, Parameters = formatterParams });
+                            tbr.Add(parameters[i].Item1, new ColourFormatterOptions(colour[0], formatterParams) { AttributeName = colour[1], AttributeType = attrType, DefaultColour = col });
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
                             keys.Add(parameterName);
@@ -1180,10 +1142,7 @@ namespace TreeViewerCommandLine
 
                             parameterUpdaters.Add(parameterName, value =>
                             {
-                                //programmaticUpdate = true;
                                 tbr[parameterName] = value;
-                                //programmaticUpdate = false;
-
                             });
 
 

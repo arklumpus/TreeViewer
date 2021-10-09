@@ -1,11 +1,9 @@
+using System.Threading.Tasks;
+using TreeViewer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using Avalonia.Threading;
-using PhyloTree;
-using TreeViewer;
 using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace PasteTreeAction
 {
@@ -27,22 +25,48 @@ namespace PasteTreeAction
         public const string Name = "Paste tree";
         public const string HelpText = "Loads a tree from the clipboard.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "a916ad8e-2f22-439f-b764-8beb54673f7d";
-        public const ModuleTypes ModuleType = ModuleTypes.Action;
+        public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
-
-        public static bool IsAvailableInCommandLine { get; } = false;
-        public static string ButtonText { get; } = "Paste\ntree";
-        public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.V;
-        public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.Control;
+        public static string ItemText { get; } = "Paste";
+        public static string ParentMenu { get; } = "Edit";
+        public static string GroupName { get; } = "Clipboard";
+        public static Avalonia.AvaloniaProperty PropertyAffectingEnabled { get; } = null;
+        public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { (Avalonia.Input.Key.V, Avalonia.Input.KeyModifiers.Control) };
         public static bool TriggerInTextBox { get; } = false;
 
-        private const string IconBase64 = "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";
+        public static double GroupIndex { get; } = 4;
+        public static bool IsLargeButton { get; } = true;
+        public static List<(string, Func<double, Page>)> SubItems { get; } = new List<(string, Func<double, Page>)>() { };
 
-        public static Page GetIcon()
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEpSURBVFhH3ZfhDYIwEIXBOIPjuICJUzAB/EfhP0zAFCYu4BAM4RLaq4W0x9GWcg2GL7mcFFNe36sIydakqnuT5/ldtNvvaKRq2xbGF3NQfQn44gA15kWIAIlYcQqlDoMxJni/asPe07lMZyyXAqCL8x85YCIjEfPp5yox3yQm7IC3vXDhmYsD3vMER8DF5gLwHjAshT2gPgbhM59VADeUgP+OwIe1MbEIsPwcrcC9hE1A0zRqxI+iKKSAqHvgUj4mhYm+CZ/11SjMvu6ELrsp2B2w2U2xrwgocCw4mqgC9Dj00tl/BC6iCqDyh9KJ7oBrDxxVZwOvcAD+fChYHbCtFMiybKwBLKBSnQ3Kka7rxvcKFuB5wAV8p+/7ybsEi4olT0SsK19PknwBx1S+bG45zP0AAAAASUVORK5CYII=";
+        private static string Icon48Base64 = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHYSURBVGhD7ZlNToQwGIZBXbP0Bh6CzcS9ie48ASeA/Qjs4QRs3LpwYXTnwkxiuAEujBfwDP7xdgop/9S2lEn6JA0tzKTf235vS6htCeD7flhebvatBlGapnimnGN65WYkeHDuuq6d5/kLbSvjiF7/Axs8RhyzGe2bhCFxUhERUFOly1Jpw0I88LmLe9PhdLMlzyfSBZCcn/s7VMo+f8mdJlHZJ9cg2EPBAwiYERQvRMSAAMAlAik0FZzM4IHU/qR4QCdGgG5g4iEz1auQCmT1OypAFzwCjAd0oySFVHqnjTIB5Q6+iLeUCkiShN5RQxAExsTaWUUK3T6/WXe7d9oa5ym+pLUVpdDc4PswKdQHbwpdbB9orZkiU5hViAcY9Sp6JKPdLiIsJuD+9cP6+v6hLXksJkBF8ECLB2BUtohgTCybPpOzpY2ZARlcb85ojZ/FdmJ2+kWNW2F24jVgBOjm4AWsdhXCCjOHVc+A53mjBUAAe7J4MGRZhkt0Uk43zqvQkH2UNEjfOw3LVIpVweOsTdk3zDEPTAEB8ECVJixs8Kgs5gGR952KdvBKwQyIgP8XRVEXtMvSCfwg9gFm5DsLzuoFtILv7FlKTUyrokSO48RhGPZ8FbCsP5QoPQL7cL4JAAAAAElFTkSuQmCC";
+        private static string Icon64Base64 = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJPSURBVHhe7ZsxT8JAFMdbnFycjF/DmcWwk+ju4sLqAswgzMCiI7s7CZOLcWFw0tFvoNGFRSf13vW10eYo78q1veu9X9K8a9Mj9//z7t2V0DAwSLfbvRJhGJ1lMprNZnBv5exh3BkN8UCr2WyGq9XqHs8ro4HRBCrx8E1Dlo2i039QzSoUkwakSdIco8qEyinMgPQct2XOp5FF8O1h3BKhL442nKs4OhnIe/MWOs0akfQVY/uRV9QsxTERY8tdSxoU8TGaIoZ4v24/IOm7BRhzHzXkAqYASTyiW7hACHyDuv0Aah9pQtTUBwygireZ3BqKXAWcgA3A6C3eGxBuWWcT4n1A2RQ9PrIBtpPXAK4BGL2FDcDoLaUWwapWkixKNwAfjqyBp0BVGTCdTuW1quj1ejLyKoDRW7gGuFYDHl9eg+vFU/Cx/sIrNJbjU2xFOFsDbhbP2uKzcM6A9/UntszANcC1GtAeLLAVkZ7bVHgfgFiTAaaqOxXrMsB0dadijQGmqzsV72uAtQbA3FYdpuFVwJZVgLq+p++jkv483gcgzhlweLCPLTM4Z8Dl2bFRE5yrAabgGoCwARi9hQ3A6C1sAEZvqc0+IF7XdeEMqFsGdDodGbOYz+fYijIA/nPvDX/Fh2F4DhlAfl9gV3QygEqcKZQMSIsXY7htiEHB2xYTcdQ6E1TiZVteKZFNGXAxucv1yzAlAzaJB6xZBUw/58dkiQesyYBdUWXANvFAbfcBFPFALQ2gigdqZ4COeKCyGlA0FPFA7TJACP+mig+CIPgF3ww5F68XgAYAAAAASUVORK5CYII=";
+
+
+        public static Page GetIcon(double scaling)
         {
-            byte[] bytes = Convert.FromBase64String(IconBase64);
+            return GetIcon(scaling, ref Icon32Base64, ref Icon48Base64, ref Icon64Base64, 32);
+        }
+
+        public static Page GetIcon(double scaling, ref string icon1, ref string icon15, ref string icon2, double resolution)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(icon1);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(icon15);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(icon2);
+            }
 
             IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
@@ -62,25 +86,26 @@ namespace PasteTreeAction
                 Marshal.FreeHGlobal(imagePtr);
             }
 
-            Page pag = new Page(icon.Width, icon.Height);
-            pag.Graphics.DrawRasterImage(0, 0, icon);
+            Page pag = new Page(resolution, resolution);
+            pag.Graphics.DrawRasterImage(0, 0, resolution, resolution, icon);
 
             return pag;
-
         }
 
-        public static void PerformAction(MainWindow window, InstanceStateData stateData)
+        public static List<bool> IsEnabled(MainWindow window)
         {
-            Avalonia.Application.Current.Clipboard.GetTextAsync().ContinueWith(async textTask =>
-            {
-                string text = textTask.Result;
+            return new List<bool>() { true };
+        }
 
-                string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString().Replace("-", ""));
+        public static async Task PerformAction(int index, MainWindow window)
+        {
+            string text = await Avalonia.Application.Current.Clipboard.GetTextAsync();
 
-                System.IO.File.WriteAllText(tempFile, text);
+            string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
 
-                await Dispatcher.UIThread.InvokeAsync(async () => { await window.LoadFile(tempFile, true); });
-            });
+            System.IO.File.WriteAllText(tempFile, text);
+
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => { await window.LoadFile(tempFile, true); });
         }
     }
 }

@@ -23,7 +23,7 @@ using VectSharp.Canvas;
 
 namespace TreeViewer
 {
-    public class CustomDashWindow : Window
+    public class CustomDashWindow : ChildWindow
     {
         public LineDash LineDash { get; private set; } = new LineDash(0, 0, 0);
 

@@ -15,94 +15,40 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.VisualTree;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TreeViewer
 {
+    internal interface IWindowWithToolTips
+    {
+        List<Control> ControlsWithToolTips { get; }
+    }
+
     public static class AvaloniaBugFixes
     {
         private static readonly Dictionary<string, VectSharp.FontFamily> manifestFonts = new Dictionary<string, VectSharp.FontFamily>();
 
-        public static double MeasureTextWidth(string text, Avalonia.Media.FontFamily fontFamily, Avalonia.Media.FontStyle fontStyle, Avalonia.Media.FontWeight fontWeight, double fontSize)
+        public static Avalonia.Size MeasureText(string text, Avalonia.Media.FontFamily fontFamily, Avalonia.Media.FontStyle fontStyle, Avalonia.Media.FontWeight fontWeight, double fontSize, Size? availableSize = null)
         {
             if (string.IsNullOrEmpty(text))
             {
-                return 0;
+                return new Avalonia.Size(0, 0);
             }
 
-            string fullFamily = fontFamily.FamilyNames + "-" + fontWeight.ToString() + fontStyle.ToString();
+            Size avail = availableSize ?? Size.Infinity;
 
-            if (!manifestFonts.ContainsKey(fullFamily))
-            {
-                string stream = null;
+            return new Avalonia.Media.FormattedText(text, new Avalonia.Media.Typeface(fontFamily, fontStyle, fontWeight), fontSize, Avalonia.Media.TextAlignment.Left, Avalonia.Media.TextWrapping.NoWrap, avail).Bounds.Size;
+        }
 
-                switch (fontFamily.FamilyNames[0])
-                {
-                    case "Open Sans":
-                    case "$Default":
-                        switch (fontStyle)
-                        {
-                            case Avalonia.Media.FontStyle.Normal:
-                                switch (fontWeight)
-                                {
-                                    case Avalonia.Media.FontWeight.Bold:
-                                        stream = "TreeViewer.Fonts.OpenSans-Bold.ttf";
-                                        break;
-                                    case Avalonia.Media.FontWeight.Regular:
-                                        stream = "TreeViewer.Fonts.OpenSans-Regular.ttf";
-                                        break;
-                                }
-                                break;
-                            case Avalonia.Media.FontStyle.Italic:
-                            case Avalonia.Media.FontStyle.Oblique:
-                                switch (fontWeight)
-                                {
-                                    case Avalonia.Media.FontWeight.Bold:
-                                        stream = "TreeViewer.Fonts.OpenSans-BoldItalic.ttf";
-                                        break;
-                                    case Avalonia.Media.FontWeight.Regular:
-                                        stream = "TreeViewer.Fonts.OpenSans-Italic.ttf";
-                                        break;
-                                }
-                                break;
-                        }
-                        break;
-                    case "Roboto Mono":
-                        switch (fontStyle)
-                        {
-                            case Avalonia.Media.FontStyle.Normal:
-                                switch (fontWeight)
-                                {
-                                    case Avalonia.Media.FontWeight.Regular:
-                                        stream = "TreeViewer.Fonts.RobotoMono-Regular.ttf";
-                                        break;
-                                }
-                                break;
-                            case Avalonia.Media.FontStyle.Italic:
-                            case Avalonia.Media.FontStyle.Oblique:
-                                switch (fontWeight)
-                                {
-                                    case Avalonia.Media.FontWeight.Regular:
-                                        stream = "TreeViewer.Fonts.RobotoMono-Italic.ttf";
-                                        break;
-                                }
-                                break;
-                        }
-                        break;
-                }
-
-                if (!string.IsNullOrEmpty(stream))
-                {
-                    manifestFonts.Add(fullFamily, new VectSharp.FontFamily(GetManifestResourceStream(stream)));
-                }
-            }
-
-            VectSharp.Font fnt = new VectSharp.Font(manifestFonts[fullFamily], fontSize);
-
-            return fnt.MeasureText(text).Width;
+        public static double MeasureTextWidth(string text, Avalonia.Media.FontFamily fontFamily, Avalonia.Media.FontStyle fontStyle, Avalonia.Media.FontWeight fontWeight, double fontSize)
+        {
+            return MeasureText(text, fontFamily, fontStyle, fontWeight, fontSize).Width;
         }
 
 
@@ -113,17 +59,57 @@ namespace TreeViewer
 
         public static Task ShowDialog2(this Window subject, Window owner)
         {
-            /*subject.Opened += async (s, e) =>
+            if (owner.IsVisible)
             {
-                subject.Width = subject.Width + 1;
-                await Task.Delay(10);
-                subject.Height = subject.Height + 1;
-                await Task.Delay(100);
-                subject.Width = subject.Width - 1;
-                subject.Height = subject.Height - 1;
-            };*/
+                if (Modules.IsMac)
+                {
+                    if (owner is IWindowWithToolTips win)
+                    {
+                        foreach (Control control in win.ControlsWithToolTips)
+                        {
+                            if (ToolTip.GetIsOpen(control))
+                            {
+                                ToolTip.SetIsOpen(control, false);
+                            }
+                        }
+                    }
+                }
 
-            return subject.ShowDialog(owner);
+                return subject.ShowDialog(owner);
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public static void SetToolTip(Control control, object tip)
+        {
+            if (Modules.IsMac)
+            {
+                if (control.FindAncestorOfType<Window>() is IWindowWithToolTips win)
+                {
+                    win.ControlsWithToolTips.Add(control);
+                }
+                else
+                {
+                    control.AttachedToVisualTree += (s, e) =>
+                    {
+                        if (control.FindAncestorOfType<Window>() is IWindowWithToolTips win)
+                        {
+                            win.ControlsWithToolTips.Add(control);
+                        }
+                    };
+                }
+
+                ToolTip.SetTip(control, tip);
+            }
+            // Workaround for https://github.com/AvaloniaUI/Avalonia/issues/3536
+            else if (!Modules.IsLinux)
+            {
+                ToolTip.SetTip(control, tip);
+            }
+            
         }
     }
 }

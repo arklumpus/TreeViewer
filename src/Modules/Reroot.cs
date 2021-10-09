@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using PhyloTree;
 using TreeViewer;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace RerootTree
 {
@@ -15,11 +17,57 @@ namespace RerootTree
         public const string Name = "Reroot tree";
         public const string HelpText = "Re-roots the tree using the specified outgroup.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.1.1");
         public const string Id = "c6f96861-11c0-4853-9738-6a90cc81d660";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = false;
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB5SURBVDhPY8AHvGo3/ocycQImKE02oNgARijNUFRUhOHcG9z2DBpfD0J5CNDX1wfXBwfYDMAG0NVR7gVsNmNzIk4XokvgUohNHCTGAmXjBMgaYWxkFxI0AASQNaC7hP4JCT2AKXIByDAMA7BFIT5AcRhgjV/iAQMDAIR3L5AFry/3AAAAAElFTkSuQmCC";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAC9SURBVEhLYyAWeNVu/A/CUC7RgAlK0wyMWkAQMEJpMCgqKmoAUvUQHiq4wW0PpjW+HgTTOEBjX18fyAw4QPcBVsNJAPj1A33wH4ShXJIALr20jwN84Q4EGGGKDAjoBYFGkA/wKSAUJwTlWaAMBqBL0VMU0XGBrhcEYPppHgdwHxALsIU71LVY44scH+AKd6ziZAcRKNxhGCqEFdA8DqhiATafwMSGhg/wAZwWYPM2OWDoBxE4F5JS7pAGGBgAH+1FP/vxtzgAAAAASUVORK5CYII=";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFNSURBVFhH7ZZRDoIwDIaZ8c2LeAvfPQ48G/UAcBeP4C28iM/Ijy0pyzq2uYXE8CXNxlbKv7YzVqmcL48eRo/J7GhcjU3AJmB1AYbGibqub8Nw/T7pvA6ncTy+n+MYwL3rOsSeMctA34/XevHjiSzHhYAhAz2MlrLgi/lfTUgljMIENp2zgYD90aZpgpqYuCMDIc4xjRnlu6dJNZxwdiX5ZMOJkhrSjidBbI6r9oAx6vtOYv2Zn5sQNcdpcM1ktvjqUY+p5LgFSzX37me7hm3bGhhqz0ZbXrIJACl9kFWARP4+YC5NMgmwnWzHEOz3uCyYIztskkmAdHA5SmHSXLjWpT9ic58El8AWxybR1oG2XqQHtAy4yCbAdboQvAIQNOZOA+2kmsDsJdA+VLwEPiCqSAZi0+0C/4jGKDF1ZqSApdQXyQAH9Z0Ye/p+VX0A++O2Bt8aiN0AAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -51,6 +99,12 @@ namespace RerootTree
                 /// branch length 0 and the outgroup's branch length corresponds to the original branch length.
                 /// </param>
                 ( "Position:", "Slider:0.5[\"0\",\"1\",\"{0:P0}\"]" ),
+                
+                /// <param name="Apply">
+                /// This button applies the changes to the values of the other parameters and triggers a redraw
+                /// of the tree.
+                /// </param>
+                ( "Apply", "Button:" )
             };
         }
 
@@ -73,8 +127,10 @@ namespace RerootTree
                 };
             }
 
-            parametersToChange = new Dictionary<string, object>();
-            return true;
+            parametersToChange = new Dictionary<string, object>() { { "Apply", false } };
+
+
+            return (bool)currentParameterValues["Apply"] || previousParameterValues["Outgroup:"] != currentParameterValues["Outgroup:"] || (int)previousParameterValues["Rooting mode:"] != (int)currentParameterValues["Rooting mode:"];
         }
 
         private static (double, TreeNode) GetDeepestTip(TreeNode node)
@@ -103,7 +159,7 @@ namespace RerootTree
             }
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             int rootingMode = (int)parameterValues["Rooting mode:"];
 

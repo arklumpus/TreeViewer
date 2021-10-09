@@ -27,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <ColumnDefinition Width="Auto" />
     </Grid.ColumnDefinitions>
     <NumericUpDown Name="ValueNud" VerticalAlignment="Center" FormatString="0" Minimum="0" Increment="1" ></NumericUpDown>
-    <ComboBox Grid.Column="1" SelectedIndex="0" Margin="5, 0, 0, 0" VerticalAlignment="Center" BorderThickness="0" Name="UnitBox">
+    <ComboBox Grid.Column="1" SelectedIndex="0" Margin="5, 0, 0, 0" VerticalAlignment="Center" BorderThickness="0" Name="UnitBox" Background="Transparent">
       <ComboBox.Items>
         <ComboBoxItem>B</ComboBoxItem>
         <ComboBoxItem>kiB</ComboBoxItem>

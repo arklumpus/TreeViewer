@@ -17,14 +17,13 @@
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System.Collections.Generic;
 
 namespace TreeViewer
 {
-    public class ChooseReferencesWindow : Window
+    public class ChooseReferencesWindow : ChildWindow
     {
         public ChooseReferencesWindow()
         {
@@ -34,13 +33,14 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.SourceCode")) { Width = 32, Height = 32 });
         }
 
         public List<string> References { get; set; } = new List<string>();
 
         public bool Result { get; private set; } = false;
 
-        private async void AddReferenceClicked(object sender, PointerReleasedEventArgs e)
+        private async void AddReferenceClicked(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog;
 
@@ -70,21 +70,22 @@ namespace TreeViewer
             {
                 References.Add(result[0]);
 
-                IndexedGrid grd = new IndexedGrid();
+                Grid grd = new Grid();
                 grd.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
                 grd.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
 
                 grd.Children.Add(new TextBlock() { Text = System.IO.Path.GetFileName(result[0]), Margin = new Thickness(5) });
 
-                AddRemoveButton but = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Remove, Margin = new Thickness(5) };
-                Grid.SetColumn(but, 1);
-                grd.Children.Add(but);
+                Button deleteButton = new Button() { Width = 20, Height = 20, Background = Avalonia.Media.Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Data = Icons.CrossGeometry, StrokeThickness = 2 }, Padding = new Avalonia.Thickness(2) };
+                deleteButton.Classes.Add("SideBarButton");
+                Grid.SetColumn(deleteButton, 1);
+                grd.Children.Add(deleteButton);
 
                 this.FindControl<StackPanel>("ReferenceContainer").Children.Add(grd);
 
                 int index = References.Count - 1;
 
-                but.PointerReleased += (s, e) =>
+                deleteButton.Click += (s, e) =>
                 {
                     References.RemoveAt(index);
                     this.FindControl<StackPanel>("ReferenceContainer").Children.Remove(grd);
@@ -101,32 +102,6 @@ namespace TreeViewer
         {
             this.Result = true;
             this.Close();
-        }
-    }
-
-
-    public class IndexedGrid : Grid
-    {
-        public static readonly DirectProperty<IndexedGrid, int> IndexProperty = AvaloniaProperty.RegisterDirect<IndexedGrid, int>(nameof(Index), o => o.Index);
-
-        public int Index
-        {
-            get
-            {
-                IPanel parent = (IPanel)this.Parent;
-                return parent.Children.IndexOf(this);
-            }
-        }
-
-        public static readonly DirectProperty<IndexedGrid, bool> IndexIsEvenProperty = AvaloniaProperty.RegisterDirect<IndexedGrid, bool>(nameof(IndexIsEven), o => o.IndexIsEven);
-
-        public bool IndexIsEven
-        {
-            get
-            {
-                IPanel parent = (IPanel)this.Parent;
-                return parent.Children.IndexOf(this) % 2 == 0;
-            }
         }
     }
 }

@@ -21,21 +21,42 @@ namespace CollapseSelection
         public const string Name = "Collapse selection";
         public const string HelpText = "Collapses the selected node.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "e149aeb6-a019-41e2-8830-e4dc3e0eee43";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
         public static bool IsAvailableInCommandLine { get; } = true;
-        public static string ButtonText { get; } = "Toggle\ncollapse";
+        public static string ButtonText { get; } = "Toggle collapse";
         public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
         public static Avalonia.Input.KeyModifiers ShortcutModifier { get; } = Avalonia.Input.KeyModifiers.None;
         public static bool TriggerInTextBox { get; } = false;
 
-        private const string IconBase64 = "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";
+        public static string GroupName { get; } = "Simplify";
+        public static double GroupIndex { get; } = 1;
+        public static bool IsLargeButton { get; } = true;
+        public static List<(string, Func<double, Page>)> SubItems { get; } = new List<(string, Func<double, Page>)>();
 
-        public static Page GetIcon()
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGQSURBVFhH7ZQ9SwNBEIZn9q4QLKws/ChEu1T2UTwhKCqkFKzsLYOlYmws8wP8DYKI/pwQzoAgWAiiYJMd390787G54s7cJYX3wLK3M3uZd9/ZC5XMGo7nKSC8f/lY8UQHzBwI0Y6QtAsUMF4QwcUoNyBHAWkK8oeIhIopRL5uIzb+R46aT+vU0zURvUXMuwitRpkIWPyJqcvCHWLpkshblAGsruxkFymZqKBLGgG5FnRJEtBoNJqYbCKc26Rvb8E8DjHUQy0hir7HiezEApRdDLBBg8L5xhGPmXwt4mODP/56dhJ/odVq8d3NKfseraDgMaTcIhxizGNUcMsPcYQz+HeO1pwwqSr2LTF6Yd7PgtsCe2wjwAYc6s2H5Z6mqhaqYcMeQmtRps8XXHqBji6x7uD5VYSTrOy3IJMAl4kE5SHA5eDifkMpL8BFDbA0Y+SrARBEz+YiR23MWYBLCoeKFeAy6pBso0ibf4sOU5SAJCb/kPPEuJHkSJHM3IFSQCmgFJD4VzxNXAeu47nkv0D0A4bH0ZO2zTH8AAAAAElFTkSuQmCC";
+        private static string Icon48Base64 = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiQAABYkAZsVxhQAAAImSURBVGhD7ZZPSxtBGIffdxdj1JZS8GaPnqqXFktIQ6tC6EXshwkq3vTYUz5CT54LofTQQ2899huUSKwIevIWSGPn9TdxsmQnrtF2s7NL5wnDzO67gd8zfzYhj+c/h01fGLYPPy+qK/VWMS2LUCv3AsPAwrxOJJu4tYo2zN3JncD7vdbjPyWpqIDqLEEdoV/gdnBTHce5wIQZHgMFJSNCmQs8dIYRVvA5J5ZjFvlFwicU8L4pT18glcAsPVO+gYMDM0pfYCqBbdIUyCSwzb8IOAlsM0mg0WgcoltD2xrcABelZeqGT6gXPEKmZHEUlCI6C4RO8GBHEJpZ+qacDiMCSTMXC9+eq9DlzJIOry9j4XVgBD1loe+Y6SOl5AOL+iikvqHUTj28RZJAFF6DEGY0DioMiVlhmsFlCRe6z4zQ9DGq1areQhFP+2fYunBF0isu6xkd/Z5ekQW0ZxitQOc12nO0RZS0TBct5S3EG2YU3w5DcAaiKW82m7Fn8Ms53+/Ty5ClJiw4xPQGbXZQTELocnCIiY9xJjq4oaX+nnsc4kQBGydCaQrYZCI0TQGbqQhlKWCTihDzrqlkL2DzbufrQlj+XeNA6TfLOsK+Qn/Xq1hnizI5F7B56ArlTsBmwgr9zL2ATSTEalWF6hOPhr2NvAnYJP4NLgqFFyjcGbDxW8g1XsA1XsA1XsA1XsA1E/9K5J2kFfhi+tyTJPADrTASHo+nsBBdAzZFYueRbvPNAAAAAElFTkSuQmCC";
+        private static string Icon64Base64 = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAo5JREFUeJztmL1uE0EURs+d/BmJIkWK0FBYAaWgoKCLpbiJhASRaPIGSDRU9gv4CVIiJDpK2kDNawQhRf6RiJFSEYJCjPejSCKcSezYxtnZdeaUs7uz9zs7szuzEIlEIpHbi4UuIA3Ktc+zdzqHT8wlZbB1g5Lg2MSrqRTQJ/DdK05tT4WAra0PM79W5x5LroSxBmwAi8Ncm0sBIzzha8mFgEkEFvppoo7Zo9722YlWOiEuDenujw0ci+fPS8N0IjuSJQ2TNc2SJnL7kAAZFOAHPjqfw6OMTy+wcPsmAUKC0/CXCSIgZGCfVARkKbDPjQjIcmCfiQjIU2CfsQTkObBPXwHVavWFpHfAUm/74cwS7QWHcCOtIv59h2kg6pAcmM6OpBjYp68ASW/wwgN8X3hA1+au7dgPbOjg7ECmcAOO3buq0YZM4LB5OSsYFJAVhBt0r2CM/A5Y/v2F9vxDOq4w8DzBvIkVYSs4cHCSmGs6qaHE6jK+GUmYcd/D0AK2t7cvzPhntY/FpPunBLZm8BS4P+h6X4ihDuZaEi1L1MSpgeiOmWNsxv4Mfqo93wP2gPcwuhCwOUTRoIgzgA7OUhcysYVQXoXc2FI4L0JS2wxlVUiw7XBWhGTifwCEE5IZAT6+kM3azmq3m5QF6wZlYHlwDxeFGHaSOJrmreMyK8Bnp7a5C+wCb2H8dYjfnhsBPv8/ZU7JrQCfMadMa2oE+PhTxhNSMjjG9NoqlcpQ2zt/LzAtZHKLmiZRQOgCQtN3XvvvhvgOmFKigNAFhCYKCF1AaKKA0AWEJgoIXUBoooDQBYQmCghdQGiigNAFhGbo/wHTyq0fAYMENFKrIiB9BUh6KelrmsVEIpFIJJIufwG8Me76d6duKwAAAABJRU5ErkJggg==";
+
+        public static Page GetIcon(double scaling)
         {
-            byte[] bytes = Convert.FromBase64String(IconBase64);
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon48Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon64Base64);
+            }
 
             IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
@@ -55,18 +76,18 @@ namespace CollapseSelection
                 Marshal.FreeHGlobal(imagePtr);
             }
 
-            Page pag = new Page(icon.Width, icon.Height);
-            pag.Graphics.DrawRasterImage(0, 0, icon);
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
 
             return pag;
         }
 
-        public static bool IsAvailable(TreeNode selection, MainWindow window, InstanceStateData stateData)
+        public static List<bool> IsAvailable(TreeNode selection, MainWindow window, InstanceStateData stateData)
         {
-            return selection != null && selection.Children.Count > 0;
+            return new List<bool>() { selection != null && selection.Children.Count > 0 };
         }
 
-        public static void PerformAction(TreeNode selection, MainWindow window, InstanceStateData stateData)
+        public static void PerformAction(int actionIndex, TreeNode selection, MainWindow window, InstanceStateData stateData)
         {
             List<string> nodeNames = selection.GetNodeNames();
 
@@ -99,10 +120,11 @@ namespace CollapseSelection
 
                 if (InstanceStateData.IsUIAvailable)
                 {
-                    _ = window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1).ContinueWith(task =>
-                    {
-                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
-                    });
+					_ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => 
+					{
+						await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+						window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
+					});
                 }
             }
             else
@@ -127,10 +149,11 @@ namespace CollapseSelection
 
                 if (InstanceStateData.IsUIAvailable)
                 {
-                    _ = window.UpdateFurtherTransformations(minIndex).ContinueWith(task =>
-                    {
-                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(nodeNames));
-                    });
+                    _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => 
+					{
+						await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+						window.SetSelection(window.TransformedTree.GetLastCommonAncestor(selection.GetNodeNames()));
+					});
                 }
             }
         }

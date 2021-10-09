@@ -4,7 +4,6 @@ netstandard.dll
 System.Collections.dll
 TreeViewer.dll
 PhyloTree.TreeNode.dll
-VectSharp.dll
 VectSharp.Canvas.dll
 System.IO.FileSystem.dll
 System.Linq.dll

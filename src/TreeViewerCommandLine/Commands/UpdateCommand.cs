@@ -222,7 +222,7 @@ namespace TreeViewerCommandLine
         {
             if (!string.IsNullOrEmpty(Program.TransformerModuleId))
             {
-                Program.FirstTransformedTree = Modules.GetModule(Modules.TransformerModules, Program.TransformerModuleId).Transform(Program.Trees, Program.TransformerParameters.Parameters);
+                Program.FirstTransformedTree = Modules.GetModule(Modules.TransformerModules, Program.TransformerModuleId).Transform(Program.Trees, Program.TransformerParameters.Parameters, (prog) => { });
                 PendingUpdates.Transformer = false;
                 PendingUpdates.FurtherTransformations = true;
             }
@@ -235,22 +235,44 @@ namespace TreeViewerCommandLine
         }
 
 
-        public static void UpdateFurtherTransformations()
+        public static void UpdateFurtherTransformations(int minIndex = 0)
         {
             if (Program.FirstTransformedTree != null)
-            {
-                Program.TransformedTree = Program.FirstTransformedTree.Clone();
+            {                
+                TreeNode[] prevTransformedTrees = Program.AllTransformedTrees;
+
+                if (minIndex > 0)
+                {
+                    if (minIndex < prevTransformedTrees.Length)
+                    {
+                        Program.TransformedTree = prevTransformedTrees[minIndex];
+                    }
+                    else
+                    {
+                        Program.TransformedTree = Program.TransformedTree.Clone();
+                    }
+                }
+                else
+                {
+                    Program.TransformedTree = Program.FirstTransformedTree.Clone();
+                }
+
 
                 Program.AllTransformedTrees = new TreeNode[Program.FurtherTransformations.Count];
 
+                for (int i = 0; i < minIndex; i++)
+                {
+                    Program.AllTransformedTrees[i] = prevTransformedTrees[i];
+                }
+
                 List<(string, string)> errors = new List<(string, string)>();
 
-                for (int i = 0; i < Program.FurtherTransformations.Count; i++)
+                for (int i = minIndex; i < Program.FurtherTransformations.Count; i++)
                 {
                     Program.AllTransformedTrees[i] = Program.TransformedTree.Clone();
                     try
                     {
-                        Modules.GetModule(Modules.FurtherTransformationModules, Program.FurtherTransformations[i].Item1).Transform(ref Program.StateData.TransformedTree, Program.FurtherTransformations[i].Item2.Parameters);
+                        Modules.GetModule(Modules.FurtherTransformationModules, Program.FurtherTransformations[i].Item1).Transform(ref Program.StateData.TransformedTree, Program.FurtherTransformations[i].Item2.Parameters, (a) => { });
                     }
                     catch (Exception ex)
                     {

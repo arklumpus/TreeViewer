@@ -4,7 +4,7 @@ using TreeViewer;
 using System;
 
 // Name of the namespace. It does not really matter, but better if it is unique.
-namespace NamespaceHere
+namespace @NamespaceHere
 {
     //Do not change class name
     public static class MyModule
@@ -106,7 +106,10 @@ namespace NamespaceHere
         //
         // parameterValues: the current value for the parameters of the module. The keys in the dictionary correspond to
         //                  the names of the parameters as returned by the GetParameters method.
-        public static TreeNode Transform(TreeCollection trees, Dictionary<string, object> parameterValues)
+        //
+        // progressAction: as your module transforms the trees, you can invoke this Action to provide feedback to the user
+        //                  as to the status of the operation. The argument to this method should be a number between 0 and 1.
+        public static TreeNode Transform(TreeCollection trees, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             // TODO: use the trees to compute the tree that will be drawn.
             // E.g.

@@ -22,10 +22,11 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using CSharpEditor;
 using System.Threading.Tasks;
+using System;
 
 namespace DebuggerClient
 {
-    public class MainWindow : Window
+    public class MainWindow : TreeViewer.ChildWindow
     {
         bool terminating = false;
         public MainWindow()
@@ -53,6 +54,7 @@ namespace DebuggerClient
                 this.Close();
             };
 
+
             this.Closing += (s, e) =>
             {
                 if (!terminating)
@@ -60,6 +62,11 @@ namespace DebuggerClient
                     e.Cancel = true;
                     this.Hide();
                 }
+            };
+
+            this.Opened += (s, e) =>
+            {
+                ((Editor)client.Content).Background = this.Background;
             };
         }
 
@@ -69,15 +76,6 @@ namespace DebuggerClient
             if (!initialized)
             {
                 initialized = true;
-
-                //Hide the window just after it is shown. We can't just not show the window, otherwise the first time it is shown it will be below the window of the server process.
-                base.Show();
-
-                Dispatcher.UIThread.InvokeAsync(async () =>
-                {
-                    await Task.Delay(250);
-                    this.Hide();
-                });
             }
             else
             {

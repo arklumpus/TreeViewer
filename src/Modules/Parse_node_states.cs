@@ -6,6 +6,8 @@ using PhyloTree;
 using TreeViewer;
 using Avalonia;
 using Avalonia.Controls;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace ParseTipStates
 {
@@ -67,11 +69,101 @@ namespace ParseTipStates
         public const string Name = "Parse node states";
         public const string HelpText = "Loads node state data from an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("2.1.1");
+        public static Version Version = new Version("2.1.2");
         public const string Id = "716b55a3-02d9-4007-a830-8326d407b24c";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = true;
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABlSURBVDhPY2SYV/yfARdI6mUEUUVFRTjVMEFpssGoAVQwYOABY2fkVpyJpHy5NzghIQOv2o3/tzX7w8VHUjSC/A7EDlC2A4gPYpPiAkcg3g9hgmkQn3gDgCF/AEiBNYFoCJ+BAQA6NRzgaIL55gAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACISURBVEhLY2SYV/yfgViQ1MsIooqKiojWwwSlaQZGLSAIRi0gCEYtGAGAsTNyK9EFV/lyb3Bhhw141W78v63ZH0N+NBURBKMWEAQUWQBKmkDsAOWCAYgPEodyKfaBIxDvh1kCpfdDxcGAIguAGesAkAJbAhaAGg4VBwOK4wDJEhBAMZyBgYEBAM31JvCuv471AAAAAElFTkSuQmCC";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACzSURBVFhHY2SYV/yfgRyQ1MsIZYFBUVERWeYwQekBA6MOGHXAqANGHTDqgFEHjIJRwNgZuZWslkz5cm+UFhEu4FW7EWz+tmZ/rOpHs+GoA0YdMPwcAMz3W0B5H4gdoEJwABKDym2BCtEkBLyh9H5kR0DZ+yE8uBqaOMARSoNACZQGAWQ2XA3VHQAscg8AKZgFcJ8CAYztCFUDBjRJhGiOQAYoloMATRwAAlgcgWE5AwMDAwDUYDD82LV19wAAAABJRU5ErkJggg==";
+        private static string Icon48Base64 = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEMSURBVGhD7ZixDoIwFEWLX6arDs6ufgIOTkaNk4O/4OrsoCv+GfbBk5RYWjSEC8k9CXktgXJPgDxCYq6b3HTN+pLoqEaapp1fa6J1tFAADQXQUAANBdBQAA0F0FAADQXQUADN6AUIIQRLcl49Ov/dt70tvL8WY8x394Mt+3Jmjs/TUuZBhtYHPuEFd9wIOzEaCqChABoKoOldQLqt3XLdpro7ihzrnFd1aMQdcDts1kZCj8nKWUG1xhAeoaCEJ3wNhMBMq4tXIhC+WqN3AfuF+bLFK6HVxRte1yiAPEIBiRi18ALsHfhD4iu8AH2Jf5DwhhegAkILicbwAlxACEgEwwuDEBA8EtHwxhjzBue3Vijn46yZAAAAAElFTkSuQmCC";
+        private static string Icon64Base64 = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFuSURBVHhe7ZqxbsIwGISdPlm7tgNz1z5COnSqoGLqwCuwMneAlb4ZzcGBkta4NqDIv/77pOjiSLFynyCypTRh+boLY/KyaHgWpW3bUZ/njukWCWC6RQKYbpEAplskgOkWCWC6RQKYbpEAplskgOkWCWC6RQKYbpEAplskgOkWCWAKIYQQQrij+Xxej/pNztvqKfmNUCmP71+zLqaHUfjYzCcYZ2N6JfirPJjyWjbWl8L98kdi186izRDTLRLAdIsEMN0iAUy3SADTLVULwLq+O3Y87nm5GNzbm2ewV6hWAB+0v67fogjPs+E928Noz2DDVPMvILapKZIQKX/kNLfFd0CWhET5ATULeGDGSErIKH+au1oBm/nku4ukBGaMZHnOvafqv0CGhFIG5UH174AbSvhTHph4Cd5AQrQ8MCEAXCHhbHlgRgC4QEKyPDAlABRI+Lc8MCcAZEjIKg9MCgAJCdnlgVkBICKhqHwIIfwAVld0RFDqXp8AAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
+
+        public static Page GetIcon32(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon48Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon64Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -325,24 +417,51 @@ namespace ParseTipStates
                         }
 
 
-                        Window previewWindow = new Window() { FontFamily = window.FontFamily, FontSize = window.FontSize, Icon = window.Icon, Width = 800, Height = 300, Title = "Data preview" };
+                        ChildWindow previewWindow = new ChildWindow() { FontFamily = window.FontFamily, FontSize = 14, Icon = window.Icon, Width = 800, Height = 450, Title = "Data preview", WindowStartupLocation = WindowStartupLocation.CenterOwner };
 
                         Grid windowGrid = new Grid() { Margin = new Thickness(10) };
+                        windowGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+                        windowGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                         windowGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                         windowGrid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
                         previewWindow.Content = windowGrid;
 
-                        StackPanel rowCountPanel = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(10), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+                        Avalonia.Controls.Grid headerGrid = new Avalonia.Controls.Grid() { Margin = new Avalonia.Thickness(0, 0, 0, 5) };
+                        headerGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(0, Avalonia.Controls.GridUnitType.Auto));
+                        headerGrid.ColumnDefinitions.Add(new Avalonia.Controls.ColumnDefinition(1, Avalonia.Controls.GridUnitType.Star));
+                        headerGrid.Children.Add(new DPIAwareBox(GetIcon32) { Width = 32, Height = 32 });
+
+                        {
+                            Avalonia.Controls.TextBlock blk = new Avalonia.Controls.TextBlock() { FontSize = 16, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 114, 178)), Text = "Data preview", Margin = new Avalonia.Thickness(10, 0, 0, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                            Avalonia.Controls.Grid.SetColumn(blk, 1);
+                            headerGrid.Children.Add(blk);
+                        }
+
+                        windowGrid.Children.Add(headerGrid);
+
+
+
+                        StackPanel rowCountPanel = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 5), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
                         rowCountPanel.Children.Add(new TextBlock() { Text = "Number of rows to preview:", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
                         NumericUpDown rowCountNud = new NumericUpDown() { Minimum = 1, Maximum = attributes.Count, Value = Math.Min(50, attributes.Count), Margin = new Thickness(5, 0, 0, 0), Width = 150, FormatString = "0" };
                         rowCountPanel.Children.Add(rowCountNud);
+                        Grid.SetRow(rowCountPanel, 1);
                         windowGrid.Children.Add(rowCountPanel);
 
-                        rowCountPanel.Children.Add(new TextBlock() { Text = "String values", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 78, 138)), Margin = new Thickness(25, 0, 0, 0) });
-                        rowCountPanel.Children.Add(new TextBlock() { Text = "Number values", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(166, 55, 0)), Margin = new Thickness(10, 0, 0, 0) });
+                        StackPanel legendPanel = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 5), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
 
-                        ScrollViewer scroller = new ScrollViewer() { HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, Padding = new Avalonia.Thickness(0, 0, 13, 13) };
-                        Grid.SetRow(scroller, 1);
+                        legendPanel.Children.Add(new Avalonia.Controls.Shapes.Rectangle() { Width = 12, Height = 12, Fill = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 78, 138)), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
+
+                        legendPanel.Children.Add(new TextBlock() { Text = "String values", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13, Margin = new Thickness(5, 0, 0, 0) });
+
+                        legendPanel.Children.Add(new Avalonia.Controls.Shapes.Rectangle() { Width = 12, Height = 12, Fill = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(166, 55, 0)), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(15, 0, 0, 0) });
+                        legendPanel.Children.Add(new TextBlock() { Text = "Number values", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13, Margin = new Thickness(5, 0, 0, 0) });
+
+                        Grid.SetRow(legendPanel, 2);
+                        windowGrid.Children.Add(legendPanel);
+
+                        ScrollViewer scroller = new ScrollViewer() { HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, Padding = new Avalonia.Thickness(0, 0, 16, 16), AllowAutoHide = false };
+                        Grid.SetRow(scroller, 3);
                         windowGrid.Children.Add(scroller);
 
                         BuildPreviewTable(rowCountNud, attributes, matchColumn, attributeNames, scroller);
@@ -352,16 +471,16 @@ namespace ParseTipStates
                             BuildPreviewTable(rowCountNud, attributes, matchColumn, attributeNames, scroller);
                         };
 
-                        await previewWindow.ShowDialog(window);
+                        await previewWindow.ShowDialog2(window);
                     }
                     else
                     {
-                        await new MessageBox("Attention!", "No attachment has been selected!").ShowDialog(window);
+                        await new MessageBox("Attention!", "No attachment has been selected!").ShowDialog2(window);
                     }
                 }
                 catch (Exception ex)
                 {
-                    await new MessageBox("Error!", "An error occurred while loading the preview!\n" + ex.Message).ShowDialog(window);
+                    await new MessageBox("Error!", "An error occurred while loading the preview!\n" + ex.Message).ShowDialog2(window);
                 }
             }
 
@@ -416,7 +535,7 @@ namespace ParseTipStates
                     }
                     else
                     {
-                        blk = new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(128, 128, 128)), Text = attributeNames[i] + "\n[match column]", Margin = new Thickness(5), TextWrapping = Avalonia.Media.TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                        blk = new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(128, 128, 128)), Text = attributeNames[i] + " [match column]", Margin = new Thickness(5), TextWrapping = Avalonia.Media.TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
                     }
 
                     Grid.SetColumn(blk, i);
@@ -427,7 +546,7 @@ namespace ParseTipStates
             previewGrid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Pixel));
 
             {
-                Canvas canvas = new Canvas() { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 0, 0)) };
+                Canvas canvas = new Canvas() { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 0, 0)), Height = 1 };
                 Grid.SetRow(canvas, 1);
                 Grid.SetColumnSpan(canvas, columnCount);
                 previewGrid.Children.Add(canvas);
@@ -436,11 +555,23 @@ namespace ParseTipStates
             for (int i = 0; i < previewRows; i++)
             {
                 previewGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-                if (i % 2 == 0)
+
+
                 {
-                    Canvas canvas = new Canvas() { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240)), ZIndex = -100 };
+                    Canvas canvas = new Canvas() { Background = Avalonia.Media.Brushes.Transparent, ZIndex = -100 };
                     Grid.SetRow(canvas, i + 2);
                     Grid.SetColumnSpan(canvas, columnCount);
+
+                    canvas.PointerEnter += (s, e) =>
+                    {
+                        canvas.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(220, 220, 220));
+                    };
+
+                    canvas.PointerLeave += (s, e) =>
+                    {
+                        canvas.Background = Avalonia.Media.Brushes.Transparent;
+                    };
+
                     previewGrid.Children.Add(canvas);
                 }
 
@@ -468,7 +599,7 @@ namespace ParseTipStates
 
                     if (j != matchColumn - 1)
                     {
-                        blk = new TextBlock() { Text = stringValue, Margin = new Thickness(5), TextWrapping = Avalonia.Media.TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                        blk = new TextBlock() { Text = stringValue, Margin = new Thickness(5), TextWrapping = Avalonia.Media.TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, IsHitTestVisible = false };
 
                         if (isString)
                         {
@@ -481,7 +612,7 @@ namespace ParseTipStates
                     }
                     else
                     {
-                        blk = new TextBlock() { FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(128, 128, 128)), Text = stringValue, Margin = new Thickness(5), TextWrapping = Avalonia.Media.TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                        blk = new TextBlock() { FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(128, 128, 128)), Text = stringValue, Margin = new Thickness(5), TextWrapping = Avalonia.Media.TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, IsHitTestVisible = false };
                     }
 
                     if (j >= attributeNames.Length + 1 || (matchColumn != 1 && j >= attributeNames.Length))
@@ -499,7 +630,7 @@ namespace ParseTipStates
             scroller.Content = previewGrid;
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             int skipLines = (int)(double)parameterValues["Lines to skip:"];
             string separatorString = (string)parameterValues["Separator:"];

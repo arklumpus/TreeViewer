@@ -1,9 +1,11 @@
+
 using System;
 using System.Collections.Generic;
 using PhyloTree;
 using TreeViewer;
 using VectSharp;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace aea7e246be93f4d0da67a88af05479b48
 {
@@ -16,10 +18,56 @@ namespace aea7e246be93f4d0da67a88af05479b48
         public const string Name = "Plot alignment";
         public const string HelpText = "Adds the plot of an alignment to the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "ea7e246b-e93f-4d0d-a67a-88af05479b48";
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACuSURBVDhPY2YAgqKiogZLS8v9QMx4/PjxAyAxYgELlK7v6+tjBBr0H8huAAl41W4EsRkWuF4EUQxidnWMIPrVoSawuNidjyCKgQlkO5gFBeh8QoAJiMG2gzhQuh7EJhaAvQB1OlkAbADMBSBAsmHoGihxzcAAWNwjA0dgmBCdmHAFIiMsIW1r9gfLdUZuBfMTM8+CKERCApMUAIx0gOwaYgBWL5BiCMVeoDAWGBgAmytK8c+kTR8AAAAASUVORK5CYII=";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAItSURBVEhLzVU9aFNRFL4vvnQIZGwQXeogdNI6RHDpIi6x0MVgOxSpYkBsMH+DDjGkDvoazE8hpRRaOwhSqoNDMjmI2EkLdbFUO4R2KR2CkujySOJ37jt55gUdfDeDH5yc75z7OOedn/si+pFIJEaZDgQe1hIIfg9qNxaLrVkedTgSdDqdMOSLpmnXI5GIl91K0Fh3W7PbbreDHo/nAxLNFAqF59apEKH06w5TsX7lEzMhAuMPZYzjd/P2eWD/OzNnBWH6KRaLHxH8AHSKbFX0JriGt39KBC1agFyNx+On5YkCZIJkMhmEOoegy2Tn8/kyaZoFaRXIBDRcUpAdvHUT8gO+n7AHkwCgBJt441ssN5GAqriYSqXG5BMuoWF7LkO/abVaZ0qlUs1yW0AldSRbQcvus+ufQRXQ7r/tD86gNVVuk8hkMr3b5EA0Gh1m+n9C3kKqoF6vnyLu8/kahmH8voqKkK1pNBovvF7vIYlpmt8w+CMMeF4+oQi79xj0V2yL5vf7T4C/xPaksaKX+Ng1dNY2stlsG2oOFdzG6p60vM6PXfXRpGytMV2xfbN3tpn9/WNnA8FDqGBI1/XP7HINOwECjqD37xF8C7wC1+NcLrdnnbpH7wxqkGegZegn0A+Q0PUN7sIxA/zBrDKlNlFVd0EpmWv8cQYEBG+ikiE2XUNuA1qxgWAXEHRCeoU4D3sJdhWre4N9riArQDATwc6C0lD3YC/CfqUaXAghfgFrwM+xmnG/pQAAAABJRU5ErkJggg==";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKXSURBVFhH7ZZLaFNREIbvTQ3ZFYxacCEuFF+4ExUUurKbgHZTqW6UbgoKIU81oLbYUowQEiSmIm4qPhAEUaGiIAqiC0EXcVGLunCjgiLBRcSASfzm3NOQG21XHQTpD8M/Z+ZyZ87MeTn/Gq7lFpLJ5HSz2VyPer5QKEx6Vj0ELBtkMpnlUMR13Q3woDEqw1eBVCo1zOwvkcA9eB+mzfl8ftbzeoicvtu0qsFUX9lqHnp6R3z//PJ0zPd9z/vvVvPgqwBB9yO/kGN2fMA4FNFKgNmvhfYgZ5j1W/gnot6GVgIye+FQKFQSbjQaOVqxicR6ZayF9hYMIB+y2WxFBpVKZUKYRFTbYBJglluhnQSbZRueTCQSp8LhcBrbR6qg2gaTwFz5CbYb/QTqcRH0bjhMglIdFcy1QBJ4wsHT3S7VanWFOElErQouJd8FP0eGWP1TxtoG/LeggVqttrJUKn3zrIuHALO7ANcovwT6A/hvCLM7DhuDBqLR6Cqr/hXxeHy1VZewhP8P5u7mpNvLMTzKVjR3N1vvM/SO8eXO98Biw5yEBF9HsG2oMwS/Db9hPIheJrkt8o0Wllk2IOgkM34hejqdvk5i5Xq9Li+jGbEJOl9E98f7fS+gcwenff6hI6+s5mHBF1E7crnca6geCATCnkUH8ybAlXwI6qINjz2LDnwJUPIcl88d5BntuILkuRUfWLcKfAlQ7ioz/oQqPX+JTi7JjHEqobMFo8z4KAtxGNnO+BpyNhaLbTReBcy7BgRU4KFwMBhcYwwKWDABYF5CbMWvZqQAs4dZ8XEWXAF1DJHDqAvegS2G/oi29Ml3GjAVYPH9MCPHGUFuIlcJ3k/wi7wLI8ajhNYpxqsoZFWnWCzWrKoMx/kN3uAG5DuQ66gAAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -319,23 +367,25 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
             if ((int)currentParameterValues["ResidueStyleButtons"] == 0)
             {
-                ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultNucleotideColourSource);
+				object[] formatterParams = new object[] { DefaultNucleotideColourSource, false };
+				
+                ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultNucleotideColourSource, formatterParams);
 
                 formatterOptions.AttributeName = "(N/A)";
                 formatterOptions.AttributeType = "String";
                 formatterOptions.DefaultColour = ((ColourFormatterOptions)currentParameterValues["Residue colours:"]).DefaultColour;
-                formatterOptions.Parameters = new object[] { DefaultNucleotideColourSource, false };
 
                 parametersToChange["Residue colours:"] = formatterOptions;
             }
             else if ((int)currentParameterValues["ResidueStyleButtons"] == 1)
             {
-                ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultAminoAcidColourSource);
+				object[] formatterParams = new object[] { DefaultAminoAcidColourSource, false };
+				
+                ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultAminoAcidColourSource, formatterParams);
 
                 formatterOptions.AttributeName = "(N/A)";
                 formatterOptions.AttributeType = "String";
                 formatterOptions.DefaultColour = ((ColourFormatterOptions)currentParameterValues["Residue colours:"]).DefaultColour;
-                formatterOptions.Parameters = new object[] { DefaultAminoAcidColourSource, false };
 
                 parametersToChange["Residue colours:"] = formatterOptions;
             }
@@ -532,20 +582,32 @@ namespace aea7e246be93f4d0da67a88af05479b48
                                 labelValue = labelFormatter(attributeObject);
                             }
 
+
                             if (!string.IsNullOrEmpty(labelValue))
                             {
-                                double labelWidth = labelFont.MeasureText(labelValue).Width;
+                                IEnumerable<FormattedText> formattedText;
+
+                                if (labelFont.FontFamily.IsStandardFamily)
+                                {
+                                    formattedText = FormattedText.Format(labelValue, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
+                                }
+                                else
+                                {
+                                    formattedText = FormattedText.Format(labelValue, labelFont, labelFont, labelFont, labelFont);
+                                }
+
+                                double labelWidth = formattedText.Measure().Width;
 
                                 maxLabelWidth = Math.Max(labelWidth, maxLabelWidth);
 
                                 if (labelPosition == 1 || labelPosition == 3)
                                 {
-                                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, height * 0.5, labelValue, labelFont, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
+                                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, height * 0.5, formattedText, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
                                 }
 
                                 if (labelPosition == 2 || labelPosition == 3)
                                 {
-                                    newGpr.FillText(kvp.Value.Length * width + labelFont.FontSize * 0.625, height * 0.5, labelValue, labelFont, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
+                                    newGpr.FillText(kvp.Value.Length * width + labelFont.FontSize * 0.625, height * 0.5, formattedText, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
                                 }
                             }
 
@@ -715,19 +777,30 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
             int maxSequenceLength = (from el in fastaAlignment select el.Value.Length).Max();
 
-            if (identityColour.A > 0)
+            if (identityColour.A > 0 && !string.IsNullOrEmpty(identityLabel))
             {
-                double labelWidth = labelFont.MeasureText(identityLabel).Width;
+                IEnumerable<FormattedText> formattedText;
+
+                if (labelFont.FontFamily.IsStandardFamily)
+                {
+                    formattedText = FormattedText.Format(identityLabel, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
+                }
+                else
+                {
+                    formattedText = FormattedText.Format(identityLabel, labelFont, labelFont, labelFont, labelFont);
+                }
+
+                double labelWidth = formattedText.Measure().Width;
                 maxLabelWidth = Math.Max(maxLabelWidth, labelWidth);
 
                 if (labelPosition == 1 || labelPosition == 3)
                 {
-                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, identityLabel, labelFont, identityColour, TextBaselines.Middle);
+                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, formattedText, identityColour, TextBaselines.Middle);
                 }
 
                 if (labelPosition == 2 || labelPosition == 3)
                 {
-                    newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, identityLabel, labelFont, identityColour, TextBaselines.Middle);
+                    newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, formattedText, identityColour, TextBaselines.Middle);
                 }
 
                 GraphicsPath path = new GraphicsPath();
@@ -748,19 +821,30 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 maxY += defaultHeight + defaultMargin;
             }
 
-            if (gapColour.A > 0)
+            if (gapColour.A > 0 && !string.IsNullOrEmpty(gapLabel))
             {
-                double labelWidth = labelFont.MeasureText(gapLabel).Width;
+                IEnumerable<FormattedText> formattedText;
+
+                if (labelFont.FontFamily.IsStandardFamily)
+                {
+                    formattedText = FormattedText.Format(gapLabel, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
+                }
+                else
+                {
+                    formattedText = FormattedText.Format(gapLabel, labelFont, labelFont, labelFont, labelFont);
+                }
+
+                double labelWidth = formattedText.Measure().Width;
                 maxLabelWidth = Math.Max(maxLabelWidth, labelWidth);
 
                 if (labelPosition == 1 || labelPosition == 3)
                 {
-                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, gapLabel, labelFont, gapColour, TextBaselines.Middle);
+                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, formattedText, gapColour, TextBaselines.Middle);
                 }
 
                 if (labelPosition == 2 || labelPosition == 3)
                 {
-                    newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, gapLabel, labelFont, gapColour, TextBaselines.Middle);
+                    newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, formattedText, gapColour, TextBaselines.Middle);
                 }
 
                 GraphicsPath path = new GraphicsPath();
@@ -975,3 +1059,4 @@ namespace aea7e246be93f4d0da67a88af05479b48
 }";
     }
 }
+

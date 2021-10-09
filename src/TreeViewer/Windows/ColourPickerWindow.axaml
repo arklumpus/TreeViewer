@@ -1,0 +1,31 @@
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        xmlns:acp="clr-namespace:AvaloniaColorPicker;assembly=AvaloniaColorPicker"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TreeViewer.ColourPickerWindow"
+        SizeToContent="WidthAndHeight" Title="Colour picker" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner" Background="#F0F0F0">
+  <local:ChildWindow.Content>
+    <Grid Margin="10">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="1*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <acp:ColorPicker Name="ColorPicker" FontSize="13"></acp:ColorPicker>
+      <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="1" Width="100" Name="OKButton" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">OK</Button>
+        <Button Grid.Column="3" Width="100" Name="CancelButton" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">Cancel</Button>
+      </Grid>
+    </Grid>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

@@ -76,7 +76,14 @@ namespace TreeViewer
             }
             else
             {
-                FilePublicKeys = new List<RSAParameters>();
+                FilePublicKeys = new List<RSAParameters>()
+                {
+                    new RSAParameters()
+                    {
+                        Exponent = Convert.FromBase64String("AQAB"),
+                        Modulus = Convert.FromBase64String("3aIbJNiueDXQ22oMsuH2eFxqNRmwG35bpcY5LgBdiHfN8abJWiZOOiV\u002Bj7Am3wtmLunm8lS4wZk76yfnhHg/K0SvAO5iWS8y\u002BxKGBpdy62OqRjpndVQc9MTvM56BfviLW3voAOLLFIzGKJm7BS4PA8wIa\u002BWrYx/hZQIje67WaMmpOq44wUkKvrVM2SEKsWUAkGjGkEOrshE1j1UKGgBsnxz8lBkaMp\u002B3H5RTHCyl8YwJ2a3SM5S2Nx64YBNF4bn4TTFvv0fRtQlxlEzSchAcBsejjg0SEnGVVoF7B\u002BLzjx2TIrbIrylibq4vYfDDXXpccze5vPH7twYZqW8sC3xIB44aoTi6V7b/rvpL4Qb9756Fq94npkfGTV9RoKN6Tn4nJAbR4hK4nnbCIjuNIgFAbLs6X\u002BfWXb2sX0cygSbzR4D0erLs4iOEkeD3f0fAsj2xWzG4n/vuUUeEEaWW/vAQ5kgddchi8kRjkJrVNBaPSq3QeR4gekUV4TFF4a\u002B\u002B5/zUzWnwSi4GjHb8X63w6pAkYzBqzT4Q0T5Xg\u002BcJZFvmc4o6hrXDdjsbVdHsfnPHfrOwrJhiJQixrvqi/qlhwXlCj7GrUnrcAm\u002Bnjy83H3d32\u002BsDVkhValH0p/hx0n/7IDM24ejHfRiALjZz7/WtkjijG/c\u002B\u002B7FlUbqoj2RsVdpYD1U=")
+                    }
+                };
             }
 
 

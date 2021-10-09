@@ -15,39 +15,97 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
-        mc:Ignorable="d" Width="800" Height="450"
+        mc:Ignorable="d" Width="930" Height="450"
         x:Class="TreeViewer.FormatOptionWindow"
-        Title="Format attribute..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Title="Format attribute..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
         Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+  <local:ChildWindow.Content>
     <Grid Margin="10">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="1*" />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
-      <StackPanel>
-        <StackPanel Orientation="Horizontal">
-          <TextBlock FontWeight="Bold" FontSize="18" Margin="0,10,0,0">Attribute type:</TextBlock>
-          <TextBlock FontSize="18" Margin="5,10,0,0" Name="AttributeTypeContainer"></TextBlock>
-        </StackPanel>
-        <TextBlock FontWeight="Bold" Margin="0,10,0,0" FontSize="18">Options:</TextBlock>
-        <Grid Name="OptionsContainer" Margin="24,5,0,0">
+
+      <Grid Name="HeaderGrid"  Margin="0,0,0,5">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Format attribute" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
+      </Grid>
+      <Grid Grid.Row="1">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="237" MinWidth="237" />
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="2" Name="CodeContainer" Margin="-15,-5,-5,-5" Grid.Row="1">
 
         </Grid>
-        <StackPanel Name="AlertContainer" Margin="24,5,0,0" Orientation="Horizontal" IsVisible="False">
-          
-        </StackPanel>
-      </StackPanel>
-      <local:Expander Grid.Row="1" Margin="0,10,0,10" Name="CustomFormatterExpander">
+
+        <ScrollViewer Grid.RowSpan="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AllowAutoHide="True" Margin="0,5,0,5">
+          <ScrollViewer.Transitions>
+            <Transitions>
+              <ThicknessTransition Property="Padding" Duration="0:0:0.1"/>
+            </Transitions>
+          </ScrollViewer.Transitions>
+          <ScrollViewer.Styles>
+            <Style Selector="ScrollViewer[IsExpanded=false]">
+              <Setter Property="Padding" Value="0,0,7,0" />
+            </Style>
+            <Style Selector="ScrollViewer[IsExpanded=true]">
+              <Setter Property="Padding" Value="0,0,20,0" />
+            </Style>
+          </ScrollViewer.Styles>
+          <StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock FontSize="14" Margin="0,10,0,0">Attribute type:</TextBlock>
+              <TextBlock FontSize="14" Margin="5,10,0,0" Name="AttributeTypeContainer"></TextBlock>
+            </StackPanel>
+
+            <Grid Name="AlertContainer" Margin="0,10,0,0" IsVisible="False">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+            </Grid>
+
+            <TextBlock Margin="0,10,0,0" FontSize="14">Options:</TextBlock>
+            <Grid Name="OptionsContainer" Margin="10,5,0,0">
+
+            </Grid>
+            
+          </StackPanel>
+        </ScrollViewer>
+
+        <GridSplitter Grid.Column="1" Background="Transparent" Grid.RowSpan="2" Margin="0,5,5,5">
+
+        </GridSplitter>
+        <Canvas Width="1" Grid.Column="1" Grid.RowSpan="2" Background="#BFBFBF" HorizontalAlignment="Center" Margin="0,5,5,5" IsHitTestVisible="False"/>
+
+        <TextBlock Grid.Column="2" Margin="0,10,0,0" FontSize="14">Formatter code:</TextBlock>
+      </Grid>
+      <!-- <local:Expander Grid.Row="1" Margin="0,10,0,10" Name="CustomFormatterExpander">
         <local:Expander.Label>
           <TextBlock FontWeight="Bold" FontSize="18" VerticalAlignment="Center">Custom formatter</TextBlock>
         </local:Expander.Label>
-      </local:Expander>
+      </local:Expander>-->
       <Grid Grid.Row="2">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="1*" />
@@ -56,9 +114,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
-        
-        <Button Grid.Column="1" Width="100" Click="OKButtonClicked" HorizontalContentAlignment="Center">OK</Button>
-        <Button Grid.Column="3" Width="100" Click="CancelButtonClicked" HorizontalContentAlignment="Center">Cancel</Button>
+
+        <Button Grid.Column="1" Width="100" Click="OKButtonClicked" HorizontalContentAlignment="Center" Classes="PlainButton">OK</Button>
+        <Button Grid.Column="3" Width="100" Click="CancelButtonClicked" HorizontalContentAlignment="Center" Classes="PlainButton">Cancel</Button>
       </Grid>
     </Grid>
-</Window>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

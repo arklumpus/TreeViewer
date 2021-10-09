@@ -4,6 +4,7 @@ using VectSharp;
 using TreeViewer;
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ab93f8a2b8731465892f5bb80af7292a8
 {
@@ -34,10 +35,56 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
         public const string Name = "Age distributions timeline";
         public const string HelpText = "Plots age distributions on a timeline.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "b93f8a2b-8731-4658-92f5-bb80af7292a8";
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACKSURBVDhPpZIxDoAgDEWLJ5PVxbuwGyTu3MXF2ZshYJsgEarwlv4O/eGXCkiYln31Rd8dmGObQ19lwErQcECjYZXcIIc1iRGyp5d4jST8sEPdBBeBpT8C1kghTvU7uQjsLeQGBmugOKyUGlG24Q0cmTx28JVggFKKpGmi+wU9hySttSfqf9ACAQAuuk8yz5D7TPgAAAAASUVORK5CYII=";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADaSURBVEhLY2TAAbxqNzYAqXogbtzW7A9ikwWYoTQKQDIcBBxU7SMZbx9acQDKJwkwQWl0ADMcBuqhlpIMMCzAYxBZlqAEEVrQYAMkBxc4kokwGBfYCsRn8CUCRqDh/6FsmgBckUw1QHMLaB8HUBoMiLSIpJyNkkxByQ+UDIFMB4gIBiC52MBaFuFIWWSVSbgiuRFKwwDZBR7Wwg4tqCgqTYceKCoq+g/E8ERCq4y2H2YJ1lRECQD5AMoEAUdGNAGqA/qURdQE6EFESx849vX1HaCVBWDDGRgYGACW61Uxk1qd/wAAAABJRU5ErkJggg==";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEWSURBVFhH7ZYxEoIwEEUTPYvnEFoba69B7yhjzzlsLbSVsfYGHgazYcMECUmAlbXwzWR2ofB/Nm42UgTY7C9HFQ5q5bfTFnJSFhh9gLiOaIYUrwGHILmJUAXM19uQmug1EBAhM7HE2AJ/3PX1NslqvZOvx7nE51F0DESKGyabaNpwoHAfV7WeQ9pVGyAS99FrTCrxCnMWYg6ir8K/BRh5/4Q2I4xMGlKdcwB6GnpbpUn9xsvkCek8CSNNkIznzhbYeFqU7G4QasMcow3pxcRbAeCjCqTiQMxBZKpALv5ndrIsq9RqtTbHMLrbJrimYWMi2IaUwBZgakil4+Ws/MaFZC5cW8BZgbQoipLLgBaHhMNAIy6EEG8Mi3WrsRRbmAAAAABJRU5ErkJggg==";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -422,13 +469,13 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             if (plotPosition == 0 || plotPosition == 2)
             {
                 RunNodePlot(nodes, ageDistributions, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, topAxis, sumPoint, perpScaleNorm,
-               lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, -1, attribute, formatter, rotatePoint);
+               lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, -1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength());
             }
 
             if (plotPosition == 1 || plotPosition == 2)
             {
                 RunNodePlot(nodes, ageDistributions, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, bottomAxis, sumPoint, perpScaleNorm,
-                lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, 1, attribute, formatter, rotatePoint);
+                lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, 1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength());
             }
 
 
@@ -438,7 +485,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
         private static void RunNodePlot(List<TreeNode> nodes, Dictionary<string, List<double>> ageDistributions, Colour defaultFill, bool autoColourByNode, double opacity, ColourFormatterOptions customColour, Func<object, Colour?> fillFormatter,
         int plotType, Func<List<double>, (int[], double[])> histogram, Func<List<double>, (int[], double[], double[])> histogramWithBinMeans, Dictionary<string, Point> coordinates, Point scaleNorm, Point[] bottomAxis, Func<Point, Point, Point> sumPoint,
         Point perpScaleNorm, double lineMargin, double maxHeight, Point scalePoint, Action<Point> updateMaxMin, Point perpScale, Graphics graphics, int labelPosition, ColourFormatterOptions labelColour, Colour defaultLabelColour, bool autoLabelColourByNode,
-        Func<object, Colour?> labelFormatter, Point labelMargin, Font labelFont, double labelOpacity, double plotDirection, string attribute, Func<object, string> formatter, Func<Point, double, Point> rotatePoint)
+        Func<object, Colour?> labelFormatter, Point labelMargin, Font labelFont, double labelOpacity, double plotDirection, string attribute, Func<object, string> formatter, Func<Point, double, Point> rotatePoint, double totalTreeLength)
         {
             int shownDistribCount = 0;
 
@@ -477,7 +524,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                             globalHist = hist;
                         }
 
-                        double age = nodes[i].LongestDownstreamLength();
+                        double age = totalTreeLength - nodes[i].UpstreamLength();
                         double deltaLeft = age - range[1];
                         double deltaRight = range[0] - age;
 

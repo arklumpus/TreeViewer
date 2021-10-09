@@ -18,3 +18,5 @@ Avalonia.Styling.dll
 System.ComponentModel.Primitives.dll
 System.ObjectModel.dll
 AvaloniaColorPicker.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

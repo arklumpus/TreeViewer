@@ -1,17 +1,31 @@
-﻿using System;
+﻿/*
+    TreeViewer - Cross-platform software to draw phylogenetic trees
+    Copyright (C) 2021  Giorgio Bianchini
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, version 3.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Win32;
 
 namespace TreeViewer
 {
-    internal class FileExtensions
+    internal static class FileExtensions
     {
+        public static List<string> EmbeddedFileTypeIcons = new List<string>() { "asn", "asnb", "nex", "nwk", "nwka", "tbi", "tre", "tree" };
+
         public static void AssociateExtensions(IEnumerable<(string, string)> extensions)
         {
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))

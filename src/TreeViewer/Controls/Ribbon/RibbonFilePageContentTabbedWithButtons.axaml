@@ -1,0 +1,69 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TreeViewer.RibbonFilePageContentTabbedWithButtons" Background="#F3F3F3" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans">
+  <UserControl.Styles>
+    <Style Selector="local|RibbonFilePageContentTabbedWithButtons ScrollViewer.ButtonContainerScrollViewer[IsExpanded=true]">
+      <Setter Property="Padding" Value="0,0,17,0"/>
+    </Style>
+
+    <Style Selector="local|RibbonFilePageContentTabbedWithButtons Border.ButtonBorder">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="local|RibbonFilePageContentTabbedWithButtons Border.ButtonBorder:pointerover">
+      <Setter Property="Background" Value="#D2D2D2" />
+      <Setter Property="BorderBrush" Value="#D2D2D2" />
+    </Style>
+
+    <Style Selector="local|RibbonFilePageContentTabbedWithButtons Border.ButtonBorder.active">
+      <Setter Property="Background" Value="#C6C6C6" />
+      <Setter Property="BorderBrush" Value="#808080" />
+    </Style>
+
+    <Style Selector="local|RibbonFilePageContentTabbedWithButtons Border.ButtonBorder.active:pointerover">
+      <Setter Property="Background" Value="#D2D2D2" />
+    </Style>
+
+    <Style Selector="local|RibbonFilePageContentTabbedWithButtons Border.ButtonBorder.active:focus">
+      <Setter Property="Background" Value="#C6C6C6" />
+      <Setter Property="BorderBrush" Value="Black" />
+    </Style>
+
+
+
+  </UserControl.Styles>
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="1*" MaxWidth="800"/>
+    </Grid.ColumnDefinitions>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Column="0" Classes="ButtonContainerScrollViewer">
+      <StackPanel Name="ButtonContainerStackPanel" Width="315"></StackPanel>
+    </ScrollViewer>
+    <Canvas Grid.Column="1" Width="1" Margin="0,0,10,0" Background="#E1E1E1" />
+    <Grid Grid.Column="2" Name="ClientContainer"></Grid>
+  </Grid>
+</UserControl>

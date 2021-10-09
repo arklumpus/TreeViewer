@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -rf TreeViewer_setup/*
-mkdir TreeViewer_setup/TreeViewer-Linux-x64
+mkdir -p TreeViewer_setup/TreeViewer-Linux-x64
 
 cp -r ../../Release/Linux-x64/* TreeViewer_setup/TreeViewer-Linux-x64/
 

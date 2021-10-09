@@ -141,7 +141,7 @@ namespace a" + Guid.NewGuid().ToString().Replace("-", "") + @"
     }
 
 
-    public class CodeEditorWindow : Window
+    public class CodeEditorWindow : ChildWindow
     {
         public CompiledCode Result { get; private set; } = null;
 
@@ -154,38 +154,11 @@ namespace a" + Guid.NewGuid().ToString().Replace("-", "") + @"
 
         private CSharpEditor.Editor Editor;
 
-
-        /*public CodeEditorWindow(string sourceCode)
-        {
-            this.InitializeComponent();
-
-            this.FindControl<TextBox>("sourceBox").Text = sourceCode.Replace("\t", "    ");
-
-
-            this.FindControl<TextBox>("sourceBox").KeyUp += (s, e) =>
-            {
-                bool needsToBeMoved = false;
-
-                if (this.FindControl<TextBox>("sourceBox").CaretIndex > 0 && this.FindControl<TextBox>("sourceBox").Text[this.FindControl<TextBox>("sourceBox").CaretIndex - 1] == '\t')
-                {
-                    needsToBeMoved = true;
-                }
-
-                this.FindControl<TextBox>("sourceBox").Text = this.FindControl<TextBox>("sourceBox").Text.Replace("\t", "    ");
-
-                if (needsToBeMoved)
-                {
-                    this.FindControl<TextBox>("sourceBox").CaretIndex += 3;
-                }
-            };
-        }*/
-
         public async Task FinishInitialization(string sourceCode, CSharpEditor.InterprocessDebuggerServer debuggerServer, string editorId)
         {
             this.DebuggerServer = debuggerServer;
             Editor = await CSharpEditor.Editor.Create(sourceCode.Replace("\t", "    "), guid: editorId);
-
-            //editor.IsReferencesButtonEnabled = false;
+            Editor.Background = this.Background;
 
             this.FindControl<Grid>("MainGrid").Children.Add(Editor);
         }
@@ -199,9 +172,6 @@ namespace a" + Guid.NewGuid().ToString().Replace("-", "") + @"
         {
             try
             {
-                //Result = new CompiledCode(this.FindControl<TextBox>("sourceBox").Text);
-                //Result = new CompiledCode(Editor.Text);
-
                 (Assembly Assembly, CSharpCompilation Compilation) result = await Editor.Compile(DebuggerServer.SynchronousBreak(Editor), DebuggerServer.AsynchronousBreak(Editor));
                 
                 if (result.Assembly != null)

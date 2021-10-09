@@ -30,6 +30,7 @@ namespace TreeViewer
     {
         public double Position { get; set; }
         public Colour Colour { get; set; }
+        public string Tag { get; set; }
 
         public GradientStop(double position, Colour colour)
         {
@@ -153,7 +154,7 @@ namespace TreeViewer
 
         private void UpdateGradient()
         {
-            LinearGradientBrush brs = new LinearGradientBrush() { StartPoint = new RelativePoint(0, 0.5, RelativeUnit.Relative), EndPoint = new RelativePoint(1, 0.5, RelativeUnit.Relative), SpreadMethod = GradientSpreadMethod.Pad };
+            Avalonia.Media.LinearGradientBrush brs = new Avalonia.Media.LinearGradientBrush() { StartPoint = new RelativePoint(0, 0.5, RelativeUnit.Relative), EndPoint = new RelativePoint(1, 0.5, RelativeUnit.Relative), SpreadMethod = GradientSpreadMethod.Pad };
 
             for (int i = 0; i < Gradient.GradientStops.Count; i++)
             {

@@ -5,3 +5,6 @@ TreeViewer.dll
 PhyloTree.TreeNode.dll
 VectSharp.Canvas.dll
 Avalonia.Controls.dll
+VectSharp.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

@@ -829,7 +829,7 @@ namespace TreeViewerCommandLine
 
                                         try
                                         {
-                                            ColourFormatterOptions options = new ColourFormatterOptions(newSourceCode) { AttributeName = prevValue.AttributeName, AttributeType = prevValue.AttributeType, Parameters = prevValue.Parameters, DefaultColour = prevValue.DefaultColour };
+                                            ColourFormatterOptions options = new ColourFormatterOptions(newSourceCode, prevValue.Parameters) { AttributeName = prevValue.AttributeName, AttributeType = prevValue.AttributeType, DefaultColour = prevValue.DefaultColour };
                                             options.Parameters[0] = newSourceCode;
                                             options.Parameters[^1] = false;
                                             Program.SelectedModuleParameters.UpdateParameterAction(new Dictionary<string, object>() { { Program.SelectedOption, options } });
@@ -880,7 +880,7 @@ namespace TreeViewerCommandLine
 
                                     try
                                     {
-                                        ColourFormatterOptions options = new ColourFormatterOptions(newSourceCode) { AttributeName = prevValue.AttributeName, AttributeType = prevValue.AttributeType, Parameters = prevValue.Parameters, DefaultColour = prevValue.DefaultColour };
+                                        ColourFormatterOptions options = new ColourFormatterOptions(newSourceCode, prevValue.Parameters) { AttributeName = prevValue.AttributeName, AttributeType = prevValue.AttributeType, DefaultColour = prevValue.DefaultColour };
                                         options.Parameters[0] = newSourceCode;
                                         options.Parameters[^1] = false;
                                         Program.SelectedModuleParameters.UpdateParameterAction(new Dictionary<string, object>() { { Program.SelectedOption, options } });

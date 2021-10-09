@@ -4,6 +4,7 @@ using System.Linq;
 using PhyloTree;
 using TreeViewer;
 using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace NodeBars
 {
@@ -36,9 +37,55 @@ namespace NodeBars
         public const string Name = "Node bars";
         public const string HelpText = "Draws node bars.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "319e8f63-d6c9-4dac-9419-0b621dcd5f23";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABuSURBVDhPY2QgEhQVFf2HMskDuAxggtK0AV61G7HaiizOAqXhAObUvr4+cPjgMgQnQPYrMS7AALgCi2aBCE8HIGdta/bHycflAkaQBCjAsPkL2QCCAN0AvAGFD+ByKi5AcSAOvAEYoUxaGDAwAAD7sTf88fSNCQAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACzSURBVEhL5ZRBDoQgDEXBeDo33oX9RI177uLG6zlUO4aY0oIdTYwvIZUghU8/WKPAOdeH0G09mgrjWdjkaoKCBRp2SbQKRC5fIJvmMy3QsEtC/ZN0UewQ772VksfMY7vn5Y7oLw6pMSaB3ePnSry7IyUqsyz4DptyLlqlH2sQIx0PsE/+FShVRGo8LCA+dhZ2UeJzzkUU9z0VoIBTIY0XA0eXU0SJ59+DF9xkLZyCAaMCY77qgFMBXTuLNQAAAABJRU5ErkJggg==";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADESURBVFhH7ZU7DoMwDIaTHq8Ld8lelYo9d2HhejSmHiiP2A4OMPiTosgiUn5+P+KdMiGENm3vX0TzwF0T9uVVSA6MsDAkqeGACBNQLOD56kdYGJLsnVd3IMboYWFIQh7c6mu4QPL3c4au+buT48A9+/q2NXDaIIJcLvOZY++8ugNSTABnDkwFxR0ukgIEVg5Q7UV9T3xwL0NBgAg/t0wyYiUtmOPyIlxxdgpIB6SjVZ3aAmwSmgATwH4Na8Fx4NjrlsW5L2y3b0k6H05nAAAAAElFTkSuQmCC";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -251,6 +298,8 @@ namespace NodeBars
                 return new Point(pt.X / modulus, pt.Y / modulus);
             }
 
+            double totalTreeLength = tree.LongestDownstreamLength();
+
             if (!circularCoordinates)
             {
                 Point perpScale = normalizePoint(rotatePoint(scalePoint, Math.PI / 2));
@@ -278,7 +327,7 @@ namespace NodeBars
                                 }
 
 
-                                double age = nodes[i].LongestDownstreamLength();
+                                double age = totalTreeLength - nodes[i].UpstreamLength();
                                 double deltaLeft = age - range[0];
                                 double deltaRight = range[1] - age;
 
@@ -338,7 +387,7 @@ namespace NodeBars
                                 }
 
 
-                                double age = nodes[i].LongestDownstreamLength();
+                                double age = totalTreeLength - nodes[i].UpstreamLength();
                                 double deltaRight = age - range[0];
                                 double deltaLeft = range[1] - age;
 

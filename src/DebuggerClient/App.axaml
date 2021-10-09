@@ -17,8 +17,251 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="DebuggerClient.App" Name="TreeViewer">
-    <Application.Styles>
-      <FluentTheme Mode="Light"/>
-    </Application.Styles>
+             x:Class="DebuggerClient.App" Name="TreeViewer"
+             xmlns:editor="clr-namespace:CSharpEditor;assembly=CSharpEditor">
+  <Application.Styles>
+    <FluentTheme Mode="Light"></FluentTheme>
+    <Style Selector="Button">
+      <Setter Property="Background" Value="#26000000"/>
+    </Style>
+    <Style Selector="NumericUpDown">
+      <Style.Resources>
+        <x:Double x:Key="TextControlThemeMinWidth">0</x:Double>
+        <x:Double x:Key="TextControlThemeMinHeight">0</x:Double>
+        <Brush x:Key="TextControlBackground">#FFFFFF</Brush>
+        <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
+      </Style.Resources>
+      <Setter Property="Padding" Value="5,2,5,2" />
+    </Style>
+
+    <Style Selector="ButtonSpinner">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <DataValidationErrors>
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{DynamicResource ControlCornerRadius}"
+                    MinHeight="{TemplateBinding MinHeight}">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Grid.Column="1"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Content="{TemplateBinding Content}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  Padding="{TemplateBinding Padding}" />
+
+                <StackPanel Name="PART_SpinnerPanel"
+                            Orientation="Horizontal"
+                            IsVisible="{TemplateBinding ShowButtonSpinner}">
+                  <RepeatButton Name="PART_IncreaseButton"
+                                Classes="ButtonSpinnerRepeatButton"
+                                VerticalContentAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{TemplateBinding Background}"
+                                FontSize="{TemplateBinding FontSize}" MinWidth="0" Padding="5">
+                    <Viewbox Width="8">
+                      <Path Fill="{TemplateBinding Foreground}"
+                            Width="16"
+                            Height="8"
+                            Stretch="Uniform"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Data="{StaticResource ButtonSpinnerIncreaseButtonIcon}" />
+                    </Viewbox>
+                  </RepeatButton>
+
+                  <RepeatButton Name="PART_DecreaseButton"
+                                Classes="ButtonSpinnerRepeatButton"
+                                Foreground="{TemplateBinding Foreground}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{TemplateBinding Background}"
+                                VerticalContentAlignment="Center"
+                                FontSize="{TemplateBinding FontSize}" MinWidth="0" Padding="5">
+                    <Viewbox Width="8">
+                      <Path Fill="{TemplateBinding Foreground}"
+                            Width="16"
+                            Height="8"
+                            Stretch="Uniform"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Data="{StaticResource ButtonSpinnerDecreaseButtonIcon}" />
+                    </Viewbox>
+                  </RepeatButton>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataValidationErrors>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="ComboBox">
+      <Style.Resources>
+        <x:Double x:Key="ComboBoxMinHeight">0</x:Double>
+        <Brush x:Key="ComboBoxBackground">#FFFFFF</Brush>
+      </Style.Resources>
+      <Setter Property="Padding" Value="5,4,5,4" />
+    </Style>
+
+    <Style Selector="ToolTip">
+      <Setter Property="MaxWidth" Value="Infinity" />
+    </Style>
+
+    <Style Selector="ListBox ListBoxItem">
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="Padding" Value="0 2 0 2" />
+    </Style>
+
+    <Style Selector="RadioButton">
+      <Setter Property="Template">
+        <ControlTemplate TargetType="RadioButton">
+          <Border Name="RootBorder"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}">
+            <Grid ColumnDefinitions="20,*">
+              <Grid VerticalAlignment="Top"
+                Height="32">
+
+                <Ellipse Name="OuterEllipse"
+                         Width="16" Height="16"
+                         UseLayoutRounding="False"
+                         StrokeThickness="{DynamicResource RadioButtonBorderThemeThickness}" />
+
+                <Ellipse Name="CheckOuterEllipse"
+                         Width="16" Height="16"
+                         UseLayoutRounding="False"
+                         StrokeThickness="{DynamicResource RadioButtonBorderThemeThickness}" />
+
+                <Ellipse Name="CheckGlyph"
+                         Width="6" Height="6"
+                         UseLayoutRounding="False" />
+              </Grid>
+
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                TextBlock.Foreground="{TemplateBinding Foreground}"
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Grid.Column="1" />
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+
+    <Style Selector=".MacOSStyle Button.SideBarButton /template/ Border">
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector=".MacOSStyle Button.SideBarButtonNoForeground /template/ Border">
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="Button.SideBarButton">
+      <Setter Property="RenderTransform" Value="scale(1,1)"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButton /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForeground">
+      <Setter Property="RenderTransform" Value="scale(1,1)"/>
+      <Setter Property="Background" Value="#E6E6E6"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForeground /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForeground.active /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="BorderBrush" Value="#808080"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForegroundHighlight.active /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#E6E6E6"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForeground.active:focus /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="BorderBrush" Value="Black"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForeground[IsEnabled=false]">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForegroundHighlight[IsEnabled=false]">
+      <Setter Property="IsVisible" Value="True"/>
+      <Setter Property="Opacity" Value="0.35"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForegroundHighlight[IsEnabled=false] /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForeground[IsEnabled=false].active /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="Background" Value="#E6E6E6"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButtonNoForeground[IsEnabled=false].active">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
+
+    <Style Selector="Button.SideBarButton Path">
+      <Setter Property="Stroke" Value="#737373" />
+    </Style>
+
+    <Style Selector="Button.SideBarButton:pointerover Path">
+      <Setter Property="Stroke" Value="#0072b2" />
+    </Style>
+
+    <Style Selector="Button.SideBarButton:pressed Path">
+      <Setter Property="Stroke" Value="#1C5B99" />
+    </Style>
+
+    <Style Selector="Button.SideBarButton TextBlock">
+      <Setter Property="Foreground" Value="#737373" />
+    </Style>
+
+    <Style Selector="Button.SideBarButton:pointerover TextBlock">
+      <Setter Property="Foreground" Value="#0072b2" />
+    </Style>
+
+    <Style Selector="Button.SideBarButton:pressed TextBlock">
+      <Setter Property="Foreground" Value="#1C5B99" />
+    </Style>
+
+    <Style Selector="Button.PlainButton">
+      <Setter Property="RenderTransform" Value="scale(1,1)"/>
+    </Style>
+
+    <Style Selector="Button.PlainButton /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="editor|Editor ToggleButton">
+      <Setter Property="ClickMode" Value="Press"/>
+    </Style>
+    <Style Selector="editor|Editor ToggleButton:pressed">
+      <Setter Property="RenderTransform" Value="scale(1)"/>
+    </Style>
+    <Style Selector="editor|Editor Button:pressed">
+      <Setter Property="RenderTransform" Value="scale(1)"/>
+    </Style>
+
+  </Application.Styles>
 </Application>

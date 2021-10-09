@@ -20,12 +20,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:paz="clr-namespace:Avalonia.Controls.PanAndZoom;assembly=Avalonia.Controls.PanAndZoom"
-        xmlns:accordion="clr-namespace:AvaloniaAccordion;assembly=AvaloniaAccordion"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        xmlns:colorpicker="clr-namespace:AvaloniaColorPicker;assembly=AvaloniaColorPicker"
         mc:Ignorable="d" Width="1000" Height="600"
         x:Class="TreeViewer.MainWindow"
         Title="TreeViewer" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
-        KeyUp="KeyPressed" Closed="WindowClosed" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        KeyUp="KeyPressed" Closed="WindowClosed" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#E7E7E7">
   <Window.Styles>
     <Style Selector="StackPanel.Attachment Ellipse">
       <Setter Property="Fill" Value="#D9D9D9" />
@@ -33,207 +33,738 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <Style Selector="StackPanel.Attachment:pointerover Ellipse">
       <Setter Property="Fill" Value="#BCBCBC" />
     </Style>
-    <Style Selector="accordion|Accordion">
-      <Setter Property="HeaderBackground" Value="#ffffff" />
-      <Setter Property="HeaderHoverBackground" Value="#e6e6e6" />
-      <Setter Property="HeaderPressedBackground" Value="#999999" />
-      <Setter Property="HeaderForeground" Value="#303030" />
-      <Setter Property="BottomBarBrush" Value="#0078d7" />
-      <Setter Property="BottomBarThickness" Value="0" />
-      <Setter Property="ContentBackground" Value="#ffffff" />
+    <Style Selector=".WindowsStyle Canvas.RibbonSeparator">
+      <Setter Property="Background" Value="#B1B1B1" />
+      <Setter Property="Margin" Value="1,0,1,0" />
     </Style>
 
-    
+    <Style Selector=".MacOSStyle Canvas.RibbonSeparator">
+      <Setter Property="Background" Value="#CECECE" />
+    </Style>
+
+    <Style Selector=".MacOSStyle Border.SideTabBorder">
+      <Setter Property="Background" Value="#F5F5F5" />
+      <Setter Property="BorderBrush" Value="#C6C6C6" />
+      <Setter Property="BorderThickness" Value="1,0,1,0" />
+    </Style>
+
+    <Style Selector=".WindowsStyle Border.SideTabBorder">
+      <Setter Property="Margin" Value="0,0,7,0" />
+    </Style>
+
+    <Style Selector=".WindowsStyle Grid#ModuleTabHeaderContainer">
+      <Setter Property="Margin" Value="0,0,7,0" />
+    </Style>
+
+    <Style Selector=".WindowsStyle Canvas.WindowsSideTabSeparator">
+      <Setter Property="Background" Value="#BFBFBF" />
+    </Style>
+
+    <Style Selector=".MacOSStyle ScrollBar[IsExpanded=true] /template/ Rectangle#TrackRect">
+      <Setter Property="Fill" Value="#00000000" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Rectangle#TrackRect">
+      <Setter Property="Fill" Value="#DADADA" />
+    </Style>
+
+    <Style Selector=".MacOSStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb /template/ Border#ThumbVisual">
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Margin" Value="2,0,2,0" />
+    </Style>
+
+    <Style Selector=".MacOSStyle ScrollBar /template/ RepeatButton.line">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb /template/ Border#ThumbVisual">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="BorderBrush" Value="#B1B1B1" />
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb:pointerover /template/ Border#ThumbVisual">
+      <Setter Property="Background" Value="#F3F3F3" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ Thumb.thumb:pressed /template/ Border#ThumbVisual">
+      <Setter Property="Background" Value="#F3F3F3" />
+      <Setter Property="BorderBrush" Value="#737373" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar /template/ RepeatButton.line /template/ Border#Root">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="BorderBrush" Value="#B1B1B1" />
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar /template/ RepeatButton.line /template/ Path">
+      <Setter Property="Fill" Value="#737373" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:vertical /template/ RepeatButton.line.up /template/ Path">
+      <Setter Property="Data" Value="M 19.091797 14.970703 L 10 5.888672 L 0.908203 14.970703 Z" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:vertical /template/ RepeatButton.line.down /template/ Path">
+      <Setter Property="Data" Value="M 19.814453 5.439453 L 10 15.253906 L 0.185547 5.439453 Z" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:horizontal /template/ RepeatButton.line.up /template/ Path">
+      <Setter Property="Data" Value="M 14.970703 0.908203 L 5.888672 10 L 14.970703 19.091797 Z" />
+
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar:horizontal /template/ RepeatButton.line.down /template/ Path">
+      <Setter Property="Data" Value="M 5.029297 19.091797 L 14.111328 10 L 5.029297 0.908203 Z" />
+
+    </Style>
+
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ RepeatButton.line:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="#F3F3F3" />
+    </Style>
+
+    <Style Selector=".WindowsStyle ScrollBar[IsExpanded=true] /template/ RepeatButton.line:pressed /template/ Border#Root">
+      <Setter Property="Background" Value="#F3F3F3" />
+      <Setter Property="BorderBrush" Value="#737373" />
+    </Style>
+
+    <Style Selector="local|Accordion Grid#HeaderGrid">
+      <Setter Property="Background" Value="{Binding $parent[1].HeaderBackground}"/>
+    </Style>
+
+    <Style Selector="local|Accordion Grid#HeaderGrid:pointerover">
+      <Setter Property="Background" Value="{Binding $parent[1].HeaderHoverBackground}"/>
+    </Style>
+
+    <Style Selector="local|Accordion Grid#HeaderGrid.Pressed">
+      <Setter Property="Background" Value="{Binding $parent[1].HeaderPressedBackground}"/>
+    </Style>
+
+
+    <Style Selector=".WindowsStyle Grid#ZoomPanel">
+      <Setter Property="Background" Value="#F3F3F3"/>
+    </Style>
+
+    <Style Selector=".MacOSStyle Grid#ZoomPanel">
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="0,26">
+            <LinearGradientBrush.GradientStops>
+              <GradientStop Offset="0" Color="#DCDCDC" />
+              <GradientStop Offset="1" Color="#C3C3C3" />
+            </LinearGradientBrush.GradientStops>
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style Selector="Grid.AttributeLine">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="Grid.AttributeLine Button.AttributeEditButton">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="Grid.AttributeLine:pointerover">
+      <Setter Property="Background" Value="#C5C5C5" />
+    </Style>
+
+    <Style Selector="Grid.AttributeLine:pointerover Button.AttributeEditButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <Style Selector="Grid.AttributeLine Button.EditButtonHidden">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="TextBox.EditValueBox ScrollViewer">
+      <Setter Property="HorizontalScrollBarVisibility" Value="Hidden"/>
+      <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
+    </Style>
   </Window.Styles>
-  <Grid Name="RootGrid">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="2" />
-      <RowDefinition Height="1*"/>
-    </Grid.RowDefinitions>
-    <DockPanel>
-      <NativeMenuBar DockPanel.Dock="Top"></NativeMenuBar>
-    </DockPanel>
-    <Canvas Background="#f0f0f0" Grid.Row="1"></Canvas>
-    <Grid Grid.Row="2" Margin="10" Name="MainGrid">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="300" />
-        <ColumnDefinition Width="1" />
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="12" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
+
+  <Border BorderBrush="#0072b2" BorderThickness="1" Name="WindowBorder">
+    <Grid>
       <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="1*" />
-        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="1*"/>
       </Grid.RowDefinitions>
-      <Grid Margin="0,0,17,0" Grid.RowSpan="3">
+      <Grid Grid.Row="0" Background="#0072b2" Margin="-1,-1,-1,-1" Name="TitleBarBG">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="36"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="1"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.RowSpan="2" Name="TitleBarContainer" Margin="1,1,1,0" Focusable="True">
+          <Grid IsHitTestVisible="False">
+            <Viewbox Name="WindowIconBox" Height="66" HorizontalAlignment="Left"/>
+            <Viewbox Name="WindowTreeBox" Height="66" HorizontalAlignment="Right"/>
+          </Grid>
+          <Grid Name="TitleBar" Background="Transparent">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="36" />
+              <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Text="{ Binding $parent[Window].Title }" />
+          </Grid>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="1*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <local:WindowsChrome Grid.Column="2" VerticalAlignment="Top" Classes="Dark"></local:WindowsChrome>
+          </Grid>
+        </Grid>
+        <Grid Grid.Row="1" Name="RibbonBarContainer">
+          <Grid.Styles>
+            <Style Selector="local|RibbonBar.Grey">
+              <Setter Property="Margin" Value="1,0,0,0"/>
+            </Style>
+          </Grid.Styles>
+
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+          <Canvas Grid.ColumnSpan="2" Name="RibbonBarBackground" Margin="1,0,1,0" />
+
+          <Grid Grid.Column="1" Name="CommandsContainer" HorizontalAlignment="Left" Margin="10,0,0,1" >
+            <Grid.Styles>
+              <Style Selector=".Colorful TextBox.CommandBox /template/ TextBlock#PART_Watermark">
+                <Setter Property="Foreground" Value="White"/>
+              </Style>
+
+              <Style Selector=".Grey TextBox.CommandBox /template/ TextBlock#PART_Watermark">
+                <Setter Property="Foreground" Value="#262626"/>
+              </Style>
+
+              <Style Selector="TextBox.CommandBox:focus /template/ TextBlock#PART_Watermark">
+                <Setter Property="Foreground" Value="Transparent"/>
+              </Style>
+
+              <Style Selector="Grid.Colorful:pointerover">
+                <Setter Property="Background" Value="#004E8A"/>
+              </Style>
+
+              <Style Selector="Grid.Colorful.focus">
+                <Setter Property="Background" Value="#7AB3D3"/>
+              </Style>
+
+              <Style Selector="Grid.Grey:pointerover">
+                <Setter Property="Background" Value="#10000000"/>
+              </Style>
+
+              <Style Selector="Grid.Grey.focus">
+                <Setter Property="Background" Value="#25000000"/>
+              </Style>
+
+              <Style Selector="Grid.Colorful Path#CommandIcon">
+                <Setter Property="Stroke" Value="White"/>
+              </Style>
+
+              <Style Selector="Grid.Colorful.focus Path#CommandIcon">
+                <Setter Property="Stroke" Value="#262626"/>
+              </Style>
+
+              <Style Selector="Grid.Grey Path#CommandIcon">
+                <Setter Property="Stroke" Value="#262626"/>
+              </Style>
+
+
+            </Grid.Styles>
+
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <Canvas Width="16" Height="16" Margin="6,0,0,0">
+              <Path Name="CommandIcon" StrokeThickness="2" Data="M6,2 L12,8 L6,14"></Path>
+            </Canvas>
+
+            <TextBox Name="CommandBox" Classes="CommandBox" Grid.Column="1" Watermark="Search command" HorizontalAlignment="Stretch" Margin="0,0,10,0" VerticalAlignment="Center" Padding="5,2,5,2" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontSize="15" MinWidth="150" MaxWidth="300" Foreground="#262626">
+              <TextBox.Styles>
+                <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+                  <Setter Property="BorderBrush" Value="Transparent"/>
+                </Style>
+              </TextBox.Styles>
+              <TextBox.Template>
+                <ControlTemplate>
+                  <DataValidationErrors>
+                    <Panel>
+                      <Border
+                        Name="PART_BorderElement"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}">
+                      </Border>
+
+                      <Border
+                        Margin="{TemplateBinding BorderThickness}">
+                        <Grid ColumnDefinitions="Auto,*,Auto" >
+                          <ContentPresenter Grid.Column="0" Grid.ColumnSpan="1" Content="{TemplateBinding InnerLeftContent}"/>
+                          <DockPanel x:Name="PART_InnerDockPanel" Grid.Column="1" Grid.ColumnSpan="1" Margin="{TemplateBinding Padding}">
+                            <TextBlock Name="PART_FloatingWatermark"
+                                       Foreground="{DynamicResource SystemAccentColor}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Text="{TemplateBinding Watermark}"
+                                       DockPanel.Dock="Top" />
+                            <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                          VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                                          AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
+                              <Panel>
+                                <TextBlock Name="PART_Watermark"
+                                        Opacity="1"
+                                        Text="{TemplateBinding Watermark}"
+                                        TextAlignment="{TemplateBinding TextAlignment}"
+                                        TextWrapping="{TemplateBinding TextWrapping}"
+                                        IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                <TextPresenter Name="PART_TextPresenter"
+                                              Text="{TemplateBinding Text, Mode=TwoWay}"
+                                              CaretIndex="{TemplateBinding CaretIndex}"
+                                              SelectionStart="{TemplateBinding SelectionStart}"
+                                              SelectionEnd="{TemplateBinding SelectionEnd}"
+                                              TextAlignment="{TemplateBinding TextAlignment}"
+                                              TextWrapping="{TemplateBinding TextWrapping}"
+                                              PasswordChar="{TemplateBinding PasswordChar}"
+                                              RevealPassword="{TemplateBinding RevealPassword}"
+                                              SelectionBrush="{TemplateBinding SelectionBrush}"
+                                              SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                              CaretBrush="{TemplateBinding CaretBrush}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                              </Panel>
+                            </ScrollViewer>
+                          </DockPanel>
+                          <ContentPresenter Grid.Column="2" Grid.ColumnSpan="1" Content="{TemplateBinding InnerRightContent}"/>
+                        </Grid>
+                      </Border>
+                    </Panel>
+                  </DataValidationErrors>
+                </ControlTemplate>
+              </TextBox.Template>
+            </TextBox>
+          </Grid>
+        </Grid>
+        <Grid Grid.Row="2" Name="RibbonTabContainer" Height="100" Margin="1,0,1,0" ClipToBounds="True">
+          <local:RibbonTabContent HorizontalAlignment="Stretch"></local:RibbonTabContent>
+        </Grid>
+        <Canvas Grid.Row="3" Height="1" Classes="RibbonSeparator"></Canvas>
+      </Grid>
+
+      <Grid Name="RootGrid" Grid.Row="1">
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="1*" />
+          <RowDefinition Height="2" />
+          <RowDefinition Height="1*"/>
+          <RowDefinition Height="26" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="24" Margin="0,0,0,5">Settings</TextBlock>
-        <Canvas Grid.Row="1" Background="#B4B4B4" Height="1" Margin="0,5,0,5"></Canvas>
-        <Grid Grid.Row="2">
+        <Canvas Background="#f0f0f0" Grid.Row="1" IsVisible="False"></Canvas>
+        <Grid Grid.Row="2" Margin="0" Name="MainGrid">
           <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="0" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="0" />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
-          <TextBlock FontWeight="Bold" FontSize="18" Margin="0,0,0,5">Attachments</TextBlock>
-          <local:AddRemoveButton Grid.Column="1" PointerReleased="AddAttachmentClicked" Name="AddAttachmentButton" IsVisible="False"></local:AddRemoveButton>
-        </Grid>
-        <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-          <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-            <StackPanel Name="AttachmentContainerPanel" Orientation="Horizontal"></StackPanel>
-          </StackPanel>
-        </ScrollViewer>
-        <Canvas Grid.Row="4" Background="#B4B4B4" Height="1" Margin="0,5,0,5"></Canvas>
-        <ScrollViewer Grid.Row="5" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="0,0,17,0" Margin="0,0,-17,0">
-          <StackPanel Name="ParameterContainerPanel"></StackPanel>
-        </ScrollViewer>
-      </Grid>
-      <Canvas Grid.Column="1" Background="#B4B4B4" Grid.RowSpan="3"></Canvas>
-      <StackPanel Margin="10,0,20,0" Grid.Column="2" Name="ActionsPanel" Grid.ColumnSpan="3">
-        <TextBlock FontWeight="Bold" FontSize="24" Margin="0,0,0,5" Grid.Row="1">Actions</TextBlock>
-        <Canvas Background="#B4B4B4" Height="1" Margin="0,5,0,5"></Canvas>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-          <StackPanel Orientation="Horizontal" Name="ActionsContainerGrid">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+          </Grid.RowDefinitions>
+
+          <Canvas Margin="0" Grid.Column="0" Grid.ColumnSpan="7" Grid.Row="1" Name="PlotBackground" Background="#E7E7E7"></Canvas>
+          <paz:ZoomBorder Margin="0" Grid.Column="0" Grid.ColumnSpan="7" Grid.Row="1" Name="PlotContainer" Stretch="None" ZoomSpeed="1.2"
+                            ClipToBounds="True" Focusable="True" PanButton="Left" IsVisible="False"
+                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch" PropertyChanged="ZoomPropertyChanged"
+                            PointerPressed="BackgroundCanvasPointerPressed" PointerReleased="BackgroundCanvasPointerReleased"
+                          PointerMoved="BackgroundCanvasPointerMoved" PointerWheelChanged="ZoomPointerWheelChanged" MinZoomX="0.01" MaxZoomX="100" MinZoomY="0.01" MaxZoomY="100">
+            <Canvas Name="ContainerCanvas">
+              <Canvas.Transitions>
+                <Transitions>
+                  <paz:TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
+                </Transitions>
+              </Canvas.Transitions>
+              <Canvas Name="SelectionCanvas">
+                <Canvas.RenderTransform>
+                  <TranslateTransform X="10" Y="10" />
+                </Canvas.RenderTransform>
+              </Canvas>
+              <Canvas Name="PlotCanvas" IsHitTestVisible="False">
+                <Canvas.RenderTransform>
+                  <TranslateTransform X="10" Y="10" />
+                </Canvas.RenderTransform>
+              </Canvas>
+            </Canvas>
+          </paz:ZoomBorder>
+
+          <Grid Grid.RowSpan="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" MinWidth="0" Width="0" Name="ParameterContainerGrid" ClipToBounds="True" Background="#E7E7E7">
+            <Grid.Transitions>
+              <Transitions>
+                <DoubleTransition Property="MinWidth" Duration="0:0:0:0.25" />
+              </Transitions>
+            </Grid.Transitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="10,10,5,5">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Row="0" FontSize="21" Foreground="#0072b2">Modules</TextBlock>
+              <Button Grid.Column="1" Width="32" Height="32" Background="Transparent" Click="CloseModulePanelClicked" Classes="SideBarButton">
+                <Path Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M0,0 L10,10 M10,0 L0,10" StrokeThickness="2" />
+              </Button>
+            </Grid>
+
+            <Grid Grid.Row="1" Name="ModuleTabHeaderContainer" Margin="10,0,5,0"></Grid>
+            <Border Grid.Row="2" Margin="10,0,5,0" Padding="0,5,0,5" Classes="SideTabBorder">
+              <Grid ClipToBounds="True">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="0,0,17,0" Opacity="1" RenderTransform="translate(0,0)" IsHitTestVisible="True">
+                  <ScrollViewer.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0:0.1" />
+                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+                    </Transitions>
+                  </ScrollViewer.Transitions>
+                  <StackPanel Name="TransformerModuleContainerPanel"/>
+                </ScrollViewer>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="0,0,17,0"  Opacity="0" RenderTransform="translate(-16px,0)" IsHitTestVisible="False">
+                  <ScrollViewer.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0:0.1" />
+                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+                    </Transitions>
+                  </ScrollViewer.Transitions>
+                  <StackPanel Name="FurtherTransformationsContainerPanel"/>
+                </ScrollViewer>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="0,0,17,0" Opacity="0" RenderTransform="translate(-16px,0)" IsHitTestVisible="False">
+                  <ScrollViewer.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0:0.1" />
+                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+                    </Transitions>
+                  </ScrollViewer.Transitions>
+                  <StackPanel Name="CoordinatesModuleContainerPanel"/>
+                </ScrollViewer>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="0,0,17,0" Opacity="0" RenderTransform="translate(-16px,0)" IsHitTestVisible="False">
+                  <ScrollViewer.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0:0.1" />
+                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+                    </Transitions>
+                  </ScrollViewer.Transitions>
+                  <StackPanel Name="PlotActionsContainerPanel"/>
+                </ScrollViewer>
+              </Grid>
+            </Border>
+          </Grid>
+
+          <GridSplitter ResizeDirection="Columns" Grid.Column="2" Grid.RowSpan="2" Background="#E7E7E7" Name="ModulesGridSplitter" IsVisible="False" />
+          <Canvas Grid.Column="2" Grid.RowSpan="2" Width="1" HorizontalAlignment="Right" IsHitTestVisible="False" Classes="WindowsSideTabSeparator" Name="ModulesGridSplitterCanvas" IsVisible="False" Margin="0,5,0,5" />
+
+          <GridSplitter ResizeDirection="Columns" Grid.Column="4" Grid.RowSpan="2" Background="#E7E7E7" Name="SelectionGridSplitter" IsVisible="False" />
+          <Canvas Grid.Column="4" Grid.RowSpan="2" Width="1" HorizontalAlignment="Left" IsHitTestVisible="False" Classes="WindowsSideTabSeparator" Name="SelectionGridSplitterCanvas" IsVisible="False" Margin="0,5,0,5" />
+
+          <Canvas Grid.Column="5" Grid.RowSpan="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Background="#E7E7E7" IsVisible="False" Name="SelectionGridBackground" />
+          <Grid Grid.Column="5" Grid.RowSpan="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" MinWidth="0" Width="0" Name="SelectionGrid" ClipToBounds="True" Background="#E7E7E7" Margin="0,0,10,0">
+            <Grid.Transitions>
+              <Transitions>
+                <DoubleTransition Property="MinWidth" Duration="0:0:0:0.25" />
+              </Transitions>
+            </Grid.Transitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="10,10,5,5">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Row="0" FontSize="21" Foreground="#0072b2">Selection</TextBlock>
+              <Button Grid.Column="1" Width="32" Height="32" Background="Transparent" Click="CloseSelectionPanelClicked" Classes="SideBarButton">
+                <Path Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M0,0 L10,10 M10,0 L0,10" StrokeThickness="2" />
+              </Button>
+            </Grid>
+            <Grid Grid.Row="1" Name="SelectionTabHeaderContainer" Margin="5,0,5,0"></Grid>
+
+            <Border Grid.Row="2"  Margin="5,0,5,0" Padding="0,5,0,5" Classes="SideTabBorder">
+              <Grid Grid.Row="2">
+                <Grid Name="SelectionInfoTabContainer" Opacity="1" RenderTransform="translate(0,0)" IsHitTestVisible="True">
+                  <Grid.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0:0.1" />
+                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+                    </Transitions>
+                  </Grid.Transitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="1*" />
+                  </Grid.RowDefinitions>
+
+                  <TextBlock Grid.Row="0" FontSize="16" Margin="10, 0, 0, 5" Foreground="#0072b2">Selection information</TextBlock>
+
+                  <TextBlock Grid.Row="1" FontSize="13" Margin="10, 0, 0, 0" FontWeight="Bold">Node:</TextBlock>
+
+                  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Grid.Row="2" Margin="0, 5, 0, 0" MaxWidth="0" Name="SelectedNodeScrollViewer">
+                    <ScrollViewer.Styles>
+                      <Style Selector="ScrollViewer#SelectedNodeScrollViewer">
+                        <Setter Property="Padding" Value="0,0,0,5"/>
+                        <Setter Property="Transitions">
+                          <Transitions>
+                            <ThicknessTransition Property="Padding" Duration="0:0:0:0.1" />
+                          </Transitions>
+                        </Setter>
+                      </Style>
+                      <Style Selector="ScrollViewer#SelectedNodeScrollViewer[IsExpanded=true]">
+                        <Setter Property="Padding" Value="0,0,0,16"/>
+                      </Style>
+                    </ScrollViewer.Styles>
+                    <TextBlock Name="SelectedNodeTextBlock" FontSize="13"></TextBlock>
+                  </ScrollViewer>
+
+                  <Grid Grid.Row="3" Margin="10, 10, 0, 10">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="1*" />
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="1*" />
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" FontSize="13" FontWeight="Bold">Descendants:</TextBlock>
+                    <TextBlock Grid.Column="2" FontSize="13" Name="SelectedNodeNodeCountBlock">X nodes</TextBlock>
+                    <TextBlock Grid.Column="4" FontSize="13" Name="SelectedNodeLeafCountBlock">X tips</TextBlock>
+                  </Grid>
+
+                  <TextBlock Grid.Row="4" FontSize="13" Margin="10, 0, 0, 0" FontWeight="Bold" Name="SelectedNodeNamedLeafCountBlock">X named tips:</TextBlock>
+
+                  <TextBox Grid.Row="5" FontSize="13" Margin="0,0,0,0" Name="SelectedNodeLeavesBox" MaxWidth="0" AcceptsReturn="True" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="0">
+                    <TextBox.Styles>
+                      <Style Selector="#SelectedNodeLeavesBox ScrollViewer>Panel">
+                        <Setter Property="Margin" Value="0,0,0,16" />
+                      </Style>
+                      <Style Selector="TextBox#SelectedNodeLeavesBox:pointerover /template/ Border#PART_BorderElement">
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="Background" Value="Transparent" />
+                      </Style>
+                      <Style Selector="TextBox#SelectedNodeLeavesBox:focus /template/ Border#PART_BorderElement">
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0"/>
+                      </Style>
+                    </TextBox.Styles>
+                  </TextBox>
+                </Grid>
+
+                <Grid Name="AttributeTabContainer" Opacity="0" RenderTransform="translate(-16px,0)" IsHitTestVisible="False">
+                  <Grid.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0:0.1" />
+                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+                    </Transitions>
+                  </Grid.Transitions>
+
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="1*"/>
+                  </Grid.RowDefinitions>
+                  <TextBlock Grid.Row="0" FontSize="16" Margin="10, 0, 0, -1" Foreground="#0072b2">Attributes</TextBlock>
+
+                  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1" Padding="0,0,13,0">
+                    <StackPanel>
+                      <StackPanel Name="SelectionContainerPanel"></StackPanel>
+                      <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="5,5,0,5" Classes="SideBarButton" Click="AddAttributeButtonClicked">
+                        <StackPanel Orientation="Horizontal">
+                          <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
+                          <TextBlock Text="Add attribute" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
+                        </StackPanel>
+                      </Button>
+                    </StackPanel>
+                  </ScrollViewer>
+                </Grid>
+              </Grid>
+            </Border>
+          </Grid>
+
+
+          <StackPanel Grid.Column="3" Name="UpperBarContainer">
 
           </StackPanel>
-        </ScrollViewer>
-        <Canvas Background="#B4B4B4" Height="1" Margin="0,5,0,5"></Canvas>
-      </StackPanel>
-      <Canvas Margin="10,5,20,10" Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="1" Name="PlotBackground"></Canvas>
-      <paz:ZoomBorder Margin="10,5,20,10" Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="1" Name="PlotContainer" Stretch="None" ZoomSpeed="1.2"
-                        ClipToBounds="True" Focusable="True" PanButton="Left"
-                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch" PropertyChanged="ZoomPropertyChanged"
-                        PointerPressed="BackgroundCanvasPointerPressed" PointerReleased="BackgroundCanvasPointerReleased"
-                      PointerMoved="BackgroundCanvasPointerMoved" MinZoomX="0.01" MaxZoomX="100" MinZoomY="0.01" MaxZoomY="100">
-        <Canvas Name="ContainerCanvas">
-          <Canvas Name="SelectionCanvas">
-            <Canvas.RenderTransform>
-              <TranslateTransform X="10" Y="10" />
-            </Canvas.RenderTransform>
-          </Canvas>
-          <Canvas Name="PlotCanvas">
-            <Canvas.RenderTransform>
-              <TranslateTransform X="10" Y="10" />
-            </Canvas.RenderTransform>
-          </Canvas>
-        </Canvas>
-      </paz:ZoomBorder>
-      <Grid Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="3" Margin="10,0,20,0" Name="ZoomPanel">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="1*" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Horizontal">
-          <Canvas Width="15" Height="25" Margin="10,0,0,0">
-            <Path Stroke="#6f8ec6" StrokeThickness="1" Data="M0,7.5 A7.5,7.5,180,0,1,15,7.5 L15,17.5 A7.5,7.5,180,0,1,0,17.5 Z" Fill="#e8f0ff"></Path>
-            <Path Fill="#ff9900" Stroke="#6f8ec6" StrokeThickness="1" Data="M0,11 L7.5,11 L7.5,0 A7.5,7.5,90,0,0,0,7.5 Z" ></Path>
-            <Path Stroke="#6f8ec6" StrokeThickness="1" Data="M7.5,11 L15,11 M7.5,0 L7.5,11" ></Path>
-            <Path Stroke="#6f8ec6" StrokeThickness="3" Data="M7.5,4 L7.5,8" StrokeLineCap="Round"></Path>
-          </Canvas>
-          <TextBlock Margin="10,0,5,0" VerticalAlignment="Center">Pan</TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Grid.Column="1">
-          <Canvas Width="15" Height="25" Margin="10,0,0,0">
-            <Path Stroke="#6f8ec6" StrokeThickness="1" Data="M0,7.5 A7.5,7.5,180,0,1,15,7.5 L15,17.5 A7.5,7.5,180,0,1,0,17.5 Z" Fill="#e8f0ff"></Path>
-            <Path Stroke="#6f8ec6" StrokeThickness="1" Data="M0,11 L15,11 M7.5,0 L7.5,11" ></Path>
-            <Path Stroke="#ff9900" StrokeThickness="3" Data="M7.5,4 L7.5,8" StrokeLineCap="Round"></Path>
-          </Canvas>
-          <TextBlock Margin="10,0,5,0" VerticalAlignment="Center">Zoom</TextBlock>
-        </StackPanel>
-        <Slider Grid.Column="2" Value="0" VerticalAlignment="Center" Minimum="-2" Maximum="2" PropertyChanged="ZoomSliderChanged" Name="ZoomSlider">
-          <Slider.Resources>
-            <CornerRadius x:Key="SliderThumbCornerRadius">2.5</CornerRadius>
-            <x:Double x:Key="SliderHorizontalThumbWidth">5</x:Double>
-            <x:Double x:Key="SliderHorizontalThumbHeight">20</x:Double>
-          </Slider.Resources>
-        </Slider>
-        <NumericUpDown Grid.Column="3" Width="140" FormatString="\{0:P0\}" Value="1" Minimum="0" Padding="5,5,5,5" Margin="5,0,5,0" ValueChanged="ZoomNudChanged" Name="ZoomNud" VerticalAlignment="Center"></NumericUpDown>
-        <Button Grid.Column="4" Padding="10,5,10,5" Margin="5,0,5,0" Click="FitZoomButtonClicked" Content="Fit" />        
+        </Grid>
+
+        <Grid Grid.Row="3" Margin="0,0,0,0" Name="ZoomPanel" IsVisible="False">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="1*"/>
+          </Grid.RowDefinitions>
+          <Canvas Background="#C6C6C6" Grid.ColumnSpan="11"></Canvas>
+          <TextBlock Grid.Column="0" Grid.Row="1" FontSize="12" VerticalAlignment="Center" Margin="25,0,10,0" Name="TreeCountLabel"></TextBlock>
+          <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12" VerticalAlignment="Center" Margin="10,0,10,0" Name="TipCountLabel"></TextBlock>
+          <TextBlock Grid.Column="2" Grid.Row="1" FontSize="12" VerticalAlignment="Center" Margin="10,0,10,0" Name="NodeCountLabel"></TextBlock>
+
+          <local:CoolProgressBar Grid.Column="3" Grid.Row="1" MaxWidth="200" Height="57" Name="PlotProgressBar" Margin="0,0,0,0" LabelText=" " Progress="0" VerticalAlignment="Top" RenderTransform="translate(0,-35px)" Opacity="0" IsHitTestVisible="False" Overlap="8">
+            <local:CoolProgressBar.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.1"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
+              </Transitions>
+            </local:CoolProgressBar.Transitions>
+          </local:CoolProgressBar>
+
+          <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="4">
+            <Grid Width="16" Height="16" Name="LeftMouseButtonContainerGrid" VerticalAlignment="Center" Margin="10,0,5,0"/>
+            <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" FontSize="12">Pan</TextBlock>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Grid.Column="5" Grid.Row="1">
+            <Grid Width="16" Height="16" Name="MouseWheelContainerGrid" VerticalAlignment="Center" Margin="10,0,5,0"/>
+            <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" FontSize="12">Zoom</TextBlock>
+          </StackPanel>
+          <RepeatButton Grid.Column="6" Grid.Row="1" Margin="0,0,0,0" Click="ZoomMinusClicked" Padding="5,0,5,0" Height="22" Width="22" FontSize="12" Classes="PlainButton" Background="Transparent" VerticalContentAlignment="Center">
+            <RepeatButton.Content>
+              <Path Stroke="Black" StrokeThickness="1" Width="16" Height="16" Data="M4,8.5 L13,8.5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </RepeatButton.Content>
+          </RepeatButton>
+          <Slider Padding="0" Grid.Column="7" Grid.Row="1" Value="0" VerticalAlignment="Top" Minimum="-2" Maximum="2" PropertyChanged="ZoomSliderChanged" Name="ZoomSlider" RenderTransform="translate(0,-6px)">
+            <Slider.Resources>
+              <CornerRadius x:Key="SliderThumbCornerRadius">2.5</CornerRadius>
+              <x:Double x:Key="SliderHorizontalThumbWidth">5</x:Double>
+              <x:Double x:Key="SliderHorizontalThumbHeight">11</x:Double>
+              <x:Double x:Key="SliderTrackThemeHeight">1</x:Double>
+            </Slider.Resources>
+          </Slider>
+          <RepeatButton Grid.Column="8" Grid.Row="1" Margin="0,0,0,0" Click="ZoomPlusClicked" Padding="5,0,5,0" Height="22" Width="22" FontSize="12" Classes="PlainButton" Background="Transparent" VerticalContentAlignment="Center">
+            <RepeatButton.Content>
+              <Path Stroke="Black" StrokeThickness="1" Width="16" Height="16" Data="M4,8.5 L13,8.5 M8.5,4 L8.5,13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </RepeatButton.Content>
+          </RepeatButton>
+          <NumericUpDown Grid.Column="9" Grid.Row="1" Width="70" FormatString="\{0:P0\}" Value="1" Minimum="0" Padding="5,0,5,0" Margin="5,0,5,0" ValueChanged="ZoomNudChanged" Name="ZoomNud" VerticalAlignment="Center" ShowButtonSpinner="False" Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center"></NumericUpDown>
+          <Button Grid.Column="10" Grid.Row="1" Margin="0,0,25,0" Click="FitZoomButtonClicked" Content="Fit" Padding="5,0,5,0" Height="22" FontSize="12" Classes="PlainButton" Background="Transparent" VerticalContentAlignment="Center"  />
+        </Grid>
       </Grid>
-      <Canvas Grid.Column="3" Grid.RowSpan="3" Background="White" RenderTransform="{Binding #ShowHideSelectionButton.RenderTransform }" />
-      <Button Grid.Column="3" Grid.RowSpan="3" Click="ShowHideSelectionClicked" Name="ShowHideSelectionButton" IsEnabled="{Binding Path=$parent[2].IsSelectionAvailable}" VerticalAlignment="Stretch" Padding="5,0,5,0">
-        <Button.RenderTransform>
-          <TranslateTransform X="300" Y="0">
-            <TranslateTransform.Transitions>
-              <Transitions>
-                <DoubleTransition Property="X" Duration="0:0:0.2"></DoubleTransition>
-              </Transitions>
-            </TranslateTransform.Transitions>
-          </TranslateTransform>
-        </Button.RenderTransform>
-        <Canvas Width="4" Height="8" Name="ShowHideSelectionIconCanvas">
-          <Canvas.RenderTransform>
-            <RotateTransform Angle="180">
-              <RotateTransform.Transitions>
-                <Transitions>
-                  <DoubleTransition Property="Angle" Duration="0:0:0.2"></DoubleTransition>
-                </Transitions>
-              </RotateTransform.Transitions>
-            </RotateTransform>
-          </Canvas.RenderTransform>
-          <Path Data="M0,0 L4,4 L0,8 Z" Fill="Black" />
-        </Canvas>
-      </Button>
-      <Canvas Grid.Column="3" Grid.RowSpan="3" Background="#80FFFFFF" RenderTransform="{Binding #ShowHideSelectionButton.RenderTransform }" IsVisible="{Binding !#ShowHideSelectionButton.IsEnabled}" />
-      <Grid Grid.Column="4" Grid.RowSpan="3" Width="300" Name="SelectionGrid" Background="White" Margin="0,0,0,0">
-        <Grid.RenderTransform>
-          <TranslateTransform X="300" Y="0" PropertyChanged="TranslationPropertyChanged">
-            <TranslateTransform.Transitions>
-              <Transitions>
-                <DoubleTransition Property="X" Duration="0:0:0.2"></DoubleTransition>
-              </Transitions>
-            </TranslateTransform.Transitions>
-          </TranslateTransform>
-        </Grid.RenderTransform>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="2*" />
-          <RowDefinition Height="1*" MinHeight="150" />
-        </Grid.RowDefinitions>
-        <Grid Margin="10,0,0,0">
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="1*" />
-          </Grid.RowDefinitions>
-          <TextBlock FontWeight="Bold" FontSize="24" Margin="0,0,0,5">Selection</TextBlock>
-          <Canvas Background="#B4B4B4" Height="1" Margin="0,5,0,5"  Grid.Row="1"></Canvas>
-          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="2" Padding="0,0,13,0">
-            <StackPanel Name="SelectionContainerPanel"></StackPanel>
-          </ScrollViewer>
+
+      <Grid Grid.Row="0" Grid.RowSpan="3" Name="RibbonFilePageContainer">
+
+        <Grid ColumnSpan="2" Name="TitleBarContainer2" Focusable="True" Height="36" VerticalAlignment="Top" Opacity="1">
+          <Grid.Transitions>
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="0:0:0:0.1"/>
+            </Transitions>
+          </Grid.Transitions>
+          <Grid Name="TitleBar2" Background="Transparent">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="36" />
+              <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" Text="{ Binding $parent[Window].Title }" />
+          </Grid>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="1*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <local:WindowsChrome Grid.Column="2" VerticalAlignment="Top" Classes="Light"></local:WindowsChrome>
+          </Grid>
         </Grid>
-        <Grid Grid.Row="1" Margin="10,0,0,0">
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="1*" />
-          </Grid.RowDefinitions>
-          <Canvas Background="#B4B4B4" Height="1" Margin="0,5,0,5"></Canvas>
-          <TextBlock FontWeight="Bold" FontSize="24" Margin="0,0,0,5" Grid.Row="1">Selection actions</TextBlock>
-          <Canvas Background="#B4B4B4" Height="1" Margin="0,5,0,5"  Grid.Row="2"></Canvas>
-          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible" Grid.Row="3">
-            <Grid Name="SelectionActionsContainerGrid" Margin="0,0,15,0">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-              </Grid.ColumnDefinitions>
-            </Grid>
-          </ScrollViewer>
-        </Grid>
+      </Grid>
+
+      <Grid Grid.Row="0" Grid.RowSpan="3" Name="PopupLayer">
+        <Grid.Styles>
+          <Style Selector=".WindowsStyle TextBlock">
+            <Setter Property="Foreground" Value="#D0000000"/>
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem">
+            <Setter Property="Background" Value="Transparent" />
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem Viewbox">
+            <Setter Property="Margin" Value="5, 3, 5, 3" />
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem:pointerover">
+            <Setter Property="Background" Value="#C5C5C5" />
+          </Style>
+
+          <Style Selector=".WindowsStyle Border.MenuBorder">
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#C6C6C6" />
+          </Style>
+
+          <Style Selector=".MacOSStyle TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem">
+            <Setter Property="Background" Value="Transparent" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem Viewbox">
+            <Setter Property="Margin" Value="20, 3, 5, 3" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover">
+            <Setter Property="Background" Value="#0072b2" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover TextBlock">
+            <Setter Property="Foreground" Value="White" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover Path">
+            <Setter Property="Fill" Value="White" />
+          </Style>
+
+          <Style Selector=".MacOSStyle Border.MenuBorder">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="0 4 0 4"/>
+            <Setter Property="Background" Value="#E9E9E9" />
+            <Setter Property="BorderBrush" Value="#C3C3C3" />
+          </Style>
+
+
+        </Grid.Styles>
+
       </Grid>
     </Grid>
-  </Grid>
+  </Border>
 </Window>

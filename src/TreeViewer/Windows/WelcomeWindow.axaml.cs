@@ -26,7 +26,7 @@ using System.Net;
 
 namespace TreeViewer
 {
-    public class WelcomeWindow : Window
+    public class WelcomeWindow : ChildWindow
     {
         public WelcomeWindow()
         {
@@ -39,6 +39,30 @@ namespace TreeViewer
         {
             AvaloniaXamlLoader.Load(this);
 
+            try
+            {
+                string localDownloadFile = null;
+
+                if (Modules.IsWindows)
+                {
+                    localDownloadFile = Path.Combine(Path.GetTempPath(), "TreeViewer-Win-x64.msi");
+                }
+                else if (Modules.IsLinux)
+                {
+                    localDownloadFile = Path.Combine(Path.GetTempPath(), "TreeViewer-Linux-x64.run");
+                }
+                else if (Modules.IsMac)
+                {
+                    localDownloadFile = Path.Combine(Path.GetTempPath(), "TreeViewer-Mac-x64.pkg");
+                }
+
+                if (File.Exists(localDownloadFile))
+                {
+                    File.Delete(localDownloadFile);
+                }
+            }
+            catch { }
+
             this.FindControl<Button>("CancelButton").Click += (s, e) =>
             {
                 this.Close();
@@ -46,10 +70,10 @@ namespace TreeViewer
 
             this.FindControl<Button>("OKButton").Click += async (s, e) =>
             {
-                if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true || this.FindControl<RadioButton>("RequiredModulesRadio").IsChecked == true)
+                if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
                 {
                     ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Accessing module database..." };
-                    _ = progressWindow.ShowDialog(this);
+                    _ = progressWindow.ShowDialog2(this);
 
                     try
                     {
@@ -61,7 +85,7 @@ namespace TreeViewer
                         Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "assets"));
                         Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "libraries"));
                         File.WriteAllText(Modules.ModuleListPath, "[]");
-                        await Modules.LoadInstalledModules(true);
+                        await Modules.LoadInstalledModules(true, null);
 
                         using (WebClient client = new WebClient())
                         {
@@ -105,7 +129,7 @@ namespace TreeViewer
                                     catch (Exception ex)
                                     {
                                         MessageBox message = new MessageBox("Attention", "An error occurred while installing module " + header.Name + "!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
-                                        await message.ShowDialog(this);
+                                        await message.ShowDialog2(this);
                                     }
 
                                     File.Delete(tempFile);
@@ -143,20 +167,20 @@ namespace TreeViewer
                         progressWindow.Close();
 
                         MessageBox message = new MessageBox("Attention", "An error occurred while accessing the module database!!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
-                        await message.ShowDialog(this);
+                        await message.ShowDialog2(this);
                     }
                 }
                 else if (this.FindControl<RadioButton>("NoModulesRadio").IsChecked == true)
                 {
-                    MessageBox message = new MessageBox("Attention", "Please make sure to install at least the required modules using the Module manager window before using the program!\nAre you sure you want to proceed with this route?", MessageBox.MessageBoxButtonTypes.YesNo);
-                    await message.ShowDialog(this);
+                    MessageBox message = new MessageBox("Attention", "Please make sure to install the required modules using the Module manager window before using the program!\nYou can open again this window by starting TreeViewer with the \"--welcome\" command-line option.\nAre you sure you want to proceed with this route?", MessageBox.MessageBoxButtonTypes.YesNo);
+                    await message.ShowDialog2(this);
                     if (message.Result == MessageBox.Results.Yes)
                     {
                         Directory.CreateDirectory(Modules.ModulePath);
                         Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "assets"));
                         Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "libraries"));
                         File.WriteAllText(Modules.ModuleListPath, "[]");
-                        await Modules.LoadInstalledModules(true);
+                        await Modules.LoadInstalledModules(true, null);
 
                         if (!Modules.IsMac)
                         {

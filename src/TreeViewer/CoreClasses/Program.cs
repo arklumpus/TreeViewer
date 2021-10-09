@@ -169,6 +169,9 @@ namespace TreeViewer
                 System.Threading.Thread.Sleep(delay);
             }
 
+            // Force loading the System.Threading.Tasks.Parallel assembly
+            Parallel.For(0, 0, (i) => { });
+
             List<string> pipeClientArgument = new List<string>();
 
             if (deleteFiles)
@@ -225,8 +228,10 @@ namespace TreeViewer
             if (!string.IsNullOrEmpty(globalSettingName))
             {
                 ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("Loading installed modules...");
+                ConsoleWrapperUI.WriteLine();
 
-                _ = Modules.LoadInstalledModules(true);
+                _ = Modules.LoadInstalledModules(true, null);
 
                 try
                 {
@@ -264,7 +269,11 @@ namespace TreeViewer
 
             if (clean)
             {
-                _ = Modules.LoadInstalledModules(false);
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("Loading installed modules...");
+                ConsoleWrapperUI.WriteLine();
+
+                _ = Modules.LoadInstalledModules(false, null);
 
                 ConsoleWrapperUI.WriteLine();
                 ConsoleWrapperUI.WriteLine("\tExporting all currently installed modules...");
@@ -325,7 +334,11 @@ namespace TreeViewer
 
             if (modulesToUninstall.Count > 0)
             {
-                _ = Modules.LoadInstalledModules(false);
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("Loading installed modules...");
+                ConsoleWrapperUI.WriteLine();
+
+                _ = Modules.LoadInstalledModules(false, null);
                 ConsoleWrapperUI.WriteLine();
                 for (int i = 0; i < modulesToUninstall.Count; i++)
                 {
@@ -438,7 +451,11 @@ namespace TreeViewer
 
             if (modulesToInstall.Count > 0)
             {
-                _ = Modules.LoadInstalledModules(false);
+                ConsoleWrapperUI.WriteLine();
+                ConsoleWrapperUI.WriteLine("Loading installed modules...");
+                ConsoleWrapperUI.WriteLine();
+
+                _ = Modules.LoadInstalledModules(false, null);
                 ConsoleWrapperUI.WriteLine();
                 for (int i = 0; i < modulesToInstall.Count; i++)
                 {
@@ -552,7 +569,7 @@ namespace TreeViewer
             psi.ArgumentList.Add("1100");
 
             NamedPipes.StopServer();
-            
+
             System.Diagnostics.Process.Start(psi);
             System.Threading.Thread.Sleep(100);
         }

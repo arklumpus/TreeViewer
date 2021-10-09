@@ -32,7 +32,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using VectSharp;
-using VectSharp.Canvas;
 
 namespace TreeViewer
 {
@@ -49,7 +48,7 @@ namespace TreeViewer
 
         }
 
-        public ColourFormatterOptions(string sourceCode)
+        public ColourFormatterOptions(string sourceCode, object[] parameters)
         {
             StringBuilder source = new StringBuilder();
 
@@ -62,18 +61,22 @@ namespace TreeViewer
             source.AppendLine("using System;");
             source.AppendLine("using System.Collections.Generic;");
 
-            /*while (line.Trim().StartsWith("using"))
-            {
-                source.AppendLine(line);
-                line = sourceReader.ReadLine();
-            }*/
-
             source.AppendLine("public static class FormatterModule { ");
+
+            int prevLength = source.Length;
+
             source.AppendLine(line);
             source.AppendLine(sourceReader.ReadToEnd());
             source.Append("}");
 
-            this.Formatter = Compile(source.ToString(), "FormatterModule");
+            this.Formatter = Compile(source.ToString(), "FormatterModule", out string actualSource);
+
+            actualSource = actualSource.Substring(prevLength);
+            actualSource = actualSource.Substring(0, actualSource.Length - 1 - Environment.NewLine.Length);
+
+            parameters[0] = actualSource;
+
+            this.Parameters = parameters;
         }
 
         public ColourFormatterOptions(Func<object, Colour?> formatter)
@@ -100,7 +103,7 @@ namespace TreeViewer
             return tbr;
         }
 
-        private static Func<object, Colour?> Compile(string source, string requestedType)
+        private static Func<object, Colour?> Compile(string source, string requestedType, out string actualSource, bool firstTry = true)
         {
             SyntaxTree syntaxTree = SyntaxFactory.ParseSyntaxTree(SourceText.From(source));
 
@@ -124,7 +127,20 @@ namespace TreeViewer
                 {
                     message.AppendLine(diagnostic.Id + ": " + diagnostic.GetMessage());
                 }
-                throw new Exception(message.ToString());
+
+                string messageText = message.ToString();
+
+                if (firstTry && messageText.Contains("TreeViewer.GradientStop") && messageText.Contains("VectSharp.GradientStop"))
+                {
+                    // Hack for backwards compatibility
+
+                    source = source.Replace(" GradientStop", " TreeViewer.GradientStop").Replace("<GradientStop", "<TreeViewer.GradientStop");
+                    return Compile(source, requestedType, out actualSource, false);
+                }
+                else
+                {
+                    throw new Exception(message.ToString());
+                }
             }
             else
             {
@@ -132,6 +148,9 @@ namespace TreeViewer
                 Assembly assembly = Assembly.Load(ms.ToArray());
 
                 Type type = assembly.GetType(requestedType);
+
+                actualSource = source;
+
                 return arg =>
                 {
                     return (Colour?)type.InvokeMember("Format",
@@ -144,7 +163,7 @@ namespace TreeViewer
         }
     }
 
-    public class ColourFormatterWindow : Window
+    public class ColourFormatterWindow : ChildWindow
     {
 
         public bool Result { get; private set; } = false;
@@ -160,6 +179,8 @@ namespace TreeViewer
         {
             this.InitializeComponent();
 
+            this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.ColourFormatter")) { Width = 32, Height = 32 });
+
             this.FindControl<Button>("GradientButton").Click += async (s, e) =>
             {
                 EditGradientWindow win = new EditGradientWindow(new Gradient(this.FindControl<GradientControl>("GradientButtonControl").Gradient.GradientStops));
@@ -168,7 +189,7 @@ namespace TreeViewer
                 {
                     this.FindControl<GradientControl>("GradientButtonControl").Gradient = win.Gradient;
                     await ConverterCodeBox.SetText(BuildCode());
-                    this.FindControl<StackPanel>("AlertContainer").IsVisible = false;
+                    this.FindControl<Grid>("AlertContainer").IsVisible = false;
                 }
             };
         }
@@ -178,12 +199,23 @@ namespace TreeViewer
         {
             this.DebuggerServer = debuggerServer;
 
-            this.FindControl<AvaloniaColorPicker.ColorButton>("DefaultColourButton").Color = defaultColour.ToAvalonia();
+            this.FindControl<ColorButton>("DefaultColourButton").Color = defaultColour.ToAvalonia();
             this.FindControl<TextBox>("AttributeNameContainer").Text = attributeName;
             this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex = attributeType == "String" ? 0 : attributeType == "Number" ? 1 : -1;
 
-            this.FindControl<StackPanel>("AlertContainer").Children.Add(MainWindow.AlertPage.PaintToCanvas());
-            this.FindControl<StackPanel>("AlertContainer").Children.Add(new TextBlock() { Text = "Note: custom formatter code will be used!", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0) });
+            Viewbox alertIcon = MainWindow.GetAlertIcon();
+            alertIcon.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
+            alertIcon.Width = 16;
+            alertIcon.Height = 16;
+
+            this.FindControl<Grid>("AlertContainer").Children.Add(alertIcon);
+
+            {
+                TextBlock blk = new TextBlock() { Text = "Using custom formatter code!", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0), FontSize = 13, TextWrapping = Avalonia.Media.TextWrapping.Wrap };
+                Grid.SetColumn(blk, 1);
+                this.FindControl<Grid>("AlertContainer").Children.Add(blk);
+            }
+
 
             string initialText = "";
 
@@ -198,6 +230,7 @@ namespace TreeViewer
 
             ConverterCodeBox = await Editor.Create(initialText, "using TreeViewer;\nusing VectSharp;\nusing System;\nusing System.Collections.Generic;\npublic static class FormatterModule {", "}", guid: editorId);
             ConverterCodeBox.IsReferencesButtonEnabled = false;
+            ConverterCodeBox.Background = this.Background;
 
             if (attributeType == "String")
             {
@@ -208,12 +241,12 @@ namespace TreeViewer
                 ConverterCodeBox.TextChanged += CheckNumber;
             }
 
-            this.FindControl<Expander>("CustomFormatterExpander").Child = ConverterCodeBox;
+            this.FindControl<Grid>("CodeContainer").Children.Add(ConverterCodeBox);
         }
 
         void CheckString(object sender, EventArgs e)
         {
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, Modules.DefaultAttributeConvertersToColour[0]);
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, Modules.DefaultAttributeConvertersToColour[0]);
         }
 
         private string SetupString(object[] parameters)
@@ -226,7 +259,7 @@ namespace TreeViewer
                 ConverterCodeBox.TextChanged -= CheckNumber;
                 ConverterCodeBox.TextChanged += CheckString;
             }
-            
+
             GetParameters = () =>
             {
                 return new object[] {
@@ -235,12 +268,12 @@ namespace TreeViewer
                 };
             };
 
-            if (this.FindControl<StackPanel>("AlertContainer").Children.Count > 2)
+            if (this.FindControl<Grid>("AlertContainer").Children.Count > 2)
             {
-                this.FindControl<StackPanel>("AlertContainer").Children.RemoveRange(2, this.FindControl<StackPanel>("AlertContainer").Children.Count - 2);
+                this.FindControl<Grid>("AlertContainer").Children.RemoveRange(2, this.FindControl<Grid>("AlertContainer").Children.Count - 2);
             }
 
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], Modules.DefaultAttributeConvertersToColour[0]);
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], Modules.DefaultAttributeConvertersToColour[0]);
             initialized = true;
             return (string)parameters[0];
         }
@@ -248,14 +281,14 @@ namespace TreeViewer
         private Func<string> BuildCode;
         void CheckNumber(object sender, EventArgs e)
         {
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, BuildCode());
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent(ConverterCodeBox.Text, BuildCode());
         }
 
         private string SetupNumber(object[] parameters)
         {
             this.FindControl<Grid>("StringOptions").IsVisible = false;
             this.FindControl<Grid>("NumberOptions").IsVisible = true;
-            
+
             try
             {
                 this.FindControl<NumericUpDown>("NumberOptionsMinimumBox").Value = (double)parameters[1];
@@ -269,14 +302,15 @@ namespace TreeViewer
                 Gradient gradient = this.FindControl<GradientControl>("GradientButtonControl").Gradient;
 
                 StringBuilder codeBuilder = new StringBuilder();
-                codeBuilder.AppendLine(@"static Gradient gradient = new Gradient(new List<GradientStop>()
+                codeBuilder.AppendLine(@"static Gradient gradient = new Gradient(
+new List<TreeViewer.GradientStop>()
 {");
                 int indentationLevel = 1;
 
                 for (int i = 0; i < gradient.GradientStops.Count; i++)
                 {
                     codeBuilder.Append(' ', indentationLevel * 4);
-                    codeBuilder.Append("new GradientStop(");
+                    codeBuilder.Append("new TreeViewer.GradientStop(");
                     codeBuilder.Append(gradient.GradientStops[i].Position.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     codeBuilder.Append(", Colour.FromRgba(");
                     codeBuilder.Append(gradient.GradientStops[i].Colour.R.ToString(System.Globalization.CultureInfo.InvariantCulture));
@@ -302,7 +336,8 @@ namespace TreeViewer
                 codeBuilder.Append(@"
 public static Colour? Format(object attribute)
 {
-    if (attribute is double attributeValue && !double.IsNaN(attributeValue))
+    if (attribute is double attributeValue &&
+    !double.IsNaN(attributeValue))
     {
 ");
                 indentationLevel++;
@@ -316,7 +351,7 @@ public static Colour? Format(object attribute)
                 codeBuilder.AppendLine("position = Math.Max(Math.Min(position, 1), 0);");
                 codeBuilder.Append(' ', indentationLevel * 4);
                 codeBuilder.AppendLine("return gradient.GetColour(position);");
-                codeBuilder.AppendLine(@"   }
+                codeBuilder.AppendLine(@"    }
     else
     {
         return null;
@@ -326,31 +361,34 @@ public static Colour? Format(object attribute)
                 return codeBuilder.ToString();
             };
 
-            this.FindControl<NumericUpDown>("NumberOptionsMinimumBox").ValueChanged += async (s, e) => { await ConverterCodeBox.SetText(BuildCode()); this.FindControl<StackPanel>("AlertContainer").IsVisible = false; };
-            this.FindControl<NumericUpDown>("NumberOptionsMaximumBox").ValueChanged += async (s, e) => { await ConverterCodeBox.SetText(BuildCode()); this.FindControl<StackPanel>("AlertContainer").IsVisible = false; };
+            this.FindControl<NumericUpDown>("NumberOptionsMinimumBox").ValueChanged += async (s, e) => { await ConverterCodeBox.SetText(BuildCode()); this.FindControl<Grid>("AlertContainer").IsVisible = false; };
+            this.FindControl<NumericUpDown>("NumberOptionsMaximumBox").ValueChanged += async (s, e) => { await ConverterCodeBox.SetText(BuildCode()); this.FindControl<Grid>("AlertContainer").IsVisible = false; };
 
-            Button regenerateButton = new Button() { Content = "Regenerate code", Margin = new Thickness(5, 0, 0, 0) };
+            Button regenerateButton = new Button() { Content = "Regenerate default code", Margin = new Thickness(0, 5, 0, 0), FontSize = 13, Padding = new Thickness(5, 2, 5, 2), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
             regenerateButton.Click += async (s, e) =>
             {
                 await ConverterCodeBox.SetText(BuildCode());
-                this.FindControl<StackPanel>("AlertContainer").IsVisible = false;
+                this.FindControl<Grid>("AlertContainer").IsVisible = false;
             };
-            
-            if (this.FindControl<StackPanel>("AlertContainer").Children.Count > 2)
+
+            Grid.SetRow(regenerateButton, 1);
+            Grid.SetColumnSpan(regenerateButton, 2);
+
+            if (this.FindControl<Grid>("AlertContainer").Children.Count > 2)
             {
-                this.FindControl<StackPanel>("AlertContainer").Children.RemoveRange(2, this.FindControl<StackPanel>("AlertContainer").Children.Count - 2);
+                this.FindControl<Grid>("AlertContainer").Children.RemoveRange(2, this.FindControl<Grid>("AlertContainer").Children.Count - 2);
             }
 
-            this.FindControl<StackPanel>("AlertContainer").Children.Add(regenerateButton);
+            this.FindControl<Grid>("AlertContainer").Children.Add(regenerateButton);
 
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = false;
+            this.FindControl<Grid>("AlertContainer").IsVisible = false;
 
             if (ConverterCodeBox != null)
             {
                 ConverterCodeBox.TextChanged -= CheckString;
                 ConverterCodeBox.TextChanged += CheckNumber;
             }
-            
+
             GetParameters = () =>
             {
                 return new object[] { ConverterCodeBox.Text, this.FindControl<NumericUpDown>("NumberOptionsMinimumBox").Value,
@@ -358,7 +396,7 @@ public static Colour? Format(object attribute)
                     this.FindControl<GradientControl>("GradientButtonControl").Gradient, !Extensions.IsCodeDifferent(ConverterCodeBox.Text, BuildCode()) };
             };
 
-            this.FindControl<StackPanel>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], BuildCode());
+            this.FindControl<Grid>("AlertContainer").IsVisible = Extensions.IsCodeDifferent((string)parameters[0], BuildCode());
             initialized = true;
 
             return (string)parameters[0];
@@ -383,7 +421,7 @@ public static Colour? Format(object attribute)
                 Formatter.Parameters = GetParameters();
                 Formatter.AttributeName = this.FindControl<TextBox>("AttributeNameContainer").Text;
                 Formatter.AttributeType = this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex == 0 ? "String" : this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex == 1 ? "Number" : "";
-                Formatter.DefaultColour = this.FindControl<AvaloniaColorPicker.ColorButton>("DefaultColourButton").Color.ToVectSharp();
+                Formatter.DefaultColour = this.FindControl<ColorButton>("DefaultColourButton").Color.ToVectSharp();
 
                 this.Result = true;
                 this.Close();

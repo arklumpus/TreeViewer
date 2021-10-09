@@ -126,12 +126,12 @@ namespace TreeViewerCommandLine
                         ConsoleWrapper.WriteLine(new ConsoleTextSpan[] { new ConsoleTextSpan(new string(ConsoleWrapper.Whitespace, 2)), new ConsoleTextSpan(CenterString(ModuleTypeStrings[i], totalLength), 2, ConsoleColor.Black, ConsoleColor.White) });
 
                         ModuleMetadata[] items;
-                        
+
                         if (ModuleTypeStrings[i] == "Action")
                         {
                             items = (from el in Modules.LoadedModulesMetadata where (int)el.Value.ModuleType == i && Modules.GetModule(Modules.ActionModules, el.Key).IsAvailableInCommandLine select el.Value).ToArray();
                         }
-                        else if(ModuleTypeStrings[i] == "Selection Action")
+                        else if (ModuleTypeStrings[i] == "Selection Action")
                         {
                             items = (from el in Modules.LoadedModulesMetadata where (int)el.Value.ModuleType == i && Modules.GetModule(Modules.SelectionActionModules, el.Key).IsAvailableInCommandLine select el.Value).ToArray();
                         }
@@ -327,15 +327,69 @@ namespace TreeViewerCommandLine
                 {
                     string argument = command.Substring(6).Trim();
 
-                    ModuleMetadata[] selectedModules = (from el in Modules.LoadedModulesMetadata where el.Value.Name.Equals(argument, StringComparison.OrdinalIgnoreCase) || el.Value.Id.Equals(argument, StringComparison.OrdinalIgnoreCase) select el.Value).ToArray();
+                    List<(ModuleMetadata, int)> selectedModules = new List<(ModuleMetadata, int)>();
 
-                    if (selectedModules.Length == 0)
+                    foreach (KeyValuePair<string, ModuleMetadata> kvp in Modules.LoadedModulesMetadata)
+                    {
+                        if (argument.StartsWith(kvp.Value.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            string postModule = argument.Substring(kvp.Value.Name.Length).Trim();
+
+                            if (kvp.Value.ModuleType == ModuleTypes.Action || kvp.Value.ModuleType == ModuleTypes.SelectionAction)
+                            {
+                                List<(string, Func<double, VectSharp.Page>)> subItems;
+
+                                if (kvp.Value.ModuleType == ModuleTypes.Action)
+                                {
+                                    subItems = Modules.GetModule(Modules.ActionModules, kvp.Value.Id).SubItems;
+                                }
+                                else
+                                {
+                                    subItems = Modules.GetModule(Modules.SelectionActionModules, kvp.Value.Id).SubItems;
+                                }
+
+                                if (subItems.Count == 0)
+                                {
+                                    if (string.IsNullOrEmpty(postModule))
+                                    {
+                                        selectedModules.Add((kvp.Value, -1));
+                                    }
+                                }
+
+                                for (int i = 0; i < subItems.Count; i++)
+                                {
+                                    if (string.IsNullOrEmpty(subItems[i].Item1) && string.IsNullOrEmpty(postModule))
+                                    {
+                                        selectedModules.Add((kvp.Value, -1));
+                                    }
+                                    else if (postModule.Equals(subItems[i].Item1, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        if (string.IsNullOrEmpty(subItems[0].Item1))
+                                        {
+                                            selectedModules.Add((kvp.Value, i - 1));
+                                        }
+                                        else
+                                        {
+                                            selectedModules.Add((kvp.Value, i));
+                                        }
+                                    }
+
+                                }
+                            }
+                            else if (string.IsNullOrEmpty(postModule))
+                            {
+                                selectedModules.Add((kvp.Value, -1));
+                            }
+                        }
+                    }
+
+                    if (selectedModules.Count == 0)
                     {
                         ConsoleWrapper.WriteLine();
                         ConsoleWrapper.WriteLine(new ConsoleTextSpan("Unknown module: " + argument, ConsoleColor.Red));
                         ConsoleWrapper.WriteLine();
                     }
-                    else if (selectedModules.Length > 1)
+                    else if (selectedModules.Count > 1)
                     {
                         ConsoleWrapper.WriteLine();
                         ConsoleWrapper.WriteLine(new ConsoleTextSpan("Ambiguous module selection! Please use the module ID to univocally specify a module!", ConsoleColor.Red));
@@ -343,9 +397,7 @@ namespace TreeViewerCommandLine
                     }
                     else
                     {
-                        ModuleMetadata selectedModule = selectedModules[0];
-
-                        EnableModule(selectedModule, new Dictionary<string, object>());
+                        EnableModule(selectedModules[0].Item1, selectedModules[0].Item2, new Dictionary<string, object>());
                     }
                 }
 
@@ -729,7 +781,7 @@ namespace TreeViewerCommandLine
             }
         }
 
-        public static void EnableModule(ModuleMetadata selectedModule, Dictionary<string, object> parametersToChange)
+        public static void EnableModule(ModuleMetadata selectedModule, int actionIndex, Dictionary<string, object> parametersToChange)
         {
             if (selectedModule.ModuleType == ModuleTypes.FileType)
             {
@@ -938,7 +990,7 @@ namespace TreeViewerCommandLine
 
                 if (actualModule.IsAvailableInCommandLine)
                 {
-                    actualModule.PerformAction(null, Program.StateData);
+                    actualModule.PerformAction(actionIndex, null, Program.StateData);
                 }
                 else
                 {
@@ -955,7 +1007,7 @@ namespace TreeViewerCommandLine
 
                     if (actualModule.IsAvailableInCommandLine)
                     {
-                        actualModule.PerformAction(Program.SelectedNode, null, Program.StateData);
+                        actualModule.PerformAction(actionIndex, Program.SelectedNode, null, Program.StateData);
                     }
                     else
                     {
@@ -1088,9 +1140,75 @@ namespace TreeViewerCommandLine
                     {
                         if (mod.Value.ModuleType != ModuleTypes.FileType && mod.Value.ModuleType != ModuleTypes.LoadFile && (mod.Value.ModuleType != ModuleTypes.Action || Modules.GetModule(Modules.ActionModules, mod.Key).IsAvailableInCommandLine) && (mod.Value.ModuleType != ModuleTypes.SelectionAction || Modules.GetModule(Modules.SelectionActionModules, mod.Key).IsAvailableInCommandLine))
                         {
-                            if (mod.Value.Name.StartsWith(partialCommand, StringComparison.OrdinalIgnoreCase))
+                            if (mod.Value.Name.Equals(partialCommand.TrimEnd(), StringComparison.OrdinalIgnoreCase) && (mod.Value.ModuleType == ModuleTypes.Action || mod.Value.ModuleType == ModuleTypes.SelectionAction))
                             {
-                                yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name, ConsoleColor.Blue) }, "module enable " + mod.Value.Name + " ");
+                                if (mod.Value.ModuleType == ModuleTypes.Action)
+                                {
+                                    ActionModule module = Modules.GetModule(Modules.ActionModules, mod.Value.Id);
+
+                                    if (module.SubItems.Count == 0 || string.IsNullOrEmpty(module.SubItems[0].Item1))
+                                    {
+                                        yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name, ConsoleColor.Blue) }, "module enable " + mod.Value.Name + " ");
+                                    }
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Name + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                                else if (mod.Value.ModuleType == ModuleTypes.SelectionAction)
+                                {
+                                    SelectionActionModule module = Modules.GetModule(Modules.SelectionActionModules, mod.Value.Id);
+
+                                    if (module.SubItems.Count == 0 || string.IsNullOrEmpty(module.SubItems[0].Item1))
+                                    {
+                                        yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name, ConsoleColor.Blue) }, "module enable " + mod.Value.Name + " ");
+                                    }
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Name + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                            }
+                            else if (partialCommand.StartsWith(mod.Value.Name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                string action = partialCommand.Substring(mod.Value.Name.Length).TrimStart();
+
+                                if (mod.Value.ModuleType == ModuleTypes.Action)
+                                {
+                                    ActionModule module = Modules.GetModule(Modules.ActionModules, mod.Value.Id);
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1) && module.SubItems[i].Item1.StartsWith(action, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Name + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                                else if (mod.Value.ModuleType == ModuleTypes.SelectionAction)
+                                {
+                                    SelectionActionModule module = Modules.GetModule(Modules.SelectionActionModules, mod.Value.Id);
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1) && module.SubItems[i].Item1.StartsWith(action, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Name + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                            }
+                            else if (mod.Value.Name.StartsWith(partialCommand, StringComparison.OrdinalIgnoreCase))
+                            {
+                                yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Name + " ", ConsoleColor.Blue) }, "module enable " + mod.Value.Name + " ");
                             }
                         }
                     }
@@ -1099,7 +1217,73 @@ namespace TreeViewerCommandLine
                     {
                         if (mod.Value.ModuleType != ModuleTypes.FileType && mod.Value.ModuleType != ModuleTypes.LoadFile && (mod.Value.ModuleType != ModuleTypes.Action || Modules.GetModule(Modules.ActionModules, mod.Key).IsAvailableInCommandLine) && (mod.Value.ModuleType != ModuleTypes.SelectionAction || Modules.GetModule(Modules.SelectionActionModules, mod.Key).IsAvailableInCommandLine))
                         {
-                            if (mod.Value.Id.StartsWith(partialCommand, StringComparison.OrdinalIgnoreCase))
+                            if (mod.Value.Id.Equals(partialCommand.TrimEnd(), StringComparison.OrdinalIgnoreCase) && (mod.Value.ModuleType == ModuleTypes.Action || mod.Value.ModuleType == ModuleTypes.SelectionAction))
+                            {
+                                if (mod.Value.ModuleType == ModuleTypes.Action)
+                                {
+                                    ActionModule module = Modules.GetModule(Modules.ActionModules, mod.Value.Id);
+
+                                    if (module.SubItems.Count == 0 || string.IsNullOrEmpty(module.SubItems[0].Item1))
+                                    {
+                                        yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Id, ConsoleColor.Blue) }, "module enable " + mod.Value.Id + " ");
+                                    }
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Id + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Id + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                                else if (mod.Value.ModuleType == ModuleTypes.SelectionAction)
+                                {
+                                    SelectionActionModule module = Modules.GetModule(Modules.SelectionActionModules, mod.Value.Id);
+
+                                    if (module.SubItems.Count == 0 || string.IsNullOrEmpty(module.SubItems[0].Item1))
+                                    {
+                                        yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Id, ConsoleColor.Blue) }, "module enable " + mod.Value.Id + " ");
+                                    }
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Id + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Id + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                            }
+                            else if (partialCommand.StartsWith(mod.Value.Id, StringComparison.OrdinalIgnoreCase))
+                            {
+                                string action = partialCommand.Substring(mod.Value.Id.Length).TrimStart();
+
+                                if (mod.Value.ModuleType == ModuleTypes.Action)
+                                {
+                                    ActionModule module = Modules.GetModule(Modules.ActionModules, mod.Value.Id);
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1) && module.SubItems[i].Item1.StartsWith(action, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Id + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Id + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                                else if (mod.Value.ModuleType == ModuleTypes.SelectionAction)
+                                {
+                                    SelectionActionModule module = Modules.GetModule(Modules.SelectionActionModules, mod.Value.Id);
+
+                                    for (int i = 0; i < module.SubItems.Count; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(module.SubItems[i].Item1) && module.SubItems[i].Item1.StartsWith(action, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Id + " ", ConsoleColor.Blue), new ConsoleTextSpan(module.SubItems[i].Item1, ConsoleColor.Yellow) }, "module enable " + mod.Value.Id + " " + module.SubItems[i].Item1 + " ");
+                                        }
+                                    }
+                                }
+                            }
+                            else if (mod.Value.Id.StartsWith(partialCommand, StringComparison.OrdinalIgnoreCase))
                             {
                                 yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(mod.Value.Id, ConsoleColor.Blue) }, "module enable " + mod.Value.Id + " ");
                             }

@@ -1,0 +1,11 @@
+System.Runtime.dll
+System.Private.CoreLib.dll
+netstandard.dll
+TreeViewer.dll
+VectSharp.dll
+Avalonia.Base.dll
+Avalonia.Input.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll
+System.Diagnostics.Process.dll
+System.ComponentModel.Primitives.dll

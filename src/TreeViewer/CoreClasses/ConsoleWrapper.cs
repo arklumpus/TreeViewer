@@ -414,7 +414,7 @@ namespace TreeViewer
             }
         }
 
-        public static bool CursorVisible { /*get { if (ConsoleEnabled && !Console.IsOutputRedirected) { try { return Console.CursorVisible; } catch { return false; } } else { return false; } }*/ set { if (ConsoleEnabled && !Console.IsOutputRedirected) { try { Console.CursorVisible = value; } catch { } } } }
+        public static bool CursorVisible { set { if (ConsoleEnabled && !Console.IsOutputRedirected) { try { Console.CursorVisible = value; } catch { } } } }
 
         public static ConsoleColor ForegroundColor { get { if (ConsoleEnabled && ColourEnabled && !Console.IsOutputRedirected) { return Console.ForegroundColor; } else { return ConsoleColor.Gray; } } set { if (ConsoleEnabled && ColourEnabled && !Console.IsOutputRedirected) { Console.ForegroundColor = value; } } }
         public static ConsoleColor BackgroundColor { get { if (ConsoleEnabled && ColourEnabled && !Console.IsOutputRedirected) { return Console.BackgroundColor; } else { return ConsoleColor.Black; } } set { if (ConsoleEnabled && ColourEnabled && !Console.IsOutputRedirected) { Console.BackgroundColor = value; } } }

@@ -15,14 +15,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeViewer.AboutWindow" SizeToContent="WidthAndHeight" CanResize="False"
-        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
-        Title="About" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
+        Title="About" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Classes="LightWindow" WindowStartupLocation="CenterScreen">
   <Window.Styles>
     <Style Selector="TextBlock#GitHubTextBlock">
       <Setter Property="Foreground" Value="#0072B2" />
@@ -31,33 +32,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <Setter Property="Foreground" Value="#4B98DC" />
     </Style>
   </Window.Styles>
-  <Grid Margin="10" Width="800">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="250" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="1*" />
-      <ColumnDefinition Width="Auto" />
-      <ColumnDefinition Width="1*" />
-      <ColumnDefinition Width="Auto" />
-      <ColumnDefinition Width="1*" />
-    </Grid.ColumnDefinitions>
-    <Image Source="resm:TreeViewer.Assets.Banner.png?assembly=TreeViewer" Grid.ColumnSpan="5"></Image>
-    <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" Grid.Column="1">
-      <TextBlock Name="VersionTextBlock" FontSize="24" FontStyle="Italic" VerticalAlignment="Center">Version</TextBlock>
-      <Button Margin="10,0,0,0" Name="CheckUpdatesButton">Check for updates...</Button>
-    </StackPanel>
-    <TextBlock Name="GitHubTextBlock" FontSize="24" FontStyle="Italic" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3" Grid.Row="1" TextDecorations="Underline" Cursor="Hand">https://treeviewer.org</TextBlock>
-    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="5" Grid.Row="2" TextWrapping="Wrap" Margin="0,10,0,0" TextAlignment="Center">
-      This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
-    </TextBlock>
-    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="5" Grid.Row="3" TextWrapping="Wrap"  Margin="0,10,0,0" TextAlignment="Center">
-      This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
-    </TextBlock>
-    <Button Margin="0,10,0,0" Grid.Row="4" HorizontalAlignment="Center" Grid.ColumnSpan="5" Name="CloseButton">Close window</Button>
-  </Grid>
-</Window>
+  <local:ChildWindow.Content>
+    <Grid Margin="10" Width="800">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="250" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+      </Grid.ColumnDefinitions>
+      <Image Source="resm:TreeViewer.Assets.Banner.png?assembly=TreeViewer" Grid.ColumnSpan="5"></Image>
+      <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" Grid.Column="1">
+        <TextBlock Name="VersionTextBlock" FontSize="18" FontStyle="Italic" VerticalAlignment="Center">Version</TextBlock>
+        <Button Margin="10,0,0,0" Name="CheckUpdatesButton" FontSize="13">Check for updates...</Button>
+      </StackPanel>
+      <TextBlock Name="GitHubTextBlock" FontSize="18" FontStyle="Italic" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3" Grid.Row="1" TextDecorations="Underline" Cursor="Hand">https://treeviewer.org</TextBlock>
+      <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="5" Grid.Row="2" TextWrapping="Wrap" Margin="0,10,0,0" TextAlignment="Center">
+        This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+      </TextBlock>
+      <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="5" Grid.Row="3" TextWrapping="Wrap"  Margin="0,10,0,0" TextAlignment="Center">
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+      </TextBlock>
+      <Button Margin="0,10,0,0" Grid.Row="4" HorizontalAlignment="Center" Grid.ColumnSpan="5" Name="CloseButton" Classes="PlainButton" FontSize="13">Close window</Button>
+    </Grid>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

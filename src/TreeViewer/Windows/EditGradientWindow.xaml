@@ -15,82 +15,119 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
-        mc:Ignorable="d" Width="600" Height="450"
+        mc:Ignorable="d" MinWidth="400" Width="450" Height="550"
         x:Class="TreeViewer.EditGradientWindow"
-        Title="Gradient editor" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
+        Title="Gradient editor" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
         Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Grid Margin="10">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="1*" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-      </Grid.ColumnDefinitions>
-      <Grid>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="1*" />
-        </Grid.RowDefinitions>
-        <TextBlock FontWeight="Bold" FontSize="18">Default gradients:</TextBlock>
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="5">
-          <Grid Width="232" VerticalAlignment="Top" Name="DefaultGradientGrid">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="1*" />
-              <ColumnDefinition Width="1*" />
-              <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
-          </Grid>
-        </ScrollViewer>
-      </Grid>
-      <Grid Grid.Column="1">
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="1*" />
-        </Grid.RowDefinitions>
-        <TextBlock FontWeight="Bold" FontSize="18">Gradient stops:</TextBlock>
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible" Padding="0,0,17,0">
-          <StackPanel>
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="64" />
-                <ColumnDefinition Width="24" />
-              </Grid.ColumnDefinitions>
-              <TextBlock FontSize="18" HorizontalAlignment="Center" FontStyle="Italic">Position</TextBlock>
-              <TextBlock FontSize="18" HorizontalAlignment="Center" FontStyle="Italic" Grid.Column="1">Colour</TextBlock>
-            </Grid>
-            <StackPanel Name="GradientStopContainer">
-              
-            </StackPanel>
-          </StackPanel>
-        </ScrollViewer>
-      </Grid>
-    </Grid>
-    <Canvas Grid.Row="1" Width="480" Height="64" HorizontalAlignment="Center" Margin="20">
-      <Canvas Width="480" Height="64" Name="GradientPreviewBackground"></Canvas>
-      <local:GradientControl Width="480" Height="64" Name="GradientPreview"></local:GradientControl>
-      <Canvas Width="480" Height="64" Name="GradientPreviewForeground"></Canvas>
-    </Canvas>
-    <Grid Grid.Row="2">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-      </Grid.ColumnDefinitions>
+  <local:ChildWindow.Content>
+    <Grid Margin="10">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="1*"/>
+      </Grid.RowDefinitions>
 
-      <Button Grid.Column="1" Width="100" Click="OKButtonClicked" HorizontalContentAlignment="Center">OK</Button>
-      <Button Grid.Column="3" Width="100" Click="CancelButtonClicked" HorizontalContentAlignment="Center">Cancel</Button>
+      <Grid Name="HeaderGrid" Margin="0,0,0,10">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Canvas Width="32" Height="16" Margin="0,8,0,8">
+          <Canvas.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="32,0">
+              <LinearGradientBrush.GradientStops>
+                <GradientStops>
+                  <GradientStop Color="#727272" Offset="0"/>
+                  <GradientStop Color="#4A7DB1" Offset="1"/>
+                </GradientStops>
+              </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+          </Canvas.Background>
+        </Canvas>
+
+        <TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Gradient editor" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
+      </Grid>
+
+      <Grid Grid.Row="1">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="1*" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+          </Grid.RowDefinitions>
+          <Grid Margin="0,0,0,10">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <TextBlock FontSize="14">Default gradients:</TextBlock>
+            <WrapPanel VerticalAlignment="Top" Name="DefaultGradientGrid" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left">
+
+            </WrapPanel>
+          </Grid>
+          <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <TextBlock FontSize="14">Gradient stops:</TextBlock>
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible" Padding="0,0,20,0" AllowAutoHide="False">
+              <StackPanel>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="64" />
+                    <ColumnDefinition Width="24" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock FontSize="12" HorizontalAlignment="Center" Margin="0,0,5,0">Position</TextBlock>
+                  <TextBlock FontSize="12" HorizontalAlignment="Center" Grid.Column="1" Margin="5,0,0,0">Colour</TextBlock>
+                </Grid>
+                <StackPanel>
+                  <Grid Name="GradientStopContainer">
+                    <Grid.Transitions>
+                      <Transitions>
+                        <DoubleTransition Property="Height" Duration="0:0:0.1"/>
+                      </Transitions>
+                    </Grid.Transitions>
+                  </Grid>
+                  <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="0,2.5,5,5" Classes="SideBarButton" Click="AddButtonClicked">
+                    <StackPanel Orientation="Horizontal">
+                      <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
+                      <TextBlock Text="Add gradient stop" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
+                    </StackPanel>
+                  </Button>
+                </StackPanel>
+              </StackPanel>
+            </ScrollViewer>
+          </Grid>
+        </Grid>
+        <Canvas Grid.Row="1" Width="340" Height="64" HorizontalAlignment="Center" Margin="20">
+          <Canvas Width="340" Height="64" Name="GradientPreviewBackground"></Canvas>
+          <local:GradientControl Width="340" Height="64" Name="GradientPreview"></local:GradientControl>
+          <Canvas Width="340" Height="64" Name="GradientPreviewForeground"></Canvas>
+        </Canvas>
+        <Grid Grid.Row="2">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+
+          <Button Grid.Column="1" Width="100" Click="OKButtonClicked" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">OK</Button>
+          <Button Grid.Column="3" Width="100" Click="CancelButtonClicked" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">Cancel</Button>
+        </Grid>
+      </Grid>
     </Grid>
-  </Grid>
-</Window>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

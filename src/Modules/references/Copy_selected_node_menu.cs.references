@@ -6,3 +6,6 @@ TreeViewer.dll
 Avalonia.Base.dll
 PhyloTree.TreeNode.dll
 Avalonia.Input.dll
+VectSharp.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

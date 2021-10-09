@@ -15,7 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using System;
 using System.Collections.Generic;
@@ -64,7 +66,7 @@ namespace TreeViewer
             {
                 await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                 {
-                    await Modules.LoadInstalledModules(true);
+                    await Modules.LoadInstalledModules(true, this);
                     if (OnModulesLoaded != null)
                     {
                         await OnModulesLoaded();
@@ -83,7 +85,12 @@ namespace TreeViewer
 
                         for (int i = 1; i < filesToOpen.Length; i++)
                         {
-                            _ = mainWindow.LoadFile(filesToOpen[i], deleteFiles);
+                            string file = filesToOpen[i];
+
+                            mainWindow.Opened += async (s, e) =>
+                            {
+                                await mainWindow.LoadFile(file, deleteFiles);
+                            };
                         }
                         mainWindow.Show();
 
@@ -155,16 +162,8 @@ namespace TreeViewer
 
                             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                             {
-                                MessageBox box = new MessageBox("Check for updates", "A new version of TreeViewer has been released: " + programUpdate.name + "!\nYou should keep the program updated to use the latest features and avoid security issues. Do you wish to open the download page?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
-                                await box.ShowDialog(GlobalSettings.Settings.MainWindows[0]);
-                                if (box.Result == MessageBox.Results.Yes)
-                                {
-                                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-                                    {
-                                        FileName = programUpdate.html_url,
-                                        UseShellExecute = true
-                                    });
-                                }
+                                UpdateWindow win = new UpdateWindow(programUpdate.name, programUpdate.html_url);
+                                await win.ShowDialog2(GlobalSettings.Settings.MainWindows[0]);
                             });
                         }
                         else if (GlobalSettings.Settings.UpdateCheckMode == GlobalSettings.UpdateCheckModes.ProgramAndInstalledModules || GlobalSettings.Settings.UpdateCheckMode == GlobalSettings.UpdateCheckModes.ProgramAndAllModules)
@@ -235,7 +234,7 @@ namespace TreeViewer
                                     await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                                     {
                                         MessageBox box = new MessageBox("Check for updates", message, MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
-                                        await box.ShowDialog(GlobalSettings.Settings.MainWindows[0]);
+                                        await box.ShowDialog2(GlobalSettings.Settings.MainWindows[0]);
                                         if (box.Result == MessageBox.Results.Yes)
                                         {
                                             ModuleManagerWindow win2 = new ModuleManagerWindow();
@@ -244,7 +243,7 @@ namespace TreeViewer
                                             try
                                             {
                                                 ModuleRepositoryWindow win = new ModuleRepositoryWindow(updatedModules ? ModuleRepositoryWindow.Modes.Install : ModuleRepositoryWindow.Modes.Load, win2);
-                                                await win.ShowDialog(win2);
+                                                await win.ShowDialog2(win2);
                                             }
                                             catch (Exception ex)
                                             {
@@ -267,6 +266,37 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+
+            this.FindControl<Grid>("BannerContainer").Children.Add(new DPIAwareBox(Icons.GetIcon("TreeViewer.Assets.Banner_dark-500.png", "TreeViewer.Assets.Banner_dark-750.png", "TreeViewer.Assets.Banner_dark-1000.png", 500, 178)) { Width = 500, Height = 178 });
+
+            this.FindControl<Canvas>("CloseCanvas").PointerPressed += (s, e) =>
+            {
+                this.FindControl<Canvas>("CloseCanvas").Classes.Add("pressed");
+            };
+
+            this.FindControl<Canvas>("CloseCanvas").PointerReleased += (s, e) =>
+            {
+                this.FindControl<Canvas>("CloseCanvas").Classes.Remove("pressed");
+
+                Point position = e.GetPosition(this.FindControl<Canvas>("CloseCanvas"));
+
+                if (position.X >= 0 && position.X <= 24 && position.Y >= 0 && position.Y <= 24)
+                {
+                    ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                }
+            };
+        }
+
+        public void SetProgress(double progress, string text)
+        {
+            this.FindControl<ProgressBar>("ProgressBar").Value = progress;
+            this.FindControl<TextBlock>("ModuleNameBox").Text = text;
+
+            if (progress == 1)
+            {
+                this.FindControl<Canvas>("CloseCanvas").Opacity = 0;
+                this.FindControl<TextBlock>("StatusBlock").Text = "Initialising main window...";
+            }
         }
     }
 }

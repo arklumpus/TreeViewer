@@ -15,45 +15,56 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="400" Height="450"
         x:Class="TreeViewer.NodeChoiceWindow"
-        Title="Choose node..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
-        WindowStartupLocation="CenterOwner" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Grid Margin="10">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="1*"/>
-      <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
-    <TextBlock FontWeight="Bold" FontSize="24">Choose node:</TextBlock>
-    <TextBlock FontWeight="Bold" Grid.Row="1" FontSize="18" Margin="0,0,0,5">Last common ancestor of:</TextBlock>
-    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
-      <StackPanel Margin="5,0,0,0">
-        <StackPanel Name="NodeContainer">
-          
+        Title="Select node..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
+        WindowStartupLocation="CenterOwner" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" SizeToContent="Height">
+  <local:ChildWindow.Content>
+    <Grid Margin="10">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <Grid Name="HeaderGrid" Margin="0,0,0,10">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Select node" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
+      </Grid>
+      <TextBlock Grid.Row="1" FontSize="14" Margin="0,0,0,5">Last common ancestor of:</TextBlock>
+      <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False" Padding="0,0,20,0" Margin="0,0,0,5">
+        <StackPanel Margin="0,0,0,0">
+          <StackPanel Name="NodeContainer">
+
+          </StackPanel>
+          <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Click="AddButtonClicked">
+            <StackPanel Orientation="Horizontal">
+              <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
+              <TextBlock Text="Add node" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
+            </StackPanel>
+          </Button>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-          <local:AddRemoveButton PointerReleased="AddButtonClicked"></local:AddRemoveButton>
-          <TextBlock FontStyle="Italic" Foreground="#B4B4B4" VerticalAlignment="Center" Margin="5,0,0,0">Add node</TextBlock>
-        </StackPanel>
-      </StackPanel>
-    </ScrollViewer>
-    <Grid Grid.Row="3">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="1*" />
-      </Grid.ColumnDefinitions>
-      <Button Grid.Column="1" Width="100" Click="OKClicked" HorizontalContentAlignment="Center">OK</Button>
-      <Button Grid.Column="3" Width="100" Click="CancelClicked" HorizontalContentAlignment="Center">Cancel</Button>
+      </ScrollViewer>
+      <Grid Grid.Row="3">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="1" Width="100" Click="OKClicked" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">OK</Button>
+        <Button Grid.Column="3" Width="100" Click="CancelClicked" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton">Cancel</Button>
+      </Grid>
     </Grid>
-  </Grid>
-</Window>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

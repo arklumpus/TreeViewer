@@ -1,4 +1,20 @@
-using Avalonia;
+/*
+    TreeViewer - Cross-platform software to draw phylogenetic trees
+    Copyright (C) 2021  Giorgio Bianchini
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, version 3.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -6,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace TreeViewer
 {
-    public class MarkdownEditorWindow : Window
+    public class MarkdownEditorWindow : ChildWindow
     {
         public MarkdownEditorWindow()
         {
@@ -25,6 +41,7 @@ namespace TreeViewer
         public async Task FinishInitialization(string sourceCode, string editorId, InstanceStateData stateData)
         {
             Editor = await MDEdit.Editor.Create(sourceCode.Replace("\t", "    "), guid: editorId);
+            Editor.Background = this.Background;
             Editor.MarkdownRenderer.ImageUriResolver = (a, b) => MarkdownUtils.ImageUriResolverAsynchronous(a, b, stateData);
             Editor.MarkdownRenderer.RasterImageLoader = imageFile => new VectSharp.MuPDFUtils.RasterImageFile(imageFile);
 

@@ -22,7 +22,7 @@ using System.Net;
 
 namespace TreeViewer
 {
-    public class AboutWindow : Window
+    public class AboutWindow : ChildWindow
     {
         public AboutWindow()
         {
@@ -53,7 +53,7 @@ namespace TreeViewer
                 string releaseJson;
 
                 ProgressWindow win = new ProgressWindow() { ProgressText = "Checking for updates..." };
-                _ = win.ShowDialog(this);
+                _ = win.ShowDialog2(this);
 
                 try
                 {
@@ -84,16 +84,9 @@ namespace TreeViewer
                                 if (version > currVers)
                                 {
                                     found = true;
-                                    MessageBox box = new MessageBox("Check for updates", "A new version of TreeViewer has been released: " + releases[i].name + "!\nYou should keep the program updated to use the latest features and avoid security issues. Do you wish to open the download page?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
-                                    await box.ShowDialog(this);
-                                    if (box.Result == MessageBox.Results.Yes)
-                                    {
-                                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-                                        {
-                                            FileName = releases[i].html_url,
-                                            UseShellExecute = true
-                                        });
-                                    }
+
+                                    UpdateWindow box = new UpdateWindow(releases[i].name, releases[i].html_url);
+                                    await box.ShowDialog2(this);
                                     break;
                                 }
                             }

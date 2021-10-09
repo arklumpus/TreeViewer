@@ -10,3 +10,5 @@ System.Security.Cryptography.Algorithms.dll
 Avalonia.Controls.dll
 VectSharp.dll
 Avalonia.Input.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll

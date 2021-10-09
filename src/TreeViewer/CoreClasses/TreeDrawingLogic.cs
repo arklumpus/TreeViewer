@@ -28,6 +28,8 @@ using PhyloTree;
 using VectSharp;
 using VectSharp.Canvas;
 using Avalonia.VisualTree;
+using System.Linq;
+using Avalonia.Media.Transformation;
 
 namespace TreeViewer
 {
@@ -35,10 +37,9 @@ namespace TreeViewer
     {
         private static Page alertPage = null;
 
-        //Colour graphBackgroundColour = Colour.FromRgb(255, 255, 255);
         Avalonia.Media.IBrush graphBackgroundBrush = Avalonia.Media.Brushes.White;
 
-        Colour GraphBackground
+        public Colour GraphBackground
         {
             get
             {
@@ -52,8 +53,6 @@ namespace TreeViewer
                 graphBackgroundBrush = value.GetColourBrush();
 
                 this.FindControl<Canvas>("ContainerCanvas").Background = GraphBackgroundBrush;
-
-                //graphBackgroundBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb((byte)(value.R * 255), (byte)(value.G * 255), (byte)(value.B * 255)));
             }
         }
 
@@ -63,12 +62,6 @@ namespace TreeViewer
             {
                 return graphBackgroundBrush;
             }
-            /*
-            set
-            {
-                graphBackgroundColour = Colour.FromRgb(value.Color.R, value.Color.G, value.Color.B);
-                graphBackgroundBrush = value;
-            }*/
         }
 
         public Avalonia.Media.IBrush SelectionBrush
@@ -96,6 +89,34 @@ namespace TreeViewer
                 double a = (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
 
                 return new SolidColorBrush(Color.FromArgb((byte)(a * 255), (byte)(r * 255), (byte)(g * 255), (byte)(b * 255)));
+            }
+        }
+
+        public SkiaSharp.SKColor SelectionSKColor
+        {
+            get
+            {
+                double transp = 0.5 * GlobalSettings.Settings.SelectionColour.A;
+                double r = (GlobalSettings.Settings.SelectionColour.R * transp + this.StateData.GraphBackgroundColour.R * this.StateData.GraphBackgroundColour.A * (1 - transp)) / (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+                double g = (GlobalSettings.Settings.SelectionColour.G * transp + this.StateData.GraphBackgroundColour.G * this.StateData.GraphBackgroundColour.A * (1 - transp)) / (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+                double b = (GlobalSettings.Settings.SelectionColour.B * transp + this.StateData.GraphBackgroundColour.B * this.StateData.GraphBackgroundColour.A * (1 - transp)) / (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+                double a = (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+
+                return new SkiaSharp.SKColor((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), (byte)(a * 255));
+            }
+        }
+
+        public SkiaSharp.SKColor SelectionChildSKColor
+        {
+            get
+            {
+                double transp = 0.15 * GlobalSettings.Settings.SelectionColour.A;
+                double r = (GlobalSettings.Settings.SelectionColour.R * transp + this.StateData.GraphBackgroundColour.R * this.StateData.GraphBackgroundColour.A * (1 - transp)) / (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+                double g = (GlobalSettings.Settings.SelectionColour.G * transp + this.StateData.GraphBackgroundColour.G * this.StateData.GraphBackgroundColour.A * (1 - transp)) / (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+                double b = (GlobalSettings.Settings.SelectionColour.B * transp + this.StateData.GraphBackgroundColour.B * this.StateData.GraphBackgroundColour.A * (1 - transp)) / (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+                double a = (transp + this.StateData.GraphBackgroundColour.A * (1 - transp));
+
+                return new SkiaSharp.SKColor((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), (byte)(a * 255));
             }
         }
 
@@ -127,7 +148,7 @@ namespace TreeViewer
             }
         }
 
-        public static Page AlertPage
+        public static Page AlertPageIcon
         {
             get
             {
@@ -150,53 +171,127 @@ namespace TreeViewer
             }
         }
 
-        private async Task UpdateOnlyTransformedTree()
+        public static Viewbox GetAlertIcon()
+        {
+            return new Viewbox() { Child = AlertPageIcon.PaintToCanvas() };
+        }
+
+        private bool TryRecoverSelectedNode(string id, List<string> nodeNames)
+        {
+            if (id != null)
+            {
+                TreeNode node = this.TransformedTree.GetNodeFromId(id);
+
+                if (node != null)
+                {
+                    this.SetSelection(node);
+                    return true;
+                }
+            }
+
+            if (nodeNames?.Count > 0)
+            {
+                TreeNode node = this.TransformedTree.GetLastCommonAncestor(nodeNames);
+
+                if (node != null)
+                {
+                    this.SetSelection(node);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private async Task UpdateOnlyTransformedTree(ProgressWindow win = null)
         {
             EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset);
 
-            ProgressWindow win = null;
+            bool wasWinNull = win == null;
 
-            win = new ProgressWindow(handle) { IsIndeterminate = true, ProgressText = "Transforming trees..." };
+            if (win == null)
+            {
+                win = new ProgressWindow(handle) { IsIndeterminate = false, ProgressText = "Transforming trees..." };
+                win.LabelText = Modules.TransformerModules[TransformerComboBox.SelectedIndex].Name;
+            }
+            else
+            {
+                win.IsIndeterminate = false;
+                win.ProgressText = "Transforming trees...";
+                win.LabelText = Modules.TransformerModules[TransformerComboBox.SelectedIndex].Name;
+            }
 
-            Thread thr = new Thread(() =>
+            Task task = Task.Run(() =>
             {
                 handle.WaitOne();
-                FirstTransformedTree = Modules.TransformerModules[TransformerComboBox.SelectedIndex].Transform(Trees, TransformerParameters);
-                Dispatcher.UIThread.InvokeAsync(() =>
+                FirstTransformedTree = Modules.TransformerModules[TransformerComboBox.SelectedIndex].Transform(Trees, TransformerParameters, progress =>
                 {
-                    win.Close();
+                    _ = Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        win.Progress = progress;
+                    });
                 });
             });
 
-            thr.Start();
+            if (wasWinNull)
+            {
+                _ = win.ShowDialog2(this);
+            }
+            else
+            {
+                handle.Set();
+            }
 
-            await win.ShowDialog2(this);
+            await task;
+
+            if (wasWinNull)
+            {
+                win.Close();
+            }
         }
 
         private async Task UpdateTransformedTree()
         {
+            ProgressWindow win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Transforming trees..." };
+            win.LabelText = Modules.TransformerModules[TransformerComboBox.SelectedIndex].Name;
+
+            _ = win.ShowDialog2(this);
+
             try
             {
-                await UpdateOnlyTransformedTree();
+                await UpdateOnlyTransformedTree(win);
 
                 TransformerAlert.IsVisible = false;
             }
             catch (Exception ex)
             {
                 TransformerAlert.IsVisible = true;
-                Avalonia.Controls.ToolTip.SetTip(TransformerAlert, GetExceptionMessage(ex));
+                AvaloniaBugFixes.SetToolTip(TransformerAlert, GetExceptionMessage(ex));
+                win.Close();
                 return;
             }
 
-            await UpdateFurtherTransformations(0);
+            await UpdateFurtherTransformations(0, win);
         }
 
-        TreeNode[] AllTransformedTrees = null;
+        public TreeNode[] AllTransformedTrees = null;
 
         object FurtherTransformationLock = new object();
 
-        private Task UpdateOnlyFurtherTransformations(int minIndex, ProgressWindow progressWindow)
+        private async Task UpdateOnlyFurtherTransformations(int minIndex, ProgressWindow progressWindow, Action<double> externalProgressAction = null)
         {
+            string id = null;
+            List<string> nodeNames = null;
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (this.IsSelectionAvailable)
+                {
+                    nodeNames = this.SelectedNode.GetNodeNames();
+                    id = this.SelectedNode.Id;
+                }
+            });
+
             lock (FurtherTransformationLock)
             {
                 TreeNode[] prevTransformedTrees = AllTransformedTrees;
@@ -224,19 +319,64 @@ namespace TreeViewer
                     TransformedTree = FirstTransformedTree.Clone();
                 }
 
+                if (externalProgressAction == null)
+                {
+                    _ = Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        progressWindow.Steps = FurtherTransformations.Count - minIndex;
+
+                    });
+                }
+
                 for (int i = minIndex; i < FurtherTransformations.Count; i++)
                 {
                     AllTransformedTrees[i] = TransformedTree.Clone();
                     int j = i;
                     try
                     {
-                        FurtherTransformations[i].Transform(ref StateData.TransformedTree, FurtherTransformationsParameters[i]);
-                        double progress = (double)(i + 1) / (FurtherTransformations.Count - minIndex);
+                        if (externalProgressAction == null)
+                        {
+                            _ = Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                progressWindow.LabelText = FurtherTransformations[j].Name;
+
+                            });
+                        }
+
+                        double progress = (double)(i - minIndex) / (FurtherTransformations.Count - minIndex);
+
+                        Action<double> progressAction;
+
+
+                        if (externalProgressAction == null)
+                        {
+                            progressAction = (prog) =>
+                            {
+                                prog = Math.Max(0, Math.Min(prog, 1));
+
+                                _ = Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    progressWindow.Progress = progress + prog / (FurtherTransformations.Count - minIndex);
+                                });
+                            };
+                        }
+                        else
+                        {
+                            progressAction = externalProgressAction;
+                        }
+
+                        FurtherTransformations[i].Transform(ref StateData.TransformedTree, FurtherTransformationsParameters[i], progressAction);
+
+                        progress = (double)(i + 1 - minIndex) / (FurtherTransformations.Count - minIndex);
 
                         _ = Dispatcher.UIThread.InvokeAsync(() =>
                         {
                             FurtherTransformationsAlerts[j].IsVisible = false;
-                            progressWindow.Progress = progress;
+
+                            if (externalProgressAction == null)
+                            {
+                                progressWindow.Progress = progress;
+                            }
                         });
                     }
                     catch (Exception ex)
@@ -244,7 +384,7 @@ namespace TreeViewer
                         _ = Dispatcher.UIThread.InvokeAsync(() =>
                         {
                             FurtherTransformationsAlerts[j].IsVisible = true;
-                            ToolTip.SetTip(FurtherTransformationsAlerts[j], GetExceptionMessage(ex));
+                            AvaloniaBugFixes.SetToolTip(FurtherTransformationsAlerts[j], GetExceptionMessage(ex));
                         });
                     }
                 }
@@ -312,7 +452,18 @@ namespace TreeViewer
                 semaphore.Release();
             }
 
-            return Task.CompletedTask;
+            _ = Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                this.FindControl<TextBlock>("TreeCountLabel").Text = this.Trees.Count.ToString() + " tree" + (this.Trees.Count > 1 ? "s" : "") + " " + (this.TransformedTree.Children.Count == 2 ? "(rooted)" : "(unrooted)");
+                this.FindControl<TextBlock>("TipCountLabel").Text = this.TransformedTree.GetLeaves().Count.ToString() + " tips";
+                this.FindControl<TextBlock>("NodeCountLabel").Text = this.TransformedTree.GetChildrenRecursiveLazy().Count().ToString() + " nodes";
+
+                if (id != null || nodeNames != null)
+                {
+                    await Task.Delay(10);
+                    TryRecoverSelectedNode(id, nodeNames);
+                }
+            }, DispatcherPriority.MinValue);
         }
 
         private static string GetExceptionMessage(Exception exception)
@@ -331,28 +482,35 @@ namespace TreeViewer
             return message;
         }
 
-        public async Task UpdateFurtherTransformations(int minIndex)
+        public async Task UpdateFurtherTransformations(int minIndex, ProgressWindow window = null)
         {
             minIndex = Math.Max(minIndex, 0);
 
-            ProgressWindow window = new ProgressWindow() { ProgressText = "Performing further transformations...", IsIndeterminate = false };
-            _ = window.ShowDialog(this);
+            if (window == null)
+            {
+                window = new ProgressWindow() { ProgressText = "Performing further transformations...", IsIndeterminate = false };
+                window.Steps = FurtherTransformations.Count - minIndex;
+                _ = window.ShowDialog2(this);
+            }
+            else
+            {
+                window.ProgressText = "Performing further transformations...";
+                window.IsIndeterminate = false;
+                window.Steps = FurtherTransformations.Count - minIndex;
+            }
 
-            SemaphoreSlim semaphore2 = new SemaphoreSlim(0, 1);
-
-            Thread thr = new Thread(async () =>
+            await Task.Run(async () =>
             {
                 await UpdateOnlyFurtherTransformations(minIndex, window);
-                semaphore2.Release();
             });
-            thr.Start();
-
-            await semaphore2.WaitAsync();
-            semaphore2.Release();
 
             window.Close();
 
-            UpdateCoordinates();
+            this.FindControl<TextBlock>("TreeCountLabel").Text = this.Trees.Count.ToString() + " tree" + (this.Trees.Count > 1 ? "s" : "") + " " + (this.TransformedTree.Children.Count == 2 ? "(rooted)" : "(unrooted)");
+            this.FindControl<TextBlock>("TipCountLabel").Text = this.TransformedTree.GetLeaves().Count.ToString() + " tips";
+            this.FindControl<TextBlock>("NodeCountLabel").Text = this.TransformedTree.GetChildrenRecursiveLazy().Count().ToString() + " nodes";
+
+            await UpdateCoordinates();
         }
 
         private void UpdateOnlyCoordinates()
@@ -360,7 +518,7 @@ namespace TreeViewer
             Coordinates = Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].GetCoordinates(TransformedTree, CoordinatesParameters);
         }
 
-        public void UpdateCoordinates()
+        public async Task UpdateCoordinates()
         {
             try
             {
@@ -370,332 +528,453 @@ namespace TreeViewer
             catch (Exception ex)
             {
                 CoordinatesAlert.IsVisible = true;
-                Avalonia.Controls.ToolTip.SetTip(CoordinatesAlert, GetExceptionMessage(ex));
+                AvaloniaBugFixes.SetToolTip(CoordinatesAlert, GetExceptionMessage(ex));
                 return;
             }
 
-            UpdateAllPlotLayers();
+            await UpdateAllPlotLayers();
         }
 
         public Point PlotOrigin;
         public Point PlotBottomRight;
         private List<(Point, Point)> PlotBounds { get; set; }
-        private List<Canvas> PlotCanvases { get; set; }
-        private List<Canvas> SelectionCanvases;
+        private List<SKRenderContext> PlotCanvases { get; set; }
+        private List<SKRenderAction> LayerTransforms { get; set; }
+        private List<SKRenderContext> SelectionCanvases;
 
-        private void UpdatePlotLayer(int layer, bool updatePlotBounds)
+        static SkiaSharp.SKColor TransparentSKColor = new SkiaSharp.SKColor(0, 0, 0, 0);
+
+        private Dictionary<string, (SkiaSharp.SKBitmap, bool)> GlobalImages = new Dictionary<string, (SkiaSharp.SKBitmap, bool)>();
+
+        public SKMultiLayerRenderCanvas FullPlotCanvas;
+        public SKMultiLayerRenderCanvas FullSelectionCanvas;
+
+        private SemaphoreSlim RenderingSemaphore = new SemaphoreSlim(1, 1);
+
+        private SemaphoreSlim RenderingUpdateRequestSemaphore = new SemaphoreSlim(1, 1);
+        private List<(int, bool)> PlotLayerUpdateRequests = new List<(int, bool)>();
+        private EventWaitHandle RenderingUpdateRequestHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
+        private EventWaitHandle RenderingUpdateRequestTerminator = new EventWaitHandle(false, EventResetMode.ManualReset);
+
+
+        private void StartPlotUpdaterThread()
         {
-            if (layer >= 0)
+            Thread thr = new Thread(async () =>
             {
-                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").IsVisible = true;
+                EventWaitHandle[] handles = new EventWaitHandle[] { RenderingUpdateRequestHandle, RenderingUpdateRequestTerminator };
 
-                double minX = double.MaxValue;
-                double maxX = double.MinValue;
-                double minY = double.MaxValue;
-                double maxY = double.MinValue;
-
-
-                try
+                while (true)
                 {
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
+                    int result = EventWaitHandle.WaitAny(handles);
 
-                    Page pag = new Page(1, 1);
-                    Graphics plotGraphics = pag.Graphics;
-                    Point[] bounds = PlottingActions[layer].PlotAction(TransformedTree, PlottingParameters[layer], Coordinates, plotGraphics);
-                    minX = Math.Min(minX, bounds[0].X);
-                    maxX = Math.Max(maxX, bounds[1].X);
-                    minY = Math.Min(minY, bounds[0].Y);
-                    maxY = Math.Max(maxY, bounds[1].Y);
-
-                    pag.Crop(new Point(minX, minY), new Size(maxX - minX, maxY - minY));
-
-                    Dictionary<string, Delegate> taggedActions = new Dictionary<string, Delegate>();
-
-                    Dictionary<string, Delegate> selectionActions = new Dictionary<string, Delegate>()
+                    if (result == 1)
                     {
-                        { "", new Func<RenderAction, IEnumerable<RenderAction>>((path) => { return new RenderAction[0]; }) }
-                    };
-
-                    List<TreeNode> nodes = TransformedTree.GetChildrenRecursive();
-
-                    ISolidColorBrush transparentBrush = new SolidColorBrush(0x00000000);
-
-                    Dictionary<string, List<(double, RenderAction)>> selectionItems = new Dictionary<string, List<(double, RenderAction)>>();
-
-                    for (int i = 0; i < nodes.Count; i++)
-                    {
-                        int index = i;
-                        /*taggedActions.Add(nodes[i].Id, new Action<Control>((path) =>
-                        {
-                            path.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
-
-                            path.PointerPressed += (s, e) =>
-                            {
-                                SetSelection(nodes[index]);
-                                HasPointerDoneSomething = true;
-                            };
-                        }));*/
-
-                        taggedActions.Add(nodes[i].Id, new Func<RenderAction, IEnumerable<RenderAction>>((path) =>
-                        {
-                            path.PointerEnter += (s, e) =>
-                            {
-                                path.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
-                            };
-
-                            path.PointerLeave += (s, e) =>
-                            {
-                                path.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Arrow);
-                            };
-
-                            path.PointerPressed += (s, e) =>
-                            {
-                                SetSelection(nodes[index]);
-                                HasPointerDoneSomething = true;
-                            };
-
-                            return new RenderAction[] { path };
-
-                        }));
-
-                        /*selectionActions.Add(nodes[i].Id, new Action<Control>((ctrl) =>
-                        {
-                            ctrl.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
-
-                            if (ctrl is Avalonia.Controls.Shapes.Path path)
-                            {
-                                path.Tag = new object[] { nodes[index].Id, path.StrokeThickness };
-                                path.Stroke = transparentBrush;
-
-                                if (path.Fill != null)
-                                {
-                                    path.Fill = transparentBrush;
-                                }
-
-                                path.StrokeLineCap = Avalonia.Media.PenLineCap.Round;
-                                path.StrokeJoin = Avalonia.Media.PenLineJoin.Round;
-                            }
-                            else if (ctrl is Avalonia.Controls.TextBlock block)
-                            {
-                                Canvas parent = (Canvas)block.Parent;
-
-                                parent.Children.Remove(block);
-
-                                Geometry geo = new RectangleGeometry(block.FormattedText.Bounds);
-
-                                parent.Children.Add(new Avalonia.Controls.Shapes.Path() { Data = geo, Fill = transparentBrush, RenderTransform = block.RenderTransform, RenderTransformOrigin = block.RenderTransformOrigin, Tag = new object[] { nodes[index].Id, 0d } });
-                            }
-
-                            ctrl.PointerPressed += (s, e) =>
-                            {
-                                SetSelection(nodes[index]);
-                                HasPointerDoneSomething = true;
-                            };
-                        }));*/
-
-                        selectionActions.Add(nodes[i].Id, new Func<RenderAction, IEnumerable<RenderAction>>(ctrl =>
-                        {
-                            if (ctrl.ActionType == RenderAction.ActionTypes.Path)
-                            {
-                                ctrl.PointerEnter += (s, e) =>
-                                {
-                                    ctrl.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
-                                };
-
-                                ctrl.PointerLeave += (s, e) =>
-                                {
-                                    ctrl.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Arrow);
-                                };
-
-                                if (ctrl.Stroke != null)
-                                {
-                                    ctrl.Stroke.Brush = transparentBrush;
-                                    ctrl.Stroke.LineCap = PenLineCap.Round;
-                                    ctrl.Stroke.LineJoin = PenLineJoin.Round;
-                                }
-                                else
-                                {
-                                    ctrl.Stroke = new Pen(transparentBrush, thickness: 0, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
-                                }
-
-                                if (ctrl.Fill != null)
-                                {
-                                    ctrl.Fill = transparentBrush;
-                                }
-
-                                ctrl.PointerPressed += (s, e) => { SetSelection(nodes[index]); HasPointerDoneSomething = true; };
-
-                                if (selectionItems.TryGetValue(nodes[index].Id, out List<(double, RenderAction)> item))
-                                {
-                                    selectionItems[nodes[index].Id].Add((ctrl.Stroke.Thickness, ctrl));
-                                }
-                                else
-                                {
-                                    selectionItems.Add(nodes[index].Id, new List<(double, RenderAction)>() { (ctrl.Stroke.Thickness, ctrl) });
-                                }
-
-                                return new RenderAction[] { ctrl };
-                            }
-                            else if (ctrl.ActionType == RenderAction.ActionTypes.Text)
-                            {
-                                Geometry geo = new RectangleGeometry(ctrl.Text.Bounds);
-
-                                RenderAction act = RenderAction.PathAction(geo, null, transparentBrush, ctrl.Transform, ctrl.ClippingPath, tag: ctrl.Tag);
-
-                                act.PointerEnter += (s, e) =>
-                                {
-                                    act.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
-                                };
-
-                                act.PointerLeave += (s, e) =>
-                                {
-                                    act.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Arrow);
-                                };
-
-                                act.PointerPressed += (s, e) => { SetSelection(nodes[index]); HasPointerDoneSomething = true; };
-
-                                if (selectionItems.TryGetValue(nodes[index].Id, out List<(double, RenderAction)> item))
-                                {
-                                    item.Add((0, act));
-                                }
-                                else
-                                {
-                                    selectionItems.Add(nodes[index].Id, new List<(double, RenderAction)>() { (0, act) });
-                                }
-
-                                return new RenderAction[] { act };
-
-                            }
-                            else
-                            {
-                                return null;
-                            }
-
-                        }));
-                    }
-
-
-                    //Canvas newCanvas = pag.PaintToCanvas(taggedActions, false);
-                    Canvas newCanvas = pag.PaintToCanvas(false, taggedActions, false);
-                    newCanvas.Background = null;
-                    newCanvas.Width = 1;
-                    newCanvas.Height = 1;
-                    newCanvas.ClipToBounds = false;
-                    /*Needed until Avalonia bug https://github.com/AvaloniaUI/Avalonia/issues/3732 is fixed*/
-                    newCanvas.IsHitTestVisible = false;
-
-                    //Canvas newSelectionCanvas = pag.PaintToCanvas(selectionActions, false);
-                    Canvas newSelectionCanvas = pag.PaintToCanvas(false, selectionActions, false);
-                    newSelectionCanvas.Background = null;
-                    newSelectionCanvas.Width = 1;
-                    newSelectionCanvas.Height = 1;
-                    newSelectionCanvas.ClipToBounds = false;
-                    newSelectionCanvas.Tag = selectionItems;
-
-
-                    /*foreach (Avalonia.Controls.Shapes.Path pth in FindPaths(newCanvas))
-                    {
-                        if (pth.Tag == null)
-                        {
-                            pth.IsHitTestVisible = false;
-                        }
-                    }
-
-                    foreach (Avalonia.Controls.Shapes.Path pth in FindPaths(newSelectionCanvas))
-                    {
-                        if (pth.Tag == null)
-                        {
-                            (pth.Parent as Canvas).Children.Remove(pth);
-                        }
-                    }*/
-
-                    Point newOrigin = new Point(Math.Min(minX, PlotOrigin.X), Math.Min(minY, PlotOrigin.Y));
-
-                    if (double.IsNaN(PlotOrigin.X) || double.IsNaN(PlotOrigin.Y))
-                    {
-                        newOrigin = new Point(minX, minY);
-                    }
-
-                    PlotBottomRight = new Point(Math.Max(maxX, PlotBottomRight.X), Math.Max(maxY, PlotBottomRight.Y));
-                    if (double.IsNaN(PlotBottomRight.X) || double.IsNaN(PlotBottomRight.Y))
-                    {
-                        PlotBottomRight = new Point(maxX, maxY);
-                    }
-
-                    if (newOrigin.Y != PlotOrigin.Y || newOrigin.X != PlotOrigin.X)
-                    {
-                        for (int i = 0; i < PlotCanvases.Count; i++)
-                        {
-                            if (i != layer && PlotCanvases[i] != null)
-                            {
-                                TranslateTransform prevTransform = (TranslateTransform)PlotCanvases[i].RenderTransform;
-                                PlotCanvases[i].RenderTransform = new TranslateTransform(prevTransform.X - newOrigin.X + PlotOrigin.X, prevTransform.Y - newOrigin.Y + PlotOrigin.Y);
-                                SelectionCanvases[i].RenderTransform = new TranslateTransform(prevTransform.X - newOrigin.X + PlotOrigin.X, prevTransform.Y - newOrigin.Y + PlotOrigin.Y);
-                            }
-                        }
-
-                        PlotOrigin = newOrigin;
-                    }
-
-                    newCanvas.RenderTransform = new TranslateTransform(minX - PlotOrigin.X, minY - PlotOrigin.Y);
-                    newSelectionCanvas.RenderTransform = new TranslateTransform(minX - PlotOrigin.X, minY - PlotOrigin.Y);
-
-                    Canvas parent = this.FindControl<Canvas>("PlotCanvas");
-                    Canvas selectionParent = this.FindControl<Canvas>("SelectionCanvas");
-
-                    if (PlotCanvases[layer] != null)
-                    {
-                        int index = parent.Children.IndexOf(PlotCanvases[layer]);
-
-                        parent.Children.RemoveAt(index);
-                        parent.Children.Insert(index, newCanvas);
-
-                        selectionParent.Children.RemoveAt(index);
-                        selectionParent.Children.Insert(index, newSelectionCanvas);
-
-                        PlotCanvases[layer] = newCanvas;
-                        PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
-                        SelectionCanvases[layer] = newSelectionCanvas;
+                        break;
                     }
                     else
                     {
-                        parent.Children.Add(newCanvas);
-                        selectionParent.Children.Add(newSelectionCanvas);
+                        await RenderingUpdateRequestSemaphore.WaitAsync();
 
-                        PlotCanvases[layer] = newCanvas;
-                        PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
-                        SelectionCanvases[layer] = newSelectionCanvas;
+                        List<(int, bool)> currPlotLayerUpdateRequests = PlotLayerUpdateRequests;
+                        PlotLayerUpdateRequests = new List<(int, bool)>();
+
+                        RenderingUpdateRequestSemaphore.Release();
+                        RenderingUpdateRequestHandle.Reset();
+
+                        HashSet<int> updated = new HashSet<int>(currPlotLayerUpdateRequests.Count);
+
+                        for (int i = 0; i < currPlotLayerUpdateRequests.Count; i++)
+                        {
+                            if (updated.Add(currPlotLayerUpdateRequests[i].Item1))
+                            {
+                                await Dispatcher.UIThread.InvokeAsync(async () =>
+                                {
+                                    await ActuallyUpdatePlotLayer(currPlotLayerUpdateRequests[i].Item1, currPlotLayerUpdateRequests[i].Item2);
+                                });
+                            }
+                        }
+
+                        // Limit rendering updates to 30fps
+                        await Task.Delay(33);
+                    }
+                }
+
+
+            });
+
+            thr.Start();
+        }
+
+
+        private async Task UpdatePlotLayer(int layer, bool updatePlotBounds)
+        {
+            await RenderingUpdateRequestSemaphore.WaitAsync();
+
+            PlotLayerUpdateRequests.Add((layer, updatePlotBounds));
+
+            RenderingUpdateRequestHandle.Set();
+            RenderingUpdateRequestSemaphore.Release();
+        }
+
+        private async Task ActuallyUpdatePlotLayer(int layer, bool updatePlotBounds, bool updatingAllLayers = false)
+        {
+            await RenderingSemaphore.WaitAsync();
+
+            try
+            {
+                if (layer >= 0)
+                {
+                    this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").IsVisible = true;
+
+                    double minX = double.MaxValue;
+                    double maxX = double.MinValue;
+                    double minY = double.MaxValue;
+                    double maxY = double.MinValue;
+
+                    if (!updatingAllLayers)
+                    {
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").IntermediateSteps = System.Collections.Immutable.ImmutableList<double>.Empty;
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = 0;
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").LabelText = PlottingActions[layer].Name;
+
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 1;
+                    }
+                    else
+                    {
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").LabelText = PlottingActions[layer].Name;
                     }
 
-                    PlottingAlerts[layer].IsVisible = false;
+                    SKRenderContext newContext = null;
+                    SKRenderContext newSelectionContext = null;
 
-                    sw.Stop();
-                    //PlottingTimings[layer].Text = sw.ElapsedMilliseconds < 2000 ? (sw.ElapsedMilliseconds.ToString() + "ms") : ((sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + "ms");
+                    bool success = false;
 
-                    Canvas containerCanvas = this.FindControl<Canvas>("ContainerCanvas");
-                    containerCanvas.Background = GraphBackgroundBrush;
-                    containerCanvas.Width = PlotBottomRight.X - PlotOrigin.X + 20;
-                    containerCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y + 20;
+                    await Task.Run(() =>
+                    {
+                        try
+                        {
+                            Page pag = new Page(1, 1);
+                            Graphics plotGraphics = pag.Graphics;
 
-                    UpdateSelectionWidth(newSelectionCanvas);
-                }
-                catch (Exception ex)
-                {
+                            Point[] bounds = PlottingActions[layer].PlotAction(TransformedTree, PlottingParameters[layer], Coordinates, plotGraphics);
+                            minX = Math.Min(minX, bounds[0].X);
+                            maxX = Math.Max(maxX, bounds[1].X);
+                            minY = Math.Min(minY, bounds[0].Y);
+                            maxY = Math.Max(maxY, bounds[1].Y);
+
+                            pag.Crop(new Point(minX, minY), new Size(maxX - minX, maxY - minY));
+
+                            Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>> taggedActions = new Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>>();
+
+                            Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>> selectionActions = new Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>>()
+                            {
+                            { "", new Func<SKRenderAction, IEnumerable<SKRenderAction>>((path) =>
+                                {
+                                    if (path.ActionType == SKRenderAction.ActionTypes.Clip || path.ActionType == SKRenderAction.ActionTypes.Restore || path.ActionType == SKRenderAction.ActionTypes.Save || path.ActionType == SKRenderAction.ActionTypes.Transform)
+                                    {
+                                        return new SKRenderAction[] { path };
+                                    }
+                                    else
+                                    {
+                                        return new SKRenderAction[0];
+                                    }
+                                    }) }
+                            };
+
+                            List<TreeNode> nodes = TransformedTree.GetChildrenRecursive();
+
+                            Dictionary<string, List<(double, SKRenderAction)>> selectionItems = new Dictionary<string, List<(double, SKRenderAction)>>();
+
+                            for (int i = 0; i < nodes.Count; i++)
+                            {
+                                int index = i;
+
+                                taggedActions.Add(nodes[i].Id, new Func<SKRenderAction, IEnumerable<SKRenderAction>>((path) =>
+                                    {
+                                        path.PointerEnter += (s, e) =>
+                                        {
+                                            path.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
+                                        };
+
+                                        path.PointerLeave += (s, e) =>
+                                        {
+                                            path.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Arrow);
+                                        };
+
+                                        path.PointerPressed += (s, e) =>
+                                        {
+                                            SetSelection(nodes[index]);
+                                            HasPointerDoneSomething = true;
+                                            FullSelectionCanvas.InvalidateDirty();
+                                        };
+
+                                        return new SKRenderAction[] { path };
+
+                                    }));
+
+                                selectionActions.Add(nodes[i].Id, new Func<SKRenderAction, IEnumerable<SKRenderAction>>(ctrl =>
+                                    {
+                                        if (ctrl.ActionType == SKRenderAction.ActionTypes.Path)
+                                        {
+                                            ctrl.PointerEnter += (s, e) =>
+                                            {
+                                                ctrl.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
+                                            };
+
+                                            ctrl.PointerLeave += (s, e) =>
+                                            {
+                                                ctrl.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Arrow);
+                                            };
+
+                                            if (ctrl.Paint.IsStroke)
+                                            {
+                                                ctrl.Paint.Style = SkiaSharp.SKPaintStyle.Stroke;
+                                                ctrl.Paint.Color = TransparentSKColor;
+                                            }
+                                            else
+                                            {
+                                                ctrl.Paint.Style = SkiaSharp.SKPaintStyle.StrokeAndFill;
+                                                ctrl.Paint.StrokeWidth = 0;
+                                                ctrl.Paint.Color = TransparentSKColor;
+                                            }
+
+                                            ctrl.Payload = (double)ctrl.Paint.StrokeWidth;
+
+                                            ctrl.PointerPressed += (s, e) => { SetSelection(nodes[index]); HasPointerDoneSomething = true; };
+
+                                            if (selectionItems.TryGetValue(nodes[index].Id, out List<(double, SKRenderAction)> item))
+                                            {
+                                                selectionItems[nodes[index].Id].Add((ctrl.Paint.StrokeWidth, ctrl));
+                                            }
+                                            else
+                                            {
+                                                selectionItems.Add(nodes[index].Id, new List<(double, SKRenderAction)>() { (ctrl.Paint.StrokeWidth, ctrl) });
+                                            }
+
+                                            return new SKRenderAction[] { ctrl };
+                                        }
+                                        else if (ctrl.ActionType == SKRenderAction.ActionTypes.Text)
+                                        {
+                                            SkiaSharp.SKRect bounds = new SkiaSharp.SKRect();
+                                            ctrl.Paint.MeasureText(ctrl.Text, ref bounds);
+
+                                            SkiaSharp.SKPath geo = new SkiaSharp.SKPath();
+
+                                            geo.AddRect(new SkiaSharp.SKRect(bounds.Left + ctrl.TextX, bounds.Top + ctrl.TextY, bounds.Right + ctrl.TextX, bounds.Bottom + ctrl.TextY));
+
+                                            ctrl.Paint.IsStroke = false;
+                                            ctrl.Paint.Style = SkiaSharp.SKPaintStyle.Fill;
+                                            ctrl.Paint.Color = TransparentSKColor;
+
+                                            SKRenderAction act = SKRenderAction.PathAction(geo, ctrl.Paint, tag: ctrl.Tag);
+
+                                            act.Payload = 0d;
+
+                                            act.PointerEnter += (s, e) =>
+                                            {
+                                                act.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand);
+                                            };
+
+                                            act.PointerLeave += (s, e) =>
+                                            {
+                                                act.Parent.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Arrow);
+                                            };
+
+                                            act.PointerPressed += (s, e) => { SetSelection(nodes[index]); HasPointerDoneSomething = true; FullSelectionCanvas.InvalidateDirty(); };
+
+                                            if (selectionItems.TryGetValue(nodes[index].Id, out List<(double, SKRenderAction)> item))
+                                            {
+                                                item.Add((0, act));
+                                            }
+                                            else
+                                            {
+                                                selectionItems.Add(nodes[index].Id, new List<(double, SKRenderAction)>() { (0, act) });
+                                            }
+
+                                            return new SKRenderAction[] { act };
+
+                                        }
+                                        else if (ctrl.ActionType == SKRenderAction.ActionTypes.Clip || ctrl.ActionType == SKRenderAction.ActionTypes.Restore || ctrl.ActionType == SKRenderAction.ActionTypes.Save || ctrl.ActionType == SKRenderAction.ActionTypes.Transform)
+                                        {
+                                            return new SKRenderAction[] { ctrl };
+                                        }
+                                        else
+                                        {
+                                            return new SKRenderAction[0];
+                                        }
+
+                                    }));
+                            }
+
+
+                            newContext = pag.CopyToSKRenderContext(taggedActions, GlobalImages, false);
+                            newSelectionContext = pag.CopyToSKRenderContext(selectionActions, GlobalImages, false);
+                            success = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            try
+                            {
+                                Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    if (PlotCanvases[layer] == null)
+                                    {
+                                        SKRenderContext plotContext = new Page(1, 1).CopyToSKRenderContext(new Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>>(), GlobalImages, false);
+                                        SKRenderAction transform = SKRenderAction.TransformAction(SkiaSharp.SKMatrix.Identity);
+                                        SKRenderContext selectionContext = new Page(1, 1).CopyToSKRenderContext(new Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>>(), GlobalImages, false);
+
+                                        FullPlotCanvas.AddLayer(plotContext, transform);
+                                        FullSelectionCanvas.AddLayer(selectionContext, transform);
+
+                                        PlotCanvases[layer] = plotContext;
+                                        PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
+                                        SelectionCanvases[layer] = selectionContext;
+                                        LayerTransforms[layer] = transform;
+                                    }
+
+                                    PlottingAlerts[layer].IsVisible = true;
+                                    AvaloniaBugFixes.SetToolTip(PlottingAlerts[layer], GetExceptionMessage(ex));
+                                });
+                            }
+                            catch { }
+                        }
+                    });
+
                     try
                     {
-                        PlottingAlerts[layer].IsVisible = true;
-                        ToolTip.SetTip(PlottingAlerts[layer], GetExceptionMessage(ex));
-                        //PlottingTimings[layer].Text = "?ms";
+                        if (success)
+                        {
+
+                            Point newOrigin = new Point(Math.Min(minX, PlotOrigin.X), Math.Min(minY, PlotOrigin.Y));
+
+                            if (double.IsNaN(PlotOrigin.X) || double.IsNaN(PlotOrigin.Y))
+                            {
+                                newOrigin = new Point(minX, minY);
+                            }
+
+                            PlotBottomRight = new Point(Math.Max(maxX, PlotBottomRight.X), Math.Max(maxY, PlotBottomRight.Y));
+                            if (double.IsNaN(PlotBottomRight.X) || double.IsNaN(PlotBottomRight.Y))
+                            {
+                                PlotBottomRight = new Point(maxX, maxY);
+                            }
+
+                            if (newOrigin.Y != PlotOrigin.Y || newOrigin.X != PlotOrigin.X)
+                            {
+                                for (int i = 0; i < PlotCanvases.Count; i++)
+                                {
+                                    if (i != layer && PlotCanvases[i] != null)
+                                    {
+                                        if (LayerTransforms[i] != null)
+                                        {
+                                            SkiaSharp.SKMatrix newTransformMatrix = LayerTransforms[i].Transform.Value.PreConcat(SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y)));
+                                            LayerTransforms[i].Transform = newTransformMatrix;
+                                            FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                            FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                        }
+                                        else
+                                        {
+                                            SkiaSharp.SKMatrix newTransformMatrix = SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y));
+                                            LayerTransforms[i] = SKRenderAction.TransformAction(newTransformMatrix);
+                                            FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                            FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                        }
+                                    }
+                                }
+
+                                PlotOrigin = newOrigin;
+                            }
+
+                            SKRenderAction newLayerTransform = SKRenderAction.TransformAction(SkiaSharp.SKMatrix.CreateTranslation((float)(minX - PlotOrigin.X), (float)(minY - PlotOrigin.Y)));
+
+                            Canvas parent = this.FindControl<Canvas>("PlotCanvas");
+                            Canvas selectionParent = this.FindControl<Canvas>("SelectionCanvas");
+
+                            if (PlotCanvases[layer] != null)
+                            {
+                                FullPlotCanvas.UpdateLayer(layer, newContext, newLayerTransform);
+                                FullSelectionCanvas.UpdateLayer(layer, newSelectionContext, newLayerTransform);
+
+                                PlotCanvases[layer] = newContext;
+                                PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
+                                SelectionCanvases[layer] = newSelectionContext;
+                                LayerTransforms[layer] = newLayerTransform;
+                            }
+                            else
+                            {
+                                FullPlotCanvas.AddLayer(newContext, newLayerTransform);
+                                FullSelectionCanvas.AddLayer(newSelectionContext, newLayerTransform);
+
+                                PlotCanvases[layer] = newContext;
+                                PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
+                                SelectionCanvases[layer] = newSelectionContext;
+                                LayerTransforms[layer] = newLayerTransform;
+                            }
+
+                            PlottingAlerts[layer].IsVisible = false;
+
+                            FullPlotCanvas.Width = PlotBottomRight.X - PlotOrigin.X;
+                            FullPlotCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y;
+
+                            FullPlotCanvas.PageWidth = PlotBottomRight.X - PlotOrigin.X;
+                            FullPlotCanvas.PageHeight = PlotBottomRight.Y - PlotOrigin.Y;
+
+                            FullSelectionCanvas.Width = PlotBottomRight.X - PlotOrigin.X;
+                            FullSelectionCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y;
+
+                            FullSelectionCanvas.PageWidth = PlotBottomRight.X - PlotOrigin.X;
+                            FullSelectionCanvas.PageHeight = PlotBottomRight.Y - PlotOrigin.Y;
+
+                            Canvas containerCanvas = this.FindControl<Canvas>("ContainerCanvas");
+                            containerCanvas.Background = GraphBackgroundBrush;
+                            containerCanvas.Width = PlotBottomRight.X - PlotOrigin.X + 20;
+                            containerCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y + 20;
+
+                            UpdateSelectionWidth(FullSelectionCanvas);
+                        }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            if (PlotCanvases[layer] == null)
+                            {
+                                SKRenderContext plotContext = new Page(1, 1).CopyToSKRenderContext(new Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>>(), GlobalImages, false);
+                                SKRenderAction transform = SKRenderAction.TransformAction(SkiaSharp.SKMatrix.Identity);
+                                SKRenderContext selectionContext = new Page(1, 1).CopyToSKRenderContext(new Dictionary<string, Func<SKRenderAction, IEnumerable<SKRenderAction>>>(), GlobalImages, false);
+
+                                FullPlotCanvas.AddLayer(plotContext, transform);
+                                FullSelectionCanvas.AddLayer(selectionContext, transform);
+
+                                PlotCanvases[layer] = plotContext;
+                                PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
+                                SelectionCanvases[layer] = selectionContext;
+                                LayerTransforms[layer] = transform;
+                            }
+
+                            PlottingAlerts[layer].IsVisible = true;
+                            AvaloniaBugFixes.SetToolTip(PlottingAlerts[layer], GetExceptionMessage(ex));
+                        }
+                        catch { }
+                    }
+
+                    if (!updatingAllLayers)
+                    {
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = 1;
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").LabelText = " ";
+
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 0;
+                    }
+                }
+                ActionsWhoseColourHasBeenChanged.RemoveWhere(act => !SelectionCanvas.Children.Contains(act.Parent));
+
+                if (updatePlotBounds)
+                {
+                    UpdatePlotBounds();
                 }
             }
-            ActionsWhoseColourHasBeenChanged.RemoveWhere(act => !SelectionCanvas.Children.Contains(act.Parent));
-
-            if (updatePlotBounds)
+            finally
             {
-                UpdatePlotBounds();
+                RenderingSemaphore.Release();
             }
         }
 
@@ -705,7 +984,7 @@ namespace TreeViewer
             double minY = double.MaxValue;
             double maxX = double.MinValue;
             double maxY = double.MinValue;
-            
+
             for (int i = 0; i < PlotBounds.Count; i++)
             {
                 minX = Math.Min(minX, PlotBounds[i].Item1.X);
@@ -721,9 +1000,23 @@ namespace TreeViewer
             {
                 if (PlotCanvases[i] != null)
                 {
-                    TranslateTransform prevTransform = (TranslateTransform)PlotCanvases[i].RenderTransform;
-                    PlotCanvases[i].RenderTransform = new TranslateTransform(prevTransform.X - newOrigin.X + PlotOrigin.X, prevTransform.Y - newOrigin.Y + PlotOrigin.Y);
-                    SelectionCanvases[i].RenderTransform = new TranslateTransform(prevTransform.X - newOrigin.X + PlotOrigin.X, prevTransform.Y - newOrigin.Y + PlotOrigin.Y);
+                    if (i < LayerTransforms.Count && i < FullPlotCanvas.LayerTransforms.Count && i < FullSelectionCanvas.LayerTransforms.Count)
+                    {
+                        if (LayerTransforms[i] != null)
+                        {
+                            SkiaSharp.SKMatrix newTransformMatrix = LayerTransforms[i].Transform.Value.PreConcat(SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y)));
+                            LayerTransforms[i].Transform = newTransformMatrix;
+                            FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
+                            FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
+                        }
+                        else
+                        {
+                            SkiaSharp.SKMatrix newTransformMatrix = SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y));
+                            LayerTransforms[i] = SKRenderAction.TransformAction(newTransformMatrix);
+                            FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
+                            FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
+                        }
+                    }
                 }
             }
 
@@ -733,28 +1026,65 @@ namespace TreeViewer
             Canvas containerCanvas = this.FindControl<Canvas>("ContainerCanvas");
             containerCanvas.Width = PlotBottomRight.X - PlotOrigin.X + 20;
             containerCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y + 20;
+
+            if (WasAutoFitted)
+            {
+                AutoFit();
+            }
         }
 
-        private void UpdateAllPlotLayers()
+        private async Task UpdateAllPlotLayers()
         {
             this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").IsVisible = true;
 
             PlotBounds = new List<(Point, Point)>(new (Point, Point)[PlottingActions.Count]);
-            PlotCanvases = new List<Canvas>(new Canvas[PlottingActions.Count]);
-            this.FindControl<Canvas>("PlotCanvas").Children.Clear();
+            PlotCanvases = new List<SKRenderContext>(new SKRenderContext[PlottingActions.Count]);
+            LayerTransforms = new List<SKRenderAction>(new SKRenderAction[PlottingActions.Count]);
 
-            SelectionCanvases = new List<Canvas>(new Canvas[PlottingActions.Count]);
-            this.FindControl<Canvas>("SelectionCanvas").Children.Clear();
+            while (FullPlotCanvas.LayerTransforms.Count > 0)
+            {
+                FullPlotCanvas.RemoveLayer(0);
+            }
+
+            while (FullSelectionCanvas.LayerTransforms.Count > 0)
+            {
+                FullSelectionCanvas.RemoveLayer(0);
+            }
+
+            SelectionCanvases = new List<SKRenderContext>(new SKRenderContext[PlottingActions.Count]);
 
             PlotOrigin = new Point(double.NaN, double.NaN);
             PlotBottomRight = new Point(double.NaN, double.NaN);
 
+            if (PlottingActions.Count <= Math.Floor(this.FindControl<CoolProgressBar>("PlotProgressBar").Bounds.Width / 13))
+            {
+                List<double> steps = new List<double>();
+
+                for (int i = 0; i < PlottingActions.Count - 1; i++)
+                {
+                    steps.Add((double)(i + 1) / PlottingActions.Count);
+                }
+
+                this.FindControl<CoolProgressBar>("PlotProgressBar").IntermediateSteps = System.Collections.Immutable.ImmutableList.Create(steps.ToArray());
+            }
+            else
+            {
+                this.FindControl<CoolProgressBar>("PlotProgressBar").IntermediateSteps = System.Collections.Immutable.ImmutableList<double>.Empty;
+            }
+
+
+            this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = 0;
+            this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 1;
+
             for (int i = 0; i < PlottingActions.Count; i++)
             {
-                UpdatePlotLayer(i, false);
+                await ActuallyUpdatePlotLayer(i, false, true);
+                this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = (double)(i + 1) / PlottingActions.Count;
             }
 
             UpdatePlotBounds();
+
+            this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 0;
         }
 
         public Page RenderPlotToPage()
@@ -784,31 +1114,25 @@ namespace TreeViewer
 
             return pag;
         }
-
-        public static List<(double, RenderAction)> FindPaths(Canvas can, string id)
+        public static List<(double, SKRenderAction)> FindPaths(SKMultiLayerRenderCanvas can, string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                List<(double, RenderAction)> tbr = new List<(double, RenderAction)>();
+                List<(double, SKRenderAction)> tbr = new List<(double, SKRenderAction)>();
 
                 if (can == null)
                 {
                     return tbr;
                 }
 
-                if (can.Tag is Dictionary<string, List<(double, RenderAction)>> dict)
+                for (int i = 0; i < can.RenderActions.Count; i++)
                 {
-                    foreach (KeyValuePair<string, List<(double, RenderAction)>> kvp in dict)
+                    for (int j = 0; j < can.RenderActions[i].Count; j++)
                     {
-                        tbr.AddRange(kvp.Value);
-                    }
-                }
-
-                for (int i = 0; i < can.Children.Count; i++)
-                {
-                    if (can.Children[i] is Canvas ccan)
-                    {
-                        tbr.AddRange(FindPaths(ccan, id));
+                        if (can.RenderActions[i][j].ActionType == SKRenderAction.ActionTypes.Path && can.RenderActions[i][j].Payload is double d)
+                        {
+                            tbr.Add((d, can.RenderActions[i][j]));
+                        }
                     }
                 }
 
@@ -816,30 +1140,29 @@ namespace TreeViewer
             }
             else
             {
-                List<(double, RenderAction)> tbr = new List<(double, RenderAction)>();
+                List<(double, SKRenderAction)> tbr = new List<(double, SKRenderAction)>();
 
                 if (can == null)
                 {
                     return tbr;
                 }
 
-                if (can.Tag is Dictionary<string, List<(double, RenderAction)>> dict && dict.TryGetValue(id, out List<(double, RenderAction)> list))
+                for (int i = 0; i < can.RenderActions.Count; i++)
                 {
-                    tbr.AddRange(list);
-                }
-
-                for (int i = 0; i < can.Children.Count; i++)
-                {
-                    if (can.Children[i] is Canvas ccan)
+                    for (int j = 0; j < can.RenderActions[i].Count; j++)
                     {
-                        tbr.AddRange(FindPaths(ccan, id));
+                        if (can.RenderActions[i][j].ActionType == SKRenderAction.ActionTypes.Path && can.RenderActions[i][j].Tag == id)
+                        {
+                            if (can.RenderActions[i][j].Payload is double d)
+                            {
+                                tbr.Add((d, can.RenderActions[i][j]));
+                            }
+                        }
                     }
                 }
 
                 return tbr;
             }
-
-
         }
     }
 }

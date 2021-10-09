@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace TreeViewer
 {
-    public class CodeViewerWindow : Window
+    public class CodeViewerWindow : ChildWindow
     {
         public CodeViewerWindow()
         {
@@ -71,17 +71,19 @@ namespace TreeViewer
             }
 
             Editor editor = await Editor.Create(source, preSource, postSource, guid: guid);
+            editor.Background = this.Background;
             editor.AccessType = Editor.AccessTypes.ReadOnlyWithHistoryAndErrors;
 
-            this.Content = editor;
+            this.FindControl<Grid>("MainContainer").Children.Add(editor);
         }
 
         public async Task Initialize(string source)
         {
             Editor editor = await Editor.Create(source);
+            editor.Background = this.Background;
             editor.AccessType = Editor.AccessTypes.ReadOnly;
 
-            this.Content = editor;
+            this.FindControl<Grid>("MainContainer").Children.Add(editor);
         }
 
         private void InitializeComponent()

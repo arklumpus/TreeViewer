@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using PhyloTree;
 using TreeViewer;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace ReplaceAttribute
 {
@@ -31,6 +33,52 @@ namespace ReplaceAttribute
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = true;
+		
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAEaSURBVDhPlZMxboNAEEVn4xwhOUAiaOOaVE5DERc+Q0paqO0kSuGOlnPYhSWo3NHQOC0oPoBzB7x/PBCzgHGehP7s7vyZ2ZVQNIDv+x9a3k+rfwKz/so8z8sucHYjuS2qzp7nkWVZvBfHMQVBwFrRWaDLDJIkoTAMFbTiVrSmzwxc14WUom1gxr3O7/w6X5W7n4OsmiBXrP0PBrOkMLLNecjnN4BZS2Ps6WJN3/tfGj/eKz3FBJPwgaYoCoqiCOHnYGfTbKJgNjsv357p6eGOlOaSmTEnQGeYrp2A6Ssix60iiLGHuP4XUERL4yFxBQ46kIIvjQSzyDVv0OpwXsS27cEJRqflH2mabh3HUVmWTaBYy1FNZd58zbZHAukZHM9PcIAAAAAASUVORK5CYII=";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAG4SURBVEhLrVW9TsMwEL4CXdgQSKygVogF9m4pQweQYIcn6NqNAWhgj9gysvAAgARSIyE60aUDsDC0Kg8A7xDuc88oaRzHqfgkyz77/N1vnAqVRKfT6fJ0MZX+GSDnEY9Go9gF0F2Qu4XQnrfbbarX69NNByzKbEURea/XozAMKYoiJWsdLVvhkhacizr0ZdchRSDnqXRakliSOYMy5K1WC5OKQtZ2gBzhmdKyf3Yf3z5/imQHODJFLvJ8Z2OVru/e2N+YdjfXZNcMFDllwCUt6yvLzkZSBmzkB+cPKTIXI+PxmIbDIamnosjzj68fOr15pWNvi072tqnCkCMF5FuWCiDHd8HwrQVN4n3yrQqsGBi89rQsKgrgAZ84rbx37hZ1gaHJeSgSOc6SAxBMRrTHSSPQnyUvgrUGptyDXI7LwSUS6JWNIIUiI6JmNSL7noiUeuyCIMAFHy2GVtNAnz9eHv6149PVUZ+nJg/Tn83n8aKNGH+ZeTWZ7f88SGQw3sy9YDIyT5GtHs0amScC6y9zMBj0G41Ghd8Ur1arUbVa7ULGvqhkkCRHrZw80pHw8KURciEpVORERL+kIjdJ1wNIzgAAAABJRU5ErkJggg==";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAI9SURBVFhHrZY9TgMxEIUd4AhcACmKoKGCIl0AKYkAiR44RUKLshF9bgHUFCAlBUmXhgMgpByDOswzMyvHa6+93nyS47X3572dGTvbUFtgMBhk1I3+R9WobaCOOKhlwBTvdruq1+vhMIrhcKj7Hf2bQB1xk6QIxIhPp1M1m814VLxOIrCrfytQUfyd2iu139Vq1cJEs9lEl5urlILYsIv4ZDK5ppahx9iMiBBtICHnX9wL9lgTZSCx4E64F+yxJlgDZeLPn9/q+GCfR5sg5+12+5Qa+geausL9dg2UGgiJvyx+lFqvCyZEhAuvQ61l3y8GvMswJuxi4rbTUnfnhzwbR+kyjM25fnOKgC8SZXiXYSjsNnhzROD+4qhhw5cUwD4hbFwUk3NXuEXs8vEN+Z5TG3883WRrAvMm1g45ziMQCru8KUyYkXCIA/0cG1scm5Q2EJtz24RHHJxxn+MSx0EjFHZXdUs6KMwNlzjNL/g4CAzoPFXJOcB5FB4ZKOS5Ct6t2JdzwWUqhT1qY2ojyY8ZBRGBCeARRb6TU7DDxQATukjMNQpCkWAxs+jmXBdR6BSkmpB17jLBfQ6ZylAvtrm8BrZsQj/HQvaGjQgVtsvQngBxmLBXh+wJPli0UCvOm2JMQDwkauMy4X1AzO4IA8grD5Pw7gOhmtgWwRD6IgFD/X6/dgqC34TL5XJB33QQ6tAnlp5Dj6jQfIZzuEafKKFSEbowI2GQ/6uFsGol3y29NWBj1gQTLc7IvcZWrdQfJPCW533IDj0AAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -171,7 +219,7 @@ namespace ReplaceAttribute
             return (bool)currentParameterValues["Apply"];
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             List<TreeNode> nodes = tree.GetChildrenRecursive();
             bool applyToChildren = (bool)parameterValues["Apply recursively to all children"];

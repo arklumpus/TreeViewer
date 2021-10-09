@@ -1,0 +1,68 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="TreeViewer.HomePage">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="80"/>
+      <RowDefinition Height="1"/>
+      <RowDefinition Height="1*"/>
+    </Grid.RowDefinitions>
+    <Canvas Background="White"/>
+    <Canvas Grid.Row="1" Background="#E6E6E6"/>
+    <Grid Grid.RowSpan="3">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="80"/>
+        <RowDefinition Height="1"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="1*"/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*" MaxWidth="1200"/>
+      </Grid.ColumnDefinitions>
+      
+      <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" FontSize="20" HorizontalAlignment="Left" Margin="40, 0, 0, 5">Welcome to TreeViewer</TextBlock>
+
+      <TextBlock Grid.Row="2" Foreground="#0072b2" FontSize="20" HorizontalAlignment="Left" Margin="40, 10, 0, 0">Examples</TextBlock>
+
+      <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" AllowAutoHide="False" Padding="0,0,0,17" Margin="40,5,40,0">
+        <StackPanel Orientation="Horizontal" Name="ExamplesContainer">
+          
+        </StackPanel>
+      </ScrollViewer>
+
+      <TextBlock Grid.Row="4" Foreground="#0072b2" FontSize="14" HorizontalAlignment="Right" Margin="40, 10, 40, 0" TextDecorations="Underline" Cursor="Hand" Name="MoreExamplesBlock">More examples...</TextBlock>
+
+      <TextBlock Grid.Row="5" Foreground="#0072b2" FontSize="20" HorizontalAlignment="Left" Margin="40, 0, 0, 0">Recent files</TextBlock>
+      
+      <ScrollViewer Grid.Row="6" Margin="40, 0, 40, 25" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False" Padding="0,5,17,0">
+        <UniformGrid Columns="2" Name="RecentFilesGrid" VerticalAlignment="Top">
+   
+        </UniformGrid>
+
+      </ScrollViewer>
+    </Grid>
+  </Grid>
+</UserControl>

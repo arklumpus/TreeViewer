@@ -149,7 +149,7 @@ namespace DiskLoader
                             Grid alertPanel = new Grid() { Margin = new Avalonia.Thickness(0, 0, 0, 10) };
                             alertPanel.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                             alertPanel.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                            alertPanel.Children.Add(MainWindow.AlertPage.PaintToCanvas());
+                            alertPanel.Children.Add(MainWindow.GetAlertIcon());
                             TextBlock alertBlock = new TextBlock() { Text = "The file you are trying to open is very large (" + (fileInfo.Length / 1024 / 1024).ToString() + "MB). The trees are going to be read from the disk, so there should not be any memory issues; however, the input file needs to be converted to a binary format: to speed things up, you may want to skip some of the trees.", TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new Avalonia.Thickness(5, 0, 0, 0) };
 
                             Grid.SetColumn(alertBlock, 1);

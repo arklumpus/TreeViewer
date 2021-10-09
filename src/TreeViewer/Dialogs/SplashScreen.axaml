@@ -19,10 +19,37 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" CanResize="False" Width="800" Height="310" HasSystemDecorations="False"
-        x:Class="TreeViewer.SplashScreen" Topmost="True" WindowStartupLocation="CenterScreen" Background="Transparent" SystemDecorations="None" TransparencyLevelHint="Blur"
-        Title="SplashScreen" ShowInTaskbar="False" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-  <Border Background="#B0FFFFFF" CornerRadius="30">
-    <Image Source="resm:TreeViewer.Assets.Banner.png?assembly=TreeViewer" Grid.ColumnSpan="5"></Image>
+        mc:Ignorable="d" CanResize="False" Width="534" Height="297" HasSystemDecorations="False"
+        x:Class="TreeViewer.SplashScreen" Topmost="True" WindowStartupLocation="CenterScreen" SystemDecorations="None" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"
+        Title="SplashScreen" ShowInTaskbar="False" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#1a91d3">
+  <Window.Styles>
+    <Style Selector="Canvas#CloseCanvas">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Canvas#CloseCanvas:pointerover">
+      <Setter Property="Background" Value="#60000000"/>
+    </Style>
+    <Style Selector="Canvas#CloseCanvas.pressed">
+      <Setter Property="Background" Value="#90000000"/>
+    </Style>
+  </Window.Styles>
+
+  <Border BorderBrush="#0072b2" BorderThickness="1">
+    <Grid Margin="16">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <Grid Grid.Row="1" Name="BannerContainer"/>
+      <Canvas HorizontalAlignment="Right" Width="24" Height="24" Margin="0,-12,-12,-8" Name="CloseCanvas">
+        <Path Margin="4" Data="M3,3 L13,13 M13,3 L3,13" UseLayoutRounding="True" IsHitTestVisible="False" StrokeThickness="1" Stroke="White" />
+      </Canvas>
+      <TextBlock FontSize="14" Foreground="White" Grid.Row="2" HorizontalAlignment="Left" Margin="0,10,0,0" Name="StatusBlock">Loading modules...</TextBlock>
+      <TextBlock FontSize="13" Foreground="White" Grid.Row="3" HorizontalAlignment="Center" Margin="0,5,0,0" Name="ModuleNameBox" Height="18" VerticalAlignment="Center"></TextBlock>
+      <ProgressBar Grid.Row="4" Name="ProgressBar" IsIndeterminate="False" Margin="0,5,0,0" Value="0" Height="24" Minimum="0" Maximum="1" Foreground="#8bc5f6"></ProgressBar>
+    </Grid>
   </Border>
 </Window>

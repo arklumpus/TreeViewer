@@ -15,12 +15,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="800" Height="450"
         x:Class="TreeViewer.CodeViewerWindow"
-        Title="Code viewer" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
-    
-</Window>
+        Title="Code viewer" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner">
+  <local:ChildWindow.Content>
+    <Grid Name="MainContainer"></Grid>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

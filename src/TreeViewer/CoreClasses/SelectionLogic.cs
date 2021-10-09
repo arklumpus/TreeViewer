@@ -47,21 +47,18 @@ namespace TreeViewer
         static Func<object, string> StringAttributeFormatter = new FormatterOptions(Modules.SafeAttributeConverters[0]).Formatter;
         static Func<object, string> NumberAttributeFormatter = new FormatterOptions(Modules.SafeAttributeConverters[1]).Formatter;
 
-        public HashSet<RenderAction> ActionsWhoseColourHasBeenChanged = new HashSet<RenderAction>();
+        public HashSet<SKRenderAction> ActionsWhoseColourHasBeenChanged = new HashSet<SKRenderAction>();
 
-        public void ChangeActionFill(RenderAction action, Avalonia.Media.IBrush newFill)
+        public void ChangeActionColour(SKRenderAction action, SkiaSharp.SKColor newColour)
         {
-            action.Fill = newFill;
-            ActionsWhoseColourHasBeenChanged.Add(action);
+            if (!action.Disposed)
+            {
+                action.Paint.Color = newColour;
+                ActionsWhoseColourHasBeenChanged.Add(action);
+            }
         }
 
-        public void ChangeActionStroke(RenderAction action, Avalonia.Media.IBrush newStroke)
-        {
-            action.Stroke.Brush = newStroke;
-            ActionsWhoseColourHasBeenChanged.Add(action);
-        }
-
-        static Avalonia.Media.ISolidColorBrush transparentBrush = new Avalonia.Media.SolidColorBrush(0x00000000);
+        Avalonia.Media.ISolidColorBrush transparentBrush = new Avalonia.Media.SolidColorBrush(0x00000000);
 
         enum HighlightModes
         {
@@ -74,57 +71,34 @@ namespace TreeViewer
 
         HighlightModes HighlightMode = HighlightModes.Auto;
 
-        public void ResetActionColours(bool invalidateVisuals = false)
+        public void ResetActionColours(bool invalidateVisuals = true)
         {
-            foreach (RenderAction pth in ActionsWhoseColourHasBeenChanged)
+            foreach (SKRenderAction pth in ActionsWhoseColourHasBeenChanged)
             {
-                if (pth.Fill != null)
+                if (!pth.Disposed)
                 {
-                    pth.Fill = transparentBrush;
+                    pth.Paint.Color = TransparentSKColor;
                 }
-
-                if (pth.Stroke != null)
-                {
-                    pth.Stroke.Brush = transparentBrush;
-                }
-                pth.Parent.InvalidateVisual();
             }
+
+            if (invalidateVisuals)
+            {
+                FullSelectionCanvas.InvalidateDirty();
+            }
+
             ActionsWhoseColourHasBeenChanged.Clear();
         }
 
         public void SetSelection(TreeNode node)
         {
-
-
-            /*foreach (Avalonia.Controls.Shapes.Path pth in FindPaths(SelectionCanvas))
-            {
-
-                if (pth.Tag as object[] != null)
-                {
-                    pth.ZIndex = 0;
-
-                    Canvas can = pth.Parent as Canvas;
-
-                    while (can != SelectionCanvas)
-                    {
-                        can.ZIndex = 0;
-                        can = can.Parent as Canvas;
-                    }
-
-                    if (pth.Fill != null)
-                    {
-                        pth.Fill = transparentBrush;
-                    }
-
-                    pth.Stroke = transparentBrush;
-                }
-            }*/
-
             for (int i = 0; i < SelectionCanvas.Children.Count; i++)
             {
                 if (SelectionCanvas.Children[i] is Canvas can)
                 {
-                    can.ZIndex = 0;
+                    _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        can.ZIndex = 0;
+                    });
                 }
             }
 
@@ -132,116 +106,8 @@ namespace TreeViewer
 
             if (node != null)
             {
-                Avalonia.Media.IBrush selectionBrush = SelectionBrush;
-                Avalonia.Media.IBrush selectionChildBrush = SelectionChildBrush;
-
-                /*foreach (Avalonia.Controls.Shapes.Path pth in FindPaths(SelectionCanvas))
-                {
-                    if (pth.Tag is object[] tag)
-                    {
-                        string id = (string)tag[0];
-                        if (id == node.Id)
-                        {
-                            pth.ZIndex = 100;
-
-                            Canvas can = pth.Parent as Canvas;
-
-                            while (can != SelectionCanvas)
-                            {
-                                can.ZIndex = 100;
-                                can = can.Parent as Canvas;
-                            }
-
-                            if (pth.Fill != null)
-                            {
-                                pth.Fill = selectionBrush;
-                            }
-
-                            pth.Stroke = selectionBrush;
-                        }
-                        else if (childIds.Contains(id))
-                        {
-                            pth.ZIndex = 90;
-
-                            Canvas can = pth.Parent as Canvas;
-
-                            while (can != SelectionCanvas)
-                            {
-                                can.ZIndex = 90;
-                                can = can.Parent as Canvas;
-                            }
-
-                            if (pth.Fill != null)
-                            {
-                                pth.Fill = selectionChildBrush;
-                            }
-
-                            pth.Stroke = selectionChildBrush;
-                        }
-                    }
-                }*/
-
-                /*List<RenderAction> toBeBroughtForward = new List<RenderAction>();
-                HashSet<Canvas> toBeBroughtForwardCanvas = new HashSet<Canvas>();
-                
-                foreach ((double, RenderAction) pth in FindPaths(SelectionCanvas, null))
-                {
-                    if (pth.Item2.Tag == node.Id)
-                    {
-                        toBeBroughtForward.Add(pth.Item2);
-                        Canvas can = pth.Item2.Parent as Canvas;
-
-                        while (can != SelectionCanvas)
-                        {
-                            toBeBroughtForwardCanvas.Add(can);
-                            can = can.Parent as Canvas;
-                        }
-
-
-                        if (pth.Item2.Fill != null)
-                        {
-                            ChangeActionFill(pth.Item2, selectionBrush);
-                        }
-
-                        if (pth.Item2.Stroke != null)
-                        {
-                            ChangeActionStroke(pth.Item2, selectionBrush);
-                        }
-                    }
-                    else if (childIds.Contains(pth.Item2.Tag))
-                    {
-                        pth.Item2.BringToFront();
-                        Canvas can = pth.Item2.Parent as Canvas;
-
-                        while (can != SelectionCanvas)
-                        {
-                            can.ZIndex = 90;
-                            can = can.Parent as Canvas;
-                        }
-
-                        if (pth.Item2.Fill != null)
-                        {
-                            ChangeActionFill(pth.Item2, selectionChildBrush);
-                        }
-
-                        if (pth.Item2.Stroke != null)
-                        {
-                            ChangeActionStroke(pth.Item2, selectionChildBrush);
-                        }
-                    }
-                }*/
-
-
-
-                /* for (int i = 0; i < toBeBroughtForward.Count; i++)
-                 {
-                     toBeBroughtForward[i].BringToFront();
-                 }
-
-                 foreach (Canvas can in toBeBroughtForwardCanvas)
-                 {
-                     can.ZIndex = 100;
-                 }*/
+                SkiaSharp.SKColor selectionColor = SelectionSKColor;
+                SkiaSharp.SKColor selectionChildColor = SelectionChildSKColor;
 
                 if (HighlightMode == HighlightModes.ParentAndChildren || HighlightMode == HighlightModes.Auto)
                 {
@@ -252,28 +118,10 @@ namespace TreeViewer
 
                     foreach (string childId in childIds)
                     {
-                        foreach ((double, RenderAction) pth in FindPaths(SelectionCanvas, childId))
+                        foreach ((double, SKRenderAction) pth in FindPaths(FullSelectionCanvas, childId))
                         {
-                            pth.Item2.BringToFront();
-                            /*Canvas can = pth.Item2.Parent as Canvas;
-
-                            while (can != SelectionCanvas)
-                            {
-                                can.ZIndex = 90;
-                                can = can.Parent as Canvas;
-                            }*/
-
-                            pth.Item2.Parent.InvalidateVisual();
-
-                            if (pth.Item2.Fill != null)
-                            {
-                                ChangeActionFill(pth.Item2, selectionChildBrush);
-                            }
-
-                            if (pth.Item2.Stroke != null)
-                            {
-                                ChangeActionStroke(pth.Item2, selectionChildBrush);
-                            }
+                            pth.Item2.ZIndex = 1;
+                            ChangeActionColour(pth.Item2, selectionChildColor);
                         }
 
                         if (sw.ElapsedMilliseconds > MaxHighlightTime)
@@ -286,87 +134,41 @@ namespace TreeViewer
                     sw.Stop();
                 }
 
-                foreach ((double, RenderAction) pth in FindPaths(SelectionCanvas, node.Id))
+                var nodePaths = FindPaths(FullSelectionCanvas, node.Id);
+
+                foreach ((double, SKRenderAction) pth in nodePaths)
                 {
-                    pth.Item2.BringToFront();
-                    Canvas can = pth.Item2.Parent as Canvas;
-
-                    can.InvalidateVisual();
-
-                    while (can != SelectionCanvas)
-                    {
-                        can.ZIndex = 100;
-                        can = can.Parent as Canvas;
-                    }
-
-                    if (pth.Item2.Fill != null)
-                    {
-                        ChangeActionFill(pth.Item2, selectionBrush);
-                    }
-
-                    if (pth.Item2.Stroke != null)
-                    {
-                        ChangeActionStroke(pth.Item2, selectionBrush);
-                    }
+                    pth.Item2.ZIndex = 2;
+                    ChangeActionColour(pth.Item2, selectionColor);
                 }
+
+                FullSelectionCanvas.InvalidateZIndex();
 
                 this.FindControl<StackPanel>("SelectionContainerPanel").Children.Clear();
+                this.FindControl<TextBlock>("SelectedNodeTextBlock").Text = node.ToString();
 
-                Grid nodeString = new Grid() { Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240)) };
-                nodeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                nodeString.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+                int nodeCount = 0;
+                int tipCount = 0;
+                List<string> names = new List<string>();
 
-                nodeString.Children.Add(new TextBlock() { Text = "Node:", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, FontWeight = Avalonia.Media.FontWeight.Bold });
-                ScrollViewer nodeStringSV = new ScrollViewer() { VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto };
-
-                string nodeToString = node.ToString();
-
-                if (AvaloniaBugFixes.MeasureTextWidth(nodeToString, FontFamily, Avalonia.Media.FontStyle.Normal, Avalonia.Media.FontWeight.Normal, 15) > 241)
+                foreach (TreeNode child in node.GetChildrenRecursiveLazy())
                 {
-                    nodeStringSV.Padding = new Avalonia.Thickness(0, 0, 0, 16);
+                    nodeCount++;
+
+                    if (child.Children.Count == 0)
+                    {
+                        tipCount++;
+                        if (!string.IsNullOrEmpty(child.Name))
+                        {
+                            names.Add(child.Name);
+                        }
+                    }
                 }
 
-                nodeStringSV.Content = new TextBlock() { Text = nodeToString, Margin = new Avalonia.Thickness(5, 0, 0, 0) };
-                Grid.SetColumn(nodeStringSV, 1);
-                nodeString.Children.Add(nodeStringSV);
+                this.FindControl<TextBlock>("SelectedNodeNodeCountBlock").Text = nodeCount.ToString() + " node" + (nodeCount > 1 ? "s" : "");
+                this.FindControl<TextBlock>("SelectedNodeLeafCountBlock").Text = tipCount.ToString() + " tip" + (tipCount > 1 ? "s" : "");
 
-                this.FindControl<StackPanel>("SelectionContainerPanel").Children.Add(nodeString);
-
-
-                Grid leavesContainer = new Grid() { Margin = new Avalonia.Thickness(0, 5, 0, 0) };
-                leavesContainer.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                leavesContainer.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                leavesContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-                leavesContainer.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
-
-                List<string> names = node.GetLeafNames();
-
-                leavesContainer.Children.Add(new TextBlock() { Text = names.Count.ToString() + (names.Count > 1 ? " leaves:" : " leaf:"), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, FontWeight = Avalonia.Media.FontWeight.Bold, Margin = new Avalonia.Thickness(0, 0, 0, 3) });
-
-                {
-                    Button copyButton = new Button() { HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Content = "Copy", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Padding = new Avalonia.Thickness(0, 2) };
-                    Grid.SetRow(copyButton, 1);
-                    leavesContainer.Children.Add(copyButton);
-
-                    copyButton.Click += CopySelectionButtonClicked;
-                }
-
-                /*ScrollViewer leavesSV = new ScrollViewer() { VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, MaxHeight = 150 };
-
-                StackPanel leavesItemsContainer = new StackPanel() { Margin = new Avalonia.Thickness(5, 0, 0, 0) };
-
-                for (int i = 0; i < names.Count; i++)
-                {
-                    leavesItemsContainer.Children.Add(new TextBlock() { Text = names[i], Margin = new Avalonia.Thickness(0, 0, 0, i < names.Count - 1 ? 5 : 0) });
-                }
-                leavesSV.Content = leavesItemsContainer;*/
-
-
-                TextBox leavesSV = new TextBox() { Margin = new Avalonia.Thickness(5, 0, 0, 0), AcceptsReturn = true, BorderBrush = null, BorderThickness = new Avalonia.Thickness(0), MaxHeight = 150, IsReadOnly = true };
-
-                Style style = new Style(x => x.OfType<ScrollViewer>());
-                style.Setters.Add(new Setter(ScrollViewer.PaddingProperty, new Avalonia.Thickness(0, 0, 0, 16)));
-                leavesSV.Styles.Add(style);
+                this.FindControl<TextBlock>("SelectedNodeNamedLeafCountBlock").Text = names.Count.ToString() + (names.Count > 1 ? " named tips:" : " named tip:");
 
                 StringBuilder text = new StringBuilder();
                 for (int i = 0; i < names.Count; i++)
@@ -381,114 +183,149 @@ namespace TreeViewer
                     }
                 }
 
-                leavesSV.Text = text.ToString();
-
-                Grid.SetColumn(leavesSV, 1);
-                Grid.SetRowSpan(leavesSV, 2);
-                leavesContainer.Children.Add(leavesSV);
-
-                this.FindControl<StackPanel>("SelectionContainerPanel").Children.Add(leavesContainer);
-
-
-                this.FindControl<StackPanel>("SelectionContainerPanel").Children.Add(new TextBlock() { Text = "Attributes", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Margin = new Avalonia.Thickness(0, 10, 0, 5) });
+                this.FindControl<TextBox>("SelectedNodeLeavesBox").Text = text.ToString();
 
                 int ind = 0;
 
                 foreach (KeyValuePair<string, object> kvp in node.Attributes)
                 {
-                    Grid attributeString = new Grid() { Margin = new Avalonia.Thickness(0, 5, 0, 0) };
+                    Grid attributeString = new Grid() { Margin = new Avalonia.Thickness(5, 5, 0, 0), Height = 20 };
+                    attributeString.Classes.Add("AttributeLine");
 
 
                     attributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                     attributeString.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                    attributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                    attributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                    attributeString.ColumnDefinitions.Add(new ColumnDefinition(20, GridUnitType.Pixel));
                     attributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
 
-                    TrimmedTextBox attributeNameBlock = new TrimmedTextBox(150) { MaxWidth = 150 };
+                    TrimmedTextBox2 attributeNameBlock = new TrimmedTextBox2() { MaxWidth = 120, Margin = new Avalonia.Thickness(5, 0, 0, 0) };
 
-                    attributeNameBlock.TextContainer.FontFamily = "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans";
-                    attributeNameBlock.TextContainer.FontSize = 15;
-                    attributeNameBlock.TextContainer.FontWeight = Avalonia.Media.FontWeight.Bold;
+                    attributeNameBlock.FontFamily = "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans";
+                    attributeNameBlock.FontSize = 13;
+                    attributeNameBlock.FontWeight = Avalonia.Media.FontWeight.Bold;
                     attributeNameBlock.Text = kvp.Key + ":";
-                    attributeNameBlock.Ellipsis.Text = "... :";
-                    attributeNameBlock.Ellipsis.FontWeight = Avalonia.Media.FontWeight.Bold;
+                    attributeNameBlock.EllipsisText = "... :";
 
-                    ToolTip.SetTip(attributeNameBlock, kvp.Key);
+                    AvaloniaBugFixes.SetToolTip(attributeNameBlock, new TextBlock() { Text = kvp.Key, FontWeight = Avalonia.Media.FontWeight.Regular });
 
                     attributeString.Children.Add(attributeNameBlock);
+                    double nameWidth = AvaloniaBugFixes.MeasureTextWidth(attributeNameBlock.Text, attributeNameBlock.FontFamily, attributeNameBlock.FontStyle, attributeNameBlock.FontWeight, attributeNameBlock.FontSize);
 
-                    //FormattedText fmtText = new FormattedText(attributeNameBlock.TextContainer.Text, new Typeface(attributeNameBlock.TextContainer.FontFamily, attributeNameBlock.TextContainer.FontStyle, attributeNameBlock.TextContainer.FontWeight), attributeNameBlock.FontSize, TextAlignment.Left, TextWrapping.NoWrap, Avalonia.Size.Infinity);
-                    double nameWidth = AvaloniaBugFixes.MeasureTextWidth(attributeNameBlock.TextContainer.Text, attributeNameBlock.TextContainer.FontFamily, attributeNameBlock.TextContainer.FontStyle, attributeNameBlock.TextContainer.FontWeight, attributeNameBlock.TextContainer.FontSize);
-
-                    TrimmedTextBox valueBlock = new TrimmedTextBox(261 - 45 - 11 - Math.Min(150, nameWidth)) { Margin = new Avalonia.Thickness(11, 1, 5, 0) };
+                    TrimmedTextBox2 valueBlock = new TrimmedTextBox2() { FontSize = 13, Margin = new Avalonia.Thickness(0), MaxWidth = 0, Background = Avalonia.Media.Brushes.Transparent };
 
                     string attributeType = node.GetAttributeType(kvp.Key);
 
                     if (attributeType == "String")
                     {
-                        valueBlock.Text = StringAttributeFormatter(kvp.Value);
+                        string tipText = StringAttributeFormatter(kvp.Value);
+
+                        if (!string.IsNullOrEmpty(tipText))
+                        {
+                            valueBlock.Text = tipText;
+                        }
                     }
                     else if (attributeType == "Number")
                     {
-                        valueBlock.Text = NumberAttributeFormatter(kvp.Value);
+                        string tipText = NumberAttributeFormatter(kvp.Value);
+
+                        if (!string.IsNullOrEmpty(tipText))
+                        {
+                            valueBlock.Text = tipText;
+                        }
                     }
 
-                    ToolTip.SetTip(valueBlock, valueBlock.Text);
-
-                    Grid.SetColumn(valueBlock, 1);
+                    AvaloniaBugFixes.SetToolTip(valueBlock, new TextBlock() { Text = valueBlock.Text, FontWeight = Avalonia.Media.FontWeight.Regular });
 
 
-                    TextBox editValueBox = new TextBox() { Margin = new Avalonia.Thickness(5, 0, 5, 0), Padding = new Avalonia.Thickness(5, 0, 5, 0), IsVisible = false, Height = 23, MaxHeight = 23, MinHeight = 23 };
-                    Grid.SetColumn(editValueBox, 1);
+                    Grid valueBlockParent = new Grid() { Margin = new Avalonia.Thickness(6, 0, 5, 0) };
+                    Grid.SetColumn(valueBlockParent, 1);
+                    valueBlockParent.Children.Add(valueBlock);
 
-
-                    if (ind % 2 == 0)
+                    valueBlockParent.PropertyChanged += (s, e) =>
                     {
-                        attributeString.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240));
-                        editValueBox.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240));
-                    }
+                        if (e.Property == Grid.BoundsProperty)
+                        {
+                            valueBlock.MaxWidth = ((Avalonia.Rect)e.NewValue).Width - 10;
+                        }
+                    };
 
-                    AddRemoveButton editButton = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Edit };
+
+                    TextBox editValueBox = new TextBox() { Margin = new Avalonia.Thickness(0, 0, 0, 0), Padding = new Avalonia.Thickness(5, 0, 5, 0), IsVisible = false, Height = 20, MaxHeight = 20, MinHeight = 20, MaxWidth = 0, FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
+                    editValueBox.Classes.Add("EditValueBox");
+
+                    Button editButton = new Button() { Width = 20, Height = 20, Background = Avalonia.Media.Brushes.Transparent, Content = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Pencil")) { Width = 16, Height = 16 }, Padding = new Avalonia.Thickness(2) };
+                    editButton.Classes.Add("SideBarButton");
+                    editButton.Classes.Add("AttributeEditButton");
                     Grid.SetColumn(editButton, 2);
 
-                    AddRemoveButton okButton = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.OK, IsVisible = false };
-                    Grid.SetColumn(okButton, 3);
+                    Button okButton = new Button() { Width = 20, Height = 20, Background = Avalonia.Media.Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Data = Icons.TickGeometry, StrokeThickness = 2 }, Padding = new Avalonia.Thickness(2), IsVisible = false };
+                    okButton.Classes.Add("SideBarButton");
+                    okButton.Classes.Add("AttributeEditButton");
+                    Grid.SetColumn(okButton, 2);
 
-                    AddRemoveButton cancelButton = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Cancel, IsVisible = false };
-                    Grid.SetColumn(cancelButton, 4);
+                    Button cancelButton = new Button() { Width = 20, Height = 20, Background = Avalonia.Media.Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Data = Icons.CrossGeometry, StrokeThickness = 2 }, Padding = new Avalonia.Thickness(2), IsVisible = false };
+                    cancelButton.Classes.Add("SideBarButton");
+                    cancelButton.Classes.Add("AttributeEditButton");
+                    Grid.SetColumn(cancelButton, 3);
 
                     attributeString.Children.Add(editButton);
                     attributeString.Children.Add(okButton);
                     attributeString.Children.Add(cancelButton);
 
-                    attributeString.Children.Add(valueBlock);
-                    attributeString.Children.Add(editValueBox);
+                    attributeString.Children.Add(valueBlockParent);
 
-                    editButton.PointerReleased += (s, e) =>
+                    Grid editValueBoxParent = new Grid();
+                    Grid.SetColumn(editValueBoxParent, 1);
+                    editValueBoxParent.Children.Add(editValueBox);
+
+                    editValueBoxParent.PropertyChanged += (s, e) =>
+                    {
+                        if (e.Property == Grid.BoundsProperty)
+                        {
+                            editValueBox.MaxWidth = ((Avalonia.Rect)e.NewValue).Width - 10;
+                        }
+                    };
+
+                    attributeString.Children.Add(editValueBoxParent);
+
+                    editButton.Click += (s, e) =>
                     {
                         valueBlock.IsVisible = false;
                         editValueBox.Text = valueBlock.Text;
                         editValueBox.IsVisible = true;
-                        editButton.IsVisible = false;
+                        editValueBox.SelectAll();
+                        editValueBox.Focus();
+                        editButton.Classes.Add("EditButtonHidden");
                         okButton.IsVisible = true;
                         cancelButton.IsVisible = true;
                     };
 
-                    cancelButton.PointerReleased += (s, e) =>
+                    valueBlock.DoubleTapped += (s, e) =>
                     {
-                        valueBlock.IsVisible = !false;
-                        editValueBox.IsVisible = !true;
-                        editButton.IsVisible = !false;
-                        okButton.IsVisible = !true;
-                        cancelButton.IsVisible = !true;
+                        valueBlock.IsVisible = false;
+                        editValueBox.Text = valueBlock.Text;
+                        editValueBox.IsVisible = true;
+                        editValueBox.SelectAll();
+                        editValueBox.Focus();
+                        editButton.Classes.Add("EditButtonHidden");
+                        okButton.IsVisible = true;
+                        cancelButton.IsVisible = true;
                     };
 
-                    okButton.PointerReleased += async (s, e) =>
+                    cancelButton.Click += (s, e) =>
+                    {
+                        valueBlock.IsVisible = true;
+                        editValueBox.IsVisible = false;
+                        editButton.Classes.Remove("EditButtonHidden");
+                        okButton.IsVisible = false;
+                        cancelButton.IsVisible = false;
+                    };
+
+                    async void commitAttributeChange()
                     {
                         valueBlock.IsVisible = !false;
                         editValueBox.IsVisible = !true;
-                        editButton.IsVisible = !false;
+                        editButton.Classes.Remove("EditButtonHidden");
                         okButton.IsVisible = !true;
                         cancelButton.IsVisible = !true;
 
@@ -513,13 +350,36 @@ namespace TreeViewer
                             return;
                         }
 
+                        string id = this.SelectedNode.Id;
+
                         Action<Dictionary<string, object>> changeParameter = AddFurtherTransformation((from el in Modules.FurtherTransformationModules where el.Id == "8de06406-68e4-4bd8-97eb-2185a0dd1127" select el).First());
 
                         changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() }, { "Attribute:", kvp.Key }, { "Attribute type:", attributeType }, { "New value:", value } });
 
                         await UpdateFurtherTransformations(this.FurtherTransformations.Count - 1);
 
-                        SetSelection(TransformedTree.GetLastCommonAncestor(nodeNames));
+                        SetSelection(TransformedTree.GetNodeFromId(id));
+                    };
+
+                    editValueBox.KeyDown += (s, e) =>
+                    {
+                        if (e.Key == Key.Enter)
+                        {
+                            commitAttributeChange();
+                        }
+                        else if (e.Key == Key.Escape)
+                        {
+                            valueBlock.IsVisible = true;
+                            editValueBox.IsVisible = false;
+                            editButton.Classes.Remove("EditButtonHidden");
+                            okButton.IsVisible = false;
+                            cancelButton.IsVisible = false;
+                        }
+                    };
+
+                    okButton.Click += (s, e) =>
+                    {
+                        commitAttributeChange();
                     };
 
                     this.FindControl<StackPanel>("SelectionContainerPanel").Children.Add(attributeString);
@@ -527,85 +387,13 @@ namespace TreeViewer
                     ind++;
                 }
 
-                {
-                    Grid addAttributeString = new Grid() { Margin = new Avalonia.Thickness(0, 5, 0, 0) };
-
-                    addAttributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                    addAttributeString.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-                    addAttributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                    addAttributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-                    addAttributeString.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-
-                    AddRemoveButton addButton = new AddRemoveButton() { ButtonType = AddRemoveButton.ButtonTypes.Add };
-                    Grid.SetColumn(addButton, 2);
-
-                    addAttributeString.Children.Add(addButton);
-
-                    addButton.PointerReleased += async (s, e) =>
-                    {
-                        NewAttributeWindow win = new NewAttributeWindow();
-                        await win.ShowDialog2(this);
-
-                        if (win.Result)
-                        {
-
-                            string value = win.AttributeValue;
-
-                            if (win.AttributeType == "Number")
-                            {
-                                if (!double.TryParse(win.AttributeValue, out _))
-                                {
-                                    await new MessageBox("Attention", "Could not interpret the attribute as a valid Number!").ShowDialog2(this);
-                                    return;
-                                }
-                            }
-
-                            List<string> nodeNames = node.GetNodeNames();
-
-                            if (nodeNames.Count == 0 || !node.IsLastCommonAncestor(nodeNames))
-                            {
-                                MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-                                await box.ShowDialog2(this);
-                                return;
-                            }
-
-                            Action<Dictionary<string, object>> addParameter = AddFurtherTransformation((from el in Modules.FurtherTransformationModules where el.Id == "afb64d72-971d-4780-8dbb-a7d9248da30b" select el).First());
-
-                            addParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() }, { "Attribute:", win.AttributeName }, { "Attribute type:", win.AttributeType }, { "New value:", value } });
-
-                            await UpdateFurtherTransformations(this.FurtherTransformations.Count - 1);
-
-                            SetSelection(TransformedTree.GetLastCommonAncestor(nodeNames));
-                        }
-                    };
-
-                    this.FindControl<StackPanel>("SelectionContainerPanel").Children.Add(addAttributeString);
-
-                    ind++;
-                }
-
-                for (int i = 0; i < Modules.SelectionActionModules.Count; i++)
-                {
-                    int index = i;
-                    ((Control)this.FindControl<Grid>("SelectionActionsContainerGrid").Children[i]).IsEnabled = Modules.SelectionActionModules[i].IsAvailable(node, this, this.StateData);
-                    SelectionActionActions[i] = () =>
-                    {
-                        Modules.SelectionActionModules[index].PerformAction(node, this, this.StateData);
-                    };
-                }
-
                 IsSelectionAvailable = true;
                 SelectedNode = node;
 
-                ExpandSelection();
-
-                Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-               {
-                   this.Height++;
-                   await System.Threading.Tasks.Task.Delay(10);
-                   this.Height--;
-               });
-
+                if (!SelectionPanelManuallyClosed)
+                {
+                    IsSelectionPanelOpen = true;
+                }
             }
             else
             {
@@ -613,11 +401,57 @@ namespace TreeViewer
                 IsSelectionAvailable = false;
                 SelectedNode = null;
                 this.FindControl<StackPanel>("SelectionContainerPanel").Children.Clear();
-                ReduceSelection();
+
+                if (IsSelectionPanelOpen)
+                {
+                    SelectionPanelManuallyClosed = false;
+                }
+
+                IsSelectionPanelOpen = false;
             }
         }
 
-        public Canvas SelectionCanvas => this.FindControl<Canvas>("SelectionCanvas");
+        public Canvas SelectionCanvas;
+
+        private async void AddAttributeButtonClicked(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            NewAttributeWindow win = new NewAttributeWindow();
+            await win.ShowDialog2(this);
+
+            if (win.Result)
+            {
+
+                string value = win.AttributeValue;
+
+                if (win.AttributeType == "Number")
+                {
+                    if (!double.TryParse(win.AttributeValue, out _))
+                    {
+                        await new MessageBox("Attention", "Could not interpret the attribute as a valid Number!").ShowDialog2(this);
+                        return;
+                    }
+                }
+
+                List<string> nodeNames = this.SelectedNode.GetNodeNames();
+
+                if (nodeNames.Count == 0 || !this.SelectedNode.IsLastCommonAncestor(nodeNames))
+                {
+                    MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                    await box.ShowDialog2(this);
+                    return;
+                }
+
+                string id = this.SelectedNode.Id;
+
+                Action<Dictionary<string, object>> addParameter = AddFurtherTransformation((from el in Modules.FurtherTransformationModules where el.Id == "afb64d72-971d-4780-8dbb-a7d9248da30b" select el).First());
+
+                addParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() }, { "Attribute:", win.AttributeName }, { "Attribute type:", win.AttributeType }, { "New value:", value } });
+
+                await UpdateFurtherTransformations(this.FurtherTransformations.Count - 1);
+
+                SetSelection(TransformedTree.GetNodeFromId(id));
+            }
+        }
 
         private void UpdateSelectionWidth()
         {
@@ -626,12 +460,13 @@ namespace TreeViewer
                 Avalonia.Controls.PanAndZoom.ZoomBorder zom = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer");
                 double zoom = zom.ZoomX;
 
-                foreach ((double, RenderAction) pth in FindPaths(SelectionCanvas, null))
+                foreach ((double, SKRenderAction) pth in FindPaths(FullSelectionCanvas, null))
                 {
                     double orig = Math.Max(0, pth.Item1);
-                    if (pth.Item2.Stroke != null)
+
+                    if (pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.Stroke)
                     {
-                        pth.Item2.Stroke.Thickness = (orig * 5) * zoom >= 5 ? (orig * 5) : (5 / zoom);
+                        pth.Item2.Paint.StrokeWidth = (float)((orig * 5) * zoom >= 5 ? (orig * 5) : (5 / zoom));
                     }
                 }
             }
@@ -639,22 +474,29 @@ namespace TreeViewer
             SelectionCanvas.InvalidateVisual();
         }
 
-        private void UpdateSelectionWidth(Canvas parent)
+        private void UpdateSelectionWidth(SKMultiLayerRenderCanvas parent)
         {
             Avalonia.Controls.PanAndZoom.ZoomBorder zom = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer");
             double zoom = zom.ZoomX;
 
-            foreach ((double, RenderAction) pth in FindPaths(parent, null))
+            foreach ((double, SKRenderAction) pth in FindPaths(parent, null))
             {
                 double orig = Math.Max(0, pth.Item1);
-                if (pth.Item2.Stroke != null)
+
+                if (pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.Stroke || pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.StrokeAndFill)
                 {
-                    pth.Item2.Stroke.Thickness = (orig * 5) * zoom >= 5 ? (orig * 5) : (5 / zoom);
+                    float newStrokeWidth = (float)((orig * 5) * zoom >= 5 ? (orig * 5) : (5 / zoom));
+
+                    if (newStrokeWidth != pth.Item2.Paint.StrokeWidth)
+                    {
+                        pth.Item2.Paint.StrokeWidth = newStrokeWidth;
+                        pth.Item2.InvalidateHitTestPath();
+                    }
                 }
 
             }
 
-            parent.InvalidateVisual();
+            parent.InvalidateDirty();
         }
 
         bool IsPointerPressed = false;
@@ -681,6 +523,7 @@ namespace TreeViewer
             if (IsPointerPressed)
             {
                 HasPointerDoneSomething = true;
+                WasAutoFitted = false;
             }
         }
 
@@ -762,7 +605,7 @@ namespace TreeViewer
                 grd.Children.Add(attributeBox);
 
 
-                await attributeSelectionWindow.ShowDialog(this);
+                await attributeSelectionWindow.ShowDialog2(this);
 
                 if (result)
                 {

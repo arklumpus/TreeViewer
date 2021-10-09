@@ -1,0 +1,117 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TreeViewer.WindowsChrome">
+  <UserControl.Styles>
+    <Style Selector="Canvas.NormalChromeButton">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Canvas.CloseButton">
+      <Setter Property="Background" Value="Transparent"/>
+      
+    </Style>
+
+    <Style Selector=".Dark Canvas.CloseButton>Path">
+      <Setter Property="Stroke" Value="White" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style Selector=".Light Canvas.CloseButton>Path">
+      <Setter Property="Stroke" Value="Black" />
+      <Setter Property="StrokeThickness" Value="0.75" />
+    </Style>
+
+    <Style Selector=".Dark Canvas.NormalChromeButton>Path">
+      <Setter Property="Stroke" Value="White" />
+    </Style>
+    <Style Selector=".Light Canvas.NormalChromeButton>Path">
+      <Setter Property="Stroke" Value="Black" />
+    </Style>
+
+    <Style Selector="Window[IsActive=false] local|WindowsChrome Canvas.CloseButton">
+      <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
+    <Style Selector="Window[IsActive=false] local|WindowsChrome Canvas.NormalChromeButton">
+      <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
+    <Style Selector=".Dark Canvas.NormalChromeButton:pointerover">
+      <Setter Property="Background" Value="#004E8A"/>
+      <Setter Property="Opacity" Value="1"/>
+    </Style>
+    <Style Selector=".Light Canvas.NormalChromeButton:pointerover">
+      <Setter Property="Background" Value="#D2D2D2"/>
+      <Setter Property="Opacity" Value="1"/>
+    </Style>
+    
+    <Style Selector="Canvas.CloseButton:pointerover">
+      <Setter Property="Background" Value="#e81123"/>
+      <Setter Property="Opacity" Value="1"/>
+    </Style>
+    <Style Selector="Canvas.CloseButton:pointerover>Path">
+      <Setter Property="Stroke" Value="White" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+
+    <Style Selector=".Dark Canvas.NormalChromeButton.pressed:pointerover">
+      <Setter Property="Background" Value="#002D64"/>
+    </Style>
+    <Style Selector=".Light Canvas.NormalChromeButton.pressed:pointerover">
+      <Setter Property="Background" Value="#B1B1B1"/>
+    </Style>
+
+    <Style Selector="Canvas.CloseButton.pressed:pointerover">
+      <Setter Property="Background" Value="#f1707a"/>
+    </Style>
+    <Style Selector="Canvas.CloseButton.pressed:pointerover>Path">
+      <Setter Property="Stroke" Value="#210f11" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+
+  </UserControl.Styles>
+  <UserControl.Resources>
+    <local:MaximizeWindowVisibleConverter x:Key="MaximizeWindowVisibleConverter" />
+  </UserControl.Resources>
+
+  <Grid Width="138" Height="31">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="46" />
+      <ColumnDefinition Width="46" />
+      <ColumnDefinition Width="46" />
+    </Grid.ColumnDefinitions>
+
+    <Canvas Width="46" Height="31" Grid.Column="0" Classes="NormalChromeButton" Name="MinimizeButton">
+      <Path Data="M18,15.5 L28,15.5" StrokeThickness="1" UseLayoutRounding="True" IsHitTestVisible="False" />
+    </Canvas>
+
+    <Canvas Width="46" Height="31" Grid.Column="1" Classes="NormalChromeButton" Name="MaximizeButton">
+      <Path Data="M18.5,10.5 L27.5,10.5 L27.5,19.5 L18.5,19.5 Z" StrokeThickness="1" UseLayoutRounding="True" IsHitTestVisible="False" StrokeJoin="Miter" Name="MaximizePath" IsVisible="{ Binding $parent[Window].WindowState, Converter={StaticResource MaximizeWindowVisibleConverter}, ConverterParameter=false }"  />
+      <Path Data="M18.5,12.5 L25.5,12.5 L25.5,19.5 L18.5,19.5 Z M20.5,12.5 L20.5,10.5 L27.5,10.5 L27.5,17.5 L25.5,17.5 " StrokeThickness="1" UseLayoutRounding="True" IsHitTestVisible="False" StrokeJoin="Miter" Name="RestorePath" IsVisible="{ Binding $parent[Window].WindowState, Converter={StaticResource MaximizeWindowVisibleConverter}, ConverterParameter=true }" />
+    </Canvas>
+
+    <Canvas Width="46" Height="31" Grid.Column="2" Classes="CloseButton" Name="CloseButton">
+      <Path Data="M18,10 L28,20 M18,20 L28,10" UseLayoutRounding="True" IsHitTestVisible="False" />
+    </Canvas>
+
+  </Grid>
+</UserControl>

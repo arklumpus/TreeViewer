@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using PhyloTree;
 using TreeViewer;
 using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace a7ef1591643834ee7b4bdbd44a7be1849
 {
@@ -36,10 +37,56 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.0");
+        public static Version Version = new Version("1.2.1");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACJSURBVDhPzZJBDoAgDATB+DovvsgI8UVe/J52m9ZA0WC44CSkS5HdRnXd8dOyn6KbGKQ2Uxgc2+xFfsIaRFOrZAaUHvBOUKWVgel00ZZDUgObWkwBc10acn8FuKoGdk9EvaTgfBTNaTJaCvorBC7bAFQ2sIcKHqI+G7yhE1Qho/Aw4Q/+xN44dwGDakGwtWqEegAAAABJRU5ErkJggg==";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGoSURBVEhL3ZXLK0RRHMevV1jMwmIW2EjyWCjWVmThUWzYmPgHsNHsNFmgvNb2s0JsbCYLImEhpCiSlBILj6nJZkr4/O45d7r3uNdiMovxrc98z2N+53vuOXcaK+9V0BPb/NLtnKhQe870vwN6oQGW7V6WCgpIJqb7E3BDe00NZaeggHX54A3rI2Sf5rX0s1FgAIsX44uqa61qN/UMUeiCVojAFmTkF3DPrrfxKagnqAwPOqZOOIE2GIYHarvxA7DlF2AfDxrVHqVIjkiOylQc9iAGE7ACol3t/gHsugavUF1rUrvfMbVoF71DmtpSPGmPIDPggt0e440wCzOwRFE17ndMLzAO1dSFoBbS9oyWGbCh/RDmYUGTovANd+YdyeXuQJxNpODDHnXJDJDjacdTBq8gcj/FLaGneAfIZYegiHrPmu7OEQVX+IjqelRC4QDz8gROWB1j5fg5XMIdRPjOJ56RO2CMArmgQdX9oSHt8uY4moMzFm3GmyDMGvJEGZn/B/LDCaumr56gUjU9eoQq1fTKvIPfFhf5LS7yXVxkBvy5ch6Q77Ksb763d6OtbjroAAAAAElFTkSuQmCC";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI3SURBVFhH7ZVLiE5hGMcPuSxQFtgYY6OwkBIiNZlkFrNQbgvXrWRHyGJkNWkWIxvNLGZFzRDlFguyoJlQilLKNRvKZSEsxe//vc/zdW7vmU99+dLMr349zznfec/7fO/tJJNMeKZ091z7bXlLmGqxZfwXBWzGebgQn+lGMxmvgFd4F7/iB7yITWW8ArzDBRZbVsAZi2/xTkibQ1UBo/g8pMlunBXShkZB7frxEB7E03gbC1QV4B11WzxmUfd/hbSAzhQVuwKP4DkcwBOo9+zCDI0UcNTiSYs/cCSkBe7hMG7H8/gIx7AXhdpdCGkgVsBV/BTSZKNFsdJibBo2oTq9jHtxLa5HjYAUKrJOrAD/h3ssOoct3sCPIS2gTstYZvGNxRplBXxD/4cHLDr7LYrYKKT5iS/xAb7TDdC9OmUFpF88Ax/m7EQRWwcamR5sx9m4FDvwFIrMx6/sa6h5zMxTBU/R14XQaanVriN7De7ENtQWvoWDuAqfYI38COjo9c7VOKZGRuSnQVtOnWsXPEbtIG29LbgaC+QL8Bcux0sV+uLMT8N9ixsspplpMTPisQL2WYzhv2thpY9m/2a8t+joGZ2IBdIF6MDwo3erxRhaiItDmpkGb3cWd2AfbsMunIYF0gX4Wa197Hu2Cj9Wr1sUujeEi/AKHsebqO38Agvkd8F3nBPShtDzoqzNa/yC62pXgc84HefWriC/Bv6mc6HnY22WYLpzMR/rnYt8Af+clhcwyUQnSf4AyNdwldDnHqQAAAAASUVORK5CYII=";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -404,8 +451,15 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             GraphicsPath background = new GraphicsPath().MoveTo(c1).LineTo(c2).LineTo(c3).LineTo(c4).Close();
 
-                            graphics.FillPath(background, backgroundColor, tag: nodeId);
-                            graphics.StrokePath(background, strokeColour, backgroundStrokeThickness, tag: nodeId);
+                            if (backgroundColor.A > 0)
+                            {
+                                graphics.FillPath(background, backgroundColor, tag: nodeId);
+                            }
+
+                            if (strokeColour.A > 0 && backgroundStrokeThickness > 0)
+                            {
+                                graphics.StrokePath(background, strokeColour, backgroundStrokeThickness, tag: nodeId);
+                            }
 
                             graphics.Save();
 
@@ -657,8 +711,15 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             GraphicsPath background = new GraphicsPath().MoveTo(c1).Arc(0, 0, radius, d1, d2).LineTo(c3).Arc(0, 0, radius + height, d2, d1).Close();
 
-                            graphics.FillPath(background, backgroundColor, tag: nodeId);
-                            graphics.StrokePath(background, strokeColour, backgroundStrokeThickness, tag: nodeId);
+                            if (backgroundColor.A > 0)
+                            {
+                                graphics.FillPath(background, backgroundColor, tag: nodeId);
+                            }
+
+                            if (strokeColour.A > 0 && backgroundStrokeThickness > 0)
+                            {
+                                graphics.StrokePath(background, strokeColour, backgroundStrokeThickness, tag: nodeId);
+                            }
 
                             double startAngle = d1;
                             double endAngle = d2;
@@ -879,8 +940,15 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             GraphicsPath background = new GraphicsPath().MoveTo(c1).Arc(parentPoint, radius, d1, d2).LineTo(c3).Arc(parentPoint, radius + height, d2, d1).Close();
 
-                            graphics.FillPath(background, backgroundColor, tag: nodeId);
-                            graphics.StrokePath(background, strokeColour, backgroundStrokeThickness, tag: nodeId);
+                            if (backgroundColor.A > 0)
+                            {
+                                graphics.FillPath(background, backgroundColor, tag: nodeId);
+                            }
+
+                            if (strokeColour.A > 0 && backgroundStrokeThickness > 0)
+                            {
+                                graphics.StrokePath(background, strokeColour, backgroundStrokeThickness, tag: nodeId);
+                            }
 
                             double startAngle = d1;
                             double endAngle = d2;

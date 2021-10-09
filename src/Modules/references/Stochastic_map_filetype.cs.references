@@ -7,3 +7,4 @@ System.Security.Cryptography.Algorithms.dll
 System.Linq.dll
 PhyloTree.TreeNode.dll
 System.Text.Json.dll
+VectSharp.dll

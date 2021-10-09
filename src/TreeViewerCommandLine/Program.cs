@@ -128,11 +128,22 @@ namespace TreeViewerCommandLine
                 InstanceStateData.IsInteractive = false;
             }
 
-            _ = Modules.LoadInstalledModules(true);
+            Console.OutputEncoding = Encoding.UTF8;
+            ConsoleWrapper.SetOutputMode(ConsoleWrapper.OutputModes.Error);
+
+            ConsoleWrapper.WriteLine("TreeViewer v" + TreeViewer.Program.Version + " (command-line v" + Version + ")");
+            ConsoleWrapper.WriteLine();
+
+            ConsoleWrapper.Write("Loading installed modules...");
+
+            _ = Modules.LoadInstalledModules(true, null);
+
+            ConsoleWrapper.WriteLine(" Done.");
+            ConsoleWrapper.WriteLine();
 
             StateData.AddPlottingModule = (module) =>
             {
-                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], new Dictionary<string, object>());
+                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], -1, new Dictionary<string, object>());
 
                 return PlotActions[^1].Item2.UpdateParameterAction;
             };
@@ -144,7 +155,7 @@ namespace TreeViewerCommandLine
 
             StateData.AddFurtherTransformationModule = (module) =>
             {
-                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], new Dictionary<string, object>());
+                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], -1, new Dictionary<string, object>());
 
                 return FurtherTransformations[^1].Item2.UpdateParameterAction;
             };
@@ -156,14 +167,14 @@ namespace TreeViewerCommandLine
 
             StateData.SetCoordinatesModule = (module) =>
             {
-                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], new Dictionary<string, object>());
+                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], -1, new Dictionary<string, object>());
 
                 return CoordinatesParameters.UpdateParameterAction;
             };
 
             StateData.SetTransformerModule = (module) =>
             {
-                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], new Dictionary<string, object>());
+                ModuleCommand.EnableModule(Modules.LoadedModulesMetadata[module.Id], -1, new Dictionary<string, object>());
 
                 return TransformerParameters.UpdateParameterAction;
             };
@@ -241,11 +252,7 @@ namespace TreeViewerCommandLine
 
             ConsoleWrapper.TreatControlCAsInput = true;
 
-            Console.OutputEncoding = Encoding.UTF8;
-            ConsoleWrapper.SetOutputMode(ConsoleWrapper.OutputModes.Error);
-
-            ConsoleWrapper.WriteLine("TreeViewer v" + TreeViewer.Program.Version + " (command-line v" + Version + ")");
-            ConsoleWrapper.WriteLine();
+            
 
             ConsoleWrapper.WriteLine("Type \"help\" for a list of available commands");
             ConsoleWrapper.WriteLine();
@@ -624,9 +631,5 @@ namespace TreeViewerCommandLine
 
             return command.ToString();
         }
-
-
-
-
     }
 }

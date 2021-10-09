@@ -28,10 +28,12 @@ using System.Net;
 using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
+using Avalonia.Styling;
 
 namespace TreeViewer
 {
-    public class ModuleRepositoryWindow : Window
+    public class ModuleRepositoryWindow : ChildWindow
     {
         public enum Modes
         {
@@ -67,7 +69,7 @@ namespace TreeViewer
         private TextBox[] idContainers;
         private TextBlock[] authorContainers;
         private TextBlock[] versionContainers;
-        private AddRemoveButton[] verifiedIcons;
+        private Canvas[] verifiedIcons;
         private TextBlock[] helpContainers;
         private TextBox[] sourceContainers;
         private string[] selectedModules;
@@ -76,6 +78,7 @@ namespace TreeViewer
         private Dictionary<string, ModuleHeader> repositoryModuleHeaders = new Dictionary<string, ModuleHeader>();
         private NotificationType[] notifications;
         private ModuleManagerWindow managerWindowParent;
+        private RibbonBar bar;
 
         private Uri ModuleRepositoryBaseUri = new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri);
 
@@ -83,14 +86,40 @@ namespace TreeViewer
         {
             AvaloniaXamlLoader.Load(this);
 
+            if (GlobalSettings.Settings.InterfaceStyle == GlobalSettings.InterfaceStyles.MacOSStyle)
+            {
+                this.Classes.Add("MacOSStyle");
+            }
+            else if (GlobalSettings.Settings.InterfaceStyle == GlobalSettings.InterfaceStyles.WindowsStyle)
+            {
+                this.Classes.Add("WindowsStyle");
+            }
+
             this.Title = this.Mode.ToString() + " from repository...";
+
+            bar = new RibbonBar((from el in headers select (el, false)).ToArray());
+
+            bar.FontSize = 14;
+
+            if (GlobalSettings.Settings.RibbonStyle == GlobalSettings.RibbonStyles.Colourful)
+            {
+                bar.Background = new SolidColorBrush(Color.FromRgb(0, 114, 178));
+                bar.Margin = new Thickness(-1, 0, -1, 0);
+                bar.Classes.Add("Colorful");
+            }
+            else
+            {
+                bar.Classes.Add("Grey");
+            }
+
+            this.FindControl<Grid>("RibbonBarContainer").Children.Add(bar);
 
             moduleContainers = new StackPanel[headers.Length];
             nameContainers = new TextBlock[headers.Length];
             idContainers = new TextBox[headers.Length];
             authorContainers = new TextBlock[headers.Length];
             versionContainers = new TextBlock[headers.Length];
-            verifiedIcons = new AddRemoveButton[headers.Length];
+            verifiedIcons = new Canvas[headers.Length];
             helpContainers = new TextBlock[headers.Length];
             sourceContainers = new TextBox[headers.Length];
             selectedModules = new string[headers.Length];
@@ -98,26 +127,28 @@ namespace TreeViewer
             noModuleGrids = new Grid[headers.Length];
             notifications = new NotificationType[headers.Length];
 
-            List<TabItem> tabItems = new List<TabItem>();
+            TransformOperations.Builder builder = new TransformOperations.Builder(1);
+            builder.AppendTranslate(-16, 0);
+            TransformOperations offScreen = builder.Build();
+
+            List<Grid> tabItems = new List<Grid>();
 
             for (int i = 0; i < headers.Length; i++)
             {
-                StackPanel tabHeader = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
-
-                tabHeader.Children.Add(new TextBlock() { Text = headers[i], FontSize = 20 });
-
-                Avalonia.Controls.Shapes.Ellipse notificationEllipse = new Avalonia.Controls.Shapes.Ellipse() { Width = 15, Height = 15, Margin = new Thickness(5, 0, 0, 0) };
+                Avalonia.Controls.Shapes.Ellipse notificationEllipse = new Avalonia.Controls.Shapes.Ellipse() { Width = 6, Height = 6, Margin = new Thickness(0, 3, 3, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right };
                 notificationEllipse.Classes.Add("Notification");
                 notificationEllipses[i] = notificationEllipse;
 
-                tabHeader.Children.Add(notificationEllipse);
-
-                TabItem item = new TabItem() { Header = tabHeader };
-                tabItems.Add(item);
+                bar.GridItems[i].Children.Add(notificationEllipse);
 
                 Grid content = new Grid();
                 content.ColumnDefinitions.Add(new ColumnDefinition(250, GridUnitType.Pixel));
+                content.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
                 content.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+                Canvas separator = new Canvas() { Margin = new Thickness(5, 10, 5, 10), Background = new SolidColorBrush(Color.FromRgb(191, 191, 191)), Width = 1 };
+                Grid.SetColumn(separator, 1);
+                content.Children.Add(separator);
 
                 ScrollViewer scr = new ScrollViewer() { Margin = new Thickness(0, 5, 10, 5), VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, Padding = new Thickness(0, 0, 10, 0) };
 
@@ -128,7 +159,8 @@ namespace TreeViewer
                 content.Children.Add(scr);
 
                 Grid grd = new Grid() { Margin = new Thickness(10, 0, 5, 5) };
-                Grid.SetColumn(grd, 1);
+                Grid.SetColumn(grd, 2);
+                grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
@@ -136,28 +168,29 @@ namespace TreeViewer
                 grd.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
                 grd.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-                TextBlock nameContainer = new TextBlock() { FontSize = 24, FontWeight = Avalonia.Media.FontWeight.Bold };
+                TextBlock nameContainer = new TextBlock() { FontSize = 20, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) };
                 nameContainers[i] = nameContainer;
                 grd.Children.Add(nameContainer);
 
-                TextBox idContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Background = null, BorderBrush = null, BorderThickness = new Thickness(0, 0, 0, 0), IsReadOnly = true, Padding = new Thickness(0), MinHeight = 0 };
+                TextBox idContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), Foreground = new Avalonia.Media.SolidColorBrush(0xFF707070), Background = null, BorderBrush = null, BorderThickness = new Thickness(0, 0, 0, 0), IsReadOnly = true, Padding = new Thickness(0), MinHeight = 0, FontSize = 12 };
                 idContainers[i] = idContainer;
                 Grid.SetRow(idContainer, 1);
                 grd.Children.Add(idContainer);
 
                 StackPanel pnl = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, Margin = new Thickness(0, 10, 0, 0) };
-                TextBlock versionContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF808080) };
+                TextBlock versionContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060) };
                 versionContainers[i] = versionContainer;
                 pnl.Children.Add(versionContainer);
 
-                pnl.Children.Add(new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontStyle = Avalonia.Media.FontStyle.Italic, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF808080), Text = "by" });
+                pnl.Children.Add(new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontStyle = Avalonia.Media.FontStyle.Italic, Margin = new Thickness(0, 0, 5, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060), Text = "by" });
 
-                TextBlock authorContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF808080) };
+                TextBlock authorContainer = new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 0), Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060) };
                 authorContainers[i] = authorContainer;
                 pnl.Children.Add(authorContainer);
 
-                AddRemoveButton verifiedIcon = new AddRemoveButton() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, ButtonType = AddRemoveButton.ButtonTypes.Cancel };
-                ToolTip.SetTip(verifiedIcon, "Code signature not verified!");
+                Canvas verifiedIcon = new Canvas() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Width = 16, Height = 16, Background = Brushes.Transparent };
+                verifiedIcon.Children.Add(new Avalonia.Controls.Shapes.Path() { Data = Icons.CrossGeometry, Stroke = new SolidColorBrush(Color.FromRgb(213, 94, 0)), Margin = new Thickness(3), StrokeThickness = 2 });
+                AvaloniaBugFixes.SetToolTip(verifiedIcon, "Code signature not verified!");
                 verifiedIcons[i] = verifiedIcon;
                 pnl.Children.Add(verifiedIcon);
                 Grid.SetRow(pnl, 2);
@@ -168,44 +201,35 @@ namespace TreeViewer
                 Grid.SetRow(helpContainer, 3);
                 grd.Children.Add(helpContainer);
 
-                /* TextBox sourceContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontSize = 12, IsReadOnly = true, Margin = new Thickness(0, 5, 0, 0) };
-                 sourceContainers[i] = sourceContainer;
-                 Grid.SetRow(sourceContainer, 4);
-                 grd.Children.Add(sourceContainer);*/
-
-                TabControl modulePreviewSelector = new TabControl();
+                RibbonBar modulePreviewSelector = new RibbonBar(new (string, bool)[] { ("Source code", false) }) { FontSize = 14, Margin = new Thickness(0, 5, 0, 0) };
                 Grid.SetRow(modulePreviewSelector, 4);
                 grd.Children.Add(modulePreviewSelector);
+
+                ((Grid)modulePreviewSelector.Content).Background = Brushes.Transparent;
+                modulePreviewSelector.Classes.Add("Grey");
 
                 StackPanel sourceCodeHeader = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
                 sourceCodeHeader.Children.Add(new TextBlock() { Text = "Source code", FontSize = 18 });
 
-                OpenWindowButton openWindowButton = new OpenWindowButton() { Width = 24, Height = 24, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 0) };
-                sourceCodeHeader.Children.Add(openWindowButton);
+                OpenWindowButton openWindowButton = new OpenWindowButton() { Width = 20, Height = 20, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 0, 4), Padding = new Thickness(2) };
+                openWindowButton.Classes.Add("PlainButton");
+                ((StackPanel)modulePreviewSelector.GridItems[0].Parent).Children.Add(openWindowButton);
                 openWindowButton.Click += async (s, e) =>
                 {
                     await OpenSourceCodeWindow();
                 };
 
-                TabItem moduleSourceItem = new TabItem() { Header = sourceCodeHeader, Height = 30, MinHeight = 30 };
-
-                /*MarkdownCanvasControl sourceContainer = new MarkdownCanvasControl() { Background = Avalonia.Media.Brushes.White, MinRenderWidth = 800, Margin = new Thickness(-12, -2, -12, -2), VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Top };
-                sourceContainer.Renderer.BaseFontSize = 16;
-                sourceContainer.Renderer.CodeFont = Modules.CodeFontFamily;
-                sourceContainer.Renderer.Margins = new VectSharp.Markdown.Margins(0, 10, 0, 0);
-                sourceContainer.Renderer.CodeBlockBackgroundColour = VectSharp.Colour.FromRgb(255, 255, 255);*/
+                Grid sourceContainerContainer = new Grid();
+                Grid.SetRow(sourceContainerContainer, 5);
+                grd.Children.Add(sourceContainerContainer);
 
                 TextBox sourceContainer = new TextBox() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontSize = 12, IsReadOnly = true, Margin = new Thickness(0, 5, 0, 0) };
                 sourceContainers[i] = sourceContainer;
-                moduleSourceItem.Content = sourceContainer;
+                sourceContainerContainer.Children.Add(sourceContainer);
 
-                modulePreviewSelector.Items = new List<TabItem>() { moduleSourceItem };
-
-                /*Grid.SetRow(sourceContainer, 4);
-                grd.Children.Add(sourceContainer);*/
-
-                Button moduleLoadInstallButton = new Button() { Content = this.Mode.ToString(), Width = 150, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Thickness(0, 10, 0, 5) };
-                Grid.SetRow(moduleLoadInstallButton, 5);
+                Button moduleLoadInstallButton = new Button() { Content = this.Mode.ToString(), Width = 150, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Thickness(0, 10, 0, 5), FontSize = 13 };
+                moduleLoadInstallButton.Classes.Add("PlainButton");
+                Grid.SetRow(moduleLoadInstallButton, 6);
                 grd.Children.Add(moduleLoadInstallButton);
 
                 moduleLoadInstallButton.Click += (s, e) =>
@@ -222,21 +246,73 @@ namespace TreeViewer
 
                 content.Children.Add(grd);
 
-                Grid noModuleGrid = new Grid() { Background = new Avalonia.Media.SolidColorBrush(0xFFF5F5F5) };
-                Grid.SetColumnSpan(noModuleGrid, 2);
+                Grid noModuleGrid = new Grid() { Background = new Avalonia.Media.SolidColorBrush(0xFFF3F3F3) };
+                Grid.SetColumnSpan(noModuleGrid, 3);
                 content.Children.Add(noModuleGrid);
                 noModuleGrid.Children.Add(new TextBlock() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = "No module available!" });
                 noModuleGrids[i] = noModuleGrid;
 
-                item.Content = content;
-            }
+                content.Opacity = 0;
+                tabItems.Add(content);
+                content.IsHitTestVisible = false;
+                content.Classes.Add("TabItem");
 
-            this.FindControl<TabControl>("MainTabControl").Items = tabItems;
+                this.FindControl<Grid>("MainGrid").Children.Add(content);
+            }
 
             this.Opened += async (s, e) =>
             {
                 await GetModuleRepositoryDatabase();
             };
+
+            bar.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == RibbonBar.SelectedIndexProperty)
+                {
+                    int newIndex = (int)e.NewValue;
+                    for (int i = 0; i < tabItems.Count; i++)
+                    {
+                        if (tabItems[i] != null)
+                        {
+                            if (i != newIndex)
+                            {
+                                tabItems[i].ZIndex = 0;
+                                tabItems[i].RenderTransform = offScreen;
+                                tabItems[i].Opacity = 0;
+                                tabItems[i].IsHitTestVisible = false;
+                            }
+                            else
+                            {
+                                tabItems[i].ZIndex = 1;
+                                tabItems[i].RenderTransform = TransformOperations.Identity;
+                                tabItems[i].Opacity = 1;
+                                tabItems[i].IsHitTestVisible = true;
+                            }
+                        }
+                    }
+                }
+            };
+
+            for (int i = 0; i < tabItems.Count; i++)
+            {
+                if (tabItems[i] != null)
+                {
+                    if (i != 0)
+                    {
+                        tabItems[i].ZIndex = 0;
+                        tabItems[i].RenderTransform = offScreen;
+                        tabItems[i].Opacity = 0;
+                        tabItems[i].IsHitTestVisible = false;
+                    }
+                    else
+                    {
+                        tabItems[i].ZIndex = 1;
+                        tabItems[i].RenderTransform = TransformOperations.Identity;
+                        tabItems[i].Opacity = 1;
+                        tabItems[i].IsHitTestVisible = true;
+                    }
+                }
+            }
         }
 
         private async Task GetModuleRepositoryDatabase()
@@ -246,7 +322,7 @@ namespace TreeViewer
             List<ModuleHeader> moduleHeaders;
 
             ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Accessing module database..." };
-            _ = progressWindow.ShowDialog(this);
+            _ = progressWindow.ShowDialog2(this);
 
             try
             {
@@ -327,23 +403,31 @@ namespace TreeViewer
             progressWindow.Close();
         }
 
-        //Dictionary<string, Border> ModuleButtons = new Dictionary<string, Border>();
-        Dictionary<string, CoolButton> ModuleButtons = new Dictionary<string, CoolButton>();
+        Dictionary<string, (ModuleTypes, Button)> ModuleButtons = new Dictionary<string, (ModuleTypes, Button)>();
 
         private async Task BuildModuleButton(ModuleHeader header)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                CoolButton button = new CoolButton() { CornerRadius = new CornerRadius(10), Margin = new Thickness(-5, 0, 0, 0), Hue = 0.98 };
+                Button button = new Button() { Margin = new Thickness(0, 0, 0, 5), Background = Brushes.Transparent, Padding = new Thickness(0) };
+                button.Classes.Add("PlainButton");
 
-                button.Title = new TextBlock() { FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 18, Text = header.Name, Foreground = Brushes.White, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Thickness(10, 5), TextWrapping = TextWrapping.Wrap, TextAlignment = TextAlignment.Center };
+                Style blackForeground = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().OfType<TextBlock>());
+                blackForeground.Setters.Add(new Setter(TextBlock.ForegroundProperty, new SolidColorBrush(Color.FromRgb(0, 114, 178))));
 
-                StackPanel pnl = new StackPanel() { Margin = new Thickness(10, 5) };
-                //pnl.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = header.Id.Substring(header.Id.Length - 22) });
+                button.Styles.Add(blackForeground);
 
-                StackPanel idPanel = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
-                idPanel.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontStyle = Avalonia.Media.FontStyle.Italic, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = header.Id.Substring(header.Id.Length - 22) });
-                Avalonia.Controls.Shapes.Ellipse notification = new Avalonia.Controls.Shapes.Ellipse() { Width = 10, Height = 10, Margin = new Thickness(5, 0, 0, 0) };
+                Border brd = new Border() { BorderBrush = Brushes.Transparent, BorderThickness = new Thickness(2), Padding = new Thickness(5) };
+
+                Grid grd = new Grid();
+
+                StackPanel pnl = new StackPanel() { Margin = new Thickness(0) };
+
+                pnl.Children.Add(new TextBlock() { FontSize = 14, FontWeight = FontWeight.Bold, Text = header.Name, Margin = new Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap });
+
+
+                pnl.Children.Add(new TextBlock() { FontFamily = new Avalonia.Media.FontFamily("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"), FontSize = 10, Foreground = new Avalonia.Media.SolidColorBrush(0xFFA0A0A0), Text = header.Id });
+                Avalonia.Controls.Shapes.Ellipse notification = new Avalonia.Controls.Shapes.Ellipse() { Width = 6, Height = 6, Margin = new Thickness(0, 0, 5, 5), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right };
                 notification.Classes.Add("Notification");
                 if (!Modules.LoadedModulesMetadata.ContainsKey(header.Id))
                 {
@@ -354,16 +438,19 @@ namespace TreeViewer
                     notification.Classes.Add("Updates");
                 }
 
-                idPanel.Children.Add(notification);
-                pnl.Children.Add(idPanel);
+                pnl.Children.Add(new TextBlock() { Text = header.Author, FontSize = 12, Foreground = new Avalonia.Media.SolidColorBrush(0xFF606060) });
 
-                pnl.Children.Add(new TextBlock() { Text = header.Author });
-                button.ButtonContent = pnl;
+                grd.Children.Add(pnl);
+                grd.Children.Add(notification);
+
+
+                brd.Child = grd;
+                button.Content = brd;
 
                 button.Click += async (s, e) =>
                 {
                     ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Downloading module file..." };
-                    _ = progressWindow.ShowDialog(this);
+                    _ = progressWindow.ShowDialog2(this);
 
                     await SelectModule(header.Id, header.Version.ToString());
 
@@ -372,7 +459,7 @@ namespace TreeViewer
 
                 moduleContainers[(int)header.ModuleType].Children.Add(button);
 
-                ModuleButtons[header.Id] = button;
+                ModuleButtons[header.Id] = (header.ModuleType, button);
             });
 
             if (string.IsNullOrEmpty(selectedModules[(int)header.ModuleType]))
@@ -416,25 +503,45 @@ namespace TreeViewer
                 authorContainers[tabInd].Text = module.Author;
                 versionContainers[tabInd].Text = "Version " + module.Version.ToString();
                 bool isVerified = module.VerifySignature();
-                verifiedIcons[tabInd].ButtonType = isVerified ? AddRemoveButton.ButtonTypes.OK : AddRemoveButton.ButtonTypes.Cancel;
+                verifiedIcons[tabInd].Children.Clear();
+
                 if (isVerified)
                 {
-                    ToolTip.SetTip(verifiedIcons[tabInd], "Code signature verified!");
+                    verifiedIcons[tabInd].Children.Add(new Avalonia.Controls.Shapes.Path() { Data = Icons.TickGeometry, Stroke = new SolidColorBrush(Color.FromRgb(0, 158, 115)), Margin = new Thickness(3), StrokeThickness = 2 });
+                    AvaloniaBugFixes.SetToolTip(verifiedIcons[tabInd], "Code signature verified!");
                 }
                 else
                 {
-                    ToolTip.SetTip(verifiedIcons[tabInd], "Code signature not verified!");
+                    verifiedIcons[tabInd].Children.Add(new Avalonia.Controls.Shapes.Path() { Data = Icons.CrossGeometry, Stroke = new SolidColorBrush(Color.FromRgb(213, 94, 0)), Margin = new Thickness(3), StrokeThickness = 2 });
+                    AvaloniaBugFixes.SetToolTip(verifiedIcons[tabInd], "Code signature not verified!");
                 }
                 helpContainers[tabInd].Text = module.HelpText;
                 sourceContainers[tabInd].Text = module.SourceCode;
 
                 noModuleGrids[tabInd].IsVisible = false;
+
+                foreach (KeyValuePair<string, (ModuleTypes, Button)> kvp in ModuleButtons)
+                {
+                    if (kvp.Value.Item1 == module.ModuleType)
+                    {
+                        if (kvp.Key == module.Id)
+                        {
+                            kvp.Value.Item2.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+                            ((Border)kvp.Value.Item2.Content).BorderBrush = new SolidColorBrush(Color.FromRgb(114, 114, 114));
+                        }
+                        else
+                        {
+                            kvp.Value.Item2.Background = Brushes.Transparent;
+                            ((Border)kvp.Value.Item2.Content).BorderBrush = Brushes.Transparent;
+                        }
+                    }
+                }
             });
         }
 
         private async void LoadClicked()
         {
-            int tabInd = this.FindControl<TabControl>("MainTabControl").SelectedIndex;
+            int tabInd = bar.SelectedIndex;
             if (string.IsNullOrEmpty(selectedModules[tabInd]))
             {
                 await new MessageBox("Attention!", "No module has been selected!").ShowDialog2(this);
@@ -449,7 +556,7 @@ namespace TreeViewer
             string tempFile = Path.GetTempFileName();
 
             ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Downloading module file..." };
-            _ = progressWindow.ShowDialog(this);
+            _ = progressWindow.ShowDialog2(this);
 
             try
             {
@@ -498,7 +605,7 @@ namespace TreeViewer
 
                 managerWindowParent.BuildModuleButton(new KeyValuePair<string, ModuleMetadata>(metaData.Id, metaData));
                 repositoryModuleHeaders.Remove(moduleId);
-                ((IPanel)ModuleButtons[moduleId].Parent).Children.Remove(ModuleButtons[moduleId]);
+                ((IPanel)ModuleButtons[moduleId].Item2.Parent).Children.Remove(ModuleButtons[moduleId].Item2);
                 ModuleButtons.Remove(moduleId);
                 noModuleGrids[tabInd].IsVisible = true;
 
@@ -507,7 +614,7 @@ namespace TreeViewer
                     if ((int)module.Value.ModuleType == tabInd)
                     {
                         progressWindow = new ProgressWindow() { ProgressText = "Downloading module file..." };
-                        _ = progressWindow.ShowDialog(this);
+                        _ = progressWindow.ShowDialog2(this);
 
                         await SelectModule(module.Key, module.Value.Version.ToString());
 
@@ -582,7 +689,7 @@ namespace TreeViewer
 
         private async void InstallClicked()
         {
-            int tabInd = this.FindControl<TabControl>("MainTabControl").SelectedIndex;
+            int tabInd = bar.SelectedIndex;
             if (string.IsNullOrEmpty(selectedModules[tabInd]))
             {
                 await new MessageBox("Attention!", "No module has been selected!").ShowDialog2(this);
@@ -597,7 +704,7 @@ namespace TreeViewer
             string tempFile = Path.GetTempFileName();
 
             ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Downloading module file..." };
-            _ = progressWindow.ShowDialog(this);
+            _ = progressWindow.ShowDialog2(this);
 
             try
             {
@@ -714,7 +821,7 @@ namespace TreeViewer
 
                     managerWindowParent.BuildModuleButton(new KeyValuePair<string, ModuleMetadata>(metaData.Id, metaData));
                     repositoryModuleHeaders.Remove(moduleId);
-                    ((IPanel)ModuleButtons[moduleId].Parent).Children.Remove(ModuleButtons[moduleId]);
+                    ((IPanel)ModuleButtons[moduleId].Item2.Parent).Children.Remove(ModuleButtons[moduleId].Item2);
                     ModuleButtons.Remove(moduleId);
                     noModuleGrids[tabInd].IsVisible = true;
 
@@ -723,7 +830,7 @@ namespace TreeViewer
                         if ((int)module.Value.ModuleType == tabInd)
                         {
                             progressWindow = new ProgressWindow() { ProgressText = "Downloading module file..." };
-                            _ = progressWindow.ShowDialog(this);
+                            _ = progressWindow.ShowDialog2(this);
 
                             await SelectModule(module.Key, module.Value.Version.ToString());
 
@@ -860,7 +967,7 @@ namespace TreeViewer
 
         internal async Task OpenSourceCodeWindow()
         {
-            int tabInd = this.FindControl<TabControl>("MainTabControl").SelectedIndex;
+            int tabInd = bar.SelectedIndex;
             if (string.IsNullOrEmpty(selectedModules[tabInd]))
             {
                 return;
@@ -871,7 +978,7 @@ namespace TreeViewer
 
 
             ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Accessing module database..." };
-            _ = progressWindow.ShowDialog(this);
+            _ = progressWindow.ShowDialog2(this);
 
             ModuleMetadata module;
 

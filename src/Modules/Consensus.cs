@@ -44,7 +44,7 @@ namespace Consensus_tree
         public const string Name = "Consensus";
         public const string HelpText = "Computes the consensus of multiple trees (or returns one of them).";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "32914d41-b182-461e-b7c6-5f0263cc1ccd";
         public const ModuleTypes ModuleType = ModuleTypes.Transformer;
 
@@ -54,6 +54,8 @@ namespace Consensus_tree
             {
                 List<string> leaves0 = trees[0].GetLeafNames();
                 List<string> leaves1 = trees[1].GetLeafNames();
+
+                bool clockLike = trees[0].IsClockLike() && trees[1].IsClockLike();
 
                 bool sameLeaves = leaves0.ContainsAll(leaves1) || leaves1.ContainsAll(leaves0);
 
@@ -75,7 +77,15 @@ namespace Consensus_tree
                     /// </param>
                     ( "Tree #", "NumericUpDown:1[\"1\",\"" + trees.Count.ToString() + "\",\"1\",\"0\"]" ),
 
-                    ( "Consensus options", "Group:6" ),
+                    ( "Consensus options", "Group:7" ),
+                    
+                    /// <param name="Treat trees as clock-like">
+                    /// If this check box is checked the trees will be treated as clock-like trees, and the consensus tree will also be
+                    /// clock-like (i.e. the rightmost tips of all trees will be aligned with each other). If this check box is unchecked,
+                    /// the tree is treated as non-clock-like, and the consensus tree will also be non-clock-like (i.e. the root of all trees
+                    /// are aligned with each other).
+                    /// </param>
+                    ( "Treat trees as clock-like", "CheckBox:" + (clockLike ? "true" : "false") ),
                     
                     /// <param name="Branch lengths:">
                     /// This parameter determines the algorithm used to compute the branch lengths of the consensus tree. If the value
@@ -161,7 +171,7 @@ namespace Consensus_tree
             }
         }
 
-        public static TreeNode Transform(TreeCollection trees, Dictionary<string, object> parameterValues)
+        public static TreeNode Transform(TreeCollection trees, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             if (trees.Count == 1)
             {
@@ -175,13 +185,17 @@ namespace Consensus_tree
                     int every = (int)(double)parameterValues["Every:"];
                     int until = (int)(double)parameterValues["Until:"];
 
+                    bool clocklike = (bool)parameterValues["Treat trees as clock-like"];
+
                     if (skip == 0 && every == 1 && until == trees.Count)
                     {
-                        return trees.GetConsensus(trees[0].Children.Count < 3 && trees[1].Children.Count < 3, trees[0].IsClockLike() && trees[1].IsClockLike(), (double)parameterValues["Threshold:"], (int)parameterValues["Branch lengths:"] == 1);
+                        return trees.GetConsensus(trees[0].Children.Count < 3 && trees[1].Children.Count < 3, clocklike, (double)parameterValues["Threshold:"], (int)parameterValues["Branch lengths:"] == 1, x => progressAction(x / trees.Count));
                     }
                     else
                     {
-                        return trees.Take(until).Skip(skip).Where((item, index) => index % every == 0).GetConsensus(trees[0].Children.Count < 3 && trees[1].Children.Count < 3, trees[0].IsClockLike() && trees[1].IsClockLike(), (double)parameterValues["Threshold:"], (int)parameterValues["Branch lengths:"] == 1);
+                        int totalTrees = (until - skip) / every;
+
+                        return trees.Take(until).Skip(skip).Where((item, index) => index % every == 0).GetConsensus(trees[0].Children.Count < 3 && trees[1].Children.Count < 3, clocklike, (double)parameterValues["Threshold:"], (int)parameterValues["Branch lengths:"] == 1, x => progressAction(x / totalTrees));
                     }
                 }
                 else

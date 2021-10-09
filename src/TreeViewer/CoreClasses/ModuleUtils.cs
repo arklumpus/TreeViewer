@@ -52,7 +52,7 @@ namespace TreeViewer
             }
         }
 
-        public static List<List<(string, Dictionary<string, object>)>> DeserializeModules(string serializedModules, Func<RSAParameters?, bool> askForCodePermission)
+        public static List<List<(string, Dictionary<string, object>)>> DeserializeModules(string serializedModules, List<Attachment> attachments, Func<RSAParameters?, bool> askForCodePermission)
         {
             List<List<(string, Dictionary<string, object>)>> tbr = new List<List<(string, Dictionary<string, object>)>>();
 
@@ -90,7 +90,7 @@ namespace TreeViewer
                 for (int j = 0; j < allModules[i].Count; j++)
                 {
                     string moduleId = allModules[i][j][0];
-                    Dictionary<string, object> parameters = DeserializeParameters(allModules[i][j][1], () => askForCodePermission(publicKey));
+                    Dictionary<string, object> parameters = DeserializeParameters(allModules[i][j][1], attachments, () => askForCodePermission(publicKey));
                     currModules.Add((moduleId, parameters));
                 }
 
@@ -100,7 +100,7 @@ namespace TreeViewer
             return tbr;
         }
 
-        private static Dictionary<string, object> DeserializeParameters(string serializedParameters, Func<bool> askForCodePermission)
+        private static Dictionary<string, object> DeserializeParameters(string serializedParameters, List<Attachment> attachments, Func<bool> askForCodePermission)
         {
             Dictionary<string, object> tbr = new Dictionary<string, object>();
 
@@ -135,7 +135,78 @@ namespace TreeViewer
                 else if (parameter[1] == "font")
                 {
                     string[] items = System.Text.Json.JsonSerializer.Deserialize<string[]>(parameter[2], Modules.DefaultSerializationOptions);
-                    value = new VectSharp.Font(new VectSharp.FontFamily(System.Text.Json.JsonSerializer.Deserialize<string>(items[0])), System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+
+                    string familyName = System.Text.Json.JsonSerializer.Deserialize<string>(items[0]);
+
+                    if (VectSharp.FontFamily.StandardFamilies.Contains(familyName))
+                    {
+                        value = new VectSharp.Font(new VectSharp.FontFamily(familyName), System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+                    }
+                    else if (familyName.StartsWith("attachment://"))
+                    {
+                        string attachmentName = familyName.Substring(13);
+
+                        bool assigned = false;
+
+                        for (int i = 0; i < attachments.Count; i++)
+                        {
+                            if (attachments[i].Name == attachmentName)
+                            {
+                                AttachmentFontFamily family = attachments[i].GetFontFamily();
+
+                                if (family != null)
+                                {
+                                    assigned = true;
+                                    value = new VectSharp.Font(family, System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+                                }
+                                break;
+                            }
+                        }
+                        
+                        if (!assigned)
+                        {
+                            value = new VectSharp.Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+                        }
+                    }
+                    else if (familyName.StartsWith("webfont://"))
+                    {
+                        try
+                        {
+                            string fontName = familyName.Substring(10);
+                            fontName = fontName.Substring(0, fontName.LastIndexOf("["));
+
+                            string style = familyName.Substring(familyName.LastIndexOf("[") + 1);
+                            style = style.Substring(0, style.Length - 1);
+
+                            FontChoiceWindow.WebFont webFont = null;
+
+                            for (int i = 0; i < FontChoiceWindow.WebFonts.Count; i++)
+                            {
+                                if (FontChoiceWindow.WebFonts[i].Name == fontName)
+                                {
+                                    webFont = FontChoiceWindow.WebFonts[i];
+                                    break;
+                                }
+                            }
+
+                            if (webFont != null)
+                            {
+                                value = new VectSharp.Font(WebFontFamily.Create(webFont, style), System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+                            }
+                            else
+                            {
+                                value = new VectSharp.Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+                            }
+                        }
+                        catch
+                        {
+                            value = new VectSharp.Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+                        }
+                    }
+                    else
+                    {
+                        value = new VectSharp.Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), System.Text.Json.JsonSerializer.Deserialize<double>(items[1], Modules.DefaultSerializationOptions));
+                    }
                 }
                 else if (parameter[1] == "point")
                 {
@@ -213,7 +284,7 @@ namespace TreeViewer
 
                     if (askForCodePermission())
                     {
-                        value = new ColourFormatterOptions((string)parameters[0]) { AttributeName = System.Text.Json.JsonSerializer.Deserialize<string>(items[0]), AttributeType = System.Text.Json.JsonSerializer.Deserialize<string>(items[1]), DefaultColour = VectSharp.Colour.FromRgba(colour[0], colour[1], colour[2], colour[3]), Parameters = parameters.ToArray() };
+                        value = new ColourFormatterOptions((string)parameters[0], parameters.ToArray()) { AttributeName = System.Text.Json.JsonSerializer.Deserialize<string>(items[0]), AttributeType = System.Text.Json.JsonSerializer.Deserialize<string>(items[1]), DefaultColour = VectSharp.Colour.FromRgba(colour[0], colour[1], colour[2], colour[3]) };
                     }
                     else
                     {

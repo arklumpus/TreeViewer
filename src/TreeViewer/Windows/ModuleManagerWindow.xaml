@@ -15,76 +15,63 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<Window xmlns="https://github.com/avaloniaui"
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
-        mc:Ignorable="d" Width="800" Height="600"
+        mc:Ignorable="d" Width="1000" Height="600"
         x:Class="TreeViewer.ModuleManagerWindow"
-        Title="Module manager" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        Title="Module manager" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#E7E7E7" WindowStartupLocation="Manual">
   <Window.Styles>
+    <Style Selector=".WindowsStyle Canvas.RibbonSeparator">
+      <Setter Property="Background" Value="#B1B1B1" />
+      <Setter Property="Margin" Value="0,0,0,0" />
+    </Style>
+
+    <Style Selector=".MacOSStyle Canvas.RibbonSeparator">
+      <Setter Property="Background" Value="#CECECE" />
+    </Style>
+
+    <Style Selector="Grid.TabItem">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.1"/>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+        </Transitions>
+      </Setter>
+    </Style>
+
+    <Style Selector="Border.TabItem">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.1"/>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    
     <Style Selector="Button.OpenWindowButton">
-      <Setter Property="IsVisible" Value="False" />
-    </Style>
-    <Style Selector="TabControl">
-      <Setter Property="Background" Value="#F5F5F5"/>
-    </Style>
-    <Style Selector="TabControl WrapPanel">
-      <Setter Property="Background" Value="#0072b2"/>
-    </Style>
-
-    <Style Selector="TabItem">
-      <Setter Property="Height" Value="34"/>
-      <Setter Property="VerticalAlignment" Value="Center"/>
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Background" Value="#0072b2"/>
-      <Setter Property="Foreground" Value="#F5F5F5"/>
-      <Setter Property="Margin" Value="0 0 0 0"/>
-      <Setter Property="Padding" Value="10 0"/>
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translate(-16px, 0)" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Setter Property="Transitions" >
+        <Setter.Value>
+          <Transitions>
+            <DoubleTransition Property="Opacity" Duration="0:0:0.1"/>
+            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+          </Transitions>
+        </Setter.Value>
+      </Setter>
     </Style>
 
-    <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
-      <Setter Property="Background" Value="#005591"/>
-      <Setter Property="TextBlock.Foreground" Value="#F5F5F5" />
+    <Style Selector="local|RibbonBar[SelectedIndex=1] Button.OpenWindowButton">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="translate(0, 0)" />
+      <Setter Property="IsHitTestVisible" Value="True" />
     </Style>
-
-    <Style Selector="TabItem:focus">
-      <Setter Property="Foreground" Value="#0072b2"/>
-      <Setter Property="Margin" Value="0 0 0 0"/>
-      <Setter Property="Padding" Value="10 0"/>
-    </Style>
-    <Style Selector="TabItem:focus /template/ Border#PART_LayoutRoot">
-      <Setter Property="Background" Value="#F5F5F5"/>
-    </Style>
-
-    <Style Selector="TabItem TabItem:focus /template/ Border#PART_LayoutRoot">
-      <Setter Property="Background" Value="#FFFFFF"/>
-    </Style>
-
-    <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
-      <Setter Property="TextBlock.Foreground" Value="#0072b2" />
-    </Style>
-
-
-    <Style Selector="TabItem:selected">
-      <Setter Property="Foreground" Value="#0072b2"/>
-      <Setter Property="Margin" Value="0 0 0 0"/>
-      <Setter Property="Padding" Value="10 0"/>
-    </Style>
-    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
-      <Setter Property="Background" Value="#F5F5F5"/>
-    </Style>
-
-    <Style Selector="TabItem TabItem:selected /template/ Border#PART_LayoutRoot">
-      <Setter Property="Background" Value="#FFFFFF"/>
-    </Style>
-
-    <Style Selector="TabItem:selected TabItem:selected Button.OpenWindowButton">
-      <Setter Property="IsVisible" Value="True" />
-    </Style>
-
+    
     <Style Selector="Border.ModuleButton">
       <Setter Property="Background" Value="#edf3fc" />
       <Setter Property="BorderBrush" Value="#bbd0f0"/>
@@ -102,18 +89,84 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <Window.Resources>
     <SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill"></SolidColorBrush>
   </Window.Resources>
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="2" />
-      <RowDefinition Height="1*" />
-    </Grid.RowDefinitions>
-    <DockPanel>
-      <NativeMenuBar DockPanel.Dock="Top"></NativeMenuBar>
-    </DockPanel>
-    <Canvas Background="#f0f0f0" Grid.Row="1"></Canvas>
-    <TabControl Grid.Row="2" Margin="5" Name="MainTabControl">
-    
-    </TabControl>
-  </Grid>
-</Window>
+  <local:ChildWindow.Content>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="1*" />
+      </Grid.RowDefinitions>
+      
+      <Grid Grid.Row="0" Name="RibbonBarContainer"></Grid>
+      <Grid Grid.Row="1" Name="RibbonTabContainer" Height="80" Margin="1,0,1,0" ClipToBounds="True">
+        <local:RibbonTabContent HorizontalAlignment="Stretch" Height="80"></local:RibbonTabContent>
+      </Grid>
+      <Canvas Grid.Row="2" Height="1" Classes="RibbonSeparator"></Canvas>
+      <Grid Grid.Row="3" Margin="5" Name="MainGrid">
+        
+      </Grid>
+      <Grid Grid.Row="0" Grid.RowSpan="4" Name="PopupLayer">
+        <Grid.Styles>
+          <Style Selector=".WindowsStyle TextBlock">
+            <Setter Property="Foreground" Value="#D0000000"/>
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem">
+            <Setter Property="Background" Value="Transparent" />
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem Viewbox">
+            <Setter Property="Margin" Value="5, 3, 5, 3" />
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem:pointerover">
+            <Setter Property="Background" Value="#C5C5C5" />
+          </Style>
+
+          <Style Selector=".WindowsStyle Border.MenuBorder">
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#C6C6C6" />
+          </Style>
+
+          <Style Selector=".MacOSStyle TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem">
+            <Setter Property="Background" Value="Transparent" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem Viewbox">
+            <Setter Property="Margin" Value="20, 3, 5, 3" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover">
+            <Setter Property="Background" Value="#0072b2" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover TextBlock">
+            <Setter Property="Foreground" Value="White" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover Path">
+            <Setter Property="Fill" Value="White" />
+          </Style>
+
+          <Style Selector=".MacOSStyle Border.MenuBorder">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="0 4 0 4"/>
+            <Setter Property="Background" Value="#E9E9E9" />
+            <Setter Property="BorderBrush" Value="#C3C3C3" />
+          </Style>
+
+
+        </Grid.Styles>
+
+      </Grid>
+      
+    </Grid>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

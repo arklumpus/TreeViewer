@@ -21,5 +21,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TreeViewer.FontButton">
-  <Button Name="MainButton" Click="ButtonClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"></Button>
+  <Button Name="MainButton" Click="ButtonClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Height="24"></Button>
 </UserControl>

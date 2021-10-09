@@ -61,7 +61,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions timeline](b93f8a2b-8731-4658-92f5-bb80af7292a8)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Plots age distributions on a timeline.
 
@@ -73,7 +73,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Apply Further transformations](9b49587c-3d02-4fbe-859f-feed56dca92d)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Applies the actions performed by the Further transformation modules.
 
@@ -85,7 +85,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Apply modules to other tree](bb4eb8d4-1925-4f08-8881-c8dd6531e5c4)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Applies the modules that are currently enabled to another tree.
 
@@ -109,7 +109,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Apply Transformer action](cdd01933-9e17-438a-ae45-57178e3d30cd)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Applies the action performed by the Transformer module.
 
@@ -158,7 +158,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Branch score style](10bbbbe1-c634-4582-9073-11f067a54081)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display node scores using the branch colours.
 
@@ -182,7 +182,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Cartoon selection](6c340923-e3d1-4646-a673-6b542a05275b)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Marks the selected node to be displayed as a "cartoon".
 
@@ -218,7 +218,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Circular tree style](1f3e0b88-c42d-417c-ba14-ba228be086a7)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as a circular tree.
 
@@ -242,7 +242,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Collapse selection](e149aeb6-a019-41e2-8830-e4dc3e0eee43)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Collapses the selected node.
 
@@ -291,7 +291,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Consensus](32914d41-b182-461e-b7c6-5f0263cc1ccd)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Computes the consensus of multiple trees (or returns one of them).
 
@@ -303,7 +303,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Copy selected node](debd9130-8451-4413-88f0-6357ec817021)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Copies the selected node to the clipboard.
 
@@ -327,7 +327,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Custom script](a76d00d2-95e0-4274-a77d-1439a013e3d9)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Executes custom code.
 
@@ -375,33 +375,33 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
-### [Export PDF](f26d503e-52aa-46fe-afb7-68d662b4de2e)
+### [Export](d5d75840-4a71-4b81-bfc4-431736792abb)
 
 _Version 1.0.0, by Giorgio Bianchini_
 
-**Description**: Exports the tree plot as a PDF document.
+**Description**: Exports the tree plot as a PDF, SVG or PNG image.
 
 **Module type**: MenuAction
 
-**Module ID**: `f26d503e-52aa-46fe-afb7-68d662b4de2e`
+**Module ID**: `d5d75840-4a71-4b81-bfc4-431736792abb`
 
 <br />
 
-### [Export SVG](99720888-ca7b-43f2-87ec-e683cab859a2)
+### [Feedback & questions](f10d9b5b-a9ff-4036-90d5-23f73042fec5)
 
 _Version 1.0.0, by Giorgio Bianchini_
 
-**Description**: Exports the tree plot as an SVG file.
+**Description**: Opens a web browser at the TreeViewer feedback/questions page.
 
 **Module type**: MenuAction
 
-**Module ID**: `99720888-ca7b-43f2-87ec-e683cab859a2`
+**Module ID**: `f10d9b5b-a9ff-4036-90d5-23f73042fec5`
 
 <br />
 
 ### [Group labels](7ef15916-4383-4ee7-b4bd-bd44a7be1849)
 
-_Version 1.2.0, by Giorgio Bianchini_
+_Version 1.2.1, by Giorgio Bianchini_
 
 **Description**: Highlights monophyletic groups with a label.
 
@@ -413,7 +413,7 @@ _Version 1.2.0, by Giorgio Bianchini_
 
 ### [Labels](ac496677-2650-4d92-8646-0812918bab03)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.2.0, by Giorgio Bianchini_
 
 **Description**: Draws labels on nodes, tips or branches.
 
@@ -425,13 +425,25 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Lasso selection](a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Selects tips from the tree.
 
 **Module type**: Action
 
 **Module ID**: `a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6`
+
+<br />
+
+### [Lasso selection (menu action)](b4411c95-e615-4fa9-80c1-d01c84cf8a54)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Selects tips from the tree.
+
+**Module type**: MenuAction
+
+**Module ID**: `b4411c95-e615-4fa9-80c1-d01c84cf8a54`
 
 <br />
 
@@ -449,7 +461,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Memory loader](a22ff194-c486-4215-a4bf-7a006d6f88fa)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Loads all the trees from the file into memory.
 Huge files may cause the program to run out of memory.
@@ -500,7 +512,7 @@ Safe even when opening huge files.
 
 ### [Node bars](319e8f63-d6c9-4dac-9419-0b621dcd5f23)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Draws node bars.
 
@@ -524,7 +536,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Node states](0512b822-044d-4c13-b3bb-bca494c51daa)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.2.1, by Giorgio Bianchini_
 
 **Description**: Draws node states based on attributes.
 
@@ -536,7 +548,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Online manual](bc943abb-66d9-4425-be78-6ff7fb4148f0)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Opens a web browser window at the TreeViewer manual homepage.
 
@@ -560,7 +572,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Parse node states](716b55a3-02d9-4007-a830-8326d407b24c)
 
-_Version 2.1.1, by Giorgio Bianchini_
+_Version 2.1.2, by Giorgio Bianchini_
 
 **Description**: Loads node state data from an attachment.
 
@@ -572,11 +584,11 @@ _Version 2.1.1, by Giorgio Bianchini_
 
 ### [Paste tree](a916ad8e-2f22-439f-b764-8beb54673f7d)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Loads a tree from the clipboard.
 
-**Module type**: Action
+**Module type**: MenuAction
 
 **Module ID**: `a916ad8e-2f22-439f-b764-8beb54673f7d`
 
@@ -584,7 +596,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions](5dbe1f3c-dbea-49b3-8f04-f319aefca534)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Plots node age distributions.
 
@@ -596,7 +608,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Plot alignment](ea7e246b-e93f-4d0d-a67a-88af05479b48)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Adds the plot of an alignment to the tree.
 
@@ -620,7 +632,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Polytomise selection](8202afa4-c9a6-47ac-98d5-dd0190c23f63)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Transforms the selected node into a polytomy.
 
@@ -656,7 +668,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Prune selection](f8abf1cd-d79f-403b-b0f2-4bb1412839ff)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Prunes the selected node off the tree.
 
@@ -678,9 +690,21 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 <br />
 
+### [Rectangle](34e1a627-7b6a-4c0f-80d9-795eea245e1e)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Draws a rectangle on the plot.
+
+**Module type**: Plotting
+
+**Module ID**: `34e1a627-7b6a-4c0f-80d9-795eea245e1e`
+
+<br />
+
 ### [Rectangular](68e25ec6-5911-4741-8547-317597e1b792)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a rectangular tree.
 
@@ -704,7 +728,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Reroot tree](c6f96861-11c0-4853-9738-6a90cc81d660)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Re-roots the tree using the specified outgroup.
 
@@ -716,13 +740,25 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Root tree on selection](77f387fb-c843-4164-aed2-bd5b8f325809)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Re-roots the tree using the selection as outgroup.
 
 **Module type**: SelectionAction
 
 **Module ID**: `77f387fb-c843-4164-aed2-bd5b8f325809`
+
+<br />
+
+### [Reshape tree](aaf3a3f5-d4d9-41c8-bd30-d99e061f28cf)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Changes the coordinate module and sets the plot actions to display the tree in a particular style.
+
+**Module type**: Action
+
+**Module ID**: `aaf3a3f5-d4d9-41c8-bd30-d99e061f28cf`
 
 <br />
 
@@ -740,7 +776,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Rooted tree style](e56b8297-4417-4494-9369-cbe9e5d25397)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as a rooted tree.
 
@@ -752,7 +788,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Save tree](a8f25c08-4935-4fd5-80ea-1d29ada66f1e)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.2.0, by Giorgio Bianchini_
 
 **Description**: Saves the tree file.
 
@@ -788,7 +824,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Search](5f3a7147-f706-43dc-9f57-18ade0c7b15d)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Searches leaves in the tree.
 
@@ -822,6 +858,42 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 <br />
 
+### [Set up age distributions (attachment)](5d721496-f2fa-48de-ad0d-90ef5d8086aa)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Computes node age distributions from trees contained in an attachment.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `5d721496-f2fa-48de-ad0d-90ef5d8086aa`
+
+<br />
+
+### [Set up stochastic map](32858c9d-0247-497f-aeee-03f7bfe24158)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Parses the information from a stochastic mapping analysis.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `32858c9d-0247-497f-aeee-03f7bfe24158`
+
+<br />
+
+### [Set up stochastic map (attachment)](0e2f5255-2d34-474b-955d-b531ee5ba605)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Parses the information from a stochastic mapping analysis contained in an attachment.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `0e2f5255-2d34-474b-955d-b531ee5ba605`
+
+<br />
+
 ### [Sort nodes](8a3e4e83-6c4d-45a8-8737-bff99accd176)
 
 _Version 1.0.0, by Giorgio Bianchini_
@@ -834,9 +906,21 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
-### [Stochastic map](e760952f-56c1-4192-8dfb-b5d6ec2692d2)
+### [Stochastic mapping branches](f7a20f2f-94b2-4331-8bbf-4e0087da6fba)
 
 _Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Plots branches with data from a stochastic mapping analysis.
+
+**Module type**: Plotting
+
+**Module ID**: `f7a20f2f-94b2-4331-8bbf-4e0087da6fba`
+
+<br />
+
+### [Stochastic map](e760952f-56c1-4192-8dfb-b5d6ec2692d2)
+
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Opens a file containing one or more trees in the format produced by the write.simmap function of phytools (Revell 2012).
 Safe even when opening huge files.
@@ -871,6 +955,18 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 <br />
 
+### [Text element](ebafe997-c220-425a-ae39-06e731de1a07)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Draws a text element on the plot.
+
+**Module type**: Plotting
+
+**Module ID**: `ebafe997-c220-425a-ae39-06e731de1a07`
+
+<br />
+
 ### [Transform lengths](f9241a42-c0cb-41a5-a1ee-a68fc339dee8)
 
 _Version 1.0.0, by Giorgio Bianchini_
@@ -897,7 +993,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Unrooted tree style](a99eb0c6-a69d-4785-961a-a0c247e9704d)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as an unrooted tree.
 

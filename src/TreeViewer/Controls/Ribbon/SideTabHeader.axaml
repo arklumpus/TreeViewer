@@ -1,0 +1,123 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2021  Giorgio Bianchini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TreeViewer.SideTabHeader">
+  <UserControl.Styles>
+    <Style Selector="#ButtonStackPanel Border.ButtonBorder">
+      <Setter Property="Margin" Value="0,0,10,0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector=".WindowsStyle #ButtonStackPanel Border.ButtonBorder:pointerover">
+      <Setter Property="Margin" Value="0,0,10,0" />
+      <Setter Property="Background" Value="#C5C5C5" />
+      <Setter Property="BorderBrush" Value="#C5C5C5" />
+    </Style>
+
+    <Style Selector=".WindowsStyle #ButtonStackPanel Border.ButtonBorder.pressed>Viewbox">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <Style Selector=".WindowsStyle #ButtonStackPanel Border.ButtonBorder.active">
+      <Setter Property="Background" Value="#AEAEAE" />
+      <Setter Property="BorderBrush" Value="#AEAEAE" />
+    </Style>
+
+    <Style Selector=".WindowsStyle #ButtonStackPanel Border.ButtonBorder.active:pointerover">
+      <Setter Property="Background" Value="#C5C5C5" />
+      <Setter Property="BorderBrush" Value="#AEAEAE" />
+    </Style>
+
+    <Style Selector=".WindowsStyle #ButtonStackPanel Border.ButtonBorder.active.pressed">
+      <Setter Property="Background" Value="#AEAEAE" />
+      <Setter Property="BorderBrush" Value="#AEAEAE" />
+    </Style>
+
+    <Style Selector=".WindowsStyle Canvas#ArrowCanvas Path#WindowsArrowPath">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
+
+    <Style Selector=".WindowsStyle Canvas#ArrowCanvas">
+      <Setter Property="Height" Value="9"/>
+    </Style>
+
+    <Style Selector=".WindowsStyle Canvas#ArrowCanvas Path#MacOSArrowPath">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+
+    <Style Selector=".MacOSStyle #ButtonStackPanel Border.ButtonBorder:pointerover">
+      <Setter Property="Margin" Value="0,0,10,0" />
+      <Setter Property="Background" Value="#D4D4D4" />
+      <Setter Property="BorderBrush" Value="#D4D4D4" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector=".MacOSStyle #ButtonStackPanel Border.ButtonBorder.pressed>Viewbox">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <Style Selector=".MacOSStyle #ButtonStackPanel Border.ButtonBorder.active">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector=".MacOSStyle Canvas#ArrowCanvas Path#WindowsArrowPath">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+    <Style Selector=".MacOSStyle Canvas#ArrowCanvas Path#MacOSArrowPath">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
+
+    <Style Selector=".MacOSStyle Canvas#ArrowCanvas">
+      <Setter Property="Height" Value="1"/>
+    </Style>
+
+  </UserControl.Styles>
+  <Grid Margin="0,1,0,0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="44" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid Grid.Row="1">
+      <Canvas VerticalAlignment="Bottom" Height="1" Background="#C6C6C6"></Canvas>
+      <Canvas VerticalAlignment="Bottom" Width="21" Background="#E7E7E7" HorizontalAlignment="Left" Name="ArrowCanvas">
+        <Canvas.Transitions>
+          <Transitions>
+            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0:0.1"/>
+          </Transitions>
+        </Canvas.Transitions>
+
+        <Path Stroke="#C6C6C6" StrokeThickness="1" Data="M0,8.5 L3,8.5 L10,0 L18,8.5 L21,8.5" StrokeLineCap="Round" StrokeJoin="Round" Name="WindowsArrowPath" />
+
+        <Path Stroke="#C6C6C6" StrokeThickness="1" Data="M-12.5,1 L-12.5,-40.5 A 4,4 0 0 1 -8.5,-44.5 L28.5,-44.5 A 4,4 0 0 1 32.5,-40.5 L32.5,1" Fill="#F5F5F5" UseLayoutRounding="True" Name="MacOSArrowPath" />
+      </Canvas>
+    </Grid>
+
+    <StackPanel Orientation="Horizontal" Margin="10,0,4,0" Name="ButtonStackPanel">
+
+    </StackPanel>
+  </Grid>
+</UserControl>

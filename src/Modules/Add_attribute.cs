@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using PhyloTree;
 using TreeViewer;
+using VectSharp;
+using System.Runtime.InteropServices;
 
 namespace Add_attribute
 {
@@ -32,6 +34,52 @@ namespace Add_attribute
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = true;
+		
+		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEpSURBVDhPlZOxUoNAEIbvVB7BFxB6a1JZUdjkGVLSQmXhmIyFHS2deYY0zkCVShoabWH0AfQdzvv3lvMCh4zfDPNn73b/ZXeCFAtkWbbV8mCif4Ji/aiu65QP3J1x7oShc5qmIooiOquqSuR5TjrgNfAVg7quRVEUEjpwwWqZKwZJkkAU6xQUYy535tv7g3r7+OLoFOTaEeY6P21W4m7/Kt4/v/nE0Pc9/9IsdYZyqgX51NRXDFDkmlDVc67oMQZ4Y+P0V2fEgJIdgwHsYFeWpZ3Jnfn66lK+PK4loEsPdMGvYxeIYpigeNxxjHUemwDqvGBwAkzcnfDxL54dnLMSTdMc4ziWbdvehGEogiDYIsY5JaxXZvOHZkeqmXwL+r+OJFoslOMZhPgBVrklcs7G+GIAAAAASUVORK5CYII=";
+        private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGkSURBVEhLrZUtT8RAEIangMIRIFggDcEA/hRBVIDAg0LWFoXg44LANbg6MIAGBEmbQFCoCsAcoQ38APgPZWc7bbbdj24TnqSZ27m9952daXsO9CQIghMWjsvVP4Pi7CqyLCtswL1j9NtOqsp93wfXdcukBeMUjXSJx3EMURRBkiR8Xe2p1kZs2oLf03bcT1mLFqE4C73bIjJBUaKPuOd5GPgp6LMZFMfjqdqyeXhXXD2OaGUGNaQhd1W+Mj8N57evrN4CVhdmKKsGh9wwsGnL3NSktUnDwCS+dXTfELMxyfMc0jQF/qroqvz9+xcOLl9gZ30JdjeWKVvm1xZnG68b7D2K43PBGBoHKvL29aMcMFe92C/4xUAd1KOiAZ8DbVuunz5oBbwNZ3sDuHn+bOTbVJWHYVgbDDGJxxJRiYkmKtiBBizU4jW6NunaIsIFhBa14a8KcpRO0m6Lo4C2amlsoMFIM6nuoofTbUdXqQ6pAp0JwivuaaBENxP6WqZrBm10M0GT9n3ehfb/QGUiPqHSrahBa4C0TfqKI0YDRDTB2EccAOAP+5oIPGiJgooAAAAASUVORK5CYII=";
+        private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIOSURBVFhHtZa/TgJBEMb38BV8ARNCtLHSAiuiCRSa2KuVj8DZCw8Ana2FidqZWJgAhaG7xgcwJjyG9bnfsnu5m2N3Z/fwlyz754Dvu5m5gURsgeFwOJLT/XoXRmMDTcRBIwNl8X6/LwaDAZYs0jRVc0u9RtBEvExUBDji8/lcLBYLvau/z0RgR70GECj+IcerHL+r1aqDg3a7jakwF5QCbtiN+HQ6vZBjhBn7ckQMbAMROf/Ss4HuFSwDkQV3pGcD3Su8NeASf/78Fod7u3pXBTnvdrvHcmC+k0fn+DytAacBn/jL8keIPK+ZMCK68HpydOjnjQHrY8gJuzFx1euI69N9fcrD+Rhyc67uXEbAFgkX1hSE5jzGBPqETI9aVwzE5jzEBOmQ4+Ix9IUdOUauIQIzlPL1xAIVR5NSRcjNOfAVHq7fnB0k4jHN9dGa20kidcyZEsei5Qs7hRMJD4U4QAqcOY8x4aAiDqytmHOnoSaoOICBMRYoDhRJmf8wQWEVIb4cIhCDqAGVrZd1NhShXlUoDmNMKANUKJCiBnR+otMRS6UTZlm2lD+diErPtErzywZox3t7ehiLy5NaYYVQewq4kSjXQhOsRcTpjtsoQmsf8EUCzGazHO1Vj6hUWA0AlwmscaapdTguzr9kYFNhYvaK0+J8z9SNUJwRMNBIbOPODSwDoGxC01hcCCH+ADILl2HQ8UejAAAAAElFTkSuQmCC";
+
+        public static Page GetIcon(double scaling)
+        {
+            byte[] bytes;
+
+            if (scaling <= 1)
+            {
+
+                bytes = Convert.FromBase64String(Icon16Base64);
+            }
+            else if (scaling <= 1.5)
+            {
+                bytes = Convert.FromBase64String(Icon24Base64);
+            }
+            else
+            {
+                bytes = Convert.FromBase64String(Icon32Base64);
+            }
+
+            IntPtr imagePtr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, imagePtr, bytes.Length);
+
+            RasterImage icon;
+
+            try
+            {
+                icon = new VectSharp.MuPDFUtils.RasterImageStream(imagePtr, bytes.Length, MuPDFCore.InputFileTypes.PNG);
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(imagePtr);
+            }
+
+            Page pag = new Page(16, 16);
+            pag.Graphics.DrawRasterImage(0, 0, 16, 16, icon);
+
+            return pag;
+        }
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
@@ -101,7 +149,7 @@ namespace Add_attribute
             return (bool)currentParameterValues["Apply"];
         }
 
-        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues)
+        public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
             string[] nodeElements = (string[])parameterValues["Node:"];
 
