@@ -376,7 +376,7 @@ namespace TreeViewerCommandLine
             }
 
 
-            if (!Console.IsOutputRedirected)
+            if (!Console.IsOutputRedirected && !Console.IsInputRedirected)
             {
 
                 int historyIndex = -1;
