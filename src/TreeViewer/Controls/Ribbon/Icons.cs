@@ -140,21 +140,32 @@ namespace TreeViewer
             return can;
         }
 
-        public static Control GetDuplicateIcon(double scaling)
+        public static Control GetDuplicateIcon()
         {
-            if (scaling <= 1)
-            {
-                return new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, Data = Geometry.Parse("M0,0.5 L7,0.5 M6.5,0 L6.5,7 M7,6.5 L0,6.5 M0.5,7 L0.5,0 M3.5,8 L3.5,10 M3.5,9.5 L10,9.5 M9.5,9.5 L9.5,3 M9.5,3.5 L8,3.5"), StrokeThickness = 1, StrokeJoin = PenLineJoin.Miter, StrokeLineCap = PenLineCap.Square, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
-            }
-            else if (scaling <= 1.5)
-            {
-                return new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, Data = Geometry.Parse("M-0.25,0.3333 L7.25,0.3333 M7,-0.25 L7,7.25 M7.25,7 L-0.25,7 M0.3333,7.25 L0.3333,-0.25 M3,8 L3,10 M3,9.6667 L9.6667,9.6667 M9.6667,10 L9.6667,2.6667 M9.6667,3 L8,3"), StrokeThickness = 1 / scaling, StrokeJoin = PenLineJoin.Miter, StrokeLineCap = PenLineCap.Square, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
-            }
-            else
-            {
-                return new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, Data = Geometry.Parse("M0,0.5 L6.5,0.5 M6.5,0 L6.5,6.5 M6.5,6.5 L0,6.5 M0.5,6.5 L0.5,0 M3.5,8 L3.5,10 M3.5,9.5 L10,9.5 M9.5,9.5 L9.5,3.5 M9.5,3.5 L8,3.5"), StrokeThickness = 1, StrokeJoin = PenLineJoin.Miter, StrokeLineCap = PenLineCap.Square, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
-            }
-            
+            DPIAwareBox regularBox = new DPIAwareBox(GetIcon("TreeViewer.Assets.Duplicate-10.png", "TreeViewer.Assets.Duplicate-15.png", "TreeViewer.Assets.Duplicate-20.png", 10, 10));
+            DPIAwareBox hoverBox = new DPIAwareBox(GetIcon("TreeViewer.Assets.Duplicate-hover-10.png", "TreeViewer.Assets.Duplicate-hover-15.png", "TreeViewer.Assets.Duplicate-hover-20.png", 10, 10));
+
+            regularBox.Classes.Add("Regular");
+            hoverBox.Classes.Add("Hover");
+
+            Grid grd = new Grid() { Width = 10, Height = 10 };
+
+            Style styleHover = new Style(x => x.OfType<Button>().Descendant().OfType<DPIAwareBox>().Class("Hover"));
+            Style styleRegular = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().OfType<DPIAwareBox>().Class("Regular"));
+            Style styleHoverHover = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().OfType<DPIAwareBox>().Class("Hover"));
+
+            styleHover.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
+            styleRegular.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
+            styleHoverHover.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, true));
+
+            grd.Styles.Add(styleRegular);
+            grd.Styles.Add(styleHover);
+            grd.Styles.Add(styleHoverHover);
+
+            grd.Children.Add(regularBox);
+            grd.Children.Add(hoverBox);
+
+            return grd;
         }
 
         public static Canvas GetReplaceIcon(double scaling)

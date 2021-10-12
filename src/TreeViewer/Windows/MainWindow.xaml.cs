@@ -2683,7 +2683,7 @@ namespace TreeViewer
                 ((Grid)((Accordion)PlottingActionsContainer.Children[PlottingActionsContainer.Children.Count - 2]).AccordionHeader).Children[5].IsVisible = true;
             }
 
-            Button duplicate = new Button() { Width = 16, Height = 16, Background = Brushes.Transparent, Content = new DPIAwareBox(Icons.GetDuplicateIcon) { Width = 10, Height = 10 }, Padding = new Thickness(0) };
+            Button duplicate = new Button() { Width = 16, Height = 16, Background = Brushes.Transparent, Content = Icons.GetDuplicateIcon(), Padding = new Thickness(0) };
             duplicate.Classes.Add("SideBarButton");
 
             duplicate.PointerPressed += (s, e) =>
