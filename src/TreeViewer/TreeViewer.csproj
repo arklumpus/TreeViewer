@@ -492,9 +492,9 @@
     <EmbeddedResource Include="Fonts\RobotoMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.7" />
-    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="4.1.1-a1" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.7" />
+    <PackageReference Include="Avalonia" Version="0.10.8" />
+    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="4.2.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.8" />
     <PackageReference Include="AvaloniaColorPicker" Version="1.1.0" />
     <PackageReference Include="CSharpEditor" Version="1.1.2" />
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
