@@ -331,9 +331,18 @@ namespace TreeViewerCommandLine
 
                     foreach (KeyValuePair<string, ModuleMetadata> kvp in Modules.LoadedModulesMetadata)
                     {
-                        if (argument.StartsWith(kvp.Value.Name, StringComparison.OrdinalIgnoreCase))
+                        if (argument.StartsWith(kvp.Value.Name, StringComparison.OrdinalIgnoreCase) || argument.StartsWith(kvp.Value.Id, StringComparison.OrdinalIgnoreCase))
                         {
-                            string postModule = argument.Substring(kvp.Value.Name.Length).Trim();
+                            string postModule;
+
+                            if (argument.StartsWith(kvp.Value.Name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                postModule = argument.Substring(kvp.Value.Name.Length).Trim();
+                            }
+                            else
+                            {
+                                postModule = argument.Substring(kvp.Value.Id.Length).Trim();
+                            }
 
                             if (kvp.Value.ModuleType == ModuleTypes.Action || kvp.Value.ModuleType == ModuleTypes.SelectionAction)
                             {
