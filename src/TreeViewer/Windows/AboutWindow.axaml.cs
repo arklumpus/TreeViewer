@@ -27,6 +27,11 @@ namespace TreeViewer
         public AboutWindow()
         {
             InitializeComponent();
+
+            if (Modules.IsMac)
+            {
+                this.PlatformImpl.GetType().InvokeMember("SetTitleBarColor", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.InvokeMethod, null, this.PlatformImpl, new object[] { Avalonia.Media.Color.FromRgb(243, 243, 243) });
+            }
         }
 
         private void InitializeComponent()
