@@ -583,6 +583,10 @@ namespace TreeViewer
                                                     text = "Colour formatter";
                                                     itemGrid.Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.ColourFormatter")) { Width = 32, Height = 32 });
                                                     break;
+                                                case "MarkdownEditor":
+                                                    text = "Markdown code";
+                                                    itemGrid.Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Markdown")) { Width = 32, Height = 32 });
+                                                    break;
                                             }
 
                                             TrimmedTextBox2 block = new TrimmedTextBox2() { Text = text, Foreground = new SolidColorBrush(Color.FromRgb(102, 102, 102)), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 12 };
@@ -636,9 +640,18 @@ namespace TreeViewer
 
                                             if (pos.X >= 0 && pos.Y >= 0 && pos.X <= itemGrid.Bounds.Width && pos.Y <= itemGrid.Bounds.Height)
                                             {
-                                                CodeViewerWindow win = new CodeViewerWindow();
-                                                await win.Initialize(item.Item2, item.Item1);
-                                                await win.ShowDialog2(this.FindAncestorOfType<Window>());
+                                                if (item.Item2 != "MarkdownEditor")
+                                                {
+                                                    CodeViewerWindow win = new CodeViewerWindow();
+                                                    await win.Initialize(item.Item2, item.Item1);
+                                                    await win.ShowDialog2(this.FindAncestorOfType<Window>());
+                                                }
+                                                else
+                                                {
+                                                    CodeViewerWindow win = new CodeViewerWindow();
+                                                    await win.Initialize(item.Item2, item.Item1);
+                                                    await win.ShowDialog2(this.FindAncestorOfType<Window>());
+                                                }
                                             }
                                         };
 

@@ -51,30 +51,45 @@ namespace TreeViewer
 
             string source = File.ReadAllText(oldestFile);
 
-            string preSource = "";
-            string postSource = "";
-
-            if (type == "StringFormatter")
+            if (type != "MarkdownEditor")
             {
-                preSource = "using TreeViewer;\npublic static class FormatterModule { ";
-                postSource = "}";
-            }
-            else if (type == "NumberFormatter")
-            {
-                preSource = "using TreeViewer;\npublic static class FormatterModule {";
-                postSource = "}";
-            }
-            else if (type == "ColourFormatter")
-            {
-                preSource = "using TreeViewer;\nusing VectSharp;\nusing System;\nusing System.Collections.Generic;\npublic static class FormatterModule {";
-                postSource = "}";
-            }
+                string preSource = "";
+                string postSource = "";
 
-            Editor editor = await Editor.Create(source, preSource, postSource, guid: guid);
-            editor.Background = this.Background;
-            editor.AccessType = Editor.AccessTypes.ReadOnlyWithHistoryAndErrors;
+                if (type == "StringFormatter")
+                {
+                    preSource = "using TreeViewer;\npublic static class FormatterModule { ";
+                    postSource = "}";
+                }
+                else if (type == "NumberFormatter")
+                {
+                    preSource = "using TreeViewer;\npublic static class FormatterModule {";
+                    postSource = "}";
+                }
+                else if (type == "ColourFormatter")
+                {
+                    preSource = "using TreeViewer;\nusing VectSharp;\nusing System;\nusing System.Collections.Generic;\npublic static class FormatterModule {";
+                    postSource = "}";
+                }
 
-            this.FindControl<Grid>("MainContainer").Children.Add(editor);
+                Editor editor = await Editor.Create(source, preSource, postSource, guid: guid);
+                editor.Background = this.Background;
+                editor.AccessType = Editor.AccessTypes.ReadOnlyWithHistoryAndErrors;
+
+                this.FindControl<Grid>("MainContainer").Children.Add(editor);
+            }
+            else
+            {
+                this.Title = "Markdown viewer";
+
+                MDEdit.Editor editor = await MDEdit.Editor.Create(source, guid);
+                editor.Background = this.Background;
+                editor.MarkdownRenderer.ImageUriResolver = (a, b) => MarkdownUtils.ImageUriResolverAsynchronous(a, b, null);
+                editor.MarkdownRenderer.RasterImageLoader = imageFile => new VectSharp.MuPDFUtils.RasterImageFile(imageFile);
+                editor.AccessType = MDEdit.Editor.AccessTypes.ReadOnlyWithHistory;
+
+                this.FindControl<Grid>("MainContainer").Children.Add(editor);
+            }
         }
 
         public async Task Initialize(string source)

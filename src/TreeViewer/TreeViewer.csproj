@@ -150,6 +150,9 @@
     <EmbeddedResource Include="Assets\LoadModule-48.png" />
     <EmbeddedResource Include="Assets\LoadModule-64.png" />
     <EmbeddedResource Include="Assets\MacOSPermissionsInstructions.md" />
+    <EmbeddedResource Include="Assets\Markdown-32.png" />
+    <EmbeddedResource Include="Assets\Markdown-48.png" />
+    <EmbeddedResource Include="Assets\Markdown-64.png" />
     <EmbeddedResource Include="Assets\MenuAction-32.png" />
     <EmbeddedResource Include="Assets\MenuAction-48.png" />
     <EmbeddedResource Include="Assets\MenuAction-64.png" />
@@ -388,6 +391,9 @@
     <None Remove="Assets\LoadModule-48.png" />
     <None Remove="Assets\LoadModule-64.png" />
     <None Remove="Assets\MacOSPermissionsInstructions.md" />
+    <None Remove="Assets\Markdown-32.png" />
+    <None Remove="Assets\Markdown-48.png" />
+    <None Remove="Assets\Markdown-64.png" />
     <None Remove="Assets\MenuAction-32.png" />
     <None Remove="Assets\MenuAction-48.png" />
     <None Remove="Assets\MenuAction-64.png" />
