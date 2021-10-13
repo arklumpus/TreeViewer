@@ -75,6 +75,8 @@ namespace TreeViewer
             string globalSettingName = null;
             string globalSettingValue = null;
 
+            bool logExceptions = false;
+
             OptionSet argParser = new OptionSet()
             {
                 { "h|help", "Print this message and exit.", v => { showHelp = v != null; } },
@@ -96,6 +98,7 @@ namespace TreeViewer
                 { "module-creator", "Start with the module creator window.", v => { moduleCreator = v != null; } },
                 { "set-global={/}{=}", "Set the value of a global setting.", (n, v) => { globalSettingName = n; globalSettingValue = v; } },
                 { "new-process", "Start a new process, even if another instance of TreeViewer is already running.", (v) => { startNewProcess = v != null; } },
+                { "log-exceptions", "Log all handled and unhandles exceptions to the console.", (v) => { logExceptions = v != null; } },
             };
 
             List<string> unrecognised = argParser.Parse(args);
@@ -167,6 +170,56 @@ namespace TreeViewer
             {
                 ConsoleWrapperUI.EnableConsole();
                 System.Threading.Thread.Sleep(delay);
+            }
+
+            if (logExceptions)
+            {
+                System.Diagnostics.Stopwatch runTime = System.Diagnostics.Stopwatch.StartNew();
+
+                AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
+                {
+                    long elapsed = runTime.ElapsedMilliseconds;
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("Exception (first chance): " + e.Exception.GetType().Name + " @ T+" + TimeSpan.FromMilliseconds(elapsed).ToString());
+                    ConsoleWrapperUI.WriteLine("\t" + e.Exception.Message.Replace("\n", "\n\t"));
+                    ConsoleWrapperUI.WriteLine("\tin " + e.Exception.Source);
+                    ConsoleWrapperUI.WriteLine("\t" + e.Exception.StackTrace.Replace("\n", "\n\t"));
+                    ConsoleWrapperUI.WriteLine();
+                };
+
+                AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                {
+                    long elapsed = runTime.ElapsedMilliseconds;
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("Exception (unhandled): " + e.ExceptionObject.GetType().Name + " @ T+" + TimeSpan.FromMilliseconds(elapsed).ToString());
+
+                    if (e.ExceptionObject is Exception ex)
+                    {
+                        ConsoleWrapperUI.WriteLine("\t " + ex.Message.Replace("\n", "\n\t"));
+                        ConsoleWrapperUI.WriteLine("\tin " + ex.Source);
+                        ConsoleWrapperUI.WriteLine("\t" + ex.StackTrace.Replace("\n", "\n\t"));
+                        ConsoleWrapperUI.WriteLine();
+                    }
+                    else
+                    {
+                        ConsoleWrapperUI.WriteLine("\t Unknown exception type!");
+                        ConsoleWrapperUI.WriteLine();
+                    }
+
+                    if (e.IsTerminating)
+                    {
+                        ConsoleWrapperUI.WriteLine("Shutting down due to the exception!");
+                        ConsoleWrapperUI.WriteLine();
+                    }
+                };
+
+                ConsoleWrapperUI.EnableConsole();
+
+                try
+                {
+                    throw new Exception("Making sure that the exception log system works.");
+                }
+                catch { }
             }
 
             // Force loading the System.Threading.Tasks.Parallel assembly
