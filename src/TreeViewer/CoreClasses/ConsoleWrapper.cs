@@ -499,7 +499,7 @@ namespace TreeViewer
 
             bool finishedCommand = false;
 
-            if (!Console.IsOutputRedirected)
+            if (!Console.IsOutputRedirected && !Console.IsInputRedirected)
             {
                 ConsoleKeyInfo ki;
 
