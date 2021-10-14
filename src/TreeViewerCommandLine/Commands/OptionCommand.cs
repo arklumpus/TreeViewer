@@ -574,7 +574,7 @@ namespace TreeViewerCommandLine
 
                             string[] splitArgument = argument.Split(' ');
 
-                            if (double.TryParse(splitArgument[0], out double parsedUnitsOn) && double.TryParse(splitArgument[1], out double parsedUnitsOff) && double.TryParse(splitArgument[1], out double parsedPhase))
+                            if (double.TryParse(splitArgument[0], out double parsedUnitsOn) && double.TryParse(splitArgument[1], out double parsedUnitsOff) && double.TryParse(splitArgument[2], out double parsedPhase))
                             {
                                 Program.SelectedModuleParameters.UpdateParameterAction(new Dictionary<string, object>() { { Program.SelectedOption, new LineDash(parsedUnitsOn, parsedUnitsOff, parsedPhase) } });
                             }
