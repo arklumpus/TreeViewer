@@ -537,7 +537,6 @@ namespace TreeViewer
 
             Modules.CachedReferences.Add(CachedMetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "PhyloTree.TreeNode.dll"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "PhyloTree.TreeNode.xml")));
             Modules.CachedReferences.Add(CachedMetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "MuPDFCore.dll"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "MuPDFCore.xml")));
-            Modules.CachedReferences.Add(CachedMetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "Avalonia.Controls.PanAndZoom.dll"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "Avalonia.Controls.PanAndZoom.xml")));
             Modules.CachedReferences.Add(CachedMetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "MathNet.Numerics.dll"), Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Modules)).Location), "MathNet.Numerics.xml")));
 
             Editor editor = await Editor.Create(moduleSource, references: Modules.CachedReferences, guid: editorId);
