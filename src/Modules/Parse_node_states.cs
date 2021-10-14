@@ -69,7 +69,7 @@ namespace ParseTipStates
         public const string Name = "Parse node states";
         public const string HelpText = "Loads node state data from an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("2.1.2");
+        public static Version Version = new Version("2.1.3");
         public const string Id = "716b55a3-02d9-4007-a830-8326d407b24c";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -289,7 +289,7 @@ namespace ParseTipStates
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType))
+                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Match attribute type:"] == (string)currentParameterValues["Match attribute type:"])
                 {
                     parametersToChange.Add("Match attribute type:", attrType);
                 }

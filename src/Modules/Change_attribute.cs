@@ -29,13 +29,13 @@ namespace ChangeAttribute
         public const string Name = "Change attribute";
         public const string HelpText = "Changes the value of an already existing attribute.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "8de06406-68e4-4bd8-97eb-2185a0dd1127";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public static bool Repeatable { get; } = true;
-		
-		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFPSURBVDhPhZKxToRAEIZ3z9KOV4DCV8DGu4ZCC5/BkhYqCyPEwo6W0mew0ASaOxtpaLQygegDaGuN8w87mz3g4pdwMzs7/7+zcFoR5zeP2fPdZYZ8SpIkqN+OqzkaYorcQCZsKIg4jmMVBMFYdEjTVK3k5JPflycSDPSseXdkT1xVFYsQhRV+zMkXyImtmBRFod2T67rmGqLABoaNicCaaIIrRBRFuNaAKEzvDNF2XDEbOnGHZCC44sDvwOSMaV6c5P3rhwtC3/cc2YCaMoyGfGrycXzGBtcPr7wGEJdliTS34q7rMKUdEyfjE9PDNd4k0Id+6KTRioEIpmBvJiZwhRzjyJ3ur07xzxzePr/ZUHDHpmtaAwaO7iQQw0RYOnnG1ET4T3xkomqaZheGoW7bdu37vvI8b+9tz8Y+hDsJoikfxE4guJPQMsd63FlCqT9+QxHv4IDv1AAAAABJRU5ErkJggg==";
+        
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFPSURBVDhPhZKxToRAEIZ3z9KOV4DCV8DGu4ZCC5/BkhYqCyPEwo6W0mew0ASaOxtpaLQygegDaGuN8w87mz3g4pdwMzs7/7+zcFoR5zeP2fPdZYZ8SpIkqN+OqzkaYorcQCZsKIg4jmMVBMFYdEjTVK3k5JPflycSDPSseXdkT1xVFYsQhRV+zMkXyImtmBRFod2T67rmGqLABoaNicCaaIIrRBRFuNaAKEzvDNF2XDEbOnGHZCC44sDvwOSMaV6c5P3rhwtC3/cc2YCaMoyGfGrycXzGBtcPr7wGEJdliTS34q7rMKUdEyfjE9PDNd4k0Id+6KTRioEIpmBvJiZwhRzjyJ3ur07xzxzePr/ZUHDHpmtaAwaO7iQQw0RYOnnG1ET4T3xkomqaZheGoW7bdu37vvI8b+9tz8Y+hDsJoikfxE4guJPQMsd63FlCqT9+QxHv4IDv1AAAAABJRU5ErkJggg==";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJOSURBVEhLlZa/a1NRFMfPq4voolHRUZugLtU5Lg0dEtJCOzi1Ti6WUKdk6KRGHASH4CJBZ7Ud2w6FhLaWDmbJoDhYTXAW/AsE9fn9nndvuHl9P/I+cHvP/fG+33vOvZB684+2PRGZRavuPltaR59IvV5vonsSjNKhQQn9h2AoD2HyysQnsOK1Wk0KhUIwmUCj0ZAp9NVgKC+u/P72BSJrZjxGVnELyyPIYo3i5/78fIDhXbSjVqtV4RpJE+90OtLtdjUul8tSqQSf2gyEZYH4DEKKn0YrQ3Sfa4bEk1McB/LYrJFFDQgWWfujYKTMwWSXAT/MUhaXkQExZTkIRkoVJhsMPKAzEbAs2OezMXaJ/Mic3F4+2YD5CgPcl79Sui735m7qQhKjOwgDsXl0m8FIWYbpNgPcl/f+8Lu8OzjWhTTGDCDSZJqMYbKMTstjWMTaHoPn9+/IpCYjA4qj09fiA86ZsuwwNnSxb+r29CUvLZPhcKi9Grji9rU4Jkvo+GTXj8/OfkT7i3u4wTWbSRiKt9tthk+9KHEX+3p4corrpMgqMnhjD+HiiuNwTWYQKb7weEfTpwjB5n+Y5tNZRXvNPWHC4jrJDND8wWBgpAI+//jl80m+3f+qY90cQhcM/J46piLjTGoSR5L4Kf7p9XqHxWLR6/f7pXw+L7lcThcvnz8jM1cvyMutTzyu3Lp2UeddIssSR1omYRLLEkecSZhJxbVELnHlcslSlhMGJMkkU81BpAGJMskqTmINSNgkqziJ/RFxMRfJf1UyiYuI/Acrj/J+e4Qz+AAAAABJRU5ErkJggg==";
         private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJrSURBVFhHrZaxbhoxGMd94RX6AhEo6pSpCxtkANRUyt4ueQboWhWUNeIp2qRrpbYCpDYkC0v3Vq2Q+hKdyfcz9skY4/Pl7ieZz/7udP//ffbZZMrw8t3nLxKuv11dLLeZdIbD4VjC++2oHNqAET+nL3TLmKgiDpknPhFxHpiEK97r9VS/36ebxGg00vFI2rXuGXEeKm0jrWPyQaqIu9gp6FB296GG7nQ63ZuOFPH5fK4Wi4UZ7d9nK9Dg5+/Dp3/Edrt9R3S4lNz9arXS16Gk+Fdpt9L+r9frExKtVouQm2MKXLomutx501FYdisu1XslbUxk7FbEsmPAlDtqQu7JEuf8p4kWf6zxK5BkYjAY5PtHhBcmWvyx5uCDjJi/JiBfmBtBZzy8NcCbI37uVs79DIOkVCITPv74rZMuiCAmsL+wZnbEXQpLWVQJ+YQ3rzsn6s3Zc5NOI1oBEdWbEf0DlZjYaZD9I7tZ/lGhSqSwZwBxCfpTm81mIROIj3lzNjASVKCMCdaIZceAK27nzC40a8KKkxPe8kP5U014O+QkNxASt3gmgGqwwu0hlmTCF+dl9CKMifuw8k03xxoExDHhL8yQOJ2jmHjoTRD78P0X86+jKw62Eini0LAHUEicNxFFdXr8zGS36LHko9cNMXHAgE40m838pIIkkch1KBIHDDCnHTkudaIuEyni0JCzflmHidQ599F/SGoxYSgjDtoAVDUBZcUhNwBVTDxFHHYMQKqJp865z54BSDJhqCIOQQNQZAKqisNBAxAzUYc4RA1AyASxDnHgwUm4h5ZDJXEorIDFrcQ2U11cKaUeAUPOIVFB/1rUAAAAAElFTkSuQmCC";
 
@@ -134,7 +134,7 @@ namespace ChangeAttribute
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType))
+                if (!string.IsNullOrEmpty(attrType) && previousParameterValues["Attribute type:"] == currentParameterValues["Attribute type:"])
                 {
                     parametersToChange.Add("Attribute type:", attrType);
                 }

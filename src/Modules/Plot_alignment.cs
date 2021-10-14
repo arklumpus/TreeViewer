@@ -18,7 +18,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
         public const string Name = "Plot alignment";
         public const string HelpText = "Adds the plot of an alignment to the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "ea7e246b-e93f-4d0d-a67a-88af05479b48";
@@ -337,10 +337,30 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"])
+                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"] && (string)currentParameterValues["Attribute type:"] != attrType)
                 {
                     parametersToChange.Add("Attribute type:", attrType);
 
+                    if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                    {
+                        if (attrType == "String")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
+                        }
+                        else if (attrType == "Number")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
+                        }
+                    }
+                }
+            }
+
+            if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
+            {
+                string attrType = (string)currentParameterValues["Attribute type:"];
+                
+                if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                {
                     if (attrType == "String")
                     {
                         parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
@@ -352,42 +372,35 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 }
             }
 
-            if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
-            {
-                string attrType = (string)currentParameterValues["Attribute type:"];
-                if (attrType == "String")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
-                }
-                else if (attrType == "Number")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
-                }
-            }
-
             if ((int)currentParameterValues["ResidueStyleButtons"] == 0)
             {
-				object[] formatterParams = new object[] { DefaultNucleotideColourSource, false };
-				
+                object[] formatterParams = new object[] { DefaultNucleotideColourSource, false };
+                
                 ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultNucleotideColourSource, formatterParams);
 
                 formatterOptions.AttributeName = "(N/A)";
                 formatterOptions.AttributeType = "String";
                 formatterOptions.DefaultColour = ((ColourFormatterOptions)currentParameterValues["Residue colours:"]).DefaultColour;
 
-                parametersToChange["Residue colours:"] = formatterOptions;
+                if (previousParameterValues["Residue colours:"] == currentParameterValues["Residue colours:"])
+                {
+                    parametersToChange["Residue colours:"] = formatterOptions;
+                }
             }
             else if ((int)currentParameterValues["ResidueStyleButtons"] == 1)
             {
-				object[] formatterParams = new object[] { DefaultAminoAcidColourSource, false };
-				
+                object[] formatterParams = new object[] { DefaultAminoAcidColourSource, false };
+                
                 ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultAminoAcidColourSource, formatterParams);
 
                 formatterOptions.AttributeName = "(N/A)";
                 formatterOptions.AttributeType = "String";
                 formatterOptions.DefaultColour = ((ColourFormatterOptions)currentParameterValues["Residue colours:"]).DefaultColour;
 
-                parametersToChange["Residue colours:"] = formatterOptions;
+                if (previousParameterValues["Residue colours:"] == currentParameterValues["Residue colours:"])
+                {
+                    parametersToChange["Residue colours:"] = formatterOptions;
+                }
             }
 
             if ((Attachment)currentParameterValues["FASTA alignment:"] != (Attachment)previousParameterValues["FASTA alignment:"])
@@ -396,8 +409,15 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
                 int maxLen = (from el in ReadFasta(attachment) select el.Value.Length).Max();
 
-                parametersToChange["Start:"] = 1.0;
-                parametersToChange["End:"] = (double)maxLen;
+                if (previousParameterValues["Start:"] == currentParameterValues["Start:"])
+                {
+                    parametersToChange["Start:"] = 1.0;
+                }
+                
+                if (previousParameterValues["End:"] == currentParameterValues["End:"])
+                {
+                    parametersToChange["End:"] = (double)maxLen;
+                }
             }
 
             return true;

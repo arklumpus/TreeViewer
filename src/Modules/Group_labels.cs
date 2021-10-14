@@ -37,7 +37,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.1");
+        public static Version Version = new Version("1.2.2");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
@@ -201,32 +201,39 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"])
+                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"] && (string)currentParameterValues["Attribute type:"] != attrType)
                 {
                     parametersToChange.Add("Attribute type:", attrType);
 
-                    if (attrType == "String")
+					if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
                     {
-                        parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
-                    }
-                    else if (attrType == "Number")
-                    {
-                        parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
-                    }
+						if (attrType == "String")
+						{
+							parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
+						}
+						else if (attrType == "Number")
+						{
+							parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
+						}
+					}
                 }
             }
 
             if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
             {
                 string attrType = (string)currentParameterValues["Attribute type:"];
-                if (attrType == "String")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
-                }
-                else if (attrType == "Number")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
-                }
+				
+				if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+				{
+					if (attrType == "String")
+					{
+						parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
+					}
+					else if (attrType == "Number")
+					{
+						parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
+					}
+				}
             }
 
             if ((bool)currentParameterValues["Prevent overlap"])

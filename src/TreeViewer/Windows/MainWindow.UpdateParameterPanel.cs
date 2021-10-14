@@ -1657,7 +1657,7 @@ namespace TreeViewer
                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
                     UpdateParameters(parametersToChange, parameterUpdaters);
 
-                    bool needsUpdate = parameterChangeDelegate(tbr, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange2);
+                    bool needsUpdate = parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange2);
                     UpdateControls(controlStatus, parameterControls);
                     UpdateParameters(parametersToChange2, parameterUpdaters);
                 };

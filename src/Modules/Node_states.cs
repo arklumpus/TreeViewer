@@ -83,7 +83,7 @@ namespace NodeStates
         public const string Name = "Node states";
         public const string HelpText = "Draws node states based on attributes.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.1");
+        public static Version Version = new Version("1.2.2");
         public const string Id = "0512b822-044d-4c13-b3bb-bca494c51daa";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -483,9 +483,15 @@ namespace NodeStates
 
                         ColourFormatterOptions cfo = new ColourFormatterOptions(code, formatterParams) { AttributeName = "(N/A)", AttributeType = "String", DefaultColour = Colour.FromRgb(220, 220, 220) };
 
-                        parametersToChange["State colours:"] = cfo;
-
-                        parametersToChange["Enabled characters:"] = new CompiledCode(GetDefaultEnabledCharactersCode(splitStates));
+                        if (currentParameterValues["State colours:"] == previousParameterValues["State colours:"])
+                        {
+                            parametersToChange["State colours:"] = cfo;
+                        }
+                        
+                        if (currentParameterValues["Enabled characters:"] == previousParameterValues["Enabled characters:"])
+                        {
+                            parametersToChange["Enabled characters:"] = new CompiledCode(GetDefaultEnabledCharactersCode(splitStates));
+                        }
                     }
                     else if (currentParameterValues["Enabled characters:"] != previousParameterValues["Enabled characters:"])
                     {
@@ -502,8 +508,11 @@ namespace NodeStates
                         object[] formatterParams = new object[2] { code, false };
 
                         ColourFormatterOptions cfo = new ColourFormatterOptions(code, formatterParams) { AttributeName = "(N/A)", AttributeType = "String", DefaultColour = Colour.FromRgb(220, 220, 220) };
-
-                        parametersToChange["State colours:"] = cfo;
+                        
+                        if (currentParameterValues["State colours:"] == previousParameterValues["State colours:"])
+                        {
+                            parametersToChange["State colours:"] = cfo;
+                        }
                     }
                 }
                 catch { }

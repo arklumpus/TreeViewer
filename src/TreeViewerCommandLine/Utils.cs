@@ -1179,13 +1179,11 @@ namespace TreeViewerCommandLine
 
                 UpdateParameterAction = (parametersToChange) =>
                 {
-                    foreach (KeyValuePair<string, object> kvp in parametersToChange)
-                    {
-                        Dictionary<string, object> previousParameters = tbr.ShallowClone();
-                        UpdateParameters(new Dictionary<string, object>() { { kvp.Key, kvp.Value } }, parameterUpdaters);
-                        parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange2);
-                        UpdateParameters(parametersToChange2, parameterUpdaters);
-                    }
+                    Dictionary<string, object> previousParameters = tbr.ShallowClone();
+
+                    UpdateParameters(parametersToChange, parameterUpdaters);
+                    parameterChangeDelegate(previousParameters, tbr, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange2);
+                    UpdateParameters(parametersToChange2, parameterUpdaters);
                 };
             }
             else

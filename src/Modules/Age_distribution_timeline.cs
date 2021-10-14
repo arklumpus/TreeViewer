@@ -35,7 +35,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
         public const string Name = "Age distributions timeline";
         public const string HelpText = "Plots age distributions on a timeline.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "b93f8a2b-8731-4658-92f5-bb80af7292a8";
@@ -242,10 +242,30 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"])
+                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"] && (string)currentParameterValues["Attribute type:"] != attrType)
                 {
                     parametersToChange.Add("Attribute type:", attrType);
 
+                    if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                    {
+                        if (attrType == "String")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
+                        }
+                        else if (attrType == "Number")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
+                        }
+                    }
+                }
+            }
+
+            if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
+            {
+                string attrType = (string)currentParameterValues["Attribute type:"];
+                
+                if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                {
                     if (attrType == "String")
                     {
                         parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
@@ -254,19 +274,6 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                     {
                         parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
                     }
-                }
-            }
-
-            if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
-            {
-                string attrType = (string)currentParameterValues["Attribute type:"];
-                if (attrType == "String")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
-                }
-                else if (attrType == "Number")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
                 }
             }
 

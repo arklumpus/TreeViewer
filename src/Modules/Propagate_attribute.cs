@@ -17,14 +17,14 @@ namespace a85eee26d29b644708184f42ebe9a2567
         public const string Name = "Propagate attribute";
         public const string HelpText = "Propagates an attribute on the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public const string Id = "85eee26d-29b6-4470-8184-f42ebe9a2567";
 
         public static bool Repeatable { get; } = true;
-		
-		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAC+SURBVDhPrZIxDsIwDEVTxMFgZeEu2VEbsecuLKzlZuDvulFo/S0GnhQlduLfHzdDIuSc37ZUaq3u2YPNO6zgvEQcKiAOTjLNMkIRV6AvFicvTRJ294qKrS9F8tOS8R1EX8Z1RhFqAsPl9kAwyijP+7VtMDqH6uQoCxQDzJPZ/AU9D4FiAWb6v1d6B4i9JsKB24OtfeS8JqJRsx3e8lVMQTGcrCJY64aD+5DMfuSkQZ9yL6IJAhUw22HxH0jpA2NzVcfIdIxdAAAAAElFTkSuQmCC";
+        
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAC+SURBVDhPrZIxDsIwDEVTxMFgZeEu2VEbsecuLKzlZuDvulFo/S0GnhQlduLfHzdDIuSc37ZUaq3u2YPNO6zgvEQcKiAOTjLNMkIRV6AvFicvTRJ294qKrS9F8tOS8R1EX8Z1RhFqAsPl9kAwyijP+7VtMDqH6uQoCxQDzJPZ/AU9D4FiAWb6v1d6B4i9JsKB24OtfeS8JqJRsx3e8lVMQTGcrCJY64aD+5DMfuSkQZ9yL6IJAhUw22HxH0jpA2NzVcfIdIxdAAAAAElFTkSuQmCC";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEMSURBVEhLpZVNDoJADIXBeDDdiol3YW+UuOcuJuIWb6YtdAg//Xngl0BnIumjrx3JM4CyLL+ynNPUdX2WtcpOYkQjcU4h0QSqIEGVHCi0/a6HKnBzoBWoyREgASX5UWJIKKAlJ1s+sg5xBYLkVuMnmA1a8+b0bBrjxTNeBVtsaeXFBpAmI8nHTZ+IdBadrs87hRuvier9uPB+FZalSWDyV0AC+cjXzZBADp2Df9hLrOgaLOIbq3c7EM0ivnljao7eHMt/XiAWLUZPwRxpT8AcPYdFta7PXun024tCQXs3h2uRJLMqCT82TNiDQCQEOgeaiMQQSIBRRCAgAW4oXXwu4DdPoBVYDQ0+Oln2AzNLewzBRFlMAAAAAElFTkSuQmCC";
         private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFXSURBVFhHxZZBcsIwDEVDOQvnoGyBma57jew70Ok+5+i2M6VbGK7BYahE5Ezq2JG+o0nfRnaI8z+y5PGiAqnr+i7DHKemafYyVnmSiHCSmGMn0QScgRjKyDOFcztroQyYv1uSgY6UOEqxgYT4RiJEkYGUOKX9ImMI2ICnOAMZ8BZnzAaM4lqLDjC1S+k/p3WPQ4vezeqoGfBIezCSQs1AtHiq+GA9UoSwOBOl/ywZ7eh+3L59HSkc2ln1/vPxwnMXxrbxYSASD8xiIhhIFgkZWER76ApvD3wSevPvW7Dk0e36eVmtX9lMqNB5i3CMXg0UteGYOIPUwKCHNTRxxmKgf9FATYyKM6oBWTTFBJPdPrUGApZ00jvfFHb03Pxdcw0YMwFdyRnoIHLajj9ABhhvE7ABxtNEkQEmZUIiRLEBJmECxtwugdBq7SwNGfNvwx5aqwFX86r6BfujvcMefl/jAAAAAElFTkSuQmCC";
 
@@ -195,37 +195,40 @@ namespace a85eee26d29b644708184f42ebe9a2567
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType))
+                if ((string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"])
                 {
-                    parametersToChange.Add("Attribute type:", attrType);
-
-                    if (attrType == "Number")
+                    if (!string.IsNullOrEmpty(attrType))
                     {
-                        if ((int)currentParameterValues["Direction:"] == 0)
+                        parametersToChange.Add("Attribute type:", attrType);
+
+                        if (attrType == "Number")
                         {
-                            controlStatus["Propagation mode:"] = ControlStatus.Enabled;
-                            controlStatus["Propagation mode: "] = ControlStatus.Hidden;
-                            controlStatus["Subtract value:"] = ControlStatus.Hidden;
-                        }
-                        else
-                        {
-                            controlStatus["Propagation mode:"] = ControlStatus.Hidden;
-                            controlStatus["Propagation mode: "] = ControlStatus.Enabled;
-                            if ((int)currentParameterValues["Propagation mode: "] == 2)
+                            if ((int)currentParameterValues["Direction:"] == 0)
                             {
-                                controlStatus["Subtract value:"] = ControlStatus.Enabled;
+                                controlStatus["Propagation mode:"] = ControlStatus.Enabled;
+                                controlStatus["Propagation mode: "] = ControlStatus.Hidden;
+                                controlStatus["Subtract value:"] = ControlStatus.Hidden;
                             }
                             else
                             {
-                                controlStatus["Subtract value:"] = ControlStatus.Hidden;
+                                controlStatus["Propagation mode:"] = ControlStatus.Hidden;
+                                controlStatus["Propagation mode: "] = ControlStatus.Enabled;
+                                if ((int)currentParameterValues["Propagation mode: "] == 2)
+                                {
+                                    controlStatus["Subtract value:"] = ControlStatus.Enabled;
+                                }
+                                else
+                                {
+                                    controlStatus["Subtract value:"] = ControlStatus.Hidden;
+                                }
                             }
                         }
-                    }
-                    else if (attrType == "String")
-                    {
-                        controlStatus["Propagation mode:"] = ControlStatus.Hidden;
-                        controlStatus["Propagation mode: "] = ControlStatus.Hidden;
-                        controlStatus["Subtract value:"] = ControlStatus.Hidden;
+                        else if (attrType == "String")
+                        {
+                            controlStatus["Propagation mode:"] = ControlStatus.Hidden;
+                            controlStatus["Propagation mode: "] = ControlStatus.Hidden;
+                            controlStatus["Subtract value:"] = ControlStatus.Hidden;
+                        }
                     }
                 }
             }

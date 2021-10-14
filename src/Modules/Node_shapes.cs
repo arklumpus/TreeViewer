@@ -18,7 +18,7 @@ namespace NodeShapes
         public const string Name = "Node shapes";
         public const string HelpText = "Draws shapes on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "7434420a-1afd-46ee-aeea-75ed8a5eeada";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 		
@@ -252,7 +252,7 @@ namespace NodeShapes
 
             parametersToChange = new Dictionary<string, object>() { };
 
-            if ((int)previousParameterValues["Anchor:"] != (int)currentParameterValues["Anchor:"])
+            if ((int)previousParameterValues["Anchor:"] != (int)currentParameterValues["Anchor:"] && previousParameterValues["Position:"] == currentParameterValues["Position:"])
             {
                 parametersToChange.Add("Position:", new Point(0, 0));
             }

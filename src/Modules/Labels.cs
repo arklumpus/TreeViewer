@@ -27,7 +27,7 @@ namespace Labels
         public const string Name = "Labels";
         public const string HelpText = "Draws labels on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.0");
+        public static Version Version = new Version("1.2.1");
         public const string Id = "ac496677-2650-4d92-8646-0812918bab03";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -282,7 +282,7 @@ namespace Labels
 
             parametersToChange = new Dictionary<string, object>() { };
 
-            if ((int)previousParameterValues["Anchor:"] != (int)currentParameterValues["Anchor:"])
+            if ((int)previousParameterValues["Anchor:"] != (int)currentParameterValues["Anchor:"] && currentParameterValues["Position:"] == previousParameterValues["Position:"])
             {
                 parametersToChange.Add("Position:", new Point(0, 0));
             }
@@ -293,10 +293,30 @@ namespace Labels
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"])
+                if (!string.IsNullOrEmpty(attrType) && (string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"] && (string)currentParameterValues["Attribute type:"] != attrType)
                 {
                     parametersToChange.Add("Attribute type:", attrType);
 
+                    if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                    {
+                        if (attrType == "String")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
+                        }
+                        else if (attrType == "Number")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
+                        }
+                    }
+                }
+            }
+
+            if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
+            {
+                string attrType = (string)currentParameterValues["Attribute type:"];
+                
+                if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                {
                     if (attrType == "String")
                     {
                         parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
@@ -305,19 +325,6 @@ namespace Labels
                     {
                         parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
                     }
-                }
-            }
-
-            if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
-            {
-                string attrType = (string)currentParameterValues["Attribute type:"];
-                if (attrType == "String")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
-                }
-                else if (attrType == "Number")
-                {
-                    parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
                 }
             }
 

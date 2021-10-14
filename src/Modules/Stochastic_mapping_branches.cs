@@ -16,7 +16,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
         public const string Name = "Stochastic mapping branches";
         public const string HelpText = "Plots branches with data from a stochastic mapping analysis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "f7a20f2f-94b2-4331-8bbf-4e0087da6fba";
@@ -255,9 +255,15 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
                     ColourFormatterOptions cfo = new ColourFormatterOptions(code, formatterParams) { AttributeName = "(N/A)", AttributeType = "String", DefaultColour = Colour.FromRgb(220, 220, 220) };
 
-                    parametersToChange["State colours:"] = cfo;
+                    if (currentParameterValues["State colours:"] == previousParameterValues["State colours:"])
+                    {
+                        parametersToChange["State colours:"] = cfo;
+                    }
 
-                    parametersToChange["Enabled characters:"] = new CompiledCode(GetDefaultEnabledCharactersCode(states));
+                    if (currentParameterValues["Enabled characters:"] == previousParameterValues["Enabled characters:"])
+                    {
+                        parametersToChange["Enabled characters:"] = new CompiledCode(GetDefaultEnabledCharactersCode(states));
+                    }
                 }
                 else if (currentParameterValues["Enabled characters:"] != previousParameterValues["Enabled characters:"])
                 {
@@ -275,7 +281,10 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
                     ColourFormatterOptions cfo = new ColourFormatterOptions(code, formatterParams) { AttributeName = "(N/A)", AttributeType = "String", DefaultColour = Colour.FromRgb(220, 220, 220) };
 
-                    parametersToChange["State colours:"] = cfo;
+                    if (currentParameterValues["State colours:"] == previousParameterValues["State colours:"])
+                    {
+                        parametersToChange["State colours:"] = cfo;
+                    }
                 }
 
                 if ((bool)currentParameterValues["Wizard edit state colours"])

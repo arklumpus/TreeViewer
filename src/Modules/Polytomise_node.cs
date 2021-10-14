@@ -41,14 +41,14 @@ namespace a19d9a55507e64dacafc1d5ffcef35f76
         public const string Name = "Polytomise node";
         public const string HelpText = "Transforms nodes into politomies.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public const string Id = "19d9a555-07e6-4dac-afc1-d5ffcef35f76";
 
         public static bool Repeatable { get; } = true;
-		
-		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABqSURBVDhPY6AUMEJpOCgqKvoPZZIHSDWACUqTDSg2ACMMkAEx3kExwKt2YwOQqgfixm3N/iA2QcAEsgWEgQDEB2lGpgkCpr6+PkYQBgIQvxEsiqAJAowwALkEahh5aWIYpAOy/D2AgIEBAK9sIxBWstekAAAAAElFTkSuQmCC";
+        
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABqSURBVDhPY6AUMEJpOCgqKvoPZZIHSDWACUqTDSg2ACMMkAEx3kExwKt2YwOQqgfixm3N/iA2QcAEsgWEgQDEB2lGpgkCpr6+PkYQBgIQvxEsiqAJAowwALkEahh5aWIYpAOy/D2AgIEBAK9sIxBWstekAAAAAElFTkSuQmCC";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADESURBVEhLzZRNDgIhDIWLJxu3mngYWPu75zBO4lpvhpRpDAMMKGUiXzIpkAmPtg+EMQbWRFBchHuARQEp5cWG8zSrZ0MxBXtzJJeBq43W+vOPEMWKRuQyaEJfAuioX79iD7gkBVDZRylVbVl3k0N37I73wYbnNIPt43Z44aDGRSIsBdpyfxpna1bA7dylTZNHaloiihF+o1lNphixqk2Rv7xF4f34hr7eoqYuatXkKAOsM9X66haYFHOuaaxPVoC7OQDAG55GbedfodH5AAAAAElFTkSuQmCC";
         private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAERSURBVFhH7ZZLDoIwEIapJ3Otid4F1j7QNYfRRLceDTuFmkltO1Po2JD4JZNSQunfeYGqPPR9P17J4xWAkRZDCqjr+qyH0zDLz2ocY4htDnA8YGLQdZ3SmHtcOOHjeGAWIDpmogJgAwpxD1D8BSQJgKzObewylIIUACotTdOs9fAaZnmICtgcbrgNt8/rHuZerFBO6eFnFT4hZnu8+74BHxGhdT5go9DzyhdjaLtagHfF47Kjj5hA8TL8Oo11VSgE2gPBPJjCpCQEkTbZrOBYnGOQ8cQv/XkZAsUbEf4hMTcyk1QFpnE4loq7fnYZui+kzGVZn2MJli8A+kTMKIr3AY4H2nEUgfQAx41zKJyEVfUGjAG3F+nFSsIAAAAASUVORK5CYII=";
 
@@ -187,21 +187,24 @@ namespace a19d9a55507e64dacafc1d5ffcef35f76
 
                 string attrType = ((TreeNode)tree).GetAttributeType(attributeName);
 
-                if (!string.IsNullOrEmpty(attrType))
+                if ((string)previousParameterValues["Attribute type:"] == (string)currentParameterValues["Attribute type:"])
                 {
-                    parametersToChange.Add("Attribute type:", attrType);
+                    if (!string.IsNullOrEmpty(attrType))
+                    {
+                        parametersToChange.Add("Attribute type:", attrType);
 
-                    if (attrType == "String")
-                    {
-                        controlStatus["Comparison type:"] = ControlStatus.Enabled;
-                        controlStatus["Comparison type: "] = ControlStatus.Hidden;
-                        controlStatus["Regex"] = ControlStatus.Enabled;
-                    }
-                    else if (attrType == "Number")
-                    {
-                        controlStatus["Comparison type:"] = ControlStatus.Hidden;
-                        controlStatus["Comparison type: "] = ControlStatus.Enabled;
-                        controlStatus["Regex"] = ControlStatus.Hidden;
+                        if (attrType == "String")
+                        {
+                            controlStatus["Comparison type:"] = ControlStatus.Enabled;
+                            controlStatus["Comparison type: "] = ControlStatus.Hidden;
+                            controlStatus["Regex"] = ControlStatus.Enabled;
+                        }
+                        else if (attrType == "Number")
+                        {
+                            controlStatus["Comparison type:"] = ControlStatus.Hidden;
+                            controlStatus["Comparison type: "] = ControlStatus.Enabled;
+                            controlStatus["Regex"] = ControlStatus.Hidden;
+                        }
                     }
                 }
             }
