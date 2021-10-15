@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using PhyloTree;
@@ -7,16 +6,41 @@ using VectSharp;
 using System.Runtime.InteropServices;
 using System.Linq;
 
-// Name of the namespace. It does not really matter, but better if it is unique.
 namespace a32858c9d0247497faeee03f7bfe24158
 {
-    //Do not change class name
+    /// <summary>
+    /// <![CDATA[
+    /// This module is used to set up the program to display the results of a stochastic mapping analysis. These can be plotted using the _Node states_ 
+    /// (id `0512b822-044d-4c13-b3bb-bca494c51daa`) and the _Stochastic mapping branches_ (id `f7a20f2f-94b2-4331-8bbf-4e0087da6fba`) Plot action modules.
+    /// 
+    /// To use this module, you should open a tree file containing the results of a stochastic mapping analysis, in the format produced by the
+    /// [_phytools_ R package](https://cran.r-project.org/web/packages/phytools/index.html) (Revell, 2012). A suitable tree file can be obtained e.g. by
+    /// using the `write.tree` function from _phytools_, or by using the _Merge-sMap_ utility from [sMap](https://github.com/arklumpus/sMap)
+    /// (Bianchini & Sánchez-Baracaldo, 2021).
+    /// 
+    /// This module will use the character histories from the file to sample the character states along each branch. The sampling strategy used is essentially
+    /// the same as in sMap (see the Supporting Information for the [sMap paper](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13540),
+    /// lines 233 and following, for more details). 
+    /// ]]>
+    /// </summary>
+    /// 
+    /// <description>
+    /// <![CDATA[
+    /// ## References
+    /// 
+    /// _Liam J. Revell_, **phytools: an R package for phylogenetic comparative biology (and other things)**, Methods in Ecology and Evolution, 3: 217-223, 2012. https://doi.org/10.1111/j.2041-210X.2011.00169.x
+    /// 
+    /// _Giorgio Bianchini, Patricia Sánchez-Baracaldo_, **sMap: Evolution of independent, dependent and conditioned discrete characters in a Bayesian framework**, Methods in Ecology and Evolution, 12: 479-486, 2021. https://doi.org/10.1111/2041-210X.13540
+    /// 
+    /// ]]>
+    /// </description>
+    
     public static class MyModule
     {
         public const string Name = "Set up stochastic map";
         public const string HelpText = "Parses the information from a stochastic mapping analysis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public const string Id = "32858c9d-0247-497f-aeee-03f7bfe24158";
@@ -232,7 +256,13 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
             Dictionary<string, (double samplePosPerc, double[] stateProbs)[]> preparedStates = new Dictionary<string, (double, double[])[]>();
 
+            Dictionary<string, double[]> conditionedPosteriors = new Dictionary<string, double[]>();
+            Dictionary<string, double[]> meanPosteriors = new Dictionary<string, double[]>();
+
             int nodeIndex = 0;
+
+            List<(string, List<int>)> NaNSamples = new List<(string, List<int>)>();
+            List<string> missingConditionedPosteriors = new List<string>();
 
             foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
             {
@@ -296,11 +326,13 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
                         state += "}";
 
+                        meanPosteriors[node.Id] = meanPosterior;
                         node.Attributes["MeanPosteriors"] = state;
                     }
 
 
                     List<(double samplePosPerc, double[] stateProbs)> preparedBranchStates = new List<(double samplePosPerc, double[] stateProbs)>();
+                    List<int> NaNs = new List<int>();
 
                     for (int i = 0; i < Math.Ceiling(Math.Abs(right - left) / actualResolution) + 1; i++)
                     {
@@ -348,6 +380,10 @@ namespace a32858c9d0247497faeee03f7bfe24158
                                 probs[j] = counts[j] / total;
                             }
                         }
+                        else
+                        {
+                            NaNs.Add(i);
+                        }
 
                         preparedBranchStates.Add((perc, probs));
 
@@ -370,14 +406,21 @@ namespace a32858c9d0247497faeee03f7bfe24158
                                 state += "}";
 
                                 node.Attributes["ConditionedPosteriors"] = state;
+                                conditionedPosteriors[node.Id] = probs;
                             }
                             else
                             {
-                                node.Attributes["ConditionedPosteriors"] = node.Attributes["MeanPosteriors"];
+                                missingConditionedPosteriors.Add(node.Id);
                             }
 
                             break;
                         }
+                    }
+
+                    if (NaNs.Count > 0)
+                    {
+                        NaNs.Sort();
+                        NaNSamples.Add((node.Id, NaNs));
                     }
 
                     preparedStates[node.Id] = preparedBranchStates.ToArray();
@@ -425,11 +468,234 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
                         node.Attributes["MeanPosteriors"] = state;
                         node.Attributes["ConditionedPosteriors"] = state;
+
+                        conditionedPosteriors[node.Id] = meanPosterior;
                     }
                 }
 
                 nodeIndex++;
                 progressAction(0.5 + (double)nodeIndex / nodeCorresps.Count * 0.5);
+            }
+
+            for (int i = 0; i < NaNSamples.Count; i++)
+            {
+                (double samplePosPerc, double[] stateProbs)[] samples = preparedStates[NaNSamples[i].Item1];
+                TreeNode node = tree.GetNodeFromId(NaNSamples[i].Item1);
+
+                if (NaNSamples[i].Item2.Count == samples.Length)
+                {
+                    if (missingConditionedPosteriors.Contains(node.Id))
+                    {
+                        conditionedPosteriors[node.Id] = meanPosteriors[node.Id];
+                    }
+
+                    for (int j = 0; j < samples.Length; j++)
+                    {
+                        samples[j] = (samples[j].samplePosPerc, conditionedPosteriors[node.Id]);
+                    }
+                }
+                else
+                {
+                    List<int> missingSamplesStart = new List<int>();
+                    List<int> missingSamplesEnd = new List<int>();
+
+                    for (int j = 0; j < NaNSamples[i].Item2.Count; j++)
+                    {
+                        if (NaNSamples[i].Item2[j] == j)
+                        {
+                            missingSamplesStart.Add(NaNSamples[i].Item2[j]);
+                        }
+
+                        if (NaNSamples[i].Item2[NaNSamples[i].Item2.Count - 1 - j] == samples.Length - 1 - j)
+                        {
+                            missingSamplesEnd.Add(NaNSamples[i].Item2[NaNSamples[i].Item2.Count - 1 - j]);
+                        }
+                    }
+
+                    if (missingSamplesStart.Count > 0)
+                    {
+                        double[] left = null;
+                        double[] right = null;
+
+                        // Parent
+                        if (!missingConditionedPosteriors.Contains(node.Parent.Id))
+                        {
+                            left = conditionedPosteriors[node.Parent.Id];
+                        }
+                        else
+                        {
+                            (double samplePosPerc, double[] stateProbs)[] parentSamples = preparedStates[node.Parent.Id];
+
+                            for (int j = parentSamples.Length - 1; j >= 0; j--)
+                            {
+                                if (parentSamples[j].stateProbs.Sum() > 0)
+                                {
+                                    left = parentSamples[j].stateProbs;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // First sample
+                        for (int j = 0; j < samples.Length; j++)
+                        {
+                            if (samples[j].stateProbs.Sum() > 0)
+                            {
+                                right = samples[j].stateProbs;
+                                break;
+                            }
+                        }
+
+                        if (left != null && right != null)
+                        {
+                            for (int j = 0; j < missingSamplesStart.Count; j++)
+                            {
+                                double[] average = new double[left.Length];
+
+                                for (int k = 0; k < left.Length; k++)
+                                {
+                                    average[k] = left[k] * (1 - (double)(j + 1) / (missingSamplesStart.Count + 1)) + right[k] * (double)(j + 1) / (missingSamplesStart.Count + 1);
+                                }
+
+                                samples[missingSamplesStart[j]] = (samples[missingSamplesStart[j]].samplePosPerc, average);
+                            }
+                        }
+                        else if (right != null)
+                        {
+                            for (int j = 0; j < missingSamplesStart.Count; j++)
+                            {
+                                samples[missingSamplesStart[j]] = (samples[missingSamplesStart[j]].samplePosPerc, right);
+                            }
+                        }
+                        else if (left != null)
+                        {
+                            for (int j = 0; j < missingSamplesStart.Count; j++)
+                            {
+                                samples[missingSamplesStart[j]] = (samples[missingSamplesStart[j]].samplePosPerc, left);
+                            }
+                        }
+                    }
+
+
+                    if (missingSamplesEnd.Count > 0)
+                    {
+                        double[] left = null;
+                        List<double[]> right = new List<double[]>();
+
+                        // Children
+                        for (int k = 0; k < node.Children.Count; k++)
+                        {
+                            if (!missingConditionedPosteriors.Contains(node.Children[k].Id))
+                            {
+                                right.Add(conditionedPosteriors[node.Children[k].Id]);
+                            }
+                            else
+                            {
+                                (double samplePosPerc, double[] stateProbs)[] childSamples = preparedStates[node.Children[k].Id];
+
+                                for (int j = 0; j < childSamples.Length; j++)
+                                {
+                                    if (childSamples[j].stateProbs.Sum() > 0)
+                                    {
+                                        right.Add(childSamples[j].stateProbs);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Last sample
+                        for (int j = samples.Length - 1; j >= 0; j--)
+                        {
+                            if (samples[j].stateProbs.Sum() > 0)
+                            {
+                                left = samples[j].stateProbs;
+                                break;
+                            }
+                        }
+
+                        if (left != null && right.Count > 0)
+                        {
+                            double[] rightAverage = new double[right[0].Length];
+
+                            for (int j = 0; j < right.Count; j++)
+                            {
+                                for (int k = 0; k < rightAverage.Length; k++)
+                                {
+                                    rightAverage[k] += right[j][k];
+                                }
+                            }
+
+                            for (int k = 0; k < rightAverage.Length; k++)
+                            {
+                                rightAverage[k] /= right.Count;
+                            }
+
+                            for (int j = 0; j < missingSamplesEnd.Count; j++)
+                            {
+                                double[] average = new double[left.Length];
+
+                                for (int k = 0; k < left.Length; k++)
+                                {
+                                    average[k] = rightAverage[k] * (1 - (double)(j + 1) / (missingSamplesEnd.Count + 1)) + left[k] * (double)(j + 1) / (missingSamplesEnd.Count + 1);
+                                }
+
+                                samples[missingSamplesEnd[j]] = (samples[missingSamplesEnd[j]].samplePosPerc, average);
+                            }
+                        }
+                        else if (right.Count > 0)
+                        {
+                            double[] rightAverage = new double[right[0].Length];
+
+                            for (int j = 0; j < right.Count; j++)
+                            {
+                                for (int k = 0; k < rightAverage.Length; k++)
+                                {
+                                    rightAverage[k] += right[j][k];
+                                }
+                            }
+
+                            for (int k = 0; k < rightAverage.Length; k++)
+                            {
+                                rightAverage[k] /= right.Count;
+                            }
+
+                            for (int j = 0; j < missingSamplesEnd.Count; j++)
+                            {
+                                samples[missingSamplesEnd[j]] = (samples[missingSamplesEnd[j]].samplePosPerc, rightAverage);
+                            }
+                        }
+                        else if (left != null)
+                        {
+                            for (int j = 0; j < missingSamplesEnd.Count; j++)
+                            {
+                                samples[missingSamplesEnd[j]] = (samples[missingSamplesEnd[j]].samplePosPerc, left);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < missingConditionedPosteriors.Count; i++)
+            {
+                double[] probs = preparedStates[missingConditionedPosteriors[i]].Last().stateProbs;
+
+                string state = "{";
+
+                for (int j = 0; j < allPossibleStates.Count; j++)
+                {
+                    state += allPossibleStates[j].Aggregate((a, b) => a + "|" + b) + ":" + probs[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+                    if (j < allPossibleStates.Count - 1)
+                    {
+                        state += ",";
+                    }
+                }
+
+                state += "}";
+
+                tree.GetNodeFromId(missingConditionedPosteriors[i]).Attributes["ConditionedPosteriors"] = state;
+                conditionedPosteriors[missingConditionedPosteriors[i]] = probs;
             }
 
             stateData.Tags["32858c9d-0247-497f-aeee-03f7bfe24158"] = preparedStates;
@@ -521,4 +787,3 @@ namespace a32858c9d0247497faeee03f7bfe24158
         }
     }
 }
-
