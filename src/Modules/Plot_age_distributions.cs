@@ -11,7 +11,7 @@ namespace NodeAgeDistributions
     /// <summary>
     /// This module can be used to draw age distributions on the tree. The age distributions must have been previously set up using the
     /// _Set up age distributions_ module (id `a1ccf05a-cf3c-4ca4-83be-af56f501c2a6`). This module can only be used if the tree is being
-    /// drawn using _Rectangular_ coordinates.
+    /// drawn using _Rectangular_ or _Circular_ coordinates.
     /// </summary>
 
     public static class MyModule
