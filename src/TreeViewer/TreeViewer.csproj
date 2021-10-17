@@ -7,7 +7,7 @@
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
     <AssemblyName>TreeViewer</AssemblyName>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <ApplicationIcon>Assets\Program.ico</ApplicationIcon>
     <Authors>Giorgio Bianchini</Authors>
     <Company>University of Bristol</Company>
