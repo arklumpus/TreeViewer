@@ -13,7 +13,7 @@ Click on the name of any module to open the folder containing the module's manua
 
 ### [Add attribute](afb64d72-971d-4780-8dbb-a7d9248da30b)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Adds or changes the value of an attribute of a node.
 
@@ -25,7 +25,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Add attribute](f71a5e60-5e40-4a5e-9795-e5259fb283ab)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Adds an attribute based on an attachment.
 
@@ -61,7 +61,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions timeline](b93f8a2b-8731-4658-92f5-bb80af7292a8)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Plots age distributions on a timeline.
 
@@ -194,7 +194,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Change attribute](8de06406-68e4-4bd8-97eb-2185a0dd1127)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Changes the value of an already existing attribute.
 
@@ -401,7 +401,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Group labels](7ef15916-4383-4ee7-b4bd-bd44a7be1849)
 
-_Version 1.2.1, by Giorgio Bianchini_
+_Version 1.2.2, by Giorgio Bianchini_
 
 **Description**: Highlights monophyletic groups with a label.
 
@@ -413,7 +413,7 @@ _Version 1.2.1, by Giorgio Bianchini_
 
 ### [Labels](ac496677-2650-4d92-8646-0812918bab03)
 
-_Version 1.2.0, by Giorgio Bianchini_
+_Version 1.2.1, by Giorgio Bianchini_
 
 **Description**: Draws labels on nodes, tips or branches.
 
@@ -524,7 +524,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Node shapes](7434420a-1afd-46ee-aeea-75ed8a5eeada)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Draws shapes on nodes, tips or branches.
 
@@ -536,7 +536,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Node states](0512b822-044d-4c13-b3bb-bca494c51daa)
 
-_Version 1.2.1, by Giorgio Bianchini_
+_Version 1.2.2, by Giorgio Bianchini_
 
 **Description**: Draws node states based on attributes.
 
@@ -572,7 +572,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Parse node states](716b55a3-02d9-4007-a830-8326d407b24c)
 
-_Version 2.1.2, by Giorgio Bianchini_
+_Version 2.1.3, by Giorgio Bianchini_
 
 **Description**: Loads node state data from an attachment.
 
@@ -608,7 +608,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Plot alignment](ea7e246b-e93f-4d0d-a67a-88af05479b48)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Adds the plot of an alignment to the tree.
 
@@ -620,7 +620,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Polytomise node](19d9a555-07e6-4dac-afc1-d5ffcef35f76)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Transforms nodes into politomies.
 
@@ -644,7 +644,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Propagate attribute](85eee26d-29b6-4470-8184-f42ebe9a2567)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Propagates an attribute on the tree.
 
@@ -656,7 +656,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Prune node](ffc97742-4cf5-44ef-81aa-d5b51708a003)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Prunes nodes off the tree.
 
@@ -716,7 +716,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Replace attribute](f17160ad-0462-449a-8a57-e1af775c92ba)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Changes the value of an attribute of a node that matches a criterion.
 
@@ -872,7 +872,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Set up stochastic map](32858c9d-0247-497f-aeee-03f7bfe24158)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Parses the information from a stochastic mapping analysis.
 
@@ -884,7 +884,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Set up stochastic map (attachment)](0e2f5255-2d34-474b-955d-b531ee5ba605)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Parses the information from a stochastic mapping analysis contained in an attachment.
 
@@ -908,7 +908,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Stochastic mapping branches](f7a20f2f-94b2-4331-8bbf-4e0087da6fba)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Plots branches with data from a stochastic mapping analysis.
 
@@ -920,7 +920,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Stochastic map](e760952f-56c1-4192-8dfb-b5d6ec2692d2)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Opens a file containing one or more trees in the format produced by the write.simmap function of phytools (Revell 2012).
 Safe even when opening huge files.
