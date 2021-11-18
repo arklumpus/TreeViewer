@@ -411,6 +411,42 @@ _Version 1.2.2, by Giorgio Bianchini_
 
 <br />
 
+### [Highlights](28e76a57-6930-4c49-974c-639c104dc4ba)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Highlights multiple nodes in a tree based on attribute values.
+
+**Module type**: Plotting
+
+**Module ID**: `28e76a57-6930-4c49-974c-639c104dc4ba`
+
+<br />
+
+### [Highlight node](64769664-d163-4fce-b7ba-18fd9445fcfb)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Highlights a single node in the tree.
+
+**Module type**: Plotting
+
+**Module ID**: `64769664-d163-4fce-b7ba-18fd9445fcfb`
+
+<br />
+
+### [Highlight selection](5bf2292f-cff3-4aa8-9c15-e881d426cba6)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Highlights the selected node in the plot.
+
+**Module type**: SelectionAction
+
+**Module ID**: `5bf2292f-cff3-4aa8-9c15-e881d426cba6`
+
+<br />
+
 ### [Labels](ac496677-2650-4d92-8646-0812918bab03)
 
 _Version 1.2.1, by Giorgio Bianchini_

@@ -1,0 +1,10 @@
+System.Runtime.dll
+System.Private.CoreLib.dll
+netstandard.dll
+System.Collections.dll
+TreeViewer.dll
+VectSharp.dll
+PhyloTree.TreeNode.dll
+VectSharp.MuPDFUtils.dll
+MuPDFCore.dll
+System.Text.Json.dll
