@@ -1,0 +1,7759 @@
+BioTreeContainer ::= {
+  fdict {
+    {
+      id 0,
+      name "label"
+    },
+    {
+      id 1,
+      name "dist"
+    },
+    {
+      id 2,
+      name "seq-id"
+    },
+    {
+      id 3,
+      name "organism"
+    },
+    {
+      id 4,
+      name "seq-title"
+    },
+    {
+      id 5,
+      name "accession-nbr"
+    },
+    {
+      id 6,
+      name "blast-name"
+    },
+    {
+      id 7,
+      name "align-index"
+    },
+    {
+      id 8,
+      name "$NODE_COLOR"
+    },
+    {
+      id 9,
+      name "$LABEL_COLOR"
+    },
+    {
+      id 10,
+      name "$LABEL_BG_COLOR"
+    },
+    {
+      id 11,
+      name "$LABEL_TAG_COLOR"
+    },
+    {
+      id 12,
+      name "$NODE_COLLAPSED"
+    },
+    {
+      id 13,
+      name "node-info"
+    },
+    {
+      id 14,
+      name "leaf-count"
+    },
+    {
+      id 15,
+      name "common-name"
+    },
+    {
+      id 16,
+      name "$NODE_SIZE"
+    },
+    {
+      id 17,
+      name "$EDGE_COLOR"
+    }
+  },
+  nodes {
+    {
+      id 0,
+      features {
+        {
+          featureid 0,
+          value "cyanobacteria and a-proteobacteria"
+        },
+        {
+          featureid 14,
+          value "99"
+        },
+        {
+          featureid 10,
+          value "255 255 0"
+        }
+      }
+    },
+    {
+      id 1,
+      parent 0,
+      features {
+        {
+          featureid 1,
+          value "0.277313"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "58"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 2,
+      parent 1,
+      features {
+        {
+          featureid 1,
+          value "0.062404"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "54"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 3,
+      parent 2,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Elainella
+ sp. C42_A2020_010]"
+        },
+        {
+          featureid 1,
+          value "0.333714"
+        },
+        {
+          featureid 2,
+          value "gb|MBF2048143.1"
+        },
+        {
+          featureid 3,
+          value "Elainella sp. C42_A2020_010"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Elainella
+ sp. C42_A2020_010]"
+        },
+        {
+          featureid 5,
+          value "MBF2048143.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Elainella sp. C42_A2020_010"
+        },
+        {
+          featureid 7,
+          value "70"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 4,
+      parent 2,
+      features {
+        {
+          featureid 1,
+          value "0.0239483"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "53"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 5,
+      parent 4,
+      features {
+        {
+          featureid 1,
+          value "0.0410101"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "52"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 6,
+      parent 5,
+      features {
+        {
+          featureid 1,
+          value "0.190184"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 7,
+      parent 6,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Acaryochloris sp. SU_5_25]"
+        },
+        {
+          featureid 1,
+          value "0.0352814"
+        },
+        {
+          featureid 2,
+          value "gb|NJK29980.1"
+        },
+        {
+          featureid 3,
+          value "Acaryochloris sp. SU_5_25"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Acaryochloris sp. SU_5_25]"
+        },
+        {
+          featureid 5,
+          value "NJK29980.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Acaryochloris sp. SU_5_25"
+        },
+        {
+          featureid 7,
+          value "92"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 8,
+      parent 6,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Acaryochloris marina]"
+        },
+        {
+          featureid 1,
+          value "0.0443145"
+        },
+        {
+          featureid 2,
+          value "ref|WP_012162230.1"
+        },
+        {
+          featureid 3,
+          value "Acaryochloris marina"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Acaryochloris marina]"
+        },
+        {
+          featureid 5,
+          value "WP_012162230.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Acaryochloris marina"
+        },
+        {
+          featureid 7,
+          value "93"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 9,
+      parent 5,
+      features {
+        {
+          featureid 1,
+          value "0.00434607"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "50"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 10,
+      parent 9,
+      features {
+        {
+          featureid 1,
+          value "0.028244"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "41"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 11,
+      parent 10,
+      features {
+        {
+          featureid 1,
+          value "0.140185"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "39"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 12,
+      parent 11,
+      features {
+        {
+          featureid 1,
+          value "0.0537669"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "22"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 13,
+      parent 12,
+      features {
+        {
+          featureid 1,
+          value "0.00735111"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "21"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 14,
+      parent 13,
+      features {
+        {
+          featureid 1,
+          value "0.00570545"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "17"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 15,
+      parent 14,
+      features {
+        {
+          featureid 1,
+          value "0.0330147"
+        },
+        {
+          featureid 12,
+          value "1"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "16"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 16,
+      parent 15,
+      features {
+        {
+          featureid 1,
+          value "0.0163111"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "14"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 17,
+      parent 16,
+      features {
+        {
+          featureid 1,
+          value "0.00968547"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "13"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 18,
+      parent 17,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. CC9616]"
+        },
+        {
+          featureid 1,
+          value "0.0248741"
+        },
+        {
+          featureid 2,
+          value "ref|WP_028952906.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. CC9616"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. CC9616]"
+        },
+        {
+          featureid 5,
+          value "WP_028952906.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. CC9616"
+        },
+        {
+          featureid 7,
+          value "86"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 19,
+      parent 17,
+      features {
+        {
+          featureid 1,
+          value "0.00107272"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "12"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 20,
+      parent 19,
+      features {
+        {
+          featureid 1,
+          value "0.0190072"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 21,
+      parent 20,
+      features {
+        {
+          featureid 1,
+          value "0.0043961"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 22,
+      parent 21,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. UW69]"
+        },
+        {
+          featureid 1,
+          value "0.00593554"
+        },
+        {
+          featureid 2,
+          value "ref|WP_115025428.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. UW69"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. UW69]"
+        },
+        {
+          featureid 5,
+          value "WP_115025428.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. UW69"
+        },
+        {
+          featureid 7,
+          value "55"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 23,
+      parent 21,
+      features {
+        {
+          featureid 1,
+          value "0.0107615"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 24,
+      parent 23,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. UW106]"
+        },
+        {
+          featureid 1,
+          value "0.00333967"
+        },
+        {
+          featureid 2,
+          value "ref|WP_115095381.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. UW106"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. UW106]"
+        },
+        {
+          featureid 5,
+          value "WP_115095381.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. UW106"
+        },
+        {
+          featureid 7,
+          value "60"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 25,
+      parent 23,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. HB1133]"
+        },
+        {
+          featureid 1,
+          value "0.00275175"
+        },
+        {
+          featureid 2,
+          value "ref|WP_166018525.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. HB1133"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. HB1133]"
+        },
+        {
+          featureid 5,
+          value "WP_166018525.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. HB1133"
+        },
+        {
+          featureid 7,
+          value "68"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 26,
+      parent 20,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. PROS-U-1]"
+        },
+        {
+          featureid 1,
+          value "0.0224139"
+        },
+        {
+          featureid 2,
+          value "ref|WP_186570710.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. PROS-U-1"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. PROS-U-1]"
+        },
+        {
+          featureid 5,
+          value "WP_186570710.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. PROS-U-1"
+        },
+        {
+          featureid 7,
+          value "77"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 27,
+      parent 19,
+      features {
+        {
+          featureid 1,
+          value "0.0128475"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "8"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 28,
+      parent 27,
+      features {
+        {
+          featureid 1,
+          value "0.0114732"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "7"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 29,
+      parent 28,
+      features {
+        {
+          featureid 1,
+          value "0.00193706"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "6"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 30,
+      parent 29,
+      features {
+        {
+          featureid 1,
+          value "0.00224917"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 31,
+      parent 30,
+      features {
+        {
+          featureid 1,
+          value "0.0195695"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 32,
+      parent 31,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcus sp. YX04-3]"
+        },
+        {
+          featureid 1,
+          value "0.0410886"
+        },
+        {
+          featureid 2,
+          value "gb|RNC86647.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. YX04-3"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcus sp. YX04-3]"
+        },
+        {
+          featureid 5,
+          value "RNC86647.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. YX04-3"
+        },
+        {
+          featureid 7,
+          value "73"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 33,
+      parent 31,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. RS9915]"
+        },
+        {
+          featureid 1,
+          value "0.00291177"
+        },
+        {
+          featureid 2,
+          value "ref|WP_186512064.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. RS9915"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. RS9915]"
+        },
+        {
+          featureid 5,
+          value "WP_186512064.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. RS9915"
+        },
+        {
+          featureid 7,
+          value "85"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 34,
+      parent 30,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. A18-40]"
+        },
+        {
+          featureid 1,
+          value "0.00481369"
+        },
+        {
+          featureid 2,
+          value "ref|WP_186573854.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. A18-40"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. A18-40]"
+        },
+        {
+          featureid 5,
+          value "WP_186573854.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. A18-40"
+        },
+        {
+          featureid 7,
+          value "84"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 35,
+      parent 29,
+      features {
+        {
+          featureid 1,
+          value "0.00165976"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 36,
+      parent 35,
+      features {
+        {
+          featureid 1,
+          value "0.00091315"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 37,
+      parent 36,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8103]"
+        },
+        {
+          featureid 1,
+          value "0.00404518"
+        },
+        {
+          featureid 2,
+          value "ref|WP_049692558.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. WH 8103"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8103]"
+        },
+        {
+          featureid 5,
+          value "WP_049692558.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. WH 8103"
+        },
+        {
+          featureid 7,
+          value "61"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 38,
+      parent 36,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8102]"
+        },
+        {
+          featureid 1,
+          value "0.00204625"
+        },
+        {
+          featureid 2,
+          value "ref|WP_011129052.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. WH 8102"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8102]"
+        },
+        {
+          featureid 5,
+          value "WP_011129052.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. WH 8102"
+        },
+        {
+          featureid 7,
+          value "81"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 39,
+      parent 35,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. A18-46.1]"
+        },
+        {
+          featureid 1,
+          value "0.00315196"
+        },
+        {
+          featureid 2,
+          value "ref|WP_186482229.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. A18-46.1"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. A18-46.1]"
+        },
+        {
+          featureid 5,
+          value "WP_186482229.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. A18-46.1"
+        },
+        {
+          featureid 7,
+          value "75"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 40,
+      parent 28,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. BOUM118]"
+        },
+        {
+          featureid 1,
+          value "0.00248009"
+        },
+        {
+          featureid 2,
+          value "ref|WP_186591718.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. BOUM118"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. BOUM118]"
+        },
+        {
+          featureid 5,
+          value "WP_186591718.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. BOUM118"
+        },
+        {
+          featureid 7,
+          value "58"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 41,
+      parent 27,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. A15-24]"
+        },
+        {
+          featureid 1,
+          value "0.0112922"
+        },
+        {
+          featureid 2,
+          value "ref|WP_186497932.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. A15-24"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. A15-24]"
+        },
+        {
+          featureid 5,
+          value "WP_186497932.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. A15-24"
+        },
+        {
+          featureid 7,
+          value "56"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 42,
+      parent 16,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. CPC35]"
+        },
+        {
+          featureid 1,
+          value "0.0574953"
+        },
+        {
+          featureid 2,
+          value "gb|MAB54942.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. CPC35"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. CPC35]"
+        },
+        {
+          featureid 5,
+          value "MAB54942.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. CPC35"
+        },
+        {
+          featureid 7,
+          value "88"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 43,
+      parent 15,
+      features {
+        {
+          featureid 1,
+          value "0.0638443"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 44,
+      parent 43,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcus sp. MED-G67]"
+        },
+        {
+          featureid 1,
+          value "0.00121267"
+        },
+        {
+          featureid 2,
+          value "gb|RCL60578.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. MED-G67"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcus sp. MED-G67]"
+        },
+        {
+          featureid 5,
+          value "RCL60578.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. MED-G67"
+        },
+        {
+          featureid 7,
+          value "80"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 45,
+      parent 43,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. Minos11]"
+        },
+        {
+          featureid 1,
+          value "0.000821917"
+        },
+        {
+          featureid 2,
+          value "ref|WP_011934715.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. Minos11"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. Minos11]"
+        },
+        {
+          featureid 5,
+          value "WP_011934715.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. Minos11"
+        },
+        {
+          featureid 7,
+          value "87"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 46,
+      parent 14,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. UW179A]"
+        },
+        {
+          featureid 1,
+          value "0.0570831"
+        },
+        {
+          featureid 2,
+          value "ref|WP_114994358.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. UW179A"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. UW179A]"
+        },
+        {
+          featureid 5,
+          value "WP_114994358.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. UW179A"
+        },
+        {
+          featureid 7,
+          value "79"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 47,
+      parent 13,
+      features {
+        {
+          featureid 1,
+          value "0.0103466"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 48,
+      parent 47,
+      features {
+        {
+          featureid 1,
+          value "0.0324894"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 49,
+      parent 48,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8020]"
+        },
+        {
+          featureid 1,
+          value "0.0234315"
+        },
+        {
+          featureid 2,
+          value "ref|WP_048348337.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. WH 8020"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8020]"
+        },
+        {
+          featureid 5,
+          value "WP_048348337.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. WH 8020"
+        },
+        {
+          featureid 7,
+          value "64"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 50,
+      parent 48,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 1,
+          value "0.020203"
+        },
+        {
+          featureid 2,
+          value "ref|WP_006854552.1"
+        },
+        {
+          featureid 3,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 5,
+          value "WP_006854552.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 7,
+          value "98"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 51,
+      parent 47,
+      features {
+        {
+          featureid 1,
+          value "0.0362284"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 52,
+      parent 51,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 1,
+          value "0.00316479"
+        },
+        {
+          featureid 2,
+          value "ref|WP_007101451.1"
+        },
+        {
+          featureid 3,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 5,
+          value "WP_007101451.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 7,
+          value "65"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 53,
+      parent 51,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8101]"
+        },
+        {
+          featureid 1,
+          value "0.00292663"
+        },
+        {
+          featureid 2,
+          value "ref|WP_130130013.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. WH 8101"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. WH 8101]"
+        },
+        {
+          featureid 5,
+          value "WP_130130013.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. WH 8101"
+        },
+        {
+          featureid 7,
+          value "66"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 54,
+      parent 12,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. RS9916]"
+        },
+        {
+          featureid 1,
+          value "0.0716466"
+        },
+        {
+          featureid 2,
+          value "ref|WP_007099042.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. RS9916"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. RS9916]"
+        },
+        {
+          featureid 5,
+          value "WP_007099042.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. RS9916"
+        },
+        {
+          featureid 7,
+          value "57"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 55,
+      parent 11,
+      features {
+        {
+          featureid 1,
+          value "0.0152802"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "17"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 56,
+      parent 55,
+      features {
+        {
+          featureid 1,
+          value "0.00655393"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "12"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 57,
+      parent 56,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WB9_2_112]"
+        },
+        {
+          featureid 1,
+          value "0.094172"
+        },
+        {
+          featureid 2,
+          value "gb|NDC34620.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcaceae bacterium WB9_2_112"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WB9_2_112]"
+        },
+        {
+          featureid 5,
+          value "NDC34620.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcaceae bacterium WB9_2_112"
+        },
+        {
+          featureid 7,
+          value "42"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 58,
+      parent 56,
+      features {
+        {
+          featureid 1,
+          value "0.0154033"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "11"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 59,
+      parent 58,
+      features {
+        {
+          featureid 1,
+          value "0.00842423"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "6"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 60,
+      parent 59,
+      features {
+        {
+          featureid 1,
+          value "0.0184637"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 61,
+      parent 60,
+      features {
+        {
+          featureid 0,
+          value "radical SAM protein [Cyanobium sp. CACIAM 14]"
+        },
+        {
+          featureid 1,
+          value "0.0792649"
+        },
+        {
+          featureid 2,
+          value "gb|KEF40917.1"
+        },
+        {
+          featureid 3,
+          value "Cyanobium sp. CACIAM 14"
+        },
+        {
+          featureid 4,
+          value "radical SAM protein [Cyanobium sp. CACIAM 14]"
+        },
+        {
+          featureid 5,
+          value "KEF40917.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Cyanobium sp. CACIAM 14"
+        },
+        {
+          featureid 7,
+          value "46"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 62,
+      parent 60,
+      features {
+        {
+          featureid 1,
+          value "0.0337864"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 63,
+      parent 62,
+      features {
+        {
+          featureid 1,
+          value "0.000852136"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 64,
+      parent 63,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ gracile]"
+        },
+        {
+          featureid 1,
+          value "0.00627069"
+        },
+        {
+          featureid 2,
+          value "ref|WP_015110483.1"
+        },
+        {
+          featureid 3,
+          value "Cyanobium gracile"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ gracile]"
+        },
+        {
+          featureid 5,
+          value "WP_015110483.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Cyanobium gracile"
+        },
+        {
+          featureid 7,
+          value "47"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 65,
+      parent 63,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [Cyanobacteria]"
+        },
+        {
+          featureid 1,
+          value "0.00575379"
+        },
+        {
+          featureid 2,
+          value "ref|WP_106223003.1"
+        },
+        {
+          featureid 3,
+          value "Cyanobacteria"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [Cyanobacteria]"
+        },
+        {
+          featureid 5,
+          value "WP_106223003.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "blue-green algae"
+        },
+        {
+          featureid 7,
+          value "50"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 66,
+      parent 62,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 1,
+          value "0.00920092"
+        },
+        {
+          featureid 2,
+          value "ref|WP_094587361.1"
+        },
+        {
+          featureid 3,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 5,
+          value "WP_094587361.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 7,
+          value "51"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 67,
+      parent 59,
+      features {
+        {
+          featureid 1,
+          value "0.0450375"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 68,
+      parent 67,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ sp.]"
+        },
+        {
+          featureid 1,
+          value "0.0155621"
+        },
+        {
+          featureid 2,
+          value "dbj|GDX72359.1"
+        },
+        {
+          featureid 3,
+          value "Cyanobium sp."
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ sp.]"
+        },
+        {
+          featureid 5,
+          value "GDX72359.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Cyanobium sp."
+        },
+        {
+          featureid 7,
+          value "82"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 69,
+      parent 67,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WBB_3_034]"
+        },
+        {
+          featureid 1,
+          value "0.0208873"
+        },
+        {
+          featureid 2,
+          value "gb|NDF62583.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcaceae bacterium WBB_3_034"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WBB_3_034]"
+        },
+        {
+          featureid 5,
+          value "NDF62583.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcaceae bacterium WBB_3_034"
+        },
+        {
+          featureid 7,
+          value "83"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 70,
+      parent 58,
+      features {
+        {
+          featureid 1,
+          value "0.00661218"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "5"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 71,
+      parent 70,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. CBW1004]"
+        },
+        {
+          featureid 1,
+          value "0.0711404"
+        },
+        {
+          featureid 2,
+          value "ref|WP_197210366.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. CBW1004"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. CBW1004]"
+        },
+        {
+          featureid 5,
+          value "WP_197210366.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. CBW1004"
+        },
+        {
+          featureid 7,
+          value "54"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 72,
+      parent 70,
+      features {
+        {
+          featureid 1,
+          value "0.0046037"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 73,
+      parent 72,
+      features {
+        {
+          featureid 1,
+          value "0.0325999"
+        },
+        {
+          featureid 12,
+          value "1"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 74,
+      parent 73,
+      features {
+        {
+          featureid 1,
+          value "0.0105041"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 75,
+      parent 74,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Vulcanococcus sp. Clear-D1]"
+        },
+        {
+          featureid 1,
+          value "0.0285447"
+        },
+        {
+          featureid 2,
+          value "gb|MBD1193784.1"
+        },
+        {
+          featureid 3,
+          value "Vulcanococcus sp. Clear-D1"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Vulcanococcus sp. Clear-D1]"
+        },
+        {
+          featureid 5,
+          value "MBD1193784.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Vulcanococcus sp. Clear-D1"
+        },
+        {
+          featureid 7,
+          value "63"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 76,
+      parent 74,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WB4_1_0192]"
+        },
+        {
+          featureid 1,
+          value "0.0563535"
+        },
+        {
+          featureid 2,
+          value "gb|NBW62172.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcaceae bacterium WB4_1_0192"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WB4_1_0192]"
+        },
+        {
+          featureid 5,
+          value "NBW62172.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcaceae bacterium WB4_1_0192"
+        },
+        {
+          featureid 7,
+          value "97"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 77,
+      parent 73,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcus sp. LA31]"
+        },
+        {
+          featureid 1,
+          value "0.081466"
+        },
+        {
+          featureid 2,
+          value "ref|WP_214338163.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. LA31"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcus sp. LA31]"
+        },
+        {
+          featureid 5,
+          value "WP_214338163.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. LA31"
+        },
+        {
+          featureid 7,
+          value "95"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 78,
+      parent 72,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ sp.]"
+        },
+        {
+          featureid 1,
+          value "0.0758072"
+        },
+        {
+          featureid 2,
+          value "dbj|GDX76555.1"
+        },
+        {
+          featureid 3,
+          value "Cyanobium sp."
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ sp.]"
+        },
+        {
+          featureid 5,
+          value "GDX76555.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Cyanobium sp."
+        },
+        {
+          featureid 7,
+          value "76"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 79,
+      parent 55,
+      features {
+        {
+          featureid 1,
+          value "0.0166023"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "5"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 80,
+      parent 79,
+      features {
+        {
+          featureid 1,
+          value "0.0227508"
+        },
+        {
+          featureid 12,
+          value "1"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 81,
+      parent 80,
+      features {
+        {
+          featureid 1,
+          value "0.0215953"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 82,
+      parent 81,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ sp.]"
+        },
+        {
+          featureid 1,
+          value "0.0444334"
+        },
+        {
+          featureid 2,
+          value "gb|PZU99029.1"
+        },
+        {
+          featureid 3,
+          value "Cyanobium sp."
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Cyanobium
+ sp.]"
+        },
+        {
+          featureid 5,
+          value "PZU99029.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Cyanobium sp."
+        },
+        {
+          featureid 7,
+          value "49"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 83,
+      parent 81,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 1,
+          value "0.0618107"
+        },
+        {
+          featureid 2,
+          value "ref|WP_071800210.1"
+        },
+        {
+          featureid 3,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 5,
+          value "WP_071800210.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 7,
+          value "62"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 84,
+      parent 80,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. MW101C3]"
+        },
+        {
+          featureid 1,
+          value "0.0851599"
+        },
+        {
+          featureid 2,
+          value "ref|WP_094514770.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. MW101C3"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. MW101C3]"
+        },
+        {
+          featureid 5,
+          value "WP_094514770.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. MW101C3"
+        },
+        {
+          featureid 7,
+          value "67"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 85,
+      parent 79,
+      features {
+        {
+          featureid 1,
+          value "0.0418846"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 86,
+      parent 85,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. 1G10]"
+        },
+        {
+          featureid 1,
+          value "0.0370681"
+        },
+        {
+          featureid 2,
+          value "ref|WP_094556480.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. 1G10"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. 1G10]"
+        },
+        {
+          featureid 5,
+          value "WP_094556480.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. 1G10"
+        },
+        {
+          featureid 7,
+          value "90"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 87,
+      parent 85,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 1,
+          value "0.0363289"
+        },
+        {
+          featureid 2,
+          value "ref|WP_185467066.1"
+        },
+        {
+          featureid 3,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [unclassified Synechococcus]"
+        },
+        {
+          featureid 5,
+          value "WP_185467066.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "unclassified Synechococcus"
+        },
+        {
+          featureid 7,
+          value "96"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 88,
+      parent 10,
+      features {
+        {
+          featureid 1,
+          value "0.00403133"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 89,
+      parent 88,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya ohadii]"
+        },
+        {
+          featureid 1,
+          value "0.164825"
+        },
+        {
+          featureid 2,
+          value "ref|WP_088892573.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya ohadii"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya ohadii]"
+        },
+        {
+          featureid 5,
+          value "WP_088892573.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya ohadii"
+        },
+        {
+          featureid 7,
+          value "59"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 90,
+      parent 88,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya foveolarum]"
+        },
+        {
+          featureid 1,
+          value "0.191466"
+        },
+        {
+          featureid 2,
+          value "gb|PZO22758.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya foveolarum"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya foveolarum]"
+        },
+        {
+          featureid 5,
+          value "PZO22758.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya foveolarum"
+        },
+        {
+          featureid 7,
+          value "72"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 91,
+      parent 9,
+      features {
+        {
+          featureid 1,
+          value "0.00587558"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "9"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 92,
+      parent 91,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Phormidesmis sp. RL_2_1]"
+        },
+        {
+          featureid 1,
+          value "0.257803"
+        },
+        {
+          featureid 2,
+          value "gb|NJM96181.1"
+        },
+        {
+          featureid 3,
+          value "Phormidesmis sp. RL_2_1"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Phormidesmis sp. RL_2_1]"
+        },
+        {
+          featureid 5,
+          value "NJM96181.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Phormidesmis sp. RL_2_1"
+        },
+        {
+          featureid 7,
+          value "91"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 93,
+      parent 91,
+      features {
+        {
+          featureid 1,
+          value "0.0152972"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "8"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 94,
+      parent 93,
+      features {
+        {
+          featureid 1,
+          value "0.0178582"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "6"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 95,
+      parent 94,
+      features {
+        {
+          featureid 1,
+          value "0.0838243"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "5"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 96,
+      parent 95,
+      features {
+        {
+          featureid 1,
+          value "0.0250087"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 97,
+      parent 96,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. NIES-2104]"
+        },
+        {
+          featureid 1,
+          value "0.0531764"
+        },
+        {
+          featureid 2,
+          value "ref|WP_058997951.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. NIES-2104"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. NIES-2104]"
+        },
+        {
+          featureid 5,
+          value "WP_058997951.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. NIES-2104"
+        },
+        {
+          featureid 7,
+          value "53"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 98,
+      parent 96,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-17]"
+        },
+        {
+          featureid 1,
+          value "0.062345"
+        },
+        {
+          featureid 2,
+          value "ref|WP_190378062.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. FACHB-17"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-17]"
+        },
+        {
+          featureid 5,
+          value "WP_190378062.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. FACHB-17"
+        },
+        {
+          featureid 7,
+          value "69"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 99,
+      parent 95,
+      features {
+        {
+          featureid 1,
+          value "0.0932025"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 100,
+      parent 99,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [Leptolyngbya]"
+        },
+        {
+          featureid 1,
+          value "0.00124653"
+        },
+        {
+          featureid 2,
+          value "ref|WP_017290398.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [Leptolyngbya]"
+        },
+        {
+          featureid 5,
+          value "WP_017290398.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya"
+        },
+        {
+          featureid 7,
+          value "71"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 101,
+      parent 99,
+      features {
+        {
+          featureid 1,
+          value "0.000721981"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 102,
+      parent 101,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-1624]"
+        },
+        {
+          featureid 1,
+          value "0.00186805"
+        },
+        {
+          featureid 2,
+          value "ref|WP_190653448.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. FACHB-1624"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-1624]"
+        },
+        {
+          featureid 5,
+          value "WP_190653448.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. FACHB-1624"
+        },
+        {
+          featureid 7,
+          value "74"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 103,
+      parent 101,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. UWPOB_LEPTO1]"
+        },
+        {
+          featureid 1,
+          value "0.000110195"
+        },
+        {
+          featureid 2,
+          value "gb|MBN8559254.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. UWPOB_LEPTO1"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. UWPOB_LEPTO1]"
+        },
+        {
+          featureid 5,
+          value "MBN8559254.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. UWPOB_LEPTO1"
+        },
+        {
+          featureid 7,
+          value "78"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 104,
+      parent 94,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Oculatella
+ sp. LEGE 06141]"
+        },
+        {
+          featureid 1,
+          value "0.155989"
+        },
+        {
+          featureid 2,
+          value "ref|WP_193876071.1"
+        },
+        {
+          featureid 3,
+          value "Oculatella sp. LEGE 06141"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Oculatella
+ sp. LEGE 06141]"
+        },
+        {
+          featureid 5,
+          value "WP_193876071.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Oculatella sp. LEGE 06141"
+        },
+        {
+          featureid 7,
+          value "89"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 105,
+      parent 93,
+      features {
+        {
+          featureid 1,
+          value "0.00977596"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 106,
+      parent 105,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Dactylococcopsis salina]"
+        },
+        {
+          featureid 1,
+          value "0.149932"
+        },
+        {
+          featureid 2,
+          value "ref|WP_015230333.1"
+        },
+        {
+          featureid 3,
+          value "Dactylococcopsis salina"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Dactylococcopsis salina]"
+        },
+        {
+          featureid 5,
+          value "WP_015230333.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Dactylococcopsis salina"
+        },
+        {
+          featureid 7,
+          value "48"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 107,
+      parent 105,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Trichocoleus sp. FACHB-591]"
+        },
+        {
+          featureid 1,
+          value "0.247497"
+        },
+        {
+          featureid 2,
+          value "ref|WP_190554004.1"
+        },
+        {
+          featureid 3,
+          value "Trichocoleus sp. FACHB-591"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Trichocoleus sp. FACHB-591]"
+        },
+        {
+          featureid 5,
+          value "WP_190554004.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Trichocoleus sp. FACHB-591"
+        },
+        {
+          featureid 7,
+          value "94"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 108,
+      parent 4,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. SIO3F4]"
+        },
+        {
+          featureid 1,
+          value "0.214388"
+        },
+        {
+          featureid 2,
+          value "gb|NEQ50723.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. SIO3F4"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. SIO3F4]"
+        },
+        {
+          featureid 5,
+          value "NEQ50723.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. SIO3F4"
+        },
+        {
+          featureid 7,
+          value "52"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 109,
+      parent 1,
+      features {
+        {
+          featureid 1,
+          value "0.266918"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 110,
+      parent 109,
+      features {
+        {
+          featureid 1,
+          value "0.0121119"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 111,
+      parent 110,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. HK01-R]"
+        },
+        {
+          featureid 1,
+          value "0.00652165"
+        },
+        {
+          featureid 2,
+          value "ref|WP_185189739.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. HK01-R"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. HK01-R]"
+        },
+        {
+          featureid 5,
+          value "WP_185189739.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. HK01-R"
+        },
+        {
+          featureid 7,
+          value "41"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 112,
+      parent 110,
+      features {
+        {
+          featureid 1,
+          value "0.00155551"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 113,
+      parent 112,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. BS56D]"
+        },
+        {
+          featureid 1,
+          value "0.00472501"
+        },
+        {
+          featureid 2,
+          value "ref|WP_131455504.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. BS56D"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. BS56D]"
+        },
+        {
+          featureid 5,
+          value "WP_131455504.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. BS56D"
+        },
+        {
+          featureid 7,
+          value "44"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 114,
+      parent 112,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WB9_4xB_025]"
+        },
+        {
+          featureid 1,
+          value "0.00732362"
+        },
+        {
+          featureid 2,
+          value "gb|NDD43928.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcaceae bacterium WB9_4xB_025"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcaceae bacterium
+ WB9_4xB_025]"
+        },
+        {
+          featureid 5,
+          value "NDD43928.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcaceae bacterium WB9_4xB_025"
+        },
+        {
+          featureid 7,
+          value "45"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 115,
+      parent 109,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. BS55D]"
+        },
+        {
+          featureid 1,
+          value "0.00974369"
+        },
+        {
+          featureid 2,
+          value "ref|WP_131593280.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. BS55D"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. BS55D]"
+        },
+        {
+          featureid 5,
+          value "WP_131593280.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. BS55D"
+        },
+        {
+          featureid 7,
+          value "43"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 116,
+      parent 0,
+      features {
+        {
+          featureid 1,
+          value "0.277313"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria and a-proteobacteria"
+        },
+        {
+          featureid 14,
+          value "41"
+        },
+        {
+          featureid 10,
+          value "255 255 0"
+        }
+      }
+    },
+    {
+      id 117,
+      parent 116,
+      features {
+        {
+          featureid 0,
+          value "RecName: Full=Hopanoid C-2 methylase [Rhodopseudomonas
+ palustris TIE-1]"
+        },
+        {
+          featureid 1,
+          value "0.263867"
+        },
+        {
+          featureid 2,
+          value "sp|B3QHD1.1"
+        },
+        {
+          featureid 3,
+          value "Rhodopseudomonas palustris TIE-1"
+        },
+        {
+          featureid 4,
+          value "RecName: Full=Hopanoid C-2 methylase [Rhodopseudomonas
+ palustris TIE-1]"
+        },
+        {
+          featureid 5,
+          value "B3QHD1.1"
+        },
+        {
+          featureid 6,
+          value "a-proteobacteria"
+        },
+        {
+          featureid 15,
+          value "Rhodopseudomonas palustris TIE-1"
+        },
+        {
+          featureid 7,
+          value "0"
+        },
+        {
+          featureid 8,
+          value "0 0 255"
+        },
+        {
+          featureid 10,
+          value "255 255 0"
+        },
+        {
+          featureid 11,
+          value "255 0 0"
+        },
+        {
+          featureid 13,
+          value "query"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 118,
+      parent 116,
+      features {
+        {
+          featureid 1,
+          value "0.122799"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "40"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 119,
+      parent 118,
+      features {
+        {
+          featureid 1,
+          value "0.0181867"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "38"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 120,
+      parent 119,
+      features {
+        {
+          featureid 1,
+          value "0.0133305"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "35"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 121,
+      parent 120,
+      features {
+        {
+          featureid 1,
+          value "0.0327741"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "15"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 122,
+      parent 121,
+      features {
+        {
+          featureid 1,
+          value "0.0616342"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "12"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 123,
+      parent 122,
+      features {
+        {
+          featureid 1,
+          value "0.0365677"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "11"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 124,
+      parent 123,
+      features {
+        {
+          featureid 1,
+          value "0.0293192"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 125,
+      parent 124,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus lividus]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "ref|WP_099799097.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus lividus"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus lividus]"
+        },
+        {
+          featureid 5,
+          value "WP_099799097.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus lividus"
+        },
+        {
+          featureid 7,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 126,
+      parent 124,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus lividus PCC 6715]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "gb|ATS19577.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus lividus PCC 6715"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus lividus PCC 6715]"
+        },
+        {
+          featureid 5,
+          value "ATS19577.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus lividus PCC 6715"
+        },
+        {
+          featureid 7,
+          value "5"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 127,
+      parent 123,
+      features {
+        {
+          featureid 1,
+          value "0.0147874"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "9"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 128,
+      parent 127,
+      features {
+        {
+          featureid 1,
+          value "0.00110905"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "8"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 129,
+      parent 128,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus elongatus]"
+        },
+        {
+          featureid 1,
+          value "0.00653546"
+        },
+        {
+          featureid 2,
+          value "ref|WP_181496272.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus elongatus"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus elongatus]"
+        },
+        {
+          featureid 5,
+          value "WP_181496272.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus elongatus"
+        },
+        {
+          featureid 7,
+          value "7"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 130,
+      parent 128,
+      features {
+        {
+          featureid 1,
+          value "0.00216992"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "7"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 131,
+      parent 130,
+      features {
+        {
+          featureid 1,
+          value "0.00133083"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 132,
+      parent 131,
+      features {
+        {
+          featureid 1,
+          value "0.0061382"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 133,
+      parent 132,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus elongatus]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "ref|WP_011056615.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus elongatus"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus elongatus]"
+        },
+        {
+          featureid 5,
+          value "WP_011056615.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus elongatus"
+        },
+        {
+          featureid 7,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 134,
+      parent 132,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus vulcanus]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "ref|WP_126985133.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus vulcanus"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus vulcanus]"
+        },
+        {
+          featureid 5,
+          value "WP_126985133.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus vulcanus"
+        },
+        {
+          featureid 7,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 135,
+      parent 131,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. NK55a]"
+        },
+        {
+          featureid 1,
+          value "0.0134331"
+        },
+        {
+          featureid 2,
+          value "ref|WP_024125695.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus sp. NK55a"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. NK55a]"
+        },
+        {
+          featureid 5,
+          value "WP_024125695.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus sp. NK55a"
+        },
+        {
+          featureid 7,
+          value "6"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 136,
+      parent 130,
+      features {
+        {
+          featureid 1,
+          value "0.00558995"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 137,
+      parent 136,
+      features {
+        {
+          featureid 1,
+          value "0.00248862"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 138,
+      parent 137,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. CL-1]"
+        },
+        {
+          featureid 1,
+          value "0.00192775"
+        },
+        {
+          featureid 2,
+          value "ref|WP_149817762.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus sp. CL-1"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. CL-1]"
+        },
+        {
+          featureid 5,
+          value "WP_149817762.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus sp. CL-1"
+        },
+        {
+          featureid 7,
+          value "11"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 139,
+      parent 137,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Thermosynechococcus sp.
+ TA-1]"
+        },
+        {
+          featureid 1,
+          value "0.00191103"
+        },
+        {
+          featureid 2,
+          value "ref|WP_206201361.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus sp. TA-1"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Thermosynechococcus sp.
+ TA-1]"
+        },
+        {
+          featureid 5,
+          value "WP_206201361.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus sp. TA-1"
+        },
+        {
+          featureid 7,
+          value "14"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 140,
+      parent 136,
+      features {
+        {
+          featureid 1,
+          value "0.00136129"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 141,
+      parent 140,
+      features {
+        {
+          featureid 0,
+          value "TPA: B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. M55_K2018_012]"
+        },
+        {
+          featureid 1,
+          value "0.00194156"
+        },
+        {
+          featureid 2,
+          value "tpg|HIK47711.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus sp. M55_K2018_012"
+        },
+        {
+          featureid 4,
+          value "TPA: B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. M55_K2018_012]"
+        },
+        {
+          featureid 5,
+          value "HIK47711.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus sp. M55_K2018_012"
+        },
+        {
+          featureid 7,
+          value "13"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 142,
+      parent 140,
+      features {
+        {
+          featureid 0,
+          value "TPA: B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. M98_K2018_005]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "tpg|HIK34151.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus sp. M98_K2018_005"
+        },
+        {
+          featureid 4,
+          value "TPA: B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. M98_K2018_005]"
+        },
+        {
+          featureid 5,
+          value "HIK34151.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus sp. M98_K2018_005"
+        },
+        {
+          featureid 7,
+          value "15"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 143,
+      parent 127,
+      features {
+        {
+          featureid 0,
+          value "TPA: B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. M46_R2017_013]"
+        },
+        {
+          featureid 1,
+          value "0.0180818"
+        },
+        {
+          featureid 2,
+          value "tpg|HIK25265.1"
+        },
+        {
+          featureid 3,
+          value "Thermosynechococcus sp. M46_R2017_013"
+        },
+        {
+          featureid 4,
+          value "TPA: B12-binding domain-containing radical SAM protein
+ [Thermosynechococcus sp. M46_R2017_013]"
+        },
+        {
+          featureid 5,
+          value "HIK25265.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Thermosynechococcus sp. M46_R2017_013"
+        },
+        {
+          featureid 7,
+          value "18"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 144,
+      parent 122,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. PCC 6312]"
+        },
+        {
+          featureid 1,
+          value "0.0897514"
+        },
+        {
+          featureid 2,
+          value "ref|WP_015123702.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcus sp. PCC 6312"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcus sp. PCC 6312]"
+        },
+        {
+          featureid 5,
+          value "WP_015123702.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcus sp. PCC 6312"
+        },
+        {
+          featureid 7,
+          value "23"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 145,
+      parent 121,
+      features {
+        {
+          featureid 1,
+          value "0.0166667"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 146,
+      parent 145,
+      features {
+        {
+          featureid 0,
+          value "DUF4070 domain-containing protein [Synechococcales
+ cyanobacterium C]"
+        },
+        {
+          featureid 1,
+          value "0.0920946"
+        },
+        {
+          featureid 2,
+          value "gb|NCJ07131.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcales cyanobacterium C"
+        },
+        {
+          featureid 4,
+          value "DUF4070 domain-containing protein [Synechococcales
+ cyanobacterium C]"
+        },
+        {
+          featureid 5,
+          value "NCJ07131.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcales cyanobacterium C"
+        },
+        {
+          featureid 7,
+          value "27"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 147,
+      parent 145,
+      features {
+        {
+          featureid 1,
+          value "0.00850124"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 148,
+      parent 147,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Acaryochloris sp. RCC1774]"
+        },
+        {
+          featureid 1,
+          value "0.134371"
+        },
+        {
+          featureid 2,
+          value "ref|WP_110986567.1"
+        },
+        {
+          featureid 3,
+          value "Acaryochloris sp. RCC1774"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Acaryochloris sp. RCC1774]"
+        },
+        {
+          featureid 5,
+          value "WP_110986567.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Acaryochloris sp. RCC1774"
+        },
+        {
+          featureid 7,
+          value "26"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 149,
+      parent 147,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Aphanocapsa montana]"
+        },
+        {
+          featureid 1,
+          value "0.155276"
+        },
+        {
+          featureid 2,
+          value "ref|WP_166280666.1"
+        },
+        {
+          featureid 3,
+          value "Aphanocapsa montana"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Aphanocapsa montana]"
+        },
+        {
+          featureid 5,
+          value "WP_166280666.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Aphanocapsa montana"
+        },
+        {
+          featureid 7,
+          value "32"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 150,
+      parent 120,
+      features {
+        {
+          featureid 1,
+          value "0.00394191"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "20"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 151,
+      parent 150,
+      features {
+        {
+          featureid 1,
+          value "0.0127436"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "16"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 152,
+      parent 151,
+      features {
+        {
+          featureid 1,
+          value "0.00592754"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "5"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 153,
+      parent 152,
+      features {
+        {
+          featureid 1,
+          value "0.0379859"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 154,
+      parent 153,
+      features {
+        {
+          featureid 1,
+          value "0.054745"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 155,
+      parent 154,
+      features {
+        {
+          featureid 0,
+          value "Fe-S oxidoreductase [Leptolyngbyaceae cyanobacterium JSC-12]"
+        },
+        {
+          featureid 1,
+          value "0.0172665"
+        },
+        {
+          featureid 2,
+          value "gb|EKQ68834.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbyaceae cyanobacterium JSC-12"
+        },
+        {
+          featureid 4,
+          value "Fe-S oxidoreductase [Leptolyngbyaceae cyanobacterium JSC-12]"
+        },
+        {
+          featureid 5,
+          value "EKQ68834.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbyaceae cyanobacterium JSC-12"
+        },
+        {
+          featureid 7,
+          value "12"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 156,
+      parent 154,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbyaceae cyanobacterium JSC-12]"
+        },
+        {
+          featureid 1,
+          value "0.0222746"
+        },
+        {
+          featureid 2,
+          value "gb|MBF2025980.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbyaceae cyanobacterium JSC-12"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbyaceae cyanobacterium JSC-12]"
+        },
+        {
+          featureid 5,
+          value "MBF2025980.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbyaceae cyanobacterium JSC-12"
+        },
+        {
+          featureid 7,
+          value "17"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 157,
+      parent 153,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp.]"
+        },
+        {
+          featureid 1,
+          value "0.103309"
+        },
+        {
+          featureid 2,
+          value "gb|PZV15814.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp."
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp.]"
+        },
+        {
+          featureid 5,
+          value "PZV15814.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp."
+        },
+        {
+          featureid 7,
+          value "29"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 158,
+      parent 152,
+      features {
+        {
+          featureid 1,
+          value "0.138832"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 159,
+      parent 158,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Prochlorothrix hollandica]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "ref|WP_017711357.1"
+        },
+        {
+          featureid 3,
+          value "Prochlorothrix hollandica"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Prochlorothrix hollandica]"
+        },
+        {
+          featureid 5,
+          value "WP_017711357.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Prochlorothrix hollandica"
+        },
+        {
+          featureid 7,
+          value "20"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 160,
+      parent 158,
+      features {
+        {
+          featureid 0,
+          value "Fe-S oxidoreductase [Prochlorothrix hollandica PCC 9006 =
+ CALU 1027]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "gb|KKJ00543.1"
+        },
+        {
+          featureid 3,
+          value "Prochlorothrix hollandica PCC 9006 = CALU 1027"
+        },
+        {
+          featureid 4,
+          value "Fe-S oxidoreductase [Prochlorothrix hollandica PCC 9006 =
+ CALU 1027]"
+        },
+        {
+          featureid 5,
+          value "KKJ00543.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Prochlorothrix hollandica PCC 9006 = CALU 1027"
+        },
+        {
+          featureid 7,
+          value "22"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 161,
+      parent 151,
+      features {
+        {
+          featureid 1,
+          value "0.0258811"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "11"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 162,
+      parent 161,
+      features {
+        {
+          featureid 1,
+          value "0.0291181"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "10"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 163,
+      parent 162,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Myxacorys
+ almedinensis]"
+        },
+        {
+          featureid 1,
+          value "0.101969"
+        },
+        {
+          featureid 2,
+          value "ref|WP_162425466.1"
+        },
+        {
+          featureid 3,
+          value "Myxacorys almedinensis"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Myxacorys
+ almedinensis]"
+        },
+        {
+          featureid 5,
+          value "WP_162425466.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Myxacorys almedinensis"
+        },
+        {
+          featureid 7,
+          value "16"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 164,
+      parent 162,
+      features {
+        {
+          featureid 1,
+          value "0.0264569"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "9"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 165,
+      parent 164,
+      features {
+        {
+          featureid 1,
+          value "0.021448"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 166,
+      parent 165,
+      features {
+        {
+          featureid 1,
+          value "0.0134818"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 167,
+      parent 166,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. NIES-3755]"
+        },
+        {
+          featureid 1,
+          value "0.0278122"
+        },
+        {
+          featureid 2,
+          value "ref|WP_068382819.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. NIES-3755"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. NIES-3755]"
+        },
+        {
+          featureid 5,
+          value "WP_068382819.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. NIES-3755"
+        },
+        {
+          featureid 7,
+          value "19"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 168,
+      parent 166,
+      features {
+        {
+          featureid 0,
+          value "cobalamin-dependent protein [Pseudanabaenaceae cyanobacterium
+ LEGE 13415]"
+        },
+        {
+          featureid 1,
+          value "0.0248559"
+        },
+        {
+          featureid 2,
+          value "gb|MBE9011789.1"
+        },
+        {
+          featureid 3,
+          value "Pseudanabaenaceae cyanobacterium LEGE 13415"
+        },
+        {
+          featureid 4,
+          value "cobalamin-dependent protein [Pseudanabaenaceae cyanobacterium
+ LEGE 13415]"
+        },
+        {
+          featureid 5,
+          value "MBE9011789.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Pseudanabaenaceae cyanobacterium LEGE 13415"
+        },
+        {
+          featureid 7,
+          value "40"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 169,
+      parent 165,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. NIES-2104]"
+        },
+        {
+          featureid 1,
+          value "0.0428896"
+        },
+        {
+          featureid 2,
+          value "ref|WP_059000240.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. NIES-2104"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. NIES-2104]"
+        },
+        {
+          featureid 5,
+          value "WP_059000240.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. NIES-2104"
+        },
+        {
+          featureid 7,
+          value "25"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 170,
+      parent 164,
+      features {
+        {
+          featureid 1,
+          value "0.0529298"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "6"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 171,
+      parent 170,
+      features {
+        {
+          featureid 1,
+          value "0.00442261"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 172,
+      parent 171,
+      features {
+        {
+          featureid 1,
+          value "0.00767427"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 173,
+      parent 172,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-1624]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "gb|MBD1857676.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. FACHB-1624"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-1624]"
+        },
+        {
+          featureid 5,
+          value "MBD1857676.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. FACHB-1624"
+        },
+        {
+          featureid 7,
+          value "30"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 174,
+      parent 172,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-1624]"
+        },
+        {
+          featureid 1,
+          value "0.000563666"
+        },
+        {
+          featureid 2,
+          value "ref|WP_199329612.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. FACHB-1624"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-1624]"
+        },
+        {
+          featureid 5,
+          value "WP_199329612.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. FACHB-1624"
+        },
+        {
+          featureid 7,
+          value "34"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 175,
+      parent 171,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. UWPOB_LEPTO1]"
+        },
+        {
+          featureid 1,
+          value "0.00695556"
+        },
+        {
+          featureid 2,
+          value "gb|MBN8564170.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. UWPOB_LEPTO1"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. UWPOB_LEPTO1]"
+        },
+        {
+          featureid 5,
+          value "MBN8564170.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. UWPOB_LEPTO1"
+        },
+        {
+          featureid 7,
+          value "35"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 176,
+      parent 170,
+      features {
+        {
+          featureid 1,
+          value "0.0101049"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 177,
+      parent 176,
+      features {
+        {
+          featureid 0,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [Leptolyngbya]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "ref|WP_026149047.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya"
+        },
+        {
+          featureid 4,
+          value "MULTISPECIES: B12-binding domain-containing radical SAM
+ protein [Leptolyngbya]"
+        },
+        {
+          featureid 5,
+          value "WP_026149047.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya"
+        },
+        {
+          featureid 7,
+          value "31"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 178,
+      parent 176,
+      features {
+        {
+          featureid 1,
+          value "0.000522508"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 179,
+      parent 178,
+      features {
+        {
+          featureid 0,
+          value "HpnP [Leptolyngbya boryana CCAP 1462/2]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "gb|AHA41835.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya boryana CCAP 1462/2"
+        },
+        {
+          featureid 4,
+          value "HpnP [Leptolyngbya boryana CCAP 1462/2]"
+        },
+        {
+          featureid 5,
+          value "AHA41835.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya boryana CCAP 1462/2"
+        },
+        {
+          featureid 7,
+          value "33"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 180,
+      parent 178,
+      features {
+        {
+          featureid 0,
+          value "Fe-S oxidoreductase [Leptolyngbya boryana IAM M-101]"
+        },
+        {
+          featureid 1,
+          value "0.000411696"
+        },
+        {
+          featureid 2,
+          value "dbj|BAS59766.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya boryana IAM M-101"
+        },
+        {
+          featureid 4,
+          value "Fe-S oxidoreductase [Leptolyngbya boryana IAM M-101]"
+        },
+        {
+          featureid 5,
+          value "BAS59766.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya boryana IAM M-101"
+        },
+        {
+          featureid 7,
+          value "36"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 181,
+      parent 161,
+      features {
+        {
+          featureid 0,
+          value "cobalamin-dependent protein [Leptolyngbya sp. FACHB-36]"
+        },
+        {
+          featureid 1,
+          value "0.0915681"
+        },
+        {
+          featureid 2,
+          value "ref|WP_190343688.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. FACHB-36"
+        },
+        {
+          featureid 4,
+          value "cobalamin-dependent protein [Leptolyngbya sp. FACHB-36]"
+        },
+        {
+          featureid 5,
+          value "WP_190343688.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. FACHB-36"
+        },
+        {
+          featureid 7,
+          value "38"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 182,
+      parent 150,
+      features {
+        {
+          featureid 1,
+          value "0.00912537"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "4"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 183,
+      parent 182,
+      features {
+        {
+          featureid 1,
+          value "0.012319"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 184,
+      parent 183,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-261]"
+        },
+        {
+          featureid 1,
+          value "0.0743711"
+        },
+        {
+          featureid 2,
+          value "ref|WP_190805177.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. FACHB-261"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-261]"
+        },
+        {
+          featureid 5,
+          value "WP_190805177.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. FACHB-261"
+        },
+        {
+          featureid 7,
+          value "1"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 185,
+      parent 183,
+      features {
+        {
+          featureid 1,
+          value "0.105402"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 186,
+      parent 185,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. 'hensonii']"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "ref|WP_083636530.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. 'hensonii'"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. 'hensonii']"
+        },
+        {
+          featureid 5,
+          value "WP_083636530.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. 'hensonii'"
+        },
+        {
+          featureid 7,
+          value "9"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 187,
+      parent 185,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. 'hensonii']"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "gb|OLP20415.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. 'hensonii'"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. 'hensonii']"
+        },
+        {
+          featureid 5,
+          value "OLP20415.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. 'hensonii'"
+        },
+        {
+          featureid 7,
+          value "10"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 188,
+      parent 182,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Neosynechococcus sphagnicola]"
+        },
+        {
+          featureid 1,
+          value "0.11817"
+        },
+        {
+          featureid 2,
+          value "ref|WP_036531267.1"
+        },
+        {
+          featureid 3,
+          value "Neosynechococcus sphagnicola"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Neosynechococcus sphagnicola]"
+        },
+        {
+          featureid 5,
+          value "WP_036531267.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Neosynechococcus sphagnicola"
+        },
+        {
+          featureid 7,
+          value "8"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 189,
+      parent 119,
+      features {
+        {
+          featureid 1,
+          value "0.0996687"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "3"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 190,
+      parent 189,
+      features {
+        {
+          featureid 1,
+          value "0.0171173"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 191,
+      parent 190,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-321]"
+        },
+        {
+          featureid 1,
+          value "0.0285323"
+        },
+        {
+          featureid 2,
+          value "ref|WP_190505176.1"
+        },
+        {
+          featureid 3,
+          value "Leptolyngbya sp. FACHB-321"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Leptolyngbya sp. FACHB-321]"
+        },
+        {
+          featureid 5,
+          value "WP_190505176.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Leptolyngbya sp. FACHB-321"
+        },
+        {
+          featureid 7,
+          value "21"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 192,
+      parent 190,
+      features {
+        {
+          featureid 0,
+          value "hopanoid biosynthesis associated radical SAM protein HpnJ
+ [uncultured Leptolyngbya sp.]"
+        },
+        {
+          featureid 1,
+          value "0"
+        },
+        {
+          featureid 2,
+          value "emb|CAA9375979.1"
+        },
+        {
+          featureid 3,
+          value "uncultured Leptolyngbya sp."
+        },
+        {
+          featureid 4,
+          value "hopanoid biosynthesis associated radical SAM protein HpnJ
+ [uncultured Leptolyngbya sp.]"
+        },
+        {
+          featureid 5,
+          value "CAA9375979.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "uncultured Leptolyngbya sp."
+        },
+        {
+          featureid 7,
+          value "37"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 193,
+      parent 189,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein [Stenomitos
+ frigidus]"
+        },
+        {
+          featureid 1,
+          value "0.065649"
+        },
+        {
+          featureid 2,
+          value "ref|WP_106255794.1"
+        },
+        {
+          featureid 3,
+          value "Stenomitos frigidus"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein [Stenomitos
+ frigidus]"
+        },
+        {
+          featureid 5,
+          value "WP_106255794.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Stenomitos frigidus"
+        },
+        {
+          featureid 7,
+          value "24"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 194,
+      parent 118,
+      features {
+        {
+          featureid 1,
+          value "0.0972503"
+        },
+        {
+          featureid 12,
+          value "0"
+        },
+        {
+          featureid 0,
+          value "cyanobacteria"
+        },
+        {
+          featureid 14,
+          value "2"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        }
+      }
+    },
+    {
+      id 195,
+      parent 194,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcales cyanobacterium RM1_1_8]"
+        },
+        {
+          featureid 1,
+          value "0.0776"
+        },
+        {
+          featureid 2,
+          value "gb|NJN30361.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcales cyanobacterium RM1_1_8"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcales cyanobacterium RM1_1_8]"
+        },
+        {
+          featureid 5,
+          value "NJN30361.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcales cyanobacterium RM1_1_8"
+        },
+        {
+          featureid 7,
+          value "28"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    },
+    {
+      id 196,
+      parent 194,
+      features {
+        {
+          featureid 0,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcales cyanobacterium CRU_2_2]"
+        },
+        {
+          featureid 1,
+          value "0.028857"
+        },
+        {
+          featureid 2,
+          value "gb|NJR70245.1"
+        },
+        {
+          featureid 3,
+          value "Synechococcales cyanobacterium CRU_2_2"
+        },
+        {
+          featureid 4,
+          value "B12-binding domain-containing radical SAM protein
+ [Synechococcales cyanobacterium CRU_2_2]"
+        },
+        {
+          featureid 5,
+          value "NJR70245.1"
+        },
+        {
+          featureid 6,
+          value "cyanobacteria"
+        },
+        {
+          featureid 15,
+          value "Synechococcales cyanobacterium CRU_2_2"
+        },
+        {
+          featureid 7,
+          value "39"
+        },
+        {
+          featureid 8,
+          value "0 255 0"
+        },
+        {
+          featureid 12,
+          value "0"
+        }
+      }
+    }
+  }
+}
