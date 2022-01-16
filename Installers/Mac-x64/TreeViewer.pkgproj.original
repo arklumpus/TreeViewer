@@ -675,7 +675,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>/Users/giorgio/Desktop/TreeViewer/Installers/Mac-x64/Introduction.rtfd</string>
+							<string>Introduction.rtfd</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
