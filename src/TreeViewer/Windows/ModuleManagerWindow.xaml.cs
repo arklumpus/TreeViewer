@@ -537,7 +537,7 @@ namespace TreeViewer
         {
             int tabInd = bar.SelectedIndex;
             ModuleMetadata selectedMetadata = Modules.LoadedModulesMetadata[selectedModules[tabInd]];
-
+            selectedMetadata = ModuleMetadata.CreateFromSource(selectedMetadata.SourceCode, (string[])selectedMetadata.AdditionalReferences.Clone());
 
             SaveFileDialog dialog = new SaveFileDialog() { Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Name = "Module file", Extensions = new List<string>() { "json.zip" } } }, Title = "Save module..." };
 
@@ -630,6 +630,11 @@ namespace TreeViewer
                                 }
                             }
                         }
+                    }
+
+                    for (int i = 0; i < selectedMetadata.AdditionalReferences.Length; i++)
+                    {
+                        selectedMetadata.AdditionalReferences[i] = Path.GetFileName(selectedMetadata.AdditionalReferences[i]);
                     }
 
                     using (FileStream fs = new FileStream(Path.Combine(tempDir, "Module.json"), FileMode.Create))
@@ -980,7 +985,7 @@ namespace TreeViewer
                 List<string> filesToCopy = new List<string>();
                 filesToCopy.Add(newModuleList);
                 filesToCopy.Add(Path.GetFullPath(Modules.ModuleListPath));
-                
+
                 for (int i = 0; i < filesToCopy.Count; i += 2)
                 {
                     if (filesToCopy[i + 1] != "-")

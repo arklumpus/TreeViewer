@@ -1442,6 +1442,11 @@ public static Colour? Format(object attribute)
                     renderer.Render(markdownDocument, out Dictionary<string, string> linkDestinations);
                 }
 
+                for (int i = 0; i < this.AdditionalReferences.Length; i++)
+                {
+                    this.AdditionalReferences[i] = Path.GetFileName(this.AdditionalReferences[i]);
+                }
+
                 using (FileStream fs = new FileStream(Path.Combine(tempDir, "Module.json"), FileMode.Create))
                 {
                     System.Text.Json.JsonSerializer.Serialize(new System.Text.Json.Utf8JsonWriter(fs), this, typeof(ModuleMetadata), Modules.DefaultSerializationOptions);
