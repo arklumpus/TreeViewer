@@ -713,6 +713,11 @@ namespace TreeViewer
                         return;
                     }
 
+                    for (int i = 0; i < metaData.AdditionalReferences.Length; i++)
+                    {
+                        metaData.AdditionalReferences[i] = Path.Combine(tempDir, Path.GetFileName(metaData.AdditionalReferences[i]));
+                    }
+
                     if (!metaData.VerifySignature())
                     {
                         MessageBox box = new MessageBox("Attention", "The source code of the module could not be verified. Proceed only if you trust the source from which you obtained the module. Do you wish to proceed?", MessageBox.MessageBoxButtonTypes.YesNo);
@@ -845,6 +850,11 @@ namespace TreeViewer
                     {
                         await new MessageBox("Attention", "A module with the same Id has already been loaded!").ShowDialog2(this);
                         return;
+                    }
+
+                    for (int i = 0; i < metaData.AdditionalReferences.Length; i++)
+                    {
+                        metaData.AdditionalReferences[i] = Path.Combine(tempDir, Path.GetFileName(metaData.AdditionalReferences[i]));
                     }
 
                     if (!metaData.VerifySignature())
