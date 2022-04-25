@@ -615,7 +615,10 @@ namespace TreeViewer
 
                             if (File.Exists(actualPath))
                             {
-                                File.Copy(actualPath, Path.Combine(tempDir, Path.GetFileName(actualPath)));
+                                if (Path.GetDirectoryName(actualPath) != Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
+                                {
+                                    File.Copy(actualPath, Path.Combine(tempDir, Path.GetFileName(actualPath)));
+                                }
                             }
                             else
                             {
