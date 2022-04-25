@@ -728,6 +728,25 @@ namespace TreeViewer
                         }
                     }
 
+                    for (int i = 0; i < metaData.AdditionalReferences.Length; i++)
+                    {
+                        string actualPath = ModuleMetadata.LocateReference(metaData.AdditionalReferences[i]);
+
+                        if (Path.GetDirectoryName(actualPath) != Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
+                        {
+                            System.Reflection.Assembly refAss = System.Reflection.Assembly.LoadFile(actualPath);
+
+                            try
+                            {
+                                AppDomain.CurrentDomain.Load(refAss.GetName());
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                Modules.ExternalAssemblies.Add(refAss.FullName, refAss);
+                            }
+                        }
+                    }
+
                     Modules.LoadModule(metaData);
 
                     BuildModuleButton(new KeyValuePair<string, ModuleMetadata>(metaData.Id, metaData));
@@ -869,6 +888,25 @@ namespace TreeViewer
 
                     metaData.IsInstalled = true;
 
+                    for (int i = 0; i < metaData.AdditionalReferences.Length; i++)
+                    {
+                        string actualPath = ModuleMetadata.LocateReference(metaData.AdditionalReferences[i]);
+
+                        if (Path.GetDirectoryName(actualPath) != Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
+                        {
+                            System.Reflection.Assembly refAss = System.Reflection.Assembly.LoadFile(actualPath);
+
+                            try
+                            {
+                                AppDomain.CurrentDomain.Load(refAss.GetName());
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                Modules.ExternalAssemblies.Add(refAss.FullName, refAss);
+                            }
+                        }
+                    }
+
                     Modules.LoadModule(metaData);
 
                     BuildModuleButton(new KeyValuePair<string, ModuleMetadata>(metaData.Id, metaData));
@@ -908,7 +946,7 @@ namespace TreeViewer
                         {
                             string actualPath = Path.Combine(tempDir, Path.GetFileName(metaData.AdditionalReferences[i]));
 
-                            if (File.Exists(actualPath))
+                            if (File.Exists(actualPath) && !File.Exists(Path.GetFullPath(Path.Combine(Modules.ModulePath, "libraries", Path.GetFileName(actualPath)))))
                             {
                                 filesToCopy.Add(Path.GetFullPath(actualPath));
                                 filesToCopy.Add(Path.GetFullPath(Path.Combine(Modules.ModulePath, "libraries", Path.GetFileName(actualPath))));
