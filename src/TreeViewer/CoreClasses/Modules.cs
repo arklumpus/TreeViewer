@@ -130,6 +130,7 @@ namespace TreeViewer
             return GetModifier(shortcut.modifier).ToString().Replace(", ", " + ") + " + " + shortcut.key.ToString();
         }
 
+        private static Dictionary<string, Assembly> ExternalAssemblies = new Dictionary<string, Assembly>();
 
         static Modules()
         {
@@ -153,6 +154,19 @@ namespace TreeViewer
             {
                 Directory.CreateDirectory(Path.Combine(ModulePath, "libraries"));
             }
+
+            AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
+            {
+                if (ExternalAssemblies.TryGetValue(e.Name, out Assembly ass))
+                {
+                    return ass;
+                }
+                else
+                {
+                    return null;
+                }
+            };
+
         }
 
         public static CSharpEditor.InterprocessDebuggerServer GetNewDebuggerServer()
@@ -502,9 +516,27 @@ public static Colour? Format(object attribute)
             return loadedModule;
         }
 
-
         public static Module LoadPreCompiledModule(ModuleMetadata metaData, string fileName)
         {
+            for (int i = 0; i < metaData.AdditionalReferences.Length; i++)
+            {
+                string actualPath = ModuleMetadata.LocateReference(metaData.AdditionalReferences[i]);
+
+                if (Path.GetDirectoryName(actualPath) != Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+                {
+                    Assembly refAss = Assembly.LoadFile(actualPath);
+
+                    try
+                    {
+                        AppDomain.CurrentDomain.Load(refAss.GetName());
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        ExternalAssemblies.Add(refAss.FullName, refAss);
+                    }
+                }
+            }
+
             Assembly ass = Assembly.LoadFrom(fileName);
             Type compiledModule = ModuleMetadata.GetTypeFromAssembly(ass, "MyModule");
             Module loadedModule = metaData.Load(compiledModule, true);
