@@ -130,7 +130,7 @@ namespace TreeViewer
             return GetModifier(shortcut.modifier).ToString().Replace(", ", " + ") + " + " + shortcut.key.ToString();
         }
 
-        private static Dictionary<string, Assembly> ExternalAssemblies = new Dictionary<string, Assembly>();
+        internal static Dictionary<string, Assembly> ExternalAssemblies = new Dictionary<string, Assembly>();
 
         static Modules()
         {

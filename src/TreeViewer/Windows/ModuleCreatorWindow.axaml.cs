@@ -737,6 +737,25 @@ namespace TreeViewer
 
                         this.loadAdditionalModule = () =>
                         {
+                            for (int i = 0; i < originalReferences.Count; i++)
+                            {
+                                string actualPath = ModuleMetadata.LocateReference(originalReferences[i]);
+
+                                if (Path.GetDirectoryName(actualPath) != Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+                                {
+                                    Assembly refAss = Assembly.LoadFile(actualPath);
+
+                                    try
+                                    {
+                                        AppDomain.CurrentDomain.Load(refAss.GetName());
+                                    }
+                                    catch (FileNotFoundException)
+                                    {
+                                        Modules.ExternalAssemblies.Add(refAss.FullName, refAss);
+                                    }
+                                }
+                            }
+
                             Module loadedModule = metadata.Load(moduleType, true);
                             Modules.LoadModule(metadata, loadedModule);
 
