@@ -125,6 +125,55 @@ namespace TreeViewer
             return tbr;
         }
 
+        public static Dictionary<string, object> DeepClone(this Dictionary<string, object> dict)
+        {
+            Dictionary<string, object> tbr = new Dictionary<string, object>();
+
+            foreach (KeyValuePair<string, object> kvp in dict)
+            {
+                if (kvp.Value is FormatterOptions formatter)
+                {
+                    object[] newParams = new object[formatter.Parameters.Length];
+                    for (int i = 0; i < newParams.Length; i++)
+                    {
+                        newParams[i] = formatter.Parameters[i];
+                    }
+
+                    FormatterOptions newFormatter = new FormatterOptions((string)formatter.Parameters[formatter.Parameters.Length - 2]) { Parameters = newParams };
+                    tbr.Add(kvp.Key, newFormatter);
+                }
+                else if (kvp.Value is ColourFormatterOptions colourFormatter)
+                {
+                    object[] newParams = new object[colourFormatter.Parameters.Length];
+                    for (int i = 0; i < newParams.Length; i++)
+                    {
+                        newParams[i] = colourFormatter.Parameters[i];
+                    }
+
+                    ColourFormatterOptions newFormatter = new ColourFormatterOptions((string)colourFormatter.Parameters[0], newParams) { AttributeName = colourFormatter.AttributeName, AttributeType = colourFormatter.AttributeType, DefaultColour = colourFormatter.DefaultColour };
+                    tbr.Add(kvp.Key, newFormatter);
+                }
+                else if (kvp.Value is NumberFormatterOptions numberFormatter)
+                {
+                    object[] newParams = new object[numberFormatter.Parameters.Length];
+                    for (int i = 0; i < newParams.Length; i++)
+                    {
+                        newParams[i] = numberFormatter.Parameters[i];
+                    }
+
+                    NumberFormatterOptions newFormatter = new NumberFormatterOptions((string)numberFormatter.Parameters[0]) { AttributeName = numberFormatter.AttributeName, AttributeType = numberFormatter.AttributeType, DefaultValue = numberFormatter.DefaultValue, Parameters = newParams };
+                    tbr.Add(kvp.Key, newFormatter);
+                }
+                else
+                {
+                    tbr.Add(kvp.Key, kvp.Value);
+                }
+            }
+
+            return tbr;
+        }
+
+
         public static string GetFormatString(this double val)
         {
             if (val == 0 || double.IsNaN(val) || double.IsInfinity(val))

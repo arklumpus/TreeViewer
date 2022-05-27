@@ -2746,7 +2746,7 @@ namespace TreeViewer
             {
                 int index = PlottingActionsContainer.Children.IndexOf(exp);
 
-                Dictionary<string, object> parameters = PlottingParameters[index].ShallowClone();
+                Dictionary<string, object> parameters = PlottingParameters[index].DeepClone();
 
                 Action<Dictionary<string, object>> updater = this.StateData.AddPlottingModule(module);
 
