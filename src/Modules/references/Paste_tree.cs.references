@@ -10,7 +10,6 @@ Avalonia.Visuals.dll
 Avalonia.Styling.dll
 Avalonia.Animation.dll
 Avalonia.Base.dll
-System.IO.FileSystem.dll
 VectSharp.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll

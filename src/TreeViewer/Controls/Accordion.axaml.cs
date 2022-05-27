@@ -161,8 +161,8 @@ namespace TreeViewer
             this.ContentGridParent = this.FindControl<Grid>("ContentGridParent");
 
             ((Avalonia.Animation.DoubleTransition)ContentGridParent.Transitions[0]).Duration = this.TransitionDuration;
-            ((Avalonia.Controls.PanAndZoom.TransformOperationsTransition)(this.FindControl<Path>("ArrowPathLeft").Transitions[0])).Duration = this.TransitionDuration;
-            ((Avalonia.Controls.PanAndZoom.TransformOperationsTransition)(this.FindControl<Path>("ArrowPathLeft").Transitions[0])).Duration = this.TransitionDuration;
+            ((Avalonia.Animation.TransformOperationsTransition)(this.FindControl<Path>("ArrowPathLeft").Transitions[0])).Duration = this.TransitionDuration;
+            ((Avalonia.Animation.TransformOperationsTransition)(this.FindControl<Path>("ArrowPathLeft").Transitions[0])).Duration = this.TransitionDuration;
 
             this.FindControl<Grid>("HeaderGrid").PointerPressed += (s, e) =>
             {

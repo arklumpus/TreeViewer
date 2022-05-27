@@ -132,6 +132,74 @@ namespace TreeViewer
 
         internal static Dictionary<string, Assembly> ExternalAssemblies = new Dictionary<string, Assembly>();
 
+        public static SimpleFontLibrary FontLibrary = new SimpleFontLibrary();
+
+        public static System.Net.Http.HttpClient HttpClient = new System.Net.Http.HttpClient();
+
+        public static async Task DownloadFileTaskAsync(this System.Net.Http.HttpClient client, Uri address, string fileName)
+        {
+            using (Stream remoteStream = await client.GetStreamAsync(address))
+            {
+                using (FileStream fs = new FileStream(fileName, FileMode.Create))
+                {
+                    await remoteStream.CopyToAsync(fs);
+                }
+            }
+        }
+
+        public static async Task DownloadFileTaskAsync(this System.Net.Http.HttpClient client, Uri address, string fileName, IProgress<double> progress)
+        {
+            using System.Net.Http.HttpResponseMessage response = await client.GetAsync(address, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+            long totalLength = response.Content.Headers.ContentLength ?? 0;
+
+            using Stream remoteStream = await response.Content.ReadAsStreamAsync();
+            using FileStream fs = new FileStream(fileName, FileMode.Create);
+
+            await remoteStream.CopyToAsync(fs, progress: new Progress<long>((p) =>
+            {
+                progress.Report((double)p / totalLength);
+            }));
+
+            progress.Report(1);
+        }
+
+        public static async Task CopyToAsync(this Stream source, Stream destination, int bufferSize = 81920, IProgress<long> progress = null)
+        {
+            var buffer = new byte[bufferSize];
+            long totalBytesRead = 0;
+            int bytesRead;
+            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) != 0)
+            {
+                await destination.WriteAsync(buffer, 0, bytesRead).ConfigureAwait(false);
+                totalBytesRead += bytesRead;
+                progress?.Report(totalBytesRead);
+            }
+        }
+
+
+
+        public static void DownloadFile(this System.Net.Http.HttpClient client, string address, string fileName)
+        {
+            using System.Net.Http.HttpRequestMessage message = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, address);
+
+            using System.Net.Http.HttpResponseMessage response = client.Send(message);
+
+            using (FileStream fs = new FileStream(fileName, FileMode.Create))
+            {
+                response.Content.ReadAsStream().CopyTo(fs);
+            }
+        }
+
+        public static Task<string> DownloadStringTaskAsync(this System.Net.Http.HttpClient client, string address)
+        {
+            using System.Net.Http.HttpRequestMessage message = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, address);
+            message.Headers.Add("User-Agent", "arklumpus/TreeViewer");
+
+            using System.Net.Http.HttpResponseMessage response = client.Send(message);
+
+            return response.Content.ReadAsStringAsync();
+        }
+
         static Modules()
         {
             if (!Directory.Exists(ModulePath))
@@ -167,6 +235,13 @@ namespace TreeViewer
                 }
             };
 
+            VectSharp.FontFamily.DefaultFontLibrary = FontLibrary;
+            FontLibrary.Add(new FontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.RobotoMono-Regular.ttf")));
+            FontLibrary.Add(new FontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.RobotoMono-Italic.ttf")));
+            FontLibrary.Add(new FontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-Regular.ttf")));
+            FontLibrary.Add(new FontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-Bold.ttf")));
+            FontLibrary.Add(new FontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-Italic.ttf")));
+            FontLibrary.Add(new FontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-BoldItalic.ttf")));
         }
 
         public static CSharpEditor.InterprocessDebuggerServer GetNewDebuggerServer()
@@ -185,7 +260,7 @@ namespace TreeViewer
             string myPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
 
 #if DEBUG
-            return new CSharpEditor.InterprocessDebuggerServer(Path.Combine(myPath, "..", "..", "..", "..", "DebuggerClient", "bin", "Debug", "net5.0", exeName));
+            return new CSharpEditor.InterprocessDebuggerServer(Path.Combine(myPath, "..", "..", "..", "..", "DebuggerClient", "bin", "Debug", "net6.0", exeName));
 #else
             if (!IsMac)
             {
@@ -209,7 +284,7 @@ namespace TreeViewer
 #endif
         }
 
-        public static VectSharp.FontFamily CodeFontFamily = new VectSharp.Canvas.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.RobotoMono-Regular.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono");
+        public static VectSharp.FontFamily CodeFontFamily = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.RobotoMono-Regular.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono");
 
         public static bool IsMac
         {

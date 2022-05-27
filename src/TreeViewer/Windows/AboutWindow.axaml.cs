@@ -63,12 +63,8 @@ namespace TreeViewer
                 try
                 {
 
-                    using (WebClient client = new WebClient())
-                    {
-                        client.Headers.Add("User-Agent", "arklumpus/TreeViewer");
 
-                        releaseJson = await client.DownloadStringTaskAsync("https://api.github.com/repos/" + GlobalSettings.ProgramRepository + "/releases");
-                    }
+                    releaseJson = await Modules.HttpClient.DownloadStringTaskAsync("https://api.github.com/repos/" + GlobalSettings.ProgramRepository + "/releases");
 
                     ReleaseHeader[] releases = System.Text.Json.JsonSerializer.Deserialize<ReleaseHeader[]>(releaseJson);
 

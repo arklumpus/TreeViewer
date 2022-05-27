@@ -46,6 +46,8 @@ namespace TreeViewer
         // yet and stuff might break.
         public static int Main(string[] args)
         {
+            //args = new string[] { "--module-creator" };
+
             bool showHelp = false;
             bool rebuildAllModules = false;
             bool showUsage = false;

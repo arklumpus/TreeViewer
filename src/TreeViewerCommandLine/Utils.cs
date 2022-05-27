@@ -95,7 +95,7 @@ namespace TreeViewerCommandLine
         {
             double fontSize = double.Parse(sr.Substring(sr.LastIndexOf(" ") + 1));
             string fontFamily = sr.Substring(0, sr.LastIndexOf(" "));
-            return new VectSharp.Font(new VectSharp.FontFamily(fontFamily), fontSize);
+            return new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily(fontFamily), fontSize);
         }
     }
 
@@ -864,7 +864,7 @@ namespace TreeViewerCommandLine
                         {
                             string[] font = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters);
 
-                            VectSharp.Font fnt = new VectSharp.Font(new VectSharp.FontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
+                            VectSharp.Font fnt = new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
 
                             tbr.Add(parameters[i].Item1, fnt);
 

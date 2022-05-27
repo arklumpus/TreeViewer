@@ -67,37 +67,19 @@ namespace TreeViewer
                 ProgressWindow win = new ProgressWindow() { IsIndeterminate = false, Progress = 0, ProgressText = "Downloading update...", LabelText = Path.GetFileName(remoteDownloadFile) };
                 _ = win.ShowDialog2(this);
 
-                SemaphoreSlim semaphore = new SemaphoreSlim(0, 1);
-                WebClient client = new WebClient();
-
                 double lastProgress = 0;
 
-                client.DownloadProgressChanged += async (s, e) =>
+                await Modules.HttpClient.DownloadFileTaskAsync(new System.Uri(remoteDownloadFile), localDownloadFile, new System.Progress<double>(async progress =>
                 {
                     await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        double progress = (double)e.BytesReceived / e.TotalBytesToReceive;
-
                         if (progress > lastProgress + 0.005)
                         {
                             win.Progress = progress;
                             lastProgress = progress;
                         }
                     });
-                };
-
-                client.DownloadFileCompleted += (s, e) =>
-                {
-                    semaphore.Release();
-                };
-
-
-                client.DownloadFileAsync(new System.Uri(remoteDownloadFile), localDownloadFile);
-
-                await semaphore.WaitAsync();
-                semaphore.Release();
-                semaphore.Dispose();
-                client.Dispose();
+                }));
 
                 win.Close();
 

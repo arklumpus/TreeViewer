@@ -48,6 +48,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <Path Margin="4" Data="M3,3 L13,13 M13,3 L3,13" UseLayoutRounding="True" IsHitTestVisible="False" StrokeThickness="1" Stroke="White" />
       </Canvas>
       <TextBlock FontSize="14" Foreground="White" Grid.Row="2" HorizontalAlignment="Left" Margin="0,10,0,0" Name="StatusBlock">Loading modules...</TextBlock>
+      <TextBlock FontSize="24" Foreground="White" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,0" Name="VersionBlock"></TextBlock>
       <TextBlock FontSize="13" Foreground="White" Grid.Row="3" HorizontalAlignment="Center" Margin="0,5,0,0" Name="ModuleNameBox" Height="18" VerticalAlignment="Center"></TextBlock>
       <ProgressBar Grid.Row="4" Name="ProgressBar" IsIndeterminate="False" Margin="0,5,0,0" Value="0" Height="24" Minimum="0" Maximum="1" Foreground="#8bc5f6"></ProgressBar>
     </Grid>

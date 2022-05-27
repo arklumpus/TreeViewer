@@ -293,8 +293,8 @@ namespace TreeViewer
                 Canvas tile = new Canvas() { Width = 32, Height = 32, Background = new SolidColorBrush(Color.FromRgb(whiteR, whiteG, whiteB)) };
                 SolidColorBrush greyBrush = new SolidColorBrush(Color.FromRgb(greyR, greyG, greyB));
 
-                tile.Children.Add(new Rectangle() { Width = 16, Height = 16, Fill = greyBrush });
-                tile.Children.Add(new Rectangle() { Width = 16, Height = 16, Fill = greyBrush, RenderTransform = new TranslateTransform(16, 16) });
+                tile.Children.Add(new Avalonia.Controls.Shapes.Rectangle() { Width = 16, Height = 16, Fill = greyBrush });
+                tile.Children.Add(new Avalonia.Controls.Shapes.Rectangle() { Width = 16, Height = 16, Fill = greyBrush, RenderTransform = new TranslateTransform(16, 16) });
 
                 return new VisualBrush(tile) { TileMode = TileMode.Tile, Stretch = Stretch.None, DestinationRect = new Avalonia.RelativeRect(0, 0, 20, 20, Avalonia.RelativeUnit.Absolute) };
             }

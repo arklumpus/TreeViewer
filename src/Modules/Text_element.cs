@@ -178,7 +178,7 @@ namespace aebafe997c220425aae3906e731de1a07
                 /// </param>
                 ( "Text colour:", "Colour:[0,0,0,255]" ),
 
-				( "Background appearance", "Group:6"),
+                ( "Background appearance", "Group:6"),
 
                 /// <param name="Background colour:">
                 /// This parameter determines the colour used as a background for the text.
@@ -555,7 +555,7 @@ namespace aebafe997c220425aae3906e731de1a07
 
             if (font.FontFamily.IsStandardFamily)
             {
-                formattedText = FormattedText.Format(text, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, font.FontFamily.FileName), font.FontSize, colour);
+                formattedText = FormattedText.Format(text, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, font.FontFamily.FileName), font.FontSize, defaultBrush:  colour);
             }
             else
             {

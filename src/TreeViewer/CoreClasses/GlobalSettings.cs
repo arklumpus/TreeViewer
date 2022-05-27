@@ -325,7 +325,7 @@ namespace TreeViewer
                                 {
                                     string[] font = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
 
-                                    VectSharp.Font fnt = new VectSharp.Font(new VectSharp.FontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
+                                    VectSharp.Font fnt = new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
 
                                     if (string.IsNullOrEmpty(settingValue))
                                     {
@@ -334,7 +334,7 @@ namespace TreeViewer
                                     else
                                     {
                                         string[] splitSettingValue = settingValue.Split(',');
-                                        VectSharp.Font newFont = new VectSharp.Font(new VectSharp.FontFamily(splitSettingValue[0]), double.Parse(splitSettingValue[1], System.Globalization.CultureInfo.InvariantCulture));
+                                        VectSharp.Font newFont = new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily(splitSettingValue[0]), double.Parse(splitSettingValue[1], System.Globalization.CultureInfo.InvariantCulture));
 
                                         GlobalSettings.Settings.AdditionalSettings[name] = double.Parse(settingValue, System.Globalization.CultureInfo.InvariantCulture);
                                     }
@@ -448,7 +448,7 @@ namespace TreeViewer
             string str = reader.GetString();
             string[] font = str.Split(',');
 
-            return new Font(new FontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
+            return new Font(FontFamily.ResolveFontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
         }
 
         public override void Write(Utf8JsonWriter writer, Font value, JsonSerializerOptions options)

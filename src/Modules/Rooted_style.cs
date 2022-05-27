@@ -161,7 +161,7 @@ namespace RootedStyleAction
 						stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
 
 						Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-						updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(new FontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
+						updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
 
 						double defaultHeight = stateData.TransformedTree.GetLeaves().Count * 14;
 
@@ -217,7 +217,7 @@ namespace RootedStyleAction
 					stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
 
 					Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-					updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(new FontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
+					updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
 
 					double defaultHeight = stateData.TransformedTree.GetLeaves().Count * 14;
 

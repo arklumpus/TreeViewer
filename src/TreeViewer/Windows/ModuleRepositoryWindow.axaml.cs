@@ -326,10 +326,9 @@ namespace TreeViewer
 
             try
             {
-                using (WebClient client = new WebClient())
                 {
                     string tempFile = Path.GetTempFileName();
-                    await client.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
+                    await Modules.HttpClient.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
 
                     using (FileStream fs = new FileStream(tempFile, FileMode.Open))
                     {
@@ -474,10 +473,9 @@ namespace TreeViewer
 
             ModuleMetadata module;
 
-            using (WebClient client = new WebClient())
             {
                 string tempFile = Path.GetTempFileName();
-                await client.DownloadFileTaskAsync(moduleFile, tempFile);
+                await Modules.HttpClient.DownloadFileTaskAsync(moduleFile, tempFile);
 
                 string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
@@ -560,9 +558,8 @@ namespace TreeViewer
 
             try
             {
-                using (WebClient client = new WebClient())
                 {
-                    await client.DownloadFileTaskAsync(moduleFile, tempFile);
+                    await Modules.HttpClient.DownloadFileTaskAsync(moduleFile, tempFile);
                 }
                 progressWindow.Close();
             }
@@ -708,10 +705,7 @@ namespace TreeViewer
 
             try
             {
-                using (WebClient client = new WebClient())
-                {
-                    await client.DownloadFileTaskAsync(moduleFile, tempFile);
-                }
+                await Modules.HttpClient.DownloadFileTaskAsync(moduleFile, tempFile);
 
                 progressWindow.Close();
             }
@@ -986,10 +980,9 @@ namespace TreeViewer
             {
                 Uri moduleFile = new Uri(ModuleRepositoryBaseUri, moduleId + "/" + moduleId + ".v" + moduleVersion + ".json.zip");
 
-                using (WebClient client = new WebClient())
                 {
                     string tempFile = Path.GetTempFileName();
-                    await client.DownloadFileTaskAsync(moduleFile, tempFile);
+                    await Modules.HttpClient.DownloadFileTaskAsync(moduleFile, tempFile);
 
                     string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 

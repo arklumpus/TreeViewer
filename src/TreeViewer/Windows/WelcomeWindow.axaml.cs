@@ -87,10 +87,9 @@ namespace TreeViewer
                         File.WriteAllText(Modules.ModuleListPath, "[]");
                         await Modules.LoadInstalledModules(true, null);
 
-                        using (WebClient client = new WebClient())
                         {
                             string tempFile = Path.GetTempFileName();
-                            await client.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
+                            await Modules.HttpClient.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
 
                             using (FileStream fs = new FileStream(tempFile, FileMode.Open))
                             {
@@ -117,10 +116,9 @@ namespace TreeViewer
 
                                 Uri moduleFile = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), header.Id + "/" + header.Id + ".v" + header.Version.ToString() + ".json.zip");
 
-                                using (WebClient client = new WebClient())
                                 {
                                     string tempFile = Path.GetTempFileName();
-                                    await client.DownloadFileTaskAsync(moduleFile, tempFile);
+                                    await Modules.HttpClient.DownloadFileTaskAsync(moduleFile, tempFile);
 
                                     try
                                     {

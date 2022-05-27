@@ -16,5 +16,4 @@ Avalonia.Styling.dll
 Avalonia.Animation.dll
 System.ObjectModel.dll
 VectSharp.Canvas.dll
-System.IO.FileSystem.dll
 System.Text.Json.dll

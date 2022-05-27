@@ -362,41 +362,9 @@ namespace TreeViewer
             this.AttachmentName = attachmentName;
         }
 
-        private AttachmentFontFamily(string attachmentName, string fileName) : base(fileName)
-        {
-            this.AttachmentName = attachmentName;
-        }
-
         public static AttachmentFontFamily Create(string attachmentName, Stream ttfStream)
         {
-            string temp = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-
-            using (FileStream fs = new FileStream(temp, FileMode.Create))
-            {
-                ttfStream.CopyTo(fs);
-            }
-
-            AttachmentFontFamily tbr = new AttachmentFontFamily(attachmentName, temp);
-
-            try
-            {
-                ((ClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Exit += (s, e) =>
-                {
-                    try
-                    {
-                        tbr.TrueTypeFile.Destroy();
-                        File.Delete(temp);
-                    }
-                    catch
-                    {
-                    
-                    }
-                };
-            }
-            catch
-            {
-
-            }
+            AttachmentFontFamily tbr = new AttachmentFontFamily(attachmentName, ttfStream);
 
             return tbr;
         }

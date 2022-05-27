@@ -7,7 +7,6 @@ Avalonia.Base.dll
 Avalonia.Controls.dll
 System.Threading.dll
 PhyloTree.TreeNode.dll
-System.IO.FileSystem.dll
 Avalonia.Input.dll
 System.Security.Cryptography.Algorithms.dll
 Avalonia.Interactivity.dll

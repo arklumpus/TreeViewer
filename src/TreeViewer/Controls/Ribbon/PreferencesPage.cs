@@ -723,7 +723,7 @@ namespace TreeViewer
                 {
                     string[] font = System.Text.Json.JsonSerializer.Deserialize<string[]>(controlParameters, Modules.DefaultSerializationOptions);
 
-                    VectSharp.Font fnt = new VectSharp.Font(new VectSharp.FontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
+                    VectSharp.Font fnt = new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
 
                     if (!GlobalSettings.Settings.AdditionalSettings.TryGetValue(parameterName, out object valueObject))
                     {
@@ -734,7 +734,7 @@ namespace TreeViewer
                         if (valueObject is JsonElement element)
                         {
                             font = element.GetString().Split(',');
-                            fnt = new VectSharp.Font(new VectSharp.FontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
+                            fnt = new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily(font[0]), double.Parse(font[1], System.Globalization.CultureInfo.InvariantCulture));
                             GlobalSettings.Settings.AdditionalSettings[parameterName] = fnt;
                         }
                         else

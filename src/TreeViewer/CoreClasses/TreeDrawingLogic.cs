@@ -164,7 +164,7 @@ namespace TreeViewer
 
                     gpr.FillPath(new GraphicsPath().MoveTo(12, 2).LineTo(2, 21).LineTo(21, 21).Close(), Colour.FromRgb(255, 201, 14));
                     gpr.StrokePath(new GraphicsPath().MoveTo(12, 2).LineTo(2, 21).LineTo(21, 21).Close(), Colour.FromRgb(255, 201, 14), lineWidth: 4, lineJoin: LineJoins.Round);
-                    gpr.FillPath(new GraphicsPath().AddText(10.5, 13, "!", new Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaBold), 18), TextBaselines.Middle), Colour.FromRgb(0, 0, 0));
+                    gpr.FillPath(new GraphicsPath().AddText(10.5, 13, "!", new Font(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaBold), 18), TextBaselines.Middle), Colour.FromRgb(0, 0, 0));
 
                     return alertPage;
                 }

@@ -829,7 +829,7 @@ public static Colour? Format(object attribute)
                     }
                 }
 
-                Font fnt = new Font(new FontFamily(FontFamily.StandardFontFamilies.Helvetica), 7.5);
+                Font fnt = new Font(FontFamily.ResolveFontFamily(FontFamily.StandardFontFamilies.Helvetica), 7.5);
 
                 gpr.FillText(3, 5, minValue.ToString(System.Globalization.CultureInfo.InvariantCulture), fnt, colLeft, TextBaselines.Middle);
                 gpr.FillText(97 - fnt.MeasureText(maxValue.ToString(System.Globalization.CultureInfo.InvariantCulture)).Width, 5, maxValue.ToString(System.Globalization.CultureInfo.InvariantCulture), fnt, colRight, TextBaselines.Middle);
@@ -873,7 +873,7 @@ public static Colour? Format(object attribute)
                     maxY = Math.Max(kvp.Value.Y, maxY);
                 }
 
-                Font legendFont = new Font(new FontFamily(FontFamily.StandardFontFamilies.HelveticaBold), maxBranchWidth * 4 / 3);
+                Font legendFont = new Font(FontFamily.ResolveFontFamily(FontFamily.StandardFontFamilies.HelveticaBold), maxBranchWidth * 4 / 3);
                 double totalWidth = 100 * maxBranchWidth / 10.5 + legendFont.MeasureText(attributeName + "_").Width + 10;
 
                 updater2 = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "06888353-e930-4d08-ab24-5727bced8cd6"));

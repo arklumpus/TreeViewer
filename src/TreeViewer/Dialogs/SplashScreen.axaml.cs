@@ -127,12 +127,7 @@ namespace TreeViewer
 
                         string releaseJson;
 
-                        using (WebClient client = new WebClient())
-                        {
-                            client.Headers.Add("User-Agent", "arklumpus/TreeViewer");
-
-                            releaseJson = await client.DownloadStringTaskAsync("https://api.github.com/repos/" + GlobalSettings.ProgramRepository + "/releases");
-                        }
+                        releaseJson = await Modules.HttpClient.DownloadStringTaskAsync("https://api.github.com/repos/" + GlobalSettings.ProgramRepository + "/releases");
 
                         ReleaseHeader[] releases = System.Text.Json.JsonSerializer.Deserialize<ReleaseHeader[]>(releaseJson);
 
@@ -172,21 +167,18 @@ namespace TreeViewer
 
                             List<ModuleHeader> moduleHeaders;
 
-                            using (WebClient client = new WebClient())
+                            string tempFile = Path.GetTempFileName();
+                            await Modules.HttpClient.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
+
+                            using (FileStream fs = new FileStream(tempFile, FileMode.Open))
                             {
-                                string tempFile = Path.GetTempFileName();
-                                await client.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
-
-                                using (FileStream fs = new FileStream(tempFile, FileMode.Open))
+                                using (GZipStream decompressionStream = new GZipStream(fs, CompressionMode.Decompress))
                                 {
-                                    using (GZipStream decompressionStream = new GZipStream(fs, CompressionMode.Decompress))
-                                    {
-                                        moduleHeaders = await System.Text.Json.JsonSerializer.DeserializeAsync<List<ModuleHeader>>(decompressionStream, Modules.DefaultSerializationOptions);
-                                    }
+                                    moduleHeaders = await System.Text.Json.JsonSerializer.DeserializeAsync<List<ModuleHeader>>(decompressionStream, Modules.DefaultSerializationOptions);
                                 }
-
-                                File.Delete(tempFile);
                             }
+
+                            File.Delete(tempFile);
 
                             bool newModules = false;
                             bool updatedModules = false;
@@ -285,6 +277,8 @@ namespace TreeViewer
                     ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
                 }
             };
+
+            this.FindControl<TextBlock>("VersionBlock").Text = "v" + Program.Version;
         }
 
         public void SetProgress(double progress, string text)

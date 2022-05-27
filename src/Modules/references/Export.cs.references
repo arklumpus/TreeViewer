@@ -14,7 +14,6 @@ Avalonia.Animation.dll
 Avalonia.Base.dll
 PhyloTree.TreeNode.dll
 VectSharp.PDF.dll
-System.IO.FileSystem.dll
 System.Text.Json.dll
 System.ObjectModel.dll
 System.ComponentModel.Primitives.dll

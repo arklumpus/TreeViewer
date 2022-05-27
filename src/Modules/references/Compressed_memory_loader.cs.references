@@ -6,7 +6,6 @@ TreeViewer.dll
 PhyloTree.TreeNode.dll
 System.Linq.dll
 VectSharp.Canvas.dll
-System.IO.FileSystem.dll
 Avalonia.Base.dll
 Avalonia.Controls.dll
 Avalonia.Input.dll

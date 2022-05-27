@@ -247,7 +247,7 @@ namespace TreeViewer
                 }
                 else
                 {
-                    fnt = new Font(new FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), fnt.FontSize);
+                    fnt = new Font(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), fnt.FontSize);
                 }
             }
 
@@ -275,7 +275,7 @@ namespace TreeViewer
                 }
                 else
                 {
-                    fnt = new Font(new FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), fnt.FontSize);
+                    fnt = new Font(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), fnt.FontSize);
                 }
             }
 
@@ -475,65 +475,65 @@ namespace TreeViewer
                     case 0:
                         if (bold && italic)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaBoldOblique);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaBoldOblique);
                         }
                         else if (bold)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaBold);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaBold);
                         }
                         else if (italic)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaOblique);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaOblique);
                         }
                         else
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica);
                         }
                         break;
 
                     case 1:
                         if (bold && italic)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesBoldItalic);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesBoldItalic);
                         }
                         else if (bold)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesBold);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesBold);
                         }
                         else if (italic)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesItalic);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesItalic);
                         }
                         else
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesRoman);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesRoman);
                         }
                         break;
 
                     case 2:
                         if (bold && italic)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.CourierBoldOblique);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.CourierBoldOblique);
                         }
                         else if (bold)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.CourierBold);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.CourierBold);
                         }
                         else if (italic)
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.CourierOblique);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.CourierOblique);
                         }
                         else
                         {
-                            fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.Courier);
+                            fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Courier);
                         }
                         break;
 
                     case 3:
-                        fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.Symbol);
+                        fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Symbol);
                         break;
                     case 4:
-                        fontFamily = new FontFamily(VectSharp.FontFamily.StandardFontFamilies.ZapfDingbats);
+                        fontFamily = VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.ZapfDingbats);
                         break;
                 }
             }
@@ -562,7 +562,7 @@ namespace TreeViewer
             }
             else
             {
-                return new Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), this.FindControl<NumericUpDown>("FontSizeBox").Value);
+                return new Font(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), this.FindControl<NumericUpDown>("FontSizeBox").Value);
             }
         }
 
@@ -608,19 +608,19 @@ namespace TreeViewer
 
             Page pag = new Page(32, 32);
 
-            pag.Graphics.FillText(1, 25, "A", new Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), 24), Colour.FromRgb(114, 114, 114), TextBaselines.Baseline);
+            pag.Graphics.FillText(1, 25, "A", new Font(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica), 24), Colour.FromRgb(114, 114, 114), TextBaselines.Baseline);
 
-            pag.Graphics.FillText(19, 25, "b", new Font(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesBoldItalic), 24), Colour.FromRgb(114, 114, 114), TextBaselines.Baseline);
+            pag.Graphics.FillText(19, 25, "b", new Font(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesBoldItalic), 24), Colour.FromRgb(114, 114, 114), TextBaselines.Baseline);
 
             this.FindControl<Grid>("HeaderGrid").Children.Add(pag.PaintToCanvas(AvaloniaContextInterpreter.TextOptions.AlwaysConvert));
 
             List<FontItem> standardFonts = new List<FontItem>();
 
-            standardFonts.Add(new FontItem() { Name = "Helvetica", Icon = GetFontIcon(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica)) });
-            standardFonts.Add(new FontItem() { Name = "Times Roman", Icon = GetFontIcon(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesRoman)) });
-            standardFonts.Add(new FontItem() { Name = "Courier", Icon = GetFontIcon(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Courier)) });
-            standardFonts.Add(new FontItem() { Name = "Symbol", Icon = GetFontIcon(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.Symbol)) });
-            standardFonts.Add(new FontItem() { Name = "ZapfDingbats", Icon = GetFontIcon(new VectSharp.FontFamily(VectSharp.FontFamily.StandardFontFamilies.ZapfDingbats)) });
+            standardFonts.Add(new FontItem() { Name = "Helvetica", Icon = GetFontIcon(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Helvetica)) });
+            standardFonts.Add(new FontItem() { Name = "Times Roman", Icon = GetFontIcon(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.TimesRoman)) });
+            standardFonts.Add(new FontItem() { Name = "Courier", Icon = GetFontIcon(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Courier)) });
+            standardFonts.Add(new FontItem() { Name = "Symbol", Icon = GetFontIcon(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.Symbol)) });
+            standardFonts.Add(new FontItem() { Name = "ZapfDingbats", Icon = GetFontIcon(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.ZapfDingbats)) });
 
             this.FindControl<ListBox>("StandardFontsListBox").Items = standardFonts;
         }
@@ -629,9 +629,9 @@ namespace TreeViewer
     public class WebFontFamily : VectSharp.FontFamily
     {
         public string Style { get; }
-        public string FamilyName { get; }
+        public new string FamilyName { get; }
 
-        private WebFontFamily(string fileName, string familyName, string style) : base(fileName)
+        private WebFontFamily(TrueTypeFile ttf, string familyName, string style) : base(ttf)
         {
             this.Style = style;
             this.FamilyName = familyName;
@@ -652,11 +652,14 @@ namespace TreeViewer
                     System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WebFonts"));
                 }
 
-                System.Net.WebClient client = new System.Net.WebClient();
-                client.DownloadFile(url, targetFile);
+                Modules.HttpClient.DownloadFile(url, targetFile);
             }
 
-            return new WebFontFamily(targetFile, webFont.Name, style);
+            FontFamily baseFamily = FontFamily.ResolveFontFamily(targetFile);
+            
+            Modules.FontLibrary.Add(baseFamily);
+
+            return new WebFontFamily(baseFamily.TrueTypeFile, webFont.Name, style);
         }
     }
 
