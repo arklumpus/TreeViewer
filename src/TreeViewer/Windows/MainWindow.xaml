@@ -387,7 +387,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           </Grid.RowDefinitions>
 
           <Canvas Margin="0" Grid.Column="0" Grid.ColumnSpan="7" Grid.Row="1" Name="PlotBackground" Background="#E7E7E7"></Canvas>
-          <paz:ZoomBorder Margin="0" Grid.Column="0" Grid.ColumnSpan="7" Grid.Row="1" Name="PlotContainer" Stretch="None" ZoomSpeed="1.2"
+          <local:MyZoomBorder Margin="0" Grid.Column="0" Grid.ColumnSpan="7" Grid.Row="1" Name="PlotContainer" Stretch="None" ZoomSpeed="1.2"
                             ClipToBounds="True" Focusable="True" PanButton="Left" IsVisible="False"
                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch" PropertyChanged="ZoomPropertyChanged"
                             PointerPressed="BackgroundCanvasPointerPressed" PointerReleased="BackgroundCanvasPointerReleased"
@@ -409,7 +409,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 </Canvas.RenderTransform>
               </Canvas>
             </Canvas>
-          </paz:ZoomBorder>
+          </local:MyZoomBorder>
 
           <Grid Grid.RowSpan="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" MinWidth="0" Width="0" Name="ParameterContainerGrid" ClipToBounds="True" Background="#E7E7E7">
             <Grid.Transitions>

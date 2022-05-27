@@ -3152,4 +3152,12 @@ namespace TreeViewer
             this.FindControl<NumericUpDown>("ZoomNud").Value /= 1.15;
         }
     }
+
+    public class MyZoomBorder : Avalonia.Controls.PanAndZoom.ZoomBorder
+    {
+        protected override Avalonia.Size MeasureOverride(Avalonia.Size availableSize)
+        {
+            return new Avalonia.Size(0, 0);
+        }
+    }
 }
