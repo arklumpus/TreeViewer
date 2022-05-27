@@ -91,12 +91,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   </UserControl.Styles>
   <UserControl.Resources>
     <local:MaximizeWindowVisibleConverter x:Key="MaximizeWindowVisibleConverter" />
+    <local:CanResizeColumnWidthConverter x:Key="CanResizeColumnWidthConverter" />
   </UserControl.Resources>
 
-  <Grid Width="138" Height="31">
+  <Grid Width="{ Binding $parent[Window].CanResize, Converter={ StaticResource CanResizeColumnWidthConverter }, ConverterParameter=true }" Height="31">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="46" />
-      <ColumnDefinition Width="46" />
+      <ColumnDefinition Width="{ Binding $parent[Window].CanResize, Converter={ StaticResource CanResizeColumnWidthConverter }, ConverterParameter=false }" />
       <ColumnDefinition Width="46" />
     </Grid.ColumnDefinitions>
 
@@ -104,7 +105,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <Path Data="M18,15.5 L28,15.5" StrokeThickness="1" UseLayoutRounding="True" IsHitTestVisible="False" />
     </Canvas>
 
-    <Canvas Width="46" Height="31" Grid.Column="1" Classes="NormalChromeButton" Name="MaximizeButton">
+    <Canvas Width="46" Height="31" Grid.Column="1" Classes="NormalChromeButton" Name="MaximizeButton" IsVisible="{ Binding $parent[Window].CanResize }">
       <Path Data="M18.5,10.5 L27.5,10.5 L27.5,19.5 L18.5,19.5 Z" StrokeThickness="1" UseLayoutRounding="True" IsHitTestVisible="False" StrokeJoin="Miter" Name="MaximizePath" IsVisible="{ Binding $parent[Window].WindowState, Converter={StaticResource MaximizeWindowVisibleConverter}, ConverterParameter=false }"  />
       <Path Data="M18.5,12.5 L25.5,12.5 L25.5,19.5 L18.5,19.5 Z M20.5,12.5 L20.5,10.5 L27.5,10.5 L27.5,17.5 L25.5,17.5 " StrokeThickness="1" UseLayoutRounding="True" IsHitTestVisible="False" StrokeJoin="Miter" Name="RestorePath" IsVisible="{ Binding $parent[Window].WindowState, Converter={StaticResource MaximizeWindowVisibleConverter}, ConverterParameter=true }" />
     </Canvas>

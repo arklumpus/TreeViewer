@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeViewer.AboutWindow" SizeToContent="WidthAndHeight" CanResize="False"
         FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Title="About" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Classes="LightWindow" WindowStartupLocation="CenterScreen">
+        Title="About" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Classes="LightWindow" WindowStartupLocation="CenterScreen" TitleAlignment="Center">
   <Window.Styles>
     <Style Selector="TextBlock#GitHubTextBlock">
       <Setter Property="Foreground" Value="#0072B2" />

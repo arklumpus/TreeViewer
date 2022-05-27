@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         mc:Ignorable="d" Width="1000" Height="600"
         x:Class="TreeViewer.ModuleManagerWindow"
         Title="Module manager" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#E7E7E7" WindowStartupLocation="Manual">
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#E7E7E7" WindowStartupLocation="Manual" TitleAlignment="Center">
   <Window.Styles>
     <Style Selector=".WindowsStyle Canvas.RibbonSeparator">
       <Setter Property="Background" Value="#B1B1B1" />

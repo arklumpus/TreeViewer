@@ -175,4 +175,45 @@ namespace TreeViewer
             }
         }
     }
+
+    public class CanResizeColumnWidthConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool canResize && !canResize)
+            {
+                if (parameter is string param && param == "true")
+                {
+                    return 92.0;
+                }
+                else
+                {
+                    return 0.0;
+                }
+            }
+            else
+            {
+                if (parameter is string param && param == "true")
+                {
+                    return 138.0;
+                }
+                else
+                {
+                    return 46.0;
+                }
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double size && size == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+    }
 }

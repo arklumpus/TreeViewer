@@ -147,7 +147,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <RowDefinition Height="31" />
               <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Name="TitleBlock" Text="{ Binding $parent[Window].Title }" Margin="10,0,0,0" FontSize="14" />
+            <TextBlock HorizontalAlignment="{ Binding $parent[Window].TitleAlignment }" VerticalAlignment="Center" Name="TitleBlock" Text="{ Binding $parent[Window].Title }" Margin="10,0,0,0" FontSize="14" />
           </Grid>
           <Grid>
             <Grid.ColumnDefinitions>

@@ -54,6 +54,20 @@ namespace TreeViewer
             }
         }
 
+
+        public static readonly Avalonia.StyledProperty<Avalonia.Layout.HorizontalAlignment> TitleAlignmentProperty = Avalonia.AvaloniaProperty.Register<ChildWindow, Avalonia.Layout.HorizontalAlignment>(nameof(TitleAlignment), Avalonia.Layout.HorizontalAlignment.Left);
+        public Avalonia.Layout.HorizontalAlignment TitleAlignment
+        {
+            get
+            {
+                return GetValue(TitleAlignmentProperty);
+            }
+            set
+            {
+                SetValue(TitleAlignmentProperty, value);
+            }
+        }
+
         public ChildWindow()
         {
             InitializeComponent();
