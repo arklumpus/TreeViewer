@@ -2738,7 +2738,7 @@ namespace TreeViewer
                     {
                         if (e.Key == Modules.SelectionActionModules[i].ShortcutKey && e.KeyModifiers == Modules.GetModifier(Modules.SelectionActionModules[i].ShortcutModifier))
                         {
-                            SelectionActionActions[i]();
+                            Modules.SelectionActionModules[i].PerformAction(0, this.SelectedNode, this, this.StateData);
                             e.Handled = true;
                         }
                     }
@@ -2802,7 +2802,7 @@ namespace TreeViewer
                     {
                         if (Modules.SelectionActionModules[i].TriggerInTextBox && e.Key == Modules.SelectionActionModules[i].ShortcutKey && e.KeyModifiers == Modules.GetModifier(Modules.SelectionActionModules[i].ShortcutModifier))
                         {
-                            SelectionActionActions[i]();
+                            Modules.SelectionActionModules[i].PerformAction(0, this.SelectedNode, this, this.StateData);
                             e.Handled = true;
                         }
                     }
