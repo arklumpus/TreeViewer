@@ -194,6 +194,12 @@
     <EmbeddedResource Include="Assets\Program-24.png" />
     <EmbeddedResource Include="Assets\Program-32.png" />
     <EmbeddedResource Include="Assets\Program.ico" />
+    <EmbeddedResource Include="Assets\Refresh-16.png" />
+    <EmbeddedResource Include="Assets\Refresh-24.png" />
+    <EmbeddedResource Include="Assets\Refresh-32.png" />
+    <EmbeddedResource Include="Assets\RefreshGrey-16.png" />
+    <EmbeddedResource Include="Assets\RefreshGrey-24.png" />
+    <EmbeddedResource Include="Assets\RefreshGrey-32.png" />
     <EmbeddedResource Include="Assets\SelectionAction-32.png" />
     <EmbeddedResource Include="Assets\SelectionAction-48.png" />
     <EmbeddedResource Include="Assets\SelectionAction-64.png" />
@@ -432,6 +438,12 @@
     <None Remove="Assets\Program-16.png" />
     <None Remove="Assets\Program-24.png" />
     <None Remove="Assets\Program-32.png" />
+    <None Remove="Assets\Refresh-16.png" />
+    <None Remove="Assets\Refresh-24.png" />
+    <None Remove="Assets\Refresh-32.png" />
+    <None Remove="Assets\RefreshGrey-16.png" />
+    <None Remove="Assets\RefreshGrey-24.png" />
+    <None Remove="Assets\RefreshGrey-32.png" />
     <None Remove="Assets\SelectionAction-32.png" />
     <None Remove="Assets\SelectionAction-48.png" />
     <None Remove="Assets\SelectionAction-64.png" />

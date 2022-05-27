@@ -34,6 +34,7 @@ using System.Security.Cryptography;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.VisualTree;
 using Avalonia.Media.Transformation;
+using Avalonia.Styling;
 
 namespace TreeViewer
 {
@@ -2194,7 +2195,52 @@ namespace TreeViewer
 
         private void BuildPlottingPanel(Colour backgroundColour)
         {
-            this.FindControl<StackPanel>("PlotActionsContainerPanel").Children.Add(new TextBlock() { Text = "Plot elements", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 5), FontSize = 16, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) });
+            Grid panelHeader = new Grid();
+            panelHeader.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            panelHeader.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+
+            panelHeader.Children.Add(new TextBlock() { Text = "Plot elements", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(5, 0, 0, 5), FontSize = 16, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)) });
+
+            StackPanel refreshAllButtonContents = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
+
+            Canvas refreshButtonIcon = new Canvas() { Width = 16, Height = 16, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+
+            DPIAwareBox blurIcon = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.RefreshGrey")) { Width = 16, Height = 16, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            blurIcon.Classes.Add("BlurIcon");
+
+            DPIAwareBox hoverIcon = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Refresh")) { Width = 16, Height = 16, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            hoverIcon.Classes.Add("HoverIcon");
+
+            refreshButtonIcon.Children.Add(blurIcon);
+            refreshButtonIcon.Children.Add(hoverIcon);
+
+            refreshAllButtonContents.Children.Add(refreshButtonIcon);
+            refreshAllButtonContents.Children.Add(new TextBlock() { Text = "Redraw all", Margin = new Thickness(5, 0, 0, 0) });
+
+            Button refreshAllButton = new Button() { Content = refreshAllButtonContents, Background = Brushes.Transparent, Padding = new Thickness(5, 2, 5, 2) };
+            Grid.SetColumn(refreshAllButton, 1);
+            refreshAllButton.Classes.Add("SideBarButton");
+
+            Style hoverIconStyle = new Style(x => x.Class("HoverIcon"));
+            hoverIconStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
+            refreshAllButton.Styles.Add(hoverIconStyle);
+
+            Style hoverIconHoverStyle = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().Class("HoverIcon"));
+            hoverIconHoverStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, true));
+            refreshAllButton.Styles.Add(hoverIconHoverStyle);
+
+            Style blurIconHoverStyle = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().Class("BlurIcon"));
+            blurIconHoverStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
+            refreshAllButton.Styles.Add(blurIconHoverStyle);
+
+            refreshAllButton.Click += async (s, e) =>
+            {
+                await UpdateAllPlotLayers();
+            };
+
+            panelHeader.Children.Add(refreshAllButton);
+
+            this.FindControl<StackPanel>("PlotActionsContainerPanel").Children.Add(panelHeader);
 
             Grid plotElementsGrid = new Grid() { Margin = new Thickness(5, 0, 0, 5) };
             plotElementsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
