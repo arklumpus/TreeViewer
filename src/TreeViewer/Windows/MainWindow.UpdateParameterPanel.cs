@@ -781,10 +781,24 @@ namespace TreeViewer
                             }
 
                             this.PropertyChanged += checkIfSelectionEnabled;
+                            bool hasEvent = true;
 
                             chooseSelection.DetachedFromLogicalTree += (s, e) =>
                             {
-                                this.PropertyChanged -= checkIfSelectionEnabled;
+                                if (hasEvent)
+                                {
+                                    this.PropertyChanged -= checkIfSelectionEnabled;
+                                    hasEvent = false;
+                                }
+                            };
+
+                            chooseSelection.AttachedToLogicalTree += (s, e) =>
+                            {
+                                if (!hasEvent)
+                                {
+                                    this.PropertyChanged += checkIfSelectionEnabled;
+                                    hasEvent = true;
+                                }
                             };
 
                             exp.AccordionHeader = new FillingControl<TrimmedTextBox2>(blk, 5) { Margin = new Thickness(-5, 0, -5, 0) };
