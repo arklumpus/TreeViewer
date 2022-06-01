@@ -158,7 +158,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Branch score style](10bbbbe1-c634-4582-9073-11f067a54081)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display node scores using the branch colours.
 
@@ -182,7 +182,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Cartoon selection](6c340923-e3d1-4646-a673-6b542a05275b)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Marks the selected node to be displayed as a "cartoon".
 
@@ -218,7 +218,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Circular tree style](1f3e0b88-c42d-417c-ba14-ba228be086a7)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as a circular tree.
 
@@ -242,7 +242,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Collapse selection](e149aeb6-a019-41e2-8830-e4dc3e0eee43)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Collapses the selected node.
 
@@ -437,7 +437,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Highlight selection](5bf2292f-cff3-4aa8-9c15-e881d426cba6)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Highlights the selected node in the plot.
 
@@ -668,7 +668,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Polytomise selection](8202afa4-c9a6-47ac-98d5-dd0190c23f63)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Transforms the selected node into a polytomy.
 
@@ -704,7 +704,7 @@ _Version 1.1.1, by Giorgio Bianchini_
 
 ### [Prune selection](f8abf1cd-d79f-403b-b0f2-4bb1412839ff)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Prunes the selected node off the tree.
 
@@ -750,6 +750,18 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 <br />
 
+### [Redo](8a2c7de0-58c5-4a85-9a0d-d11ce9844139)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Redoes an action.
+
+**Module type**: MenuAction
+
+**Module ID**: `8a2c7de0-58c5-4a85-9a0d-d11ce9844139`
+
+<br />
+
 ### [Replace attribute](f17160ad-0462-449a-8a57-e1af775c92ba)
 
 _Version 1.0.3, by Giorgio Bianchini_
@@ -776,7 +788,7 @@ _Version 1.1.1, by Giorgio Bianchini_
 
 ### [Root tree on selection](77f387fb-c843-4164-aed2-bd5b8f325809)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Re-roots the tree using the selection as outgroup.
 
@@ -788,7 +800,7 @@ _Version 1.1.1, by Giorgio Bianchini_
 
 ### [Reshape tree](aaf3a3f5-d4d9-41c8-bd30-d99e061f28cf)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Changes the coordinate module and sets the plot actions to display the tree in a particular style.
 
@@ -812,7 +824,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Rooted tree style](e56b8297-4417-4494-9369-cbe9e5d25397)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as a rooted tree.
 
@@ -981,7 +993,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Switch selection](0b27abb2-0d48-40c0-9d1e-cfc7ffb7284c)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Switches the order of the children of the selection.
 
@@ -1015,6 +1027,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Undo](24093e44-fdb0-427a-b00a-21f24fb95898)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Undoes the last action.
+
+**Module type**: MenuAction
+
+**Module ID**: `24093e44-fdb0-427a-b00a-21f24fb95898`
+
+<br />
+
 ### [Unroot tree](f06dce2a-794b-4897-a154-82f7f44c125d)
 
 _Version 1.0.0, by Giorgio Bianchini_
@@ -1029,7 +1053,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Unrooted tree style](a99eb0c6-a69d-4785-961a-a0c247e9704d)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as an unrooted tree.
 
