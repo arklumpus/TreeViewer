@@ -27,6 +27,37 @@ namespace TreeViewer
 {
     public partial class MainWindow
     {
+        private (UndoFrameLevel, int) GetModuleIndex(Dictionary<string, object> parameters)
+        {
+            if (parameters == this.TransformerParameters)
+            {
+                return (UndoFrameLevel.TransformerModule, 0);
+            }
+
+            if (parameters == this.CoordinatesParameters)
+            {
+                return (UndoFrameLevel.CoordinatesModule, 0);
+            }
+
+            for (int i = 0; i < this.FurtherTransformationsParameters.Count; i++)
+            {
+                if (parameters == this.FurtherTransformationsParameters[i])
+                {
+                    return (UndoFrameLevel.FurtherTransformationModule, i);
+                }
+            }
+
+            for (int i = 0; i < this.PlottingParameters.Count; i++)
+            {
+                if (parameters == this.PlottingParameters[i])
+                {
+                    return (UndoFrameLevel.PlotActionModule, i);
+                }
+            }
+
+            throw new ArgumentException("The parameter list was not found!");
+        }
+
         private Dictionary<string, object> UpdateParameterPanel(GenericParameterChangeDelegate parameterChangeDelegate, List<(string, string)> parameters, Action updateAction, out Action<Dictionary<string, object>> UpdateParameterAction, out Control panel)
         {
             StackPanel controlsPanel = new StackPanel();
@@ -132,6 +163,9 @@ namespace TreeViewer
 
                         control.Click += (s, e) =>
                         {
+                            (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                            PrepareUndoFrame(undoLevel, moduleIndex);
+
                             Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                             tbr[parameterName] = true;
@@ -142,6 +176,7 @@ namespace TreeViewer
 
                             if (needsUpdate)
                             {
+                                CommitUndoFrame();
                                 updateAction();
                             }
                         };
@@ -187,6 +222,9 @@ namespace TreeViewer
 
                             butt.Click += (s, e) =>
                             {
+                                (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                PrepareUndoFrame(undoLevel, moduleIndex);
+
                                 Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                 tbr[parameterName] = index;
@@ -197,6 +235,7 @@ namespace TreeViewer
 
                                 if (needsUpdate)
                                 {
+                                    CommitUndoFrame();
                                     updateAction();
                                 }
                             };
@@ -262,6 +301,9 @@ namespace TreeViewer
 
                         control.Click += (s, e) =>
                         {
+                            (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                            PrepareUndoFrame(undoLevel, moduleIndex);
+
                             Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                             tbr[parameterName] = control.IsChecked == true;
@@ -272,6 +314,7 @@ namespace TreeViewer
 
                             if (needsUpdate)
                             {
+                                CommitUndoFrame();
                                 updateAction();
                             }
                         };
@@ -348,6 +391,9 @@ namespace TreeViewer
 
                             if (win.Result)
                             {
+                                (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                PrepareUndoFrame(undoLevel, moduleIndex);
+
                                 Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                 tbr[parameterName] = win.Formatter;
@@ -358,6 +404,7 @@ namespace TreeViewer
 
                                 if (needsUpdate)
                                 {
+                                    CommitUndoFrame();
                                     updateAction();
                                 }
                             }
@@ -534,6 +581,9 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
+
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = box.SelectedIndex;
@@ -544,6 +594,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -574,6 +625,9 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate && e.Property == TextBox.TextProperty)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
+
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = box.Text;
@@ -584,6 +638,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -639,6 +694,9 @@ namespace TreeViewer
 
                                     if (newValue != oldValue)
                                     {
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
+
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = newValue;
@@ -649,6 +707,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -720,6 +779,9 @@ namespace TreeViewer
                                         items.AddRange(StateData.Attachments.Keys);
                                     }
 
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
+
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = StateData.Attachments[items[box.SelectedIndex]];
@@ -730,6 +792,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -848,6 +911,9 @@ namespace TreeViewer
 
                                 if (win.Result != null)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
+
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = win.Result;
@@ -865,6 +931,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -874,6 +941,9 @@ namespace TreeViewer
                             {
                                 if (this.SelectedNode != null)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
+
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     string[] nodeNames = this.SelectedNode.GetNodeNames().ToArray();
@@ -893,6 +963,8 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
+
                                         updateAction();
                                     }
                                 }
@@ -951,6 +1023,9 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
+
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = nud.Value;
@@ -961,6 +1036,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -1031,6 +1107,9 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
+
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     ((NumberFormatterOptions)tbr[parameterName]).DefaultValue = nud.Value;
@@ -1041,6 +1120,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -1061,7 +1141,8 @@ namespace TreeViewer
 
                                     if (win.Result)
                                     {
-
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = win.Formatter;
@@ -1073,6 +1154,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -1138,6 +1220,8 @@ namespace TreeViewer
 
                             });
 
+                            bool causedUpdate = false;
+
                             slid.PropertyChanged += (s, e) =>
                             {
                                 if (e.Property == Slider.ValueProperty)
@@ -1150,6 +1234,9 @@ namespace TreeViewer
 
                                     if (!programmaticUpdate)
                                     {
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
+
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = slid.Value;
@@ -1160,12 +1247,24 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            causedUpdate = true;
                                             updateAction();
+                                        }
+                                        else
+                                        {
+                                            causedUpdate = false;
                                         }
                                     }
                                 }
                             };
 
+                            slid.AddValueChangeEndHandler(() => {
+                                if (causedUpdate)
+                                {
+                                    CommitUndoFrame();
+                                    causedUpdate = false;
+                                }
+                            });
 
                             if (valueBlock != null)
                             {
@@ -1178,6 +1277,8 @@ namespace TreeViewer
 
                                     if (!programmaticUpdate)
                                     {
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = slid.Value;
@@ -1188,6 +1289,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -1222,6 +1324,8 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = but.Font;
@@ -1232,6 +1336,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -1289,6 +1394,8 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = new VectSharp.Point(nudX.Value, nudY.Value);
@@ -1299,6 +1406,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -1308,6 +1416,8 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = new VectSharp.Point(nudX.Value, nudY.Value);
@@ -1318,6 +1428,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -1354,6 +1465,8 @@ namespace TreeViewer
                                 {
                                     if (!programmaticUpdate)
                                     {
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = but.Color.ToVectSharp();
@@ -1364,6 +1477,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -1404,6 +1518,8 @@ namespace TreeViewer
 
                                     if (win.Result != null)
                                     {
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = win.Result;
@@ -1414,6 +1530,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -1454,6 +1571,8 @@ namespace TreeViewer
 
                                     if (win.Result != null)
                                     {
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = win.Result;
@@ -1464,6 +1583,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -1499,6 +1619,8 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = control.LineDash;
@@ -1509,6 +1631,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -1567,6 +1690,8 @@ namespace TreeViewer
                                 {
                                     if (!programmaticUpdate)
                                     {
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         ((ColourFormatterOptions)tbr[parameterName]).DefaultColour = but.Color.ToVectSharp();
@@ -1577,6 +1702,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -1598,7 +1724,8 @@ namespace TreeViewer
 
                                     if (win.Result)
                                     {
-
+                                        (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                        PrepareUndoFrame(undoLevel, moduleIndex);
                                         Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                         tbr[parameterName] = win.Formatter;
@@ -1610,6 +1737,7 @@ namespace TreeViewer
 
                                         if (needsUpdate)
                                         {
+                                            CommitUndoFrame();
                                             updateAction();
                                         }
                                     }
@@ -1643,6 +1771,8 @@ namespace TreeViewer
                             {
                                 if (!programmaticUpdate)
                                 {
+                                    (UndoFrameLevel undoLevel, int moduleIndex) = GetModuleIndex(tbr);
+                                    PrepareUndoFrame(undoLevel, moduleIndex);
                                     Dictionary<string, object> previousParameters = tbr.ShallowClone();
 
                                     tbr[parameterName] = attributeTypes[box.SelectedIndex];
@@ -1653,6 +1783,7 @@ namespace TreeViewer
 
                                     if (needsUpdate)
                                     {
+                                        CommitUndoFrame();
                                         updateAction();
                                     }
                                 }
@@ -1706,6 +1837,43 @@ namespace TreeViewer
             panel = controlsPanel;
 
             return tbr;
+        }
+    }
+
+    internal static class SliderExtensions
+    {
+        public static void AddValueChangeEndHandler(this Slider slid, Action handler)
+        {
+            slid.AddHandler(Avalonia.Input.InputElement.KeyUpEvent, (s, e) =>
+            {
+                if (e.Handled)
+                {
+
+                    handler();
+                }
+            }, handledEventsToo: true);
+
+            slid.TemplateApplied += (s, e) =>
+            {
+                Avalonia.Controls.Primitives.Thumb tmb = e.NameScope.Find<Avalonia.Controls.Primitives.Thumb>("thumb");
+
+                tmb.DragCompleted += (s, e) =>
+                {
+                    handler();
+                };
+
+                Avalonia.Controls.Primitives.Track trk = e.NameScope.Find<Avalonia.Controls.Primitives.Track>("PART_Track");
+
+                trk.IncreaseButton.AddHandler(Avalonia.Input.InputElement.PointerReleasedEvent, (s, e) =>
+                {
+                    handler();
+                }, handledEventsToo: true);
+
+                trk.DecreaseButton.AddHandler(Avalonia.Input.InputElement.PointerReleasedEvent, (s, e) =>
+                {
+                    handler();
+                }, handledEventsToo: true);
+            };
         }
     }
 }

@@ -37,7 +37,28 @@ namespace TreeViewer
 {
     public class FormatterOptions
     {
-        public Func<object, string> Formatter { get; set; }
+        private Func<object, string> formatter = null;
+        public Func<object, string> Formatter
+        {
+            get
+            {
+                if (compileOnDemand && formatter == null)
+                {
+                    formatter = Compile(compileOnDemandSource.ToString(), "FormatterModule");
+                }
+
+                return formatter;
+            }
+
+            set
+            {
+                formatter = value;
+            }
+        }
+
+        private bool compileOnDemand = false;
+        private string compileOnDemandSource = null;
+
         public object[] Parameters { get; set; }
 
         private FormatterOptions()
@@ -61,6 +82,32 @@ namespace TreeViewer
             source.Append("}");
 
             this.Formatter = Compile(source.ToString(), "FormatterModule");
+        }
+
+        public FormatterOptions(string sourceCode, bool compileOnDemand)
+        {
+            StringBuilder source = new StringBuilder();
+
+            using StringReader sourceReader = new StringReader(sourceCode);
+
+            string line = sourceReader.ReadLine();
+
+            source.AppendLine("using TreeViewer;");
+
+            source.AppendLine("public static class FormatterModule { ");
+            source.AppendLine(line);
+            source.AppendLine(sourceReader.ReadToEnd());
+            source.Append("}");
+
+            if (!compileOnDemand)
+            {
+                this.Formatter = Compile(source.ToString(), "FormatterModule");
+            }
+            else
+            {
+                this.compileOnDemand = true;
+                this.compileOnDemandSource = source.ToString();
+            }
         }
 
         public static async Task<FormatterOptions> Create(Editor editor, InterprocessDebuggerServer debuggerServer)

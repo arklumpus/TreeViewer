@@ -40,12 +40,78 @@ namespace TreeViewer
         public Colour DefaultColour { get; set; }
         public string AttributeName { get; set; }
         public string AttributeType { get; set; }
-        public Func<object, Colour?> Formatter { get; set; }
+
+        private Func<object, Colour?> formatter;
+        public Func<object, Colour?> Formatter
+        {
+            get
+            {
+                if (compileOnDemand && formatter == null)
+                {
+                    formatter = Compile(compileOnDemandSource.ToString(), "FormatterModule", out string actualSource);
+                    actualSource = actualSource.Substring(compileOnDemandPrevLength);
+                    actualSource = actualSource.Substring(0, actualSource.Length - 1 - Environment.NewLine.Length);
+
+                    this.Parameters[0] = actualSource;
+                }
+
+                return formatter;
+            }
+
+            set
+            {
+                formatter = value;
+            }
+        }
+
         public object[] Parameters { get; set; }
+
+        private bool compileOnDemand = false;
+        private string compileOnDemandSource = null;
+        private int compileOnDemandPrevLength = 0;
 
         private ColourFormatterOptions()
         {
 
+        }
+
+        public ColourFormatterOptions(string sourceCode, object[] parameters, bool compileOnDemand)
+        {
+            StringBuilder source = new StringBuilder();
+
+            using StringReader sourceReader = new StringReader(sourceCode);
+
+            string line = sourceReader.ReadLine();
+
+            source.AppendLine("using TreeViewer;");
+            source.AppendLine("using VectSharp;");
+            source.AppendLine("using System;");
+            source.AppendLine("using System.Collections.Generic;");
+
+            source.AppendLine("public static class FormatterModule { ");
+
+            int prevLength = source.Length;
+
+            source.AppendLine(line);
+            source.AppendLine(sourceReader.ReadToEnd());
+            source.Append("}");
+
+            if (!compileOnDemand)
+            {
+                this.Formatter = Compile(source.ToString(), "FormatterModule", out string actualSource);
+                actualSource = actualSource.Substring(prevLength);
+                actualSource = actualSource.Substring(0, actualSource.Length - 1 - Environment.NewLine.Length);
+
+                parameters[0] = actualSource;
+            }
+            else
+            {
+                this.compileOnDemand = true;
+                this.compileOnDemandSource = source.ToString();
+                this.compileOnDemandPrevLength = prevLength;
+            }
+
+            this.Parameters = parameters;
         }
 
         public ColourFormatterOptions(string sourceCode, object[] parameters)

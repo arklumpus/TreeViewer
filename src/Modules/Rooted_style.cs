@@ -33,7 +33,7 @@ namespace RootedStyleAction
         public const string Name = "Rooted tree style";
         public const string HelpText = "Sets the plot actions to display the tree as a rooted tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "e56b8297-4417-4494-9369-cbe9e5d25397";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -151,6 +151,8 @@ namespace RootedStyleAction
 								return;
 							}
 						}
+						
+						window.PushUndoFrame(UndoFrameLevel.CoordinatesModule, 0);
 
 						while (stateData.PlottingModules().Count > 0)
 						{

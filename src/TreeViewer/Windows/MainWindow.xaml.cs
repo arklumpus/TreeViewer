@@ -117,15 +117,17 @@ namespace TreeViewer
 
         public Dictionary<string, VectSharp.Point> Coordinates = null;
 
-        public ComboBox TransformerComboBox;
+        public PreviewComboBox TransformerComboBox;
         Control TransformerAlert;
         public Dictionary<string, object> TransformerParameters;
         public Action<Dictionary<string, object>> UpdateTransformerParameters;
 
-        public ComboBox CoordinatesComboBox;
+        public PreviewComboBox CoordinatesComboBox;
         Control CoordinatesAlert;
         public Dictionary<string, object> CoordinatesParameters;
         public Action<Dictionary<string, object>> UpdateCoordinatesParameters;
+
+        ColorButton GraphBackgroundButton;
 
         StackPanel PlottingActionsContainer;
         public List<PlottingModule> PlottingActions = new List<PlottingModule>();
@@ -1172,6 +1174,9 @@ namespace TreeViewer
                 AutoFit();
 
                 StartPlotUpdaterThread();
+
+                this.UndoStack.Clear();
+                this.CanUndo = false;
             }, Avalonia.Threading.DispatcherPriority.MinValue);
         }
 
@@ -1468,7 +1473,7 @@ namespace TreeViewer
             int moduleIndex = Math.Max(0, Modules.TransformerModules.IndexOf(Modules.GetModule(Modules.TransformerModules, suggestedModuleId)));
 
             List<string> transformerModules = (from el in Modules.TransformerModules select el.Name).ToList();
-            TransformerComboBox = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Items = transformerModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
+            TransformerComboBox = new PreviewComboBox() { Margin = new Thickness(5, 0, 0, 0), Items = transformerModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
             Grid.SetColumn(TransformerComboBox, 2);
             transformerPanel.Children.Add(TransformerComboBox);
 
@@ -1519,6 +1524,14 @@ namespace TreeViewer
                 return Modules.TransformerModules[TransformerComboBox.SelectedIndex].OnParameterChange(Trees, previousParameterValues, currentParameterValues, out controlStatus, out parametersToChange);
             };
 
+            TransformerComboBox.PreviewSelectionChanged += (s, e) =>
+            {
+                if (!SettingTransformerModule)
+                {
+                    PushUndoFrame(UndoFrameLevel.TransformerModule, 0);
+                }
+            };
+
             TransformerComboBox.SelectionChanged += async (s, e) =>
             {
                 AvaloniaBugFixes.SetToolTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
@@ -1563,6 +1576,8 @@ namespace TreeViewer
 
                 if (win.Result != null)
                 {
+                    PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, this.FurtherTransformations.Count);
+
                     List<string> childNames = null;
 
                     if (this.IsSelectionAvailable)
@@ -1653,6 +1668,8 @@ namespace TreeViewer
                         childNames = this.SelectedNode.GetNodeNames();
                     }
 
+                    this.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, index - 1);
+
                     FurtherTransformationModule mod = FurtherTransformations[index];
                     FurtherTransformations.RemoveAt(index);
                     FurtherTransformations.Insert(index - 1, mod);
@@ -1736,6 +1753,8 @@ namespace TreeViewer
                         childNames = this.SelectedNode.GetNodeNames();
                     }
 
+                    this.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, index);
+
                     FurtherTransformationModule mod = FurtherTransformations[index];
                     FurtherTransformations.RemoveAt(index);
                     FurtherTransformations.Insert(index + 1, mod);
@@ -1817,6 +1836,8 @@ namespace TreeViewer
                 }
 
                 int index = FurtherTransformationsContainer.Children.IndexOf(exp);
+
+                this.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, index);
 
                 FurtherTransformations.RemoveAt(index);
                 FurtherTransformationsParameters.RemoveAt(index);
@@ -1926,6 +1947,8 @@ namespace TreeViewer
 
                                 if (oldIndex != newIndex)
                                 {
+                                    this.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, Math.Min(oldIndex, newIndex));
+
                                     List<string> childNames = null;
 
                                     if (this.IsSelectionAvailable)
@@ -2143,7 +2166,8 @@ namespace TreeViewer
             int moduleIndex = Math.Max(0, Modules.CoordinateModules.IndexOf(Modules.GetModule(Modules.CoordinateModules, suggestedModuleId)));
 
             List<string> coordinateModules = (from el in Modules.CoordinateModules select el.Name).ToList();
-            CoordinatesComboBox = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Items = coordinateModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
+            //CoordinatesComboBox = new ComboBox() { Margin = new Thickness(5, 0, 0, 0), Items = coordinateModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
+            CoordinatesComboBox = new PreviewComboBox() { Margin = new Thickness(5, 0, 0, 0), Items = coordinateModules, SelectedIndex = moduleIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
             Grid.SetColumn(CoordinatesComboBox, 2);
             coordinatesPanel.Children.Add(CoordinatesComboBox);
 
@@ -2191,6 +2215,14 @@ namespace TreeViewer
                 return Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].OnParameterChange(TransformedTree, previousParameterValues, currentParameterValues, out controlStatus, out parametersToChange);
             };
 
+            CoordinatesComboBox.PreviewSelectionChanged += (s, e) =>
+            {
+                if (!SettingCoordinatesModule)
+                {
+                    PushUndoFrame(UndoFrameLevel.CoordinatesModule, 0);
+                }
+            };
+
             CoordinatesComboBox.SelectionChanged += async (s, e) =>
             {
                 await ResetDefaultCoordinateModuleParameters();
@@ -2219,13 +2251,17 @@ namespace TreeViewer
             await resetDefaultCoordinateModuleParameters();
         }
 
+        bool SettingCoordinatesModule = false;
+
         public Action<Dictionary<string, object>> SetCoordinateModule(CoordinateModule module)
         {
             int index = Modules.CoordinateModules.IndexOf(module);
 
             if (index != CoordinatesComboBox.SelectedIndex)
             {
+                SettingCoordinatesModule = true;
                 CoordinatesComboBox.SelectedIndex = index;
+                SettingCoordinatesModule = false;
                 return UpdateCoordinatesParameters;
             }
             else
@@ -2234,13 +2270,17 @@ namespace TreeViewer
             }
         }
 
+        bool SettingTransformerModule = false;
+
         public Action<Dictionary<string, object>> SetTransformerModule(TransformerModule module)
         {
             int index = Modules.TransformerModules.IndexOf(module);
 
             if (index != TransformerComboBox.SelectedIndex)
             {
+                SettingTransformerModule = true;
                 TransformerComboBox.SelectedIndex = index;
+                SettingTransformerModule = false;
                 return UpdateTransformerParameters;
             }
             else
@@ -2308,16 +2348,20 @@ namespace TreeViewer
                 TextBlock blk = new TextBlock() { Text = "Background: ", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0), FontSize = 13 };
                 plotElementsGrid.Children.Add(blk);
 
-                ColorButton btn = new ColorButton() { Color = backgroundColour.ToAvalonia(), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontFamily = this.FontFamily, FontSize = this.FontSize };
-                btn.Classes.Add("PlainButton");
-                Grid.SetColumn(btn, 1);
-                plotElementsGrid.Children.Add(btn);
+                GraphBackgroundButton = new ColorButton() { Color = backgroundColour.ToAvalonia(), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontFamily = this.FontFamily, FontSize = this.FontSize };
+                GraphBackgroundButton.Classes.Add("PlainButton");
+                Grid.SetColumn(GraphBackgroundButton, 1);
+                plotElementsGrid.Children.Add(GraphBackgroundButton);
 
-                btn.PropertyChanged += (s, e) =>
+                GraphBackgroundButton.PropertyChanged += (s, e) =>
                 {
                     if (e.Property == ColorButton.ColorProperty)
                     {
-                        GraphBackground = btn.Color.ToVectSharp();
+                        if (!SettingGraphBackground)
+                        {
+                            PushUndoFrame(UndoFrameLevel.PlotActionModule, -1);
+                            GraphBackground = GraphBackgroundButton.Color.ToVectSharp();
+                        }
                     }
                 };
             }
@@ -2347,6 +2391,8 @@ namespace TreeViewer
 
                 if (win.Result != null)
                 {
+                    PushUndoFrame(UndoFrameLevel.PlotActionModule, this.PlottingActions.Count);
+
                     AddPlottingModule(win.Result);
 
                     PlotCanvases.Add(null);
@@ -2463,6 +2509,8 @@ namespace TreeViewer
 
                 if (index > 0)
                 {
+                    this.PushUndoFrame(UndoFrameLevel.PlotActionModule, index - 1, new int[] { index - 1, index });
+
                     PlottingModule mod = PlottingActions[index];
                     PlottingActions.RemoveAt(index);
                     PlottingActions.Insert(index - 1, mod);
@@ -2538,6 +2586,8 @@ namespace TreeViewer
 
                 if (index < PlottingActionsContainer.Children.Count - 1)
                 {
+                    this.PushUndoFrame(UndoFrameLevel.PlotActionModule, index, new int[] { index, index + 1 });
+
                     PlottingModule mod = PlottingActions[index];
                     PlottingActions.RemoveAt(index);
                     PlottingActions.Insert(index + 1, mod);
@@ -2639,6 +2689,8 @@ namespace TreeViewer
 
                 int index = PlottingActionsContainer.Children.IndexOf(exp);
 
+                this.PushUndoFrame(UndoFrameLevel.PlotActionModule, index);
+
                 PlottingActions.RemoveAt(index);
                 PlottingParameters.RemoveAt(index);
                 PlottingActionsContainer.Children.RemoveAt(index);
@@ -2698,6 +2750,8 @@ namespace TreeViewer
 
                                 if (oldIndex != newIndex)
                                 {
+                                    this.PushUndoFrame(UndoFrameLevel.PlotActionModule, Math.Min(oldIndex, newIndex), Enumerable.Range(Math.Min(oldIndex, newIndex), Math.Abs(oldIndex - newIndex) + 1));
+
                                     PlottingModule mod = PlottingActions[oldIndex];
                                     PlottingActions.RemoveAt(oldIndex);
                                     PlottingActions.Insert(newIndex, mod);
@@ -2803,7 +2857,7 @@ namespace TreeViewer
             {
                 int index = PlottingActionsContainer.Children.IndexOf(exp);
 
-                Dictionary<string, object> parameters = PlottingParameters[index].DeepClone();
+                Dictionary<string, object> parameters = PlottingParameters[index].DeepClone(false);
 
                 Action<Dictionary<string, object>> updater = this.StateData.AddPlottingModule(module);
 
@@ -3122,6 +3176,9 @@ namespace TreeViewer
                         if (!StateData.Attachments.ContainsKey(win.AttachmentName))
                         {
                             validResult = true;
+                            
+                            this.PushUndoFrame(UndoFrameLevel.Attachment, 0);
+
                             Attachment attachment = new Attachment(win.AttachmentName, win.CacheResults, win.LoadInMemory, result[0]);
                             this.StateData.Attachments.Add(attachment.Name, attachment);
 

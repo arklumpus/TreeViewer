@@ -68,6 +68,7 @@ namespace TreeViewer
         public string ModuleRepositoryBaseUri { get; set; } = DefaultModuleRepository;
         public long UpdateCheckDate { get; set; } = 0;
         public UpdateCheckModes UpdateCheckMode { get; set; } = UpdateCheckModes.ProgramAndAllModules;
+        public bool EnableUndoStack { get; set; } = true;
         public static GlobalSettings Settings { get; }
         internal List<MainWindow> MainWindows { get; } = new List<MainWindow>();
 
@@ -199,6 +200,16 @@ namespace TreeViewer
                     else
                     {
                         GlobalSettings.Settings.UpdateCheckMode = (GlobalSettings.UpdateCheckModes)Enum.Parse(typeof(GlobalSettings.UpdateCheckModes), settingValue);
+                    }
+                    break;
+                case "EnableUndoStack":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.EnableUndoStack = false;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.EnableUndoStack = Convert.ToBoolean(settingValue);
                     }
                     break;
                 case "InterfaceStyle":

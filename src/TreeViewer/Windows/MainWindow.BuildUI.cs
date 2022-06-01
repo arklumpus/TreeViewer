@@ -607,6 +607,9 @@ namespace TreeViewer
                                         ms.Seek(0, SeekOrigin.Begin);
 
                                         validResult = true;
+
+                                        this.PushUndoFrame(UndoFrameLevel.Attachment, 0);
+
                                         Attachment attachment = new Attachment(win.AttachmentName, win.CacheResults, win.LoadInMemory, ref ms);
                                         this.StateData.Attachments.Add(attachment.Name, attachment);
 
@@ -1224,6 +1227,8 @@ namespace TreeViewer
 
                                 if (win.Result != null)
                                 {
+                                    PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, this.FurtherTransformations.Count);
+
                                     List<string> childNames = null;
 
                                     if (this.IsSelectionAvailable)
@@ -1254,6 +1259,8 @@ namespace TreeViewer
                             }
                             else
                             {
+                                PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, this.FurtherTransformations.Count);
+
                                 List<string> childNames = null;
 
                                 if (this.IsSelectionAvailable)
@@ -1304,6 +1311,7 @@ namespace TreeViewer
 
                                 if (win.Result != null)
                                 {
+                                    PushUndoFrame(UndoFrameLevel.PlotActionModule, this.PlottingActions.Count);
                                     AddPlottingModule(win.Result);
 
                                     PlotCanvases.Add(null);
@@ -1316,6 +1324,7 @@ namespace TreeViewer
                             }
                             else
                             {
+                                PushUndoFrame(UndoFrameLevel.PlotActionModule, this.PlottingActions.Count);
                                 AddPlottingModule(builtPlotActionModules[ind]);
 
                                 PlotCanvases.Add(null);

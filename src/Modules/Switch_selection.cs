@@ -19,7 +19,7 @@ namespace SwitchSelectionAction
         public const string Name = "Switch selection";
         public const string HelpText = "Switches the order of the children of the selection.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "0b27abb2-0d48-40c0-9d1e-cfc7ffb7284c";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
@@ -137,6 +137,11 @@ namespace SwitchSelectionAction
                     return;
                 }
             }
+			
+			if (InstanceStateData.IsUIAvailable)
+			{
+				window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, window.FurtherTransformations.Count);
+			}
 
             FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "c4c71099-c7dc-44b3-93be-25a79afb1102");
             Action<Dictionary<string, object>> changeParameter = stateData.AddFurtherTransformationModule(module);

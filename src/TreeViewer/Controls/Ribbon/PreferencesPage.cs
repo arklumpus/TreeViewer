@@ -243,6 +243,24 @@ namespace TreeViewer
             pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
             {
+                CheckBox checkBox = new CheckBox() { Margin = new Thickness(0, 0, 0, 10), Content = "Enable undo/redo stack", IsChecked = GlobalSettings.Settings.EnableUndoStack, FontSize = 14 };
+                Grid.SetColumnSpan(checkBox, 2);
+                Grid.SetRow(checkBox, currRow);
+                pageContent.Children.Add(checkBox);
+
+                applyChanges.Add(() =>
+                {
+                    bool hasChanged = GlobalSettings.Settings.EnableUndoStack != (checkBox.IsChecked == true);
+
+                    GlobalSettings.Settings.EnableUndoStack = checkBox.IsChecked == true;
+                    return hasChanged;
+                });
+            }
+
+            currRow++;
+            pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+
+            {
                 TextBlock blk = new TextBlock() { Text = "Module repository:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
                 TextBox textBox = new TextBox() { Text = GlobalSettings.Settings.ModuleRepositoryBaseUri, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 200, FontSize = 14, Padding = new Thickness(5, 2, 5, 2), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
 
@@ -380,6 +398,7 @@ namespace TreeViewer
 
                 GlobalSettings.Settings.DrawTreeWhenOpened = true;
                 GlobalSettings.Settings.ShowLegacyUpDownArrows = false;
+                GlobalSettings.Settings.EnableUndoStack = true;
                 GlobalSettings.Settings.BackgroundColour = VectSharp.Colour.FromRgb(240, 244, 250);
                 GlobalSettings.Settings.ModuleRepositoryBaseUri = GlobalSettings.DefaultModuleRepository;
                 GlobalSettings.Settings.UpdateCheckMode = GlobalSettings.UpdateCheckModes.ProgramAndAllModules;

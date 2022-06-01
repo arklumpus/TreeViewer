@@ -49,7 +49,7 @@ namespace a10bbbbe1c6344582907311f067a54081
         public const string Name = "Branch score style";
         public const string HelpText = "Sets the plot actions to display node scores using the branch colours.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public const string Id = "10bbbbe1-c634-4582-9073-11f067a54081";
@@ -703,6 +703,11 @@ public static Colour? Format(object attribute)
 
         private static void ContinueAction(MainWindow window, InstanceStateData stateData, string attributeName, double minValue, double maxValue, int branchCount, Gradient fullGradient)
         {
+			if (InstanceStateData.IsUIAvailable)
+            {
+				window.PushUndoFrame(UndoFrameLevel.CoordinatesModule, 0);
+			}
+			
             double defaultHeight = Math.Min(10000, stateData.TransformedTree.GetLeaves().Count * 14);
             double maxBranchWidth = defaultHeight / 60;
             double minBranchWidth = defaultHeight / 60 * 0.1;

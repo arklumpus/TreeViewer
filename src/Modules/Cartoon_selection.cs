@@ -21,7 +21,7 @@ namespace CartoonSelection
         public const string Name = "Cartoon selection";
         public const string HelpText = "Marks the selected node to be displayed as a \"cartoon\".";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "6c340923-e3d1-4646-a673-6b542a05275b";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
@@ -114,6 +114,11 @@ namespace CartoonSelection
 
             if (!selection.Attributes.ContainsKey("0c3400fd-8872-4395-83bc-a5dc5f4967fe"))
             {
+				if (InstanceStateData.IsUIAvailable)
+                {
+					window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, window.FurtherTransformations.Count);
+				}
+				
                 FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "0c3400fd-8872-4395-83bc-a5dc5f4967fe");
                 Action<Dictionary<string, object>> changeParameter = stateData.AddFurtherTransformationModule(module);
                 changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() } });
@@ -141,8 +146,25 @@ namespace CartoonSelection
 
                         if (node.ContainsAll(nodeNames))
                         {
-                            stateData.RemoveFurtherTransformationModule(i);
                             minIndex = Math.Min(minIndex, i);
+                        }
+                    }
+                }
+				
+				if (InstanceStateData.IsUIAvailable)
+                {
+					window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, minIndex);
+				}
+				
+				for (int i = 0; i < furtherTransformationModules.Count; i++)
+                {
+                    if (furtherTransformationModules[i].Id == "0c3400fd-8872-4395-83bc-a5dc5f4967fe")
+                    {
+                        string[] node = (string[])stateData.GetFurtherTransformationModulesParamters(i)["Node:"];
+
+                        if (node.ContainsAll(nodeNames))
+                        {
+                            stateData.RemoveFurtherTransformationModule(i);
                         }
                     }
                 }

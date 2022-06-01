@@ -14,7 +14,7 @@ namespace aaaf3a3f5d4d941c8bd30d99e061f28cf
         public const string Name = "Reshape tree";
         public const string HelpText = "Changes the coordinate module and sets the plot actions to display the tree in a particular style.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public const string Id = "aaf3a3f5-d4d9-41c8-bd30-d99e061f28cf";
@@ -115,6 +115,11 @@ namespace aaaf3a3f5d4d941c8bd30d99e061f28cf
 
         public static void PerformAction(int actionIndex, MainWindow window, InstanceStateData stateData)
         {
+			if (InstanceStateData.IsUIAvailable)
+            {
+				window.PushUndoFrame(UndoFrameLevel.CoordinatesModule, 0);
+			}
+			
             List<PlottingModule> plottingModules = stateData.PlottingModules();
 
             List<(int, Dictionary<string, object>)> parametersToChange = new List<(int, Dictionary<string, object>)>();

@@ -40,12 +40,65 @@ namespace TreeViewer
         public double DefaultValue { get; set; }
         public string AttributeName { get; set; }
         public string AttributeType { get; set; }
-        public Func<object, double?> Formatter { get; set; }
+
+        private Func<object, double?> formatter;
+        public Func<object, double?> Formatter
+        {
+            get
+            {
+                if (compileOnDemand && formatter == null)
+                {
+                    formatter = Compile(compileOnDemandSource.ToString(), "FormatterModule");
+                }
+
+                return formatter;
+            }
+            set
+            {
+                formatter = value;
+            }
+        }
+
         public object[] Parameters { get; set; }
+
+        private bool compileOnDemand = false;
+        private string compileOnDemandSource = null;
 
         private NumberFormatterOptions()
         {
 
+        }
+
+        public NumberFormatterOptions(string sourceCode, bool compileOnDemand)
+        {
+            StringBuilder source = new StringBuilder();
+
+            StringReader sourceReader = new StringReader(sourceCode);
+
+            string line = sourceReader.ReadLine();
+
+            source.AppendLine("using TreeViewer;");
+
+            while (line.Trim().StartsWith("using"))
+            {
+                source.AppendLine(line);
+                line = sourceReader.ReadLine();
+            }
+
+            source.AppendLine("public static class FormatterModule { ");
+            source.AppendLine(line);
+            source.AppendLine(sourceReader.ReadToEnd());
+            source.Append("}");
+
+            if (!compileOnDemand)
+            {
+                this.Formatter = Compile(source.ToString(), "FormatterModule");
+            }
+            else
+            {
+                this.compileOnDemand = true;
+                this.compileOnDemandSource = source.ToString();
+            }
         }
 
         public NumberFormatterOptions(string sourceCode)
@@ -246,7 +299,7 @@ namespace TreeViewer
             {
                 ConverterCodeBox.TextChanged -= CheckString;
                 ConverterCodeBox.TextChanged += CheckNumber;
-                
+
             }
 
             GetParameters = () =>

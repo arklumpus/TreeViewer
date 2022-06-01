@@ -20,7 +20,7 @@ namespace RerootSelectionAction
         public const string Name = "Root tree on selection";
         public const string HelpText = "Re-roots the tree using the selection as outgroup.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const string Id = "77f387fb-c843-4164-aed2-bd5b8f325809";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
@@ -113,6 +113,11 @@ namespace RerootSelectionAction
                     return;
                 }
             }
+			
+			if (InstanceStateData.IsUIAvailable)
+			{
+				window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, index < 0 ? window.FurtherTransformations.Count : index);
+			}
 
             if (InstanceStateData.IsUIAvailable && index >= 0)
             {

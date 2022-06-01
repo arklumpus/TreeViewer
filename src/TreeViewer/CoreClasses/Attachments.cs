@@ -25,6 +25,7 @@ namespace TreeViewer
 {
     public class Attachment : IDisposable
     {
+        public string Id { get; } = Guid.NewGuid().ToString();
         public Stream Stream { get; }
         public bool CacheResults { get; }
         public bool StoreInMemory { get; }

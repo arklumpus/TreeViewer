@@ -32,7 +32,7 @@ namespace UnrootedStyleAction
         public const string Name = "Unrooted tree style";
         public const string HelpText = "Sets the plot actions to display the tree as an unrooted tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "a99eb0c6-a69d-4785-961a-a0c247e9704d";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -150,6 +150,8 @@ namespace UnrootedStyleAction
 								return;
 							}
 						}
+						
+						window.PushUndoFrame(UndoFrameLevel.CoordinatesModule, 0);
 
 						while (stateData.PlottingModules().Count > 0)
 						{

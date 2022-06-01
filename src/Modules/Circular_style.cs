@@ -31,7 +31,7 @@ namespace CircularStyleAction
         public const string Name = "Circular tree style";
         public const string HelpText = "Sets the plot actions to display the tree as a circular tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "1f3e0b88-c42d-417c-ba14-ba228be086a7";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -149,6 +149,9 @@ namespace CircularStyleAction
 								return;
 							}
 						}
+						
+						window.PushUndoFrame(UndoFrameLevel.CoordinatesModule, 0);
+						
 						while (stateData.PlottingModules().Count > 0)
 						{
 							stateData.RemovePlottingModule(0);

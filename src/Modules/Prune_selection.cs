@@ -19,7 +19,7 @@ namespace PruneSelection
         public const string Name = "Prune selection";
         public const string HelpText = "Prunes the selected node off the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "f8abf1cd-d79f-403b-b0f2-4bb1412839ff";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
         public static bool IsAvailableInCommandLine { get; } = false;
@@ -91,10 +91,25 @@ namespace PruneSelection
 
             if (nodeNames.Count == 0 || !selection.IsLastCommonAncestor(nodeNames))
             {
-                MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-                box.ShowDialog2(window);
-                return;
+				if (InstanceStateData.IsUIAvailable)
+				{
+					MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+					box.ShowDialog2(window);
+				}
+				else if (InstanceStateData.IsInteractive)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Attention! The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                    Console.WriteLine();
+                }
+				
+				return;
             }
+			
+			if (InstanceStateData.IsUIAvailable)
+			{
+				window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, window.FurtherTransformations.Count);
+			}
 
             FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "ffc97742-4cf5-44ef-81aa-d5b51708a003");
             Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
@@ -102,22 +117,28 @@ namespace PruneSelection
             {
                 changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() }, { "Position:", 0.0 } });
 
-                _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
-                        window.SetSelection(null);
-                    });
+				if (InstanceStateData.IsUIAvailable)
+				{
+					_ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+						{
+							await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+							window.SetSelection(null);
+						});
+				}
             }
             else
             {
                 changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() } });
 
-                _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
-                        TreeNode selectedNode = window.TransformedTree.GetNodeFromId(selection.Id);
-                        window.SetSelection(selectedNode);
-                    });
+				if (InstanceStateData.IsUIAvailable)
+				{
+					_ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+						{
+							await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+							TreeNode selectedNode = window.TransformedTree.GetNodeFromId(selection.Id);
+							window.SetSelection(selectedNode);
+						});
+				}
             }
         }
     }

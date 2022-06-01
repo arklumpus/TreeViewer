@@ -21,7 +21,7 @@ namespace CollapseSelection
         public const string Name = "Collapse selection";
         public const string HelpText = "Collapses the selected node.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "e149aeb6-a019-41e2-8830-e4dc3e0eee43";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
@@ -114,6 +114,11 @@ namespace CollapseSelection
 
             if (!selection.Attributes.ContainsKey("3812314b-e821-4399-abfd-2a929a7a7d80"))
             {
+				if (InstanceStateData.IsUIAvailable)
+                {
+					window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, window.FurtherTransformations.Count);
+				}
+				
                 FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "3812314b-e821-4399-abfd-2a929a7a7d80");
                 Action<Dictionary<string, object>> changeParameter = stateData.AddFurtherTransformationModule(module);
                 changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() } });
@@ -141,8 +146,25 @@ namespace CollapseSelection
 
                         if (node.ContainsAll(nodeNames))
                         {
-                            stateData.RemoveFurtherTransformationModule(i);
                             minIndex = Math.Min(minIndex, i);
+                        }
+                    }
+                }
+				
+				if (InstanceStateData.IsUIAvailable)
+                {
+					window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, minIndex);
+				}
+				
+				for (int i = 0; i < furtherTransformations.Count; i++)
+                {
+                    if (furtherTransformations[i].Id == "3812314b-e821-4399-abfd-2a929a7a7d80")
+                    {
+                        string[] node = (string[])stateData.GetFurtherTransformationModulesParamters(i)["Node:"];
+
+                        if (node.ContainsAll(nodeNames))
+                        {
+                            stateData.RemoveFurtherTransformationModule(i);
                         }
                     }
                 }

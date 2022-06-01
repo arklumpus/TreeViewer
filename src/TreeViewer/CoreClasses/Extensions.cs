@@ -125,7 +125,7 @@ namespace TreeViewer
             return tbr;
         }
 
-        public static Dictionary<string, object> DeepClone(this Dictionary<string, object> dict)
+        public static Dictionary<string, object> DeepClone(this Dictionary<string, object> dict, bool compileOnDemand)
         {
             Dictionary<string, object> tbr = new Dictionary<string, object>();
 
@@ -139,7 +139,7 @@ namespace TreeViewer
                         newParams[i] = formatter.Parameters[i];
                     }
 
-                    FormatterOptions newFormatter = new FormatterOptions((string)formatter.Parameters[formatter.Parameters.Length - 2]) { Parameters = newParams };
+                    FormatterOptions newFormatter = new FormatterOptions((string)formatter.Parameters[formatter.Parameters.Length - 2], compileOnDemand) { Parameters = newParams };
                     tbr.Add(kvp.Key, newFormatter);
                 }
                 else if (kvp.Value is ColourFormatterOptions colourFormatter)
@@ -150,7 +150,7 @@ namespace TreeViewer
                         newParams[i] = colourFormatter.Parameters[i];
                     }
 
-                    ColourFormatterOptions newFormatter = new ColourFormatterOptions((string)colourFormatter.Parameters[0], newParams) { AttributeName = colourFormatter.AttributeName, AttributeType = colourFormatter.AttributeType, DefaultColour = colourFormatter.DefaultColour };
+                    ColourFormatterOptions newFormatter = new ColourFormatterOptions((string)colourFormatter.Parameters[0], newParams, compileOnDemand) { AttributeName = colourFormatter.AttributeName, AttributeType = colourFormatter.AttributeType, DefaultColour = colourFormatter.DefaultColour };
                     tbr.Add(kvp.Key, newFormatter);
                 }
                 else if (kvp.Value is NumberFormatterOptions numberFormatter)
@@ -161,7 +161,7 @@ namespace TreeViewer
                         newParams[i] = numberFormatter.Parameters[i];
                     }
 
-                    NumberFormatterOptions newFormatter = new NumberFormatterOptions((string)numberFormatter.Parameters[0]) { AttributeName = numberFormatter.AttributeName, AttributeType = numberFormatter.AttributeType, DefaultValue = numberFormatter.DefaultValue, Parameters = newParams };
+                    NumberFormatterOptions newFormatter = new NumberFormatterOptions((string)numberFormatter.Parameters[0], compileOnDemand) { AttributeName = numberFormatter.AttributeName, AttributeType = numberFormatter.AttributeType, DefaultValue = numberFormatter.DefaultValue, Parameters = newParams };
                     tbr.Add(kvp.Key, newFormatter);
                 }
                 else

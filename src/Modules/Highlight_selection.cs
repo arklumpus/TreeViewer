@@ -19,7 +19,7 @@ namespace a5bf2292fcff34aa89c15e881d426cba6
         public const string Name = "Highlight selection";
         public const string HelpText = "Highlights the selected node in the plot.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
         public const string Id = "5bf2292f-cff3-4aa8-9c15-e881d426cba6";
@@ -113,6 +113,11 @@ namespace a5bf2292fcff34aa89c15e881d426cba6
                     return;
                 }
             }
+			
+			if (InstanceStateData.IsUIAvailable)
+			{
+				window.PushUndoFrame(UndoFrameLevel.PlotActionModule, window.PlottingActions.Count);
+			}
 
             PlottingModule module = Modules.GetModule(Modules.PlottingModules, "64769664-d163-4fce-b7ba-18fd9445fcfb");
             Action<Dictionary<string, object>> changeParameter = stateData.AddPlottingModule(module);
