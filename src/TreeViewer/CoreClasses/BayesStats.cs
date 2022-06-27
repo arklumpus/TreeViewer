@@ -41,13 +41,15 @@ namespace TreeViewer
             int windowSize = (int)Math.Ceiling(threshold * sorted.Count);
             if (windowSize < 2)
             {
-                throw new ArgumentException("The threshold is too low or the data does not contain enough samples!");
+                //throw new ArgumentException("The threshold is too low or the data does not contain enough samples!");
+                return new double[] { sorted[0], sorted[^1] };
             }
 
             int nCIs = sorted.Count - windowSize;
             if (nCIs < 1)
             {
-                throw new ArgumentException("The threshold is too high or the data does not contain enough samples!");
+                //throw new ArgumentException("The threshold is too high or the data does not contain enough samples!");
+                return new double[] { sorted[0], sorted[^1] };
             }
 
             double[] ciWidths = new double[nCIs];
