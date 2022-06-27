@@ -69,6 +69,7 @@ namespace TreeViewer
         public long UpdateCheckDate { get; set; } = 0;
         public UpdateCheckModes UpdateCheckMode { get; set; } = UpdateCheckModes.ProgramAndAllModules;
         public bool EnableUndoStack { get; set; } = true;
+        public bool ClusterAccordingToRFDistances { get; set; } = false;
         public static GlobalSettings Settings { get; }
         internal List<MainWindow> MainWindows { get; } = new List<MainWindow>();
 

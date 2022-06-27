@@ -1,0 +1,97 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2022  Giorgio Bianchini, University of Bristol
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" Width="360" Height="350"
+        x:Class="TreeViewer.CreateReportWindow"
+        Title="Create report..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
+        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner">
+  <local:ChildWindow.Content>
+    <Grid Margin="10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="1*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="1*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid Grid.Row="1" Grid.ColumnSpan="2">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid Name="HeaderGrid" Margin="0,0,0,5">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="1*"/>
+          </Grid.ColumnDefinitions>
+
+          <TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Create report" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
+        </Grid>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible" Margin="0,0,0,10" AllowAutoHide="False" Padding="0,0,20,0">
+          <StackPanel>
+            <StackPanel Name="TreeContainer">
+            </StackPanel>
+            <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="AddFinalTreeButton" Click="AddFinalTreeClicked">
+              <StackPanel Orientation="Horizontal">
+                <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
+                <TextBlock Text="Add final transformed tree" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
+              </StackPanel>
+            </Button>
+            <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="AddAllLoadedTrees" Click="AddAllLoadedTreesClicked">
+              <StackPanel Orientation="Horizontal">
+                <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
+                <TextBlock Text="Add all loaded trees" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
+              </StackPanel>
+            </Button>
+            <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="AddLoadedTree" Click="AddLoadedTreeClicked">
+              <StackPanel Orientation="Horizontal">
+                <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
+                <TextBlock Text="Add loaded tree: #" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
+                <NumericUpDown Margin="2,0,0,0" Minimum="1" Maximum="1000" Value="1" Width="100" Padding="3,0,3,0" Opacity="0.75" FormatString="0" Name="LoadedTreeIndexNUD"></NumericUpDown>
+              </StackPanel>
+            </Button>
+            <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="AddTreeFile" Click="AddTreeFileClicked">
+              <StackPanel Orientation="Horizontal">
+                <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
+                <TextBlock Text="Add tree file..." VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+      <Grid Grid.Row="2" Grid.ColumnSpan="2">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="1" Width="100" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton" Click="OKClicked">OK</Button>
+        <Button Grid.Column="3" Width="100" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton" Click="CancelClicked">Cancel</Button>
+      </Grid>
+    </Grid>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

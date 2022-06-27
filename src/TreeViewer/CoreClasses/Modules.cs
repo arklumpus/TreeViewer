@@ -30,6 +30,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml;
@@ -824,6 +825,185 @@ public static Colour? Format(object attribute)
                 new VersionConverter()
             }
         };
+
+        public async static Task<TreeCollection> OpenTreeFile(string fileName, Avalonia.Controls.Window parentWindow)
+        {
+            double maxResult = 0;
+            int maxIndex = -1;
+
+            for (int i = 0; i < Modules.FileTypeModules.Count; i++)
+            {
+                try
+                {
+                    double priority = Modules.FileTypeModules[i].IsSupported(fileName);
+                    if (priority > maxResult)
+                    {
+                        maxResult = priority;
+                        maxIndex = i;
+                    }
+                }
+                catch { }
+            }
+
+            if (maxIndex >= 0)
+            {
+                double maxLoadResult = 0;
+                int maxLoadIndex = -1;
+
+                IEnumerable<TreeNode> loader;
+
+                try
+                {
+                    List<(string, Dictionary<string, object>)> moduleSuggestions = new List<(string, Dictionary<string, object>)>()
+                    {
+                        ("32914d41-b182-461e-b7c6-5f0263cc1ccd", new Dictionary<string, object>()),
+                        ("68e25ec6-5911-4741-8547-317597e1b792", new Dictionary<string, object>()),
+                    };
+
+                    EventWaitHandle progressWindowHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
+                    ProgressWindow progressWin = new ProgressWindow(progressWindowHandle) { ProgressText = "Opening and loading file..." };
+                    SemaphoreSlim progressSemaphore = new SemaphoreSlim(0, 1);
+                    Action<double> progressAction = (progress) =>
+                    {
+                        if (progress >= 0)
+                        {
+                            Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                progressWin.IsIndeterminate = false;
+                                progressWin.Progress = progress;
+                            });
+                        }
+                        else
+                        {
+                            Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                progressWin.IsIndeterminate = true;
+                            });
+                        }
+                    };
+
+                    TreeCollection coll = null;
+
+                    Thread thr = new Thread(async () =>
+                    {
+                        progressWindowHandle.WaitOne();
+
+                        Action<double> openerProgressAction = (_) => { };
+
+                        bool? codePermissionGranted = null;
+
+                        bool askForCodePermission(RSAParameters? publicKey)
+                        {
+                            if (codePermissionGranted.HasValue)
+                            {
+                                return codePermissionGranted.Value;
+                            }
+                            else
+                            {
+                                MessageBox box = null;
+
+                                EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset);
+
+                                async void showDialog()
+                                {
+                                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                                    {
+                                        box = new MessageBox("Attention!", "The selected file contains source code and its signature does not match any known keys. Do you want to load and compile it? You should only do this if you trust the source of the file and/or you have accurately reviewed the code.", MessageBox.MessageBoxButtonTypes.YesNo);
+                                        await box.ShowDialog2(parentWindow);
+
+                                        if (box.Result == MessageBox.Results.Yes && publicKey.HasValue)
+                                        {
+                                            MessageBox box2 = new MessageBox("Question", "Would you like to add the file's public key to the local storage? This will allow you to open other files produced by the same author without seeing this dialog. You should only do this if you trust the source of the file.", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
+                                            await box2.ShowDialog2(parentWindow);
+                                            if (box2.Result == MessageBox.Results.Yes)
+                                            {
+                                                CryptoUtils.AddPublicKey(publicKey.Value);
+                                            }
+                                        }
+                                    });
+
+                                    handle.Set();
+                                }
+
+                                showDialog();
+
+                                handle.WaitOne();
+
+                                if (box.Result == MessageBox.Results.Yes)
+                                {
+                                    codePermissionGranted = true;
+                                    return true;
+                                }
+                                else
+                                {
+                                    codePermissionGranted = false;
+                                    return false;
+                                }
+                            }
+                        };
+
+                        loader = Modules.FileTypeModules[maxIndex].OpenFile(fileName, moduleSuggestions, (val) => { openerProgressAction(val); }, askForCodePermission);
+
+                        FileInfo finfo = new FileInfo(fileName);
+
+                        for (int i = 0; i < Modules.LoadFileModules.Count; i++)
+                        {
+                            try
+                            {
+                                double priority = Modules.LoadFileModules[i].IsSupported(finfo, Modules.FileTypeModules[maxIndex].Id, loader);
+                                if (priority > maxLoadResult)
+                                {
+                                    maxLoadResult = priority;
+                                    maxLoadIndex = i;
+                                }
+                            }
+                            catch { }
+                        }
+
+                        if (maxLoadIndex >= 0)
+                        {
+                            try
+                            {
+                                coll = Modules.LoadFileModules[maxLoadIndex].Load(parentWindow, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, ref openerProgressAction, progressAction);
+                            }
+                            catch (Exception ex)
+                            {
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWin.Close(); });
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => { await new MessageBox("Error!", "An error has occurred while loading the file!\n" + ex.Message).ShowDialog2(parentWindow); return Task.CompletedTask; });
+                            }
+
+                            progressSemaphore.Release();
+                        }
+                        else
+                        {
+                            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => { await new MessageBox("Attention!", "The file cannot be loaded by any of the currently installed modules!").ShowDialog2(parentWindow); return Task.CompletedTask; });
+                            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWin.Close(); });
+                        }
+                    });
+
+                    thr.Start();
+
+                    _ = progressWin.ShowDialog2(parentWindow);
+
+                    await progressSemaphore.WaitAsync();
+                    progressSemaphore.Release();
+                    progressSemaphore.Dispose();
+
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWin.Close(); });
+                    return coll;
+                }
+                catch (Exception ex)
+                {
+                    await new MessageBox("Error!", "An error has occurred while opening the file!\n" + ex.Message).ShowDialog2(parentWindow);
+                    return null;
+                }
+            }
+            else
+            {
+                await new MessageBox("Attention!", "The file type is not supported by any of the currently installed modules!").ShowDialog2(parentWindow);
+                return null;
+            }
+        }
     }
 
 

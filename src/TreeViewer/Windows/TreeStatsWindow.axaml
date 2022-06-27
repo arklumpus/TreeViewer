@@ -1,0 +1,161 @@
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        xmlns:paz="clr-namespace:Avalonia.Controls.PanAndZoom;assembly=Avalonia.Controls.PanAndZoom"
+        xmlns:mdc="clr-namespace:VectSharp.MarkdownCanvas;assembly=VectSharp.MarkdownCanvas"
+        mc:Ignorable="d" Width="1000" Height="700"
+        x:Class="TreeViewer.TreeStatsWindow"
+        Title="Tree statistics">
+  <Window.Styles>
+    <Style Selector=".WindowsStyle Canvas.RibbonSeparator">
+      <Setter Property="Background" Value="#B1B1B1" />
+      <Setter Property="Margin" Value="0,0,0,0" />
+    </Style>
+
+    <Style Selector=".MacOSStyle Canvas.RibbonSeparator">
+      <Setter Property="Background" Value="#CECECE" />
+    </Style>
+  </Window.Styles>
+  <local:ChildWindow.Content>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="1*" />
+        <RowDefinition Height="25" />
+      </Grid.RowDefinitions>
+
+      <Grid Grid.Row="0" Name="RibbonBarContainer"></Grid>
+      <Grid Grid.Row="1" Name="RibbonTabContainer" Height="100" Margin="1,0,1,0" ClipToBounds="True">
+        <local:RibbonTabContent HorizontalAlignment="Stretch" Height="100"></local:RibbonTabContent>
+      </Grid>
+      <Canvas Grid.Row="2" Height="1" Classes="RibbonSeparator"></Canvas>
+      <Grid Grid.Row="3" Margin="5" Name="MainGrid">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Name="ScrollViewer" VerticalContentAlignment="Top" VerticalAlignment="Top">
+
+        </ScrollViewer>
+        <Grid Name="PlotGrid" Background="{ Binding $parent[Window].Background }" IsVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top">
+          <paz:ZoomBorder Name="PlotViewBox" Margin="0" ZoomSpeed="1.2"
+                            ClipToBounds="True" Focusable="True" PanButton="Left"
+                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch" PropertyChanged="ZoomPropertyChanged"
+                          PointerWheelChanged="ZoomPointerWheelChanged" MinZoomX="0.01" MaxZoomX="100" MinZoomY="0.01" MaxZoomY="100" >
+
+          </paz:ZoomBorder>
+
+          <Border Background="White" BorderBrush="Black" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="10, 5, 10, 5" CornerRadius="5" Name="HoverBorder" IsHitTestVisible="False" Opacity="0" IsVisible="False">
+            <TextBlock Text="Description of hover element" Name="HoverDescription" />
+          </Border>
+        </Grid>
+      </Grid>
+      <Grid Grid.Row="4" Margin="0,0,0,0" Name="ZoomPanel" IsVisible="False" Background="{ Binding $parent[Window].Background }">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="100" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="1"/>
+          <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Canvas Background="#C6C6C6" Grid.ColumnSpan="8"></Canvas>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+          <Grid Width="16" Height="16" Name="LeftMouseButtonContainerGrid" VerticalAlignment="Center" Margin="10,0,5,0"/>
+          <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" FontSize="12">Pan</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="1">
+          <Grid Width="16" Height="16" Name="MouseWheelContainerGrid" VerticalAlignment="Center" Margin="10,0,5,0"/>
+          <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" FontSize="12">Zoom</TextBlock>
+        </StackPanel>
+        <RepeatButton Grid.Column="3" Grid.Row="1" Margin="0,0,0,0" Click="ZoomMinusClicked" Padding="5,0,5,0" Height="22" Width="22" FontSize="12" Classes="PlainButton" Background="Transparent" VerticalContentAlignment="Center">
+          <RepeatButton.Content>
+            <Path Stroke="Black" StrokeThickness="1" Width="16" Height="16" Data="M4,8.5 L13,8.5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </RepeatButton.Content>
+        </RepeatButton>
+        <Slider Padding="0" Grid.Column="4" Grid.Row="1" Value="0" VerticalAlignment="Top" Minimum="-2" Maximum="2" PropertyChanged="ZoomSliderChanged" Name="ZoomSlider" RenderTransform="translate(0,-6px)">
+          <Slider.Resources>
+            <CornerRadius x:Key="SliderThumbCornerRadius">2.5</CornerRadius>
+            <x:Double x:Key="SliderHorizontalThumbWidth">5</x:Double>
+            <x:Double x:Key="SliderHorizontalThumbHeight">11</x:Double>
+            <x:Double x:Key="SliderTrackThemeHeight">1</x:Double>
+          </Slider.Resources>
+        </Slider>
+        <RepeatButton Grid.Column="5" Grid.Row="1" Margin="0,0,0,0" Click="ZoomPlusClicked" Padding="5,0,5,0" Height="22" Width="22" FontSize="12" Classes="PlainButton" Background="Transparent" VerticalContentAlignment="Center">
+          <RepeatButton.Content>
+            <Path Stroke="Black" StrokeThickness="1" Width="16" Height="16" Data="M4,8.5 L13,8.5 M8.5,4 L8.5,13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </RepeatButton.Content>
+        </RepeatButton>
+        <NumericUpDown Grid.Column="6" Grid.Row="1" Width="70" FormatString="\{0:P0\}" Value="1" Minimum="0" Padding="5,0,5,0" Margin="5,0,5,0" ValueChanged="ZoomNudChanged" Name="ZoomNud" VerticalAlignment="Center" ShowButtonSpinner="False" Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Center"></NumericUpDown>
+        <Button Grid.Column="7" Grid.Row="1" Margin="0,0,25,0" Click="FitZoomButtonClicked" Content="Fit" Padding="5,0,5,0" Height="22" FontSize="12" Classes="PlainButton" Background="Transparent" VerticalContentAlignment="Center"  />
+      </Grid>
+      <Grid Grid.Row="0" Grid.RowSpan="4" Name="PopupLayer">
+        <Grid.Styles>
+          <Style Selector=".WindowsStyle TextBlock">
+            <Setter Property="Foreground" Value="#D0000000"/>
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem">
+            <Setter Property="Background" Value="Transparent" />
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem Viewbox">
+            <Setter Property="Margin" Value="5, 3, 5, 3" />
+          </Style>
+
+          <Style Selector=".WindowsStyle StackPanel.MenuItem:pointerover">
+            <Setter Property="Background" Value="#C5C5C5" />
+          </Style>
+
+          <Style Selector=".WindowsStyle Border.MenuBorder">
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#C6C6C6" />
+          </Style>
+
+          <Style Selector=".MacOSStyle TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem">
+            <Setter Property="Background" Value="Transparent" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem Viewbox">
+            <Setter Property="Margin" Value="20, 3, 5, 3" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover">
+            <Setter Property="Background" Value="#0072b2" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover TextBlock">
+            <Setter Property="Foreground" Value="White" />
+          </Style>
+
+          <Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover Path">
+            <Setter Property="Fill" Value="White" />
+          </Style>
+
+          <Style Selector=".MacOSStyle Border.MenuBorder">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="0 4 0 4"/>
+            <Setter Property="Background" Value="#E9E9E9" />
+            <Setter Property="BorderBrush" Value="#C3C3C3" />
+          </Style>
+
+
+        </Grid.Styles>
+
+      </Grid>
+
+    </Grid>
+  </local:ChildWindow.Content>
+</local:ChildWindow>

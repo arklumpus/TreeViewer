@@ -513,6 +513,14 @@ namespace TreeViewer
 
             SetupPlatform();
 
+            this.FindControl<Canvas>("StatsIconCanvas").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Stats")));
+            this.FindControl<Button>("TreeStatsButton").Click += async (s, e) =>
+            {
+                TreeStatsWindow win = new TreeStatsWindow(this);
+
+                await win.ShowDialog2(this);
+            };
+
             this.FindControl<Grid>("LeftMouseButtonContainerGrid").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.LeftMouseButton")));
             this.FindControl<Grid>("MouseWheelContainerGrid").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.MouseWheel")));
 

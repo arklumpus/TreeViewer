@@ -194,6 +194,11 @@ namespace TreeViewer
 
         public static string ToString(this double val, int significantDigits, bool decimalDigits = true)
         {
+            if (double.IsNaN(val))
+            {
+                return "NaN";
+            }
+
             if (decimalDigits)
             {
                 if (val == 0 || double.IsNaN(val) || double.IsInfinity(val))
@@ -348,5 +353,62 @@ namespace TreeViewer
                 return new VisualBrush(tile) { TileMode = TileMode.Tile, Stretch = Stretch.None, DestinationRect = new Avalonia.RelativeRect(0, 0, 20, 20, Avalonia.RelativeUnit.Absolute) };
             }
         }
+
+        public static (double q1, double q3, double iqr) IQR(this IEnumerable<double> values)
+        {
+            double[] values2 = (from el in values orderby el ascending select el).ToArray();
+
+            double q1, q3;
+
+            if (values2.Length < 4)
+            {
+                q1 = values2[0];
+                q3 = values2[values2.Length - 1];
+            }
+            else if (values2.Length == 4)
+            {
+                q1 = (values2[0] + values2[1]) * 0.5;
+                q3 = (values2[2] + values2[3]) * 0.5;
+            }
+            else if (values2.Length % 2 == 0)
+            {
+                q1 = values2.Length % 4 == 0 ? (values2[values2.Length / 4] + values2[values2.Length / 4 + 1]) * 0.5 : values2[values2.Length / 4];
+                q3 = values2.Length % 4 == 0 ? (values2[3 * values2.Length / 4] + values2[3 * values2.Length / 4 + 1]) * 0.5 : values2[3 * values2.Length / 4];
+            }
+            else if (values2.Length % 4 == 1)
+            {
+                int n = (values2.Length - 1) / 4;
+                q1 = 0.75 * values2[n - 1] + 0.25 * values2[n];
+                q3 = 0.25 * values2[3 * n] + 0.75 * values2[3 * n + 1];
+            }
+            else
+            {
+                int n = (values2.Length - 3) / 4;
+                q1 = 0.75 * values2[n] + 0.25 * values2[n + 1];
+                q3 = 0.25 * values2[3 * n + 1] + 0.75 * values2[3 * n + 2];
+            }
+
+            return (q1, q3, q3 - q1);
+        }
+
+        public static int GetDigits(this double value)
+        {
+            if (value == 0)
+            {
+                return 0;
+            }
+
+            if (value == 1)
+            {
+                return 2;
+            }
+
+            double oom = Math.Ceiling(Math.Log10(Math.Abs(value)));
+
+            int digits = (int)(oom > 0 ? 2 : (Math.Abs(oom) + 4));
+
+            return digits;
+        }
+
     }
 }
