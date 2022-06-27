@@ -560,7 +560,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Node shapes](7434420a-1afd-46ee-aeea-75ed8a5eeada)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Draws shapes on nodes, tips or branches.
 
