@@ -18,7 +18,7 @@ namespace NodeShapes
         public const string Name = "Node shapes";
         public const string HelpText = "Draws shapes on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "7434420a-1afd-46ee-aeea-75ed8a5eeada";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 		
@@ -129,7 +129,7 @@ namespace NodeShapes
                 /// </param>
                 ( "Position:", "Point:[0,0]" ),
 
-                ( "Appearance", "Group:8"),
+                ( "Appearance", "Group:12"),
                 
                 /// <param name="Size:">
                 /// This parameter determines the size (diameter) of the shapes.
