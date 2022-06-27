@@ -50,7 +50,7 @@ namespace TreeViewer
             {
                 dialog = new OpenFileDialog()
                 {
-                    Title = "Open tree file",
+                    Title = "Add reference",
                     AllowMultiple = false,
                     Filters = filters
                 };
@@ -59,7 +59,7 @@ namespace TreeViewer
             {
                 dialog = new OpenFileDialog()
                 {
-                    Title = "Open tree file",
+                    Title = "Add reference",
                     AllowMultiple = false
                 };
             }
