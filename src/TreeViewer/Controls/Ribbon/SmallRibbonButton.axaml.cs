@@ -228,6 +228,11 @@ namespace TreeViewer
 
                 this.PointerPressed += (s, e) =>
                 {
+                    if (ToolTip.GetTip(this) != null)
+                    {
+                        ToolTip.SetIsOpen(this, false);
+                    }
+
                     e.GetCurrentPoint(this.FindControl<Border>("ButtonBorder")).Pointer.Capture(this.FindControl<Border>("ButtonBorder"));
                     
                     if (!this.IsActive)
@@ -276,6 +281,11 @@ namespace TreeViewer
 
                 arrowGrid.PointerPressed += (s, e) =>
                 {
+                    if (ToolTip.GetTip(this) != null)
+                    {
+                        ToolTip.SetIsOpen(this, false);
+                    }
+
                     e.GetCurrentPoint(arrowGrid).Pointer.Capture(arrowGrid);
 
                     if (!this.IsActive)
