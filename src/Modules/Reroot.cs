@@ -17,7 +17,7 @@ namespace RerootTree
         public const string Name = "Reroot tree";
         public const string HelpText = "Re-roots the tree using the specified outgroup.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const string Id = "c6f96861-11c0-4853-9738-6a90cc81d660";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -141,7 +141,7 @@ namespace RerootTree
             }
             else
             {
-                double maxLen = 0;
+                double maxLen = double.MinValue;
                 TreeNode maxDeepestTip = null;
                 for (int i = 0; i < node.Children.Count; i++)
                 {
