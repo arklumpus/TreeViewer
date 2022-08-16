@@ -188,6 +188,30 @@ namespace TreeViewer
             }
         }
 
+        private CancellationTokenSource cancellationTokenSource = null;
+
+        public CancellationTokenSource CancellationTokenSource
+        {
+            get
+            {
+                return cancellationTokenSource;
+            }
+
+            set
+            {
+                cancellationTokenSource = value;
+
+                if (cancellationTokenSource == null)
+                {
+                    this.FindControl<Button>("CancelButton").IsVisible = false;
+                }
+                else
+                {
+                    this.FindControl<Button>("CancelButton").IsVisible = true;
+                }
+            }
+        }
+
         public ProgressWindow()
         {
             this.InitializeComponent();
@@ -213,6 +237,14 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+
+            this.FindControl<Button>("CancelButton").Click += (s, e) =>
+            {
+                if (cancellationTokenSource != null)
+                {
+                    cancellationTokenSource.Cancel();
+                }
+            };
         }
     }
 }

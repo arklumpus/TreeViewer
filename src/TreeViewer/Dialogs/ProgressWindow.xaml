@@ -30,6 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 <RowDefinition Height="Auto" />
                 <!--<RowDefinition Height="Auto" />-->
                 <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
@@ -44,7 +45,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             <Grid Grid.Row="1" Margin="20,10,10,20" Height="70">
                 <local:CoolProgressBar  Name="ProgressBar" IsIndeterminate="True" Height="24" />
             </Grid>
-            <TextBlock Margin="0,0,10,10" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Name="ProgressDesc" IsVisible="True">0%</TextBlock>
+            <TextBlock Margin="0,0,10,10" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Name="ProgressDesc" IsVisible="True">0%</TextBlock>
+
+            <Button Grid.ColumnSpan="2" Grid.Row="2" HorizontalAlignment="Center" Width="100" Content="Cancel" HorizontalContentAlignment="Center" Margin="0,0,0,10" Name="CancelButton" IsVisible="false" />
         </Grid>
     </local:ChildWindow.Content>
 </local:ChildWindow>
