@@ -26,7 +26,7 @@ namespace Branches
         public const string Name = "Branches";
         public const string HelpText = "Plots tree branches as lines.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "7c767b07-71be-48b2-8753-b27f3e973570";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 		
@@ -308,7 +308,7 @@ namespace Branches
                     weight = weightFormatter(weightAttributeObject) ?? defaultWeight;
                 }
 
-                if (node.Parent != null && (!isCartooned || isCartoonedParent))
+                if (node.Parent != null && (!isCartooned || isCartoonedParent) && weight > 0 && colour.A > 0)
                 {
                     Point childPoint = coordinates[node.Id];
                     Point parentPoint = coordinates[node.Parent.Id];
