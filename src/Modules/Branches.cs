@@ -26,7 +26,7 @@ namespace Branches
         public const string Name = "Branches";
         public const string HelpText = "Plots tree branches as lines.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "7c767b07-71be-48b2-8753-b27f3e973570";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 		
@@ -297,7 +297,7 @@ namespace Branches
                 }
                 else
                 {
-                    colour = Modules.DefaultColours[Math.Abs(node.GetLeafNames().Aggregate((a, b) => a + "," + b).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                    colour = Modules.DefaultColours[Math.Abs(string.Join(",", node.GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
                 }
 
 

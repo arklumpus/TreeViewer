@@ -50,7 +50,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
         public const string Name = "Stochastic mapping branches";
         public const string HelpText = "Plots branches with data from a stochastic mapping analysis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "f7a20f2f-94b2-4331-8bbf-4e0087da6fba";
@@ -411,7 +411,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
                             for (int i = 0; i < allPossibleStates.Count; i++)
                             {
-                                stateColours.Add(stateColoursCFO.Formatter(allPossibleStates[i].Aggregate((a, b) => a + "|" + b)) ?? stateColoursCFO.DefaultColour);
+                                stateColours.Add(stateColoursCFO.Formatter(string.Join("|", allPossibleStates[i])) ?? stateColoursCFO.DefaultColour);
                             }
 
 
@@ -528,7 +528,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
             Dictionary<string, (double samplePosPerc, double[] stateProbs)[]> preparedStates = (Dictionary<string, (double samplePosPerc, double[] stateProbs)[]>)stateData.Tags["32858c9d-0247-497f-aeee-03f7bfe24158"];
 
-            List<string> allPossibleStates = (from el in GetAllPossibleStates(states, enabledCharacters) select el.Aggregate((a, b) => a + "|" + b)).ToList();
+            List<string> allPossibleStates = (from el in GetAllPossibleStates(states, enabledCharacters) select string.Join("|", el)).ToList();
 
             List<Colour> stateColours = new List<Colour>(allPossibleStates.Count);
 
@@ -1088,7 +1088,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
                 }
             }
 
-            return enabledCharacterStates.Aggregate((a, b) => a + "|" + b);
+            return string.Join("|", enabledCharacterStates);
         }
 
         private static Colour GetColour(int index, int count)
@@ -1120,7 +1120,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
         private static string GetDefaultStateColours(string[][] states)
         {
-            List<string> allStates = (from el in GetAllPossibleStates(states) select el.Aggregate((a, b) => a + "|" + b)).ToList();
+            List<string> allStates = (from el in GetAllPossibleStates(states) select string.Join("|", el)).ToList();
 
             System.Text.StringBuilder defaultSourceCode = new System.Text.StringBuilder();
             defaultSourceCode.AppendLine("public static Colour? Format(object attribute)");
@@ -1304,7 +1304,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
             Dictionary<string, Colour> allStateColours = new Dictionary<string, Colour>();
 
-            List<string> allStatesString = (from el in GetAllPossibleStates(states) select el.Aggregate((a, b) => a + "|" + b)).ToList();
+            List<string> allStatesString = (from el in GetAllPossibleStates(states) select string.Join("|", el)).ToList();
 
             try
             {
@@ -1489,7 +1489,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
             Avalonia.Controls.Grid.SetColumn(cancelButton, 3);
             buttonGrid.Children.Add(cancelButton);
 
-            List<string> allStatesString = (from el in GetAllPossibleStates(states) select el.Aggregate((a, b) => a + "|" + b)).ToList();
+            List<string> allStatesString = (from el in GetAllPossibleStates(states) select string.Join("|", el)).ToList();
 
             Avalonia.Controls.ScrollViewer scroller = new Avalonia.Controls.ScrollViewer() { AllowAutoHide = false, VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, Margin = new Avalonia.Thickness(10, 0, 10, 0), Padding = new Avalonia.Thickness(0, 0, 16, 0) };
             Avalonia.Controls.Grid.SetRow(scroller, 1);

@@ -27,7 +27,7 @@ namespace LassoSelection
         public const string Name = "Lasso selection";
         public const string HelpText = "Selects tips from the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const string Id = "a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -334,7 +334,7 @@ namespace LassoSelection
 
                         if (tipsInside.Count > 0)
                         {
-                            await Avalonia.Application.Current.Clipboard.SetTextAsync(tipsInside.Aggregate((a, b) => a + "\n" + b));
+                            await Avalonia.Application.Current.Clipboard.SetTextAsync(string.Join("\n", tipsInside));
                         }
 
                         lassoGrid.MaxHeight = lassoGrid.Bounds.Height;

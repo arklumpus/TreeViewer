@@ -83,7 +83,7 @@ namespace NodeStates
         public const string Name = "Node states";
         public const string HelpText = "Draws node states based on attributes.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.2");
+        public static Version Version = new Version("1.2.3");
         public const string Id = "0512b822-044d-4c13-b3bb-bca494c51daa";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -662,7 +662,7 @@ namespace NodeStates
 
                         List<List<string>> allPossibleStates = GetAllPossibleStates(splitStates, enabledCharacters);
 
-                        allStatesString = new HashSet<string>(from el in allPossibleStates select el.Aggregate((a, b) => a + "|" + b));
+                        allStatesString = new HashSet<string>(from el in allPossibleStates select string.Join("|", el));
 
                         allStates = GetEnabledStates(splitStates, enabledCharacters).ToArray();
                     }
@@ -944,7 +944,7 @@ namespace NodeStates
                         kvp.Value.AddRange(marginalStates);
                     }
 
-                    allStatesString = new HashSet<string>(from el in allPossibleStates select el.Aggregate((a, b) => a + "|" + b));
+                    allStatesString = new HashSet<string>(from el in allPossibleStates select string.Join("|", el));
                 }
 
                 ambiguousState.AddRange(from el in allStatesString select ((object)el, 1.0));
@@ -1538,7 +1538,7 @@ namespace NodeStates
 
             Dictionary<string, Colour> allStateColours = new Dictionary<string, Colour>();
 
-            List<string> allStatesString = (from el in GetAllPossibleStates(states) select el.Aggregate((a, b) => a + "|" + b)).ToList();
+            List<string> allStatesString = (from el in GetAllPossibleStates(states) select string.Join("|", el)).ToList();
 
             try
             {
@@ -1779,7 +1779,7 @@ namespace NodeStates
 
             for (int i = 0; i < allPossibleStates.Count; i++)
             {
-                tbr.Add((allPossibleStates[i].Aggregate((a, b) => a + "|" + b), probs[i]));
+                tbr.Add((string.Join("|", allPossibleStates[i]), probs[i]));
             }
 
             return tbr;
@@ -1829,7 +1829,7 @@ namespace NodeStates
 
         private static string GetDefaultStateColours(string[][] states)
         {
-            List<string> allStates = (from el in GetAllPossibleStates(states) select el.Aggregate((a, b) => a + "|" + b)).ToList();
+            List<string> allStates = (from el in GetAllPossibleStates(states) select string.Join("|", el)).ToList();
 
             System.Text.StringBuilder defaultSourceCode = new System.Text.StringBuilder();
             defaultSourceCode.AppendLine("public static Colour? Format(object attribute)");
@@ -1931,7 +1931,7 @@ namespace NodeStates
             Avalonia.Controls.Grid.SetColumn(cancelButton, 3);
             buttonGrid.Children.Add(cancelButton);
 
-            List<string> allStatesString = (from el in GetAllPossibleStates(states) select el.Aggregate((a, b) => a + "|" + b)).ToList();
+            List<string> allStatesString = (from el in GetAllPossibleStates(states) select string.Join("|", el)).ToList();
 
             Avalonia.Controls.ScrollViewer scroller = new Avalonia.Controls.ScrollViewer() { AllowAutoHide = false, VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, Margin = new Avalonia.Thickness(10, 0, 10, 0), Padding = new Avalonia.Thickness(0, 0, 16, 0) };
             Avalonia.Controls.Grid.SetRow(scroller, 1);

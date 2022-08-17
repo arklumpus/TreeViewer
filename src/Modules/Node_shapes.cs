@@ -18,7 +18,7 @@ namespace NodeShapes
         public const string Name = "Node shapes";
         public const string HelpText = "Draws shapes on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "7434420a-1afd-46ee-aeea-75ed8a5eeada";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 		
@@ -356,7 +356,7 @@ namespace NodeShapes
                         List<string> leafNames = node.GetLeafNames();
                         if (leafNames.Count > 0)
                         {
-                            fillColour = Modules.DefaultColours[Math.Abs(leafNames.Aggregate((a, b) => a + "," + b).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(fillOpacity);
+                            fillColour = Modules.DefaultColours[Math.Abs(string.Join(",", leafNames).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(fillOpacity);
                         }
                         else
                         {
@@ -375,7 +375,7 @@ namespace NodeShapes
                     }
                     else
                     {
-                        strokeColour = Modules.DefaultColours[Math.Abs(node.GetLeafNames().Aggregate((a, b) => a + "," + b).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(strokeOpacity);
+                        strokeColour = Modules.DefaultColours[Math.Abs(string.Join(",", node.GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(strokeOpacity);
                     }
 
                     double size = defaultSize;

@@ -30,7 +30,7 @@ namespace Search
         public const string Name = "Search";
         public const string HelpText = "Searches leaves in the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "5f3a7147-f706-43dc-9f57-18ade0c7b15d";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -997,7 +997,7 @@ namespace Search
 
                         if (attributeValues.Count > 0)
                         {
-                            _ = Avalonia.Application.Current.Clipboard.SetTextAsync(attributeValues.Aggregate((a, b) => a + "\n" + b));
+                            _ = Avalonia.Application.Current.Clipboard.SetTextAsync(string.Join("\n", attributeValues));
                         }
                     }
                 }

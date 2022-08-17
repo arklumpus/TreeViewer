@@ -21,7 +21,7 @@ namespace Copy_selected_node
         public const string Name = "Copy selected node";
         public const string HelpText = "Copies the selected node to the clipboard.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "debd9130-8451-4413-88f0-6357ec817021";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
 
@@ -257,7 +257,7 @@ namespace Copy_selected_node
 
                     if (attributeValues.Count > 0)
                     {
-                        _ = Avalonia.Application.Current.Clipboard.SetTextAsync(attributeValues.Aggregate((a, b) => a + "\n" + b));
+                        _ = Avalonia.Application.Current.Clipboard.SetTextAsync(string.Join("\n", attributeValues));
                     }
                 }
             }
@@ -387,7 +387,7 @@ namespace Copy_selected_node
 
                     if (attributeValues.Count > 0)
                     {
-                        _ = Avalonia.Application.Current.Clipboard.SetTextAsync(attributeValues.Aggregate((a, b) => a + "\n" + b));
+                        _ = Avalonia.Application.Current.Clipboard.SetTextAsync(string.Join("\n", attributeValues));
                     }
                 }
             }

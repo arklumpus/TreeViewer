@@ -35,7 +35,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
         public const string Name = "Age distributions timeline";
         public const string HelpText = "Plots age distributions on a timeline.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "b93f8a2b-8731-4658-92f5-bb80af7292a8";
@@ -506,7 +506,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
                     if (autoColourByNode)
                     {
-                        colour = Modules.DefaultColours[Math.Abs(nodes[i].GetLeafNames().Aggregate((a, b) => a + "," + b).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                        colour = Modules.DefaultColours[Math.Abs(string.Join(",", nodes[i].GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
                     }
                     else if (nodes[i].Attributes.TryGetValue(customColour.AttributeName, out object fillAttributeObject) && fillAttributeObject != null)
                     {
@@ -633,7 +633,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
                             if (autoLabelColourByNode)
                             {
-                                labelCol = Modules.DefaultColours[Math.Abs(nodes[i].GetLeafNames().Aggregate((a, b) => a + "," + b).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(labelOpacity);
+                                labelCol = Modules.DefaultColours[Math.Abs(string.Join(",", nodes[i].GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(labelOpacity);
                             }
                             else if (nodes[i].Attributes.TryGetValue(labelColour.AttributeName, out object fillAttributeObject) && fillAttributeObject != null)
                             {

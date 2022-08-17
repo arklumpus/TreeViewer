@@ -6,6 +6,5 @@ TreeViewer.dll
 VectSharp.dll
 PhyloTree.TreeNode.dll
 System.Text.Json.dll
-System.Linq.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll

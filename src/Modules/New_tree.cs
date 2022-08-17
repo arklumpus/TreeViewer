@@ -1442,7 +1442,7 @@ namespace a36a54db04e2447868b84ad4e188c3285
                 btn.Click += async (s, e) =>
                 {
                     TextEditorWindow window = new TextEditorWindow();
-                    window.Text = leafNames.Aggregate((a, b) => a + "\n" + b);
+                    window.Text = string.Join("\n", leafNames);
                     await window.ShowDialog2(this.FindAncestorOfType<Window>());
 
                     if (window.Result)

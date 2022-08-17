@@ -30,7 +30,7 @@ namespace BranchExtensions
         public const string Name = "Branch extensions";
         public const string HelpText = "Extends terminal branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "fb385719-b376-49b0-8e99-aab7cf641966";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 		
@@ -259,7 +259,7 @@ namespace BranchExtensions
                     }
                     else
                     {
-                        strokeColour = Modules.DefaultColours[Math.Abs(node.GetLeafNames().Aggregate((a, b) => a + "," + b).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(strokeOpacity);
+                        strokeColour = Modules.DefaultColours[Math.Abs(string.Join(",", node.GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(strokeOpacity);
                     }
 
                     double weight = defaultWeight;

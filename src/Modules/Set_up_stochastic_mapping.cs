@@ -40,7 +40,7 @@ namespace a32858c9d0247497faeee03f7bfe24158
         public const string Name = "Set up stochastic map";
         public const string HelpText = "Parses the information from a stochastic mapping analysis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public const string Id = "32858c9d-0247-497f-aeee-03f7bfe24158";
@@ -177,7 +177,7 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
             foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
             {
-                nodeCorresps[node.GetLeafNames().OrderBy(a => a).Aggregate((a, b) => a + "," + b)] = node;
+                nodeCorresps[string.Join(",", node.GetLeafNames().OrderBy(a => a))] = node;
             }
 
             Dictionary<string, List<(double left, double right, SimmapBranchState[] states)>> branchStates = new Dictionary<string, List<(double, double, SimmapBranchState[])>>(nodeCorresps.Count);
@@ -208,7 +208,7 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
                     if (nodeStates != null)
                     {
-                        string leafString = node.GetLeafNames().OrderBy(a => a).Aggregate((a, b) => a + "," + b);
+                        string leafString = string.Join(",", node.GetLeafNames().OrderBy(a => a));
 
                         if (nodeCorresps.TryGetValue(leafString, out TreeNode corresp))
                         {
@@ -316,7 +316,7 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
                         for (int j = 0; j < allPossibleStates.Count; j++)
                         {
-                            state += allPossibleStates[j].Aggregate((a, b) => a + "|" + b) + ":" + meanPosterior[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            state += string.Join("|", allPossibleStates[j]) + ":" + meanPosterior[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                             if (j < allPossibleStates.Count - 1)
                             {
@@ -395,7 +395,7 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
                                 for (int j = 0; j < allPossibleStates.Count; j++)
                                 {
-                                    state += allPossibleStates[j].Aggregate((a, b) => a + "|" + b) + ":" + probs[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
+                                    state += string.Join("|", allPossibleStates[j]) + ":" + probs[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                                     if (j < allPossibleStates.Count - 1)
                                     {
@@ -456,7 +456,7 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
                         for (int j = 0; j < allPossibleStates.Count; j++)
                         {
-                            state += allPossibleStates[j].Aggregate((a, b) => a + "|" + b) + ":" + meanPosterior[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            state += string.Join("|", allPossibleStates[j]) + ":" + meanPosterior[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                             if (j < allPossibleStates.Count - 1)
                             {
@@ -684,7 +684,7 @@ namespace a32858c9d0247497faeee03f7bfe24158
 
                 for (int j = 0; j < allPossibleStates.Count; j++)
                 {
-                    state += allPossibleStates[j].Aggregate((a, b) => a + "|" + b) + ":" + probs[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    state += string.Join("|", allPossibleStates[j]) + ":" + probs[j].ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                     if (j < allPossibleStates.Count - 1)
                     {
