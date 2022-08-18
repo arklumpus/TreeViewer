@@ -17,7 +17,6 @@ Avalonia.Animation.dll
 System.ObjectModel.dll
 System.Text.RegularExpressions.dll
 VectSharp.dll
-Avalonia.Controls.PanAndZoom.dll
 System.Linq.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll

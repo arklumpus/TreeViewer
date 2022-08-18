@@ -28,15 +28,15 @@ namespace Search
     public static class MyModule
     {
         public const string Name = "Search";
-        public const string HelpText = "Searches leaves in the tree.";
+        public const string HelpText = "Searches nodes in the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "5f3a7147-f706-43dc-9f57-18ade0c7b15d";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public static bool IsAvailableInCommandLine { get; } = false;
         public static string ButtonText { get; } = "Search";
-		public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { (Avalonia.Input.Key.F, Avalonia.Input.KeyModifiers.Control) };
+        public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { (Avalonia.Input.Key.F, Avalonia.Input.KeyModifiers.Control) };
         public static bool TriggerInTextBox { get; } = false;
 
         public static string GroupName { get; } = "Selection";
@@ -140,8 +140,6 @@ namespace Search
             }
             stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = true;
 
-            Avalonia.Controls.PanAndZoom.ZoomBorder zom = window.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer");
-
             Grid searchGrid = new Grid() { ClipToBounds = true };
 
             searchGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
@@ -190,6 +188,8 @@ namespace Search
             searchResultsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             searchResultsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             searchResultsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            searchResultsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            searchResultsGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             Grid.SetColumnSpan(searchResultsGrid, 2);
             Grid.SetRow(searchResultsGrid, 1);
             searchGrid.Children.Add(searchResultsGrid);
@@ -219,40 +219,36 @@ namespace Search
                 }
             };
 
-            Button findAllButton = new Button() { Padding = new Avalonia.Thickness(5, 2, 5, 2), Margin = new Avalonia.Thickness(5, 0, 5, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-
+            SmallRibbonButton findButton = new SmallRibbonButton(new List<(string, Control, string)>()
             {
-                StackPanel buttonContent = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
-                buttonContent.Children.Add(new DPIAwareBox(GetIconFind) { Width = 16, Height = 16, Margin = new Avalonia.Thickness(0, 0, 5, 0) });
-                buttonContent.Children.Add(new TextBlock() { Text = "Find all", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
-                findAllButton.Content = buttonContent;
-            }
+                ("", null, ""),
+                ("Find next", new DPIAwareBox(GetIconFind) { Width = 16, Height = 16 }, "Highlights the next matched node."),
+                ("Find previous", new DPIAwareBox(GetIconFind) { Width = 16, Height = 16 }, "Highlights the previous matched node."),
+                ("Find all", new DPIAwareBox(GetIconFind) { Width = 16, Height = 16 }, "Highlights all matched nodes."),
+            })
+            { Margin = new Avalonia.Thickness(5, 0, 5, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
 
-            findAllButton.Classes.Add("PlainButton");
-            Grid.SetColumn(findAllButton, 3);
-            searchResultsGrid.Children.Add(findAllButton);
+            findButton.Icon = new DPIAwareBox(GetIconFind) { Width = 16, Height = 16 };
+            findButton.ButtonText = "Find";
+            AvaloniaBugFixes.SetToolTip(findButton, "Highlights the next matched node.");
+            Grid.SetColumn(findButton, 3);
+            searchResultsGrid.Children.Add(findButton);
 
-            Button replaceAllButton = new Button() { Padding = new Avalonia.Thickness(5, 2, 5, 2), Margin = new Avalonia.Thickness(5, 0, 5, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-            {
-                StackPanel buttonContent = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
-                buttonContent.Children.Add(new DPIAwareBox(GetIconReplace) { Width = 16, Height = 16, Margin = new Avalonia.Thickness(0, 0, 5, 0) });
-                buttonContent.Children.Add(new TextBlock() { Text = "Replace all", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
-                replaceAllButton.Content = buttonContent;
-            }
+            SmallRibbonButton replaceAllButton = new SmallRibbonButton(new List<(string, Control, string)>())
+            { Margin = new Avalonia.Thickness(5, 0, 5, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
 
-            replaceAllButton.Classes.Add("PlainButton");
+            replaceAllButton.Icon = new DPIAwareBox(GetIconReplace) { Width = 16, Height = 16 };
+            replaceAllButton.ButtonText = "Replace all";
+            AvaloniaBugFixes.SetToolTip(replaceAllButton, "Enables the Replace attribute module.");
             Grid.SetColumn(replaceAllButton, 4);
             searchResultsGrid.Children.Add(replaceAllButton);
 
-            Button copyButton = new Button() { Padding = new Avalonia.Thickness(5, 2, 5, 2), Margin = new Avalonia.Thickness(5, 0, 10, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-            {
-                StackPanel buttonContent = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
-                buttonContent.Children.Add(new DPIAwareBox(GetIconCopy16) { Width = 16, Height = 16, Margin = new Avalonia.Thickness(0, 0, 5, 0) });
-                buttonContent.Children.Add(new TextBlock() { Text = "Copy", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
-                copyButton.Content = buttonContent;
-            }
+            SmallRibbonButton copyButton = new SmallRibbonButton(new List<(string, Control, string)>())
+            { Margin = new Avalonia.Thickness(5, 0, 5, 0), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center, FontSize = 13, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
 
-            copyButton.Classes.Add("PlainButton");
+            copyButton.Icon = new DPIAwareBox(GetIconCopy16) { Width = 16, Height = 16 };
+            copyButton.ButtonText = "Copy";
+            AvaloniaBugFixes.SetToolTip(copyButton, "Copies the value of an attribute at the matched nodes to the clipboard.");
             Grid.SetColumn(copyButton, 5);
             searchResultsGrid.Children.Add(copyButton);
 
@@ -650,9 +646,185 @@ namespace Search
                 searchResultsNodesBlock.Text = matchedNodes.Count.ToString() + " node" + (matchedNodes.Count != 1 ? "s" : "");
             };
 
-            findAllButton.Click += (s, e) =>
+            int foundIndex = -1;
+
+            void findNext(int increment)
             {
-                findAll();
+                window.ResetActionColours(true);
+
+                string attribute = sortedAttributes[attributeBox.SelectedIndex];
+
+                int attributeTypeIndex = attributeTypeBox.SelectedIndex;
+
+                int comparisonType = comparisonTypeBox.SelectedIndex;
+
+                bool regex = regexBox.IsChecked == true;
+
+                string needle = searchBox.Text;
+
+                double numberNeedle = -1;
+
+                if (attributeTypeIndex == 1 && !double.TryParse(needle, out numberNeedle))
+                {
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(needle))
+                {
+                    return;
+                }
+
+
+                StringComparison comparison = StringComparison.InvariantCulture;
+                RegexOptions options = RegexOptions.CultureInvariant;
+                switch (comparisonType)
+                {
+                    case 0:
+                        comparison = StringComparison.InvariantCulture;
+                        options = RegexOptions.CultureInvariant;
+                        break;
+                    case 1:
+                        comparison = StringComparison.InvariantCultureIgnoreCase;
+                        options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+                        break;
+                    case 2:
+                        comparison = StringComparison.CurrentCulture;
+                        options = RegexOptions.None;
+                        break;
+                    case 3:
+                        comparison = StringComparison.CurrentCultureIgnoreCase;
+                        options = RegexOptions.IgnoreCase;
+                        break;
+                }
+
+
+                Regex reg = regex ? new Regex(needle, options) : null;
+
+                SkiaSharp.SKColor selectionChildColor = window.SelectionChildSKColor;
+                List<string> matchedIds = new List<string>();
+                List<TreeNode> matchedNodes = new List<TreeNode>();
+                int matchedTips = 0;
+
+                foreach (TreeNode node in window.TransformedTree.GetChildrenRecursiveLazy())
+                {
+                    if (node.Attributes.TryGetValue(attribute, out object attributeValue))
+                    {
+                        if (attributeTypeIndex == 0 && attributeValue is string actualValue)
+                        {
+                            if (regex)
+                            {
+                                if (reg.IsMatch(actualValue))
+                                {
+                                    matchedNodes.Add(node);
+                                    matchedIds.Add(node.Id);
+                                    if (node.Children.Count == 0)
+                                    {
+                                        matchedTips++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (actualValue.Contains(needle, comparison))
+                                {
+                                    matchedNodes.Add(node);
+                                    matchedIds.Add(node.Id);
+
+                                    if (node.Children.Count == 0)
+                                    {
+                                        matchedTips++;
+                                    }
+                                }
+                            }
+                        }
+                        else if (attributeTypeIndex == 1 && attributeValue is double actualNumber)
+                        {
+                            switch (comparisonType)
+                            {
+                                case 0:
+                                    if (actualNumber == numberNeedle)
+                                    {
+                                        matchedNodes.Add(node);
+                                        matchedIds.Add(node.Id);
+
+                                        if (node.Children.Count == 0)
+                                        {
+                                            matchedTips++;
+                                        }
+                                    }
+                                    break;
+                                case 1:
+                                    if (actualNumber < numberNeedle)
+                                    {
+                                        matchedNodes.Add(node);
+                                        matchedIds.Add(node.Id);
+
+                                        if (node.Children.Count == 0)
+                                        {
+                                            matchedTips++;
+                                        }
+                                    }
+                                    break;
+                                case 2:
+                                    if (actualNumber > numberNeedle)
+                                    {
+                                        matchedNodes.Add(node);
+                                        matchedIds.Add(node.Id);
+
+                                        if (node.Children.Count == 0)
+                                        {
+                                            matchedTips++;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                if (matchedIds.Count > 0)
+                {
+                    foundIndex = (foundIndex + increment) % matchedIds.Count;
+
+                    if (foundIndex < 0)
+                    {
+                        foundIndex = matchedIds.Count - 1;
+                    }
+
+                    Point pt = window.Coordinates[matchedIds[foundIndex]];
+
+                    foreach ((double, SKRenderAction) pth in MainWindow.FindPaths(window.FullSelectionCanvas, matchedIds[foundIndex]))
+                    {
+                        window.ChangeActionColour(pth.Item2, selectionChildColor);
+                    }
+
+                    window.SelectionCanvas.InvalidateVisual();
+                    window.CenterAt(pt.X, pt.Y);
+                }
+                else
+                {
+                    foundIndex = 0;
+                }
+
+                searchResultsTipBlock.Text = matchedTips.ToString() + " tip" + (matchedTips != 1 ? "s" : "");
+                searchResultsNodesBlock.Text = matchedNodes.Count.ToString() + " node" + (matchedNodes.Count != 1 ? "s" : "");
+            };
+
+            findButton.ButtonPressed += (s, e) =>
+            {
+                if (e.Index <= 0)
+                {
+                    findNext(1);
+                }
+                else if (e.Index == 1)
+                {
+                    findNext(-1);
+                }
+                else if (e.Index == 2)
+                {
+                    foundIndex = -1;
+                    findAll();
+                }
             };
 
             searchBox.PropertyChanged += (s, e) =>
@@ -660,6 +832,11 @@ namespace Search
                 if (autoSearchBox.IsChecked == true && e.Property == TextBox.TextProperty)
                 {
                     findAll();
+                }
+
+                if (e.Property == TextBox.TextProperty)
+                {
+                    foundIndex = -1;
                 }
             };
 
@@ -669,6 +846,8 @@ namespace Search
                 {
                     findAll();
                 }
+
+                foundIndex = -1;
             };
 
             attributeTypeBox.SelectionChanged += (s, e) =>
@@ -677,6 +856,8 @@ namespace Search
                 {
                     findAll();
                 }
+
+                foundIndex = -1;
             };
 
             comparisonTypeBox.SelectionChanged += (s, e) =>
@@ -685,9 +866,11 @@ namespace Search
                 {
                     findAll();
                 }
+
+                foundIndex = -1;
             };
 
-            copyButton.Click += async (s, e) =>
+            copyButton.ButtonPressed += async (s, e) =>
             {
                 window.ResetActionColours(true);
 
@@ -1003,7 +1186,7 @@ namespace Search
                 }
             };
 
-            replaceAllButton.Click += (s, e) =>
+            replaceAllButton.ButtonPressed += (s, e) =>
             {
                 findAll();
 
