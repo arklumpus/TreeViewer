@@ -1229,6 +1229,7 @@ namespace Search
 
                 parametersToChange.Add("Apply", true);
 
+                window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, window.FurtherTransformations.Count);
 
                 FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "f17160ad-0462-449a-8a57-e1af775c92ba");
                 Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
