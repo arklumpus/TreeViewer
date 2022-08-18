@@ -360,9 +360,22 @@ namespace TreeViewer
                 item.Children.Add(iconBox);
                 item.Children.Add(text);
 
+                if (!string.IsNullOrEmpty(items[i].Item3))
+                {
+                    AvaloniaBugFixes.SetToolTip(item, items[i].Item3);
+                }
+
                 subMenu.Children.Add(item);
 
                 int index = i;
+
+                item.PointerPressed += (s, e) =>
+                {
+                    if (ToolTip.GetTip(item) != null)
+                    {
+                        ToolTip.SetIsOpen(item, false);
+                    }
+                };
 
                 item.PointerReleased += (s, e) =>
                 {
