@@ -3109,6 +3109,24 @@ namespace TreeViewer
             programmaticZoomUpdate = false;
         }
 
+        public void CenterAt(double x, double y)
+        {
+            double marginLeft = this.IsModulesPanelOpen ? this.FindControl<Grid>("ParameterContainerGrid").Bounds.Width + 6 : 0;
+            double marginRight = this.IsSelectionPanelOpen ? this.FindControl<Grid>("SelectionGrid").Bounds.Width + 16 : 0;
+
+            double deltaX = (marginLeft - marginRight) * 0.5;
+
+            double zoom = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX;
+
+            this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomTo(1 / this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Width * 0.5, this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Child.Height * 0.5);
+            this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").BeginPanTo(0, 0);
+            this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ContinuePanTo(-this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetX + deltaX + (PlotBottomRight.X - PlotOrigin.X) * 0.5 * zoom - (x - PlotOrigin.X) * zoom, -this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetY + (PlotBottomRight.Y - PlotOrigin.Y) * 0.5 * zoom - (y - PlotOrigin.Y) * zoom);
+
+            SetZoom(zoom, false);
+
+            WasAutoFitted = false;
+        }
+
         private static bool WasAutoFitted = false;
 
         public void AutoFit()
@@ -3184,7 +3202,7 @@ namespace TreeViewer
                         if (!StateData.Attachments.ContainsKey(win.AttachmentName))
                         {
                             validResult = true;
-                            
+
                             this.PushUndoFrame(UndoFrameLevel.Attachment, 0);
 
                             Attachment attachment = new Attachment(win.AttachmentName, win.CacheResults, win.LoadInMemory, result[0]);
