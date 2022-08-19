@@ -58,7 +58,7 @@ namespace TreeViewer
 
         private CSharpEditor.InterprocessDebuggerServer cachedDebuggerServer = null;
 
-        internal CSharpEditor.InterprocessDebuggerServer DebuggerServer
+        public CSharpEditor.InterprocessDebuggerServer DebuggerServer
         {
             get
             {
@@ -3107,6 +3107,27 @@ namespace TreeViewer
             }
             UpdateSelectionWidth();
             programmaticZoomUpdate = false;
+        }
+
+        public Rectangle GetVisibleRegion()
+        {
+            double marginLeft = this.IsModulesPanelOpen ? this.FindControl<Grid>("ParameterContainerGrid").Bounds.Width + 6 : 0;
+            double marginRight = this.IsSelectionPanelOpen ? this.FindControl<Grid>("SelectionGrid").Bounds.Width + 16 : 0;
+
+            double deltaX = (marginLeft - marginRight) * 0.5;
+
+            double zoom = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").ZoomX;
+
+            double offsetX = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetX;
+            double offsetY = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").OffsetY;
+
+            double centerX = -(offsetX - deltaX - (PlotOrigin.X + PlotBottomRight.X) * 0.5 - (PlotOrigin.X - 10) * (zoom - 1)) / zoom;
+            double centerY = -(offsetY - (PlotOrigin.Y + PlotBottomRight.Y) * 0.5 - (PlotOrigin.Y - 10) * (zoom - 1)) / zoom;
+
+            double width = (this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Bounds.Width - marginLeft - marginRight) / zoom;
+            double height = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").Bounds.Height / zoom;
+
+            return new Rectangle(new VectSharp.Point(Math.Max(centerX - width * 0.5, PlotOrigin.X), Math.Max(centerY - height * 0.5, PlotOrigin.Y)), new VectSharp.Point(Math.Min(PlotBottomRight.X, centerX + width * 0.5), Math.Min(PlotBottomRight.Y, centerY + height * 0.5)));
         }
 
         public void CenterAt(double x, double y)
