@@ -13,13 +13,13 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using VectSharp.PDF;
 using VectSharp.SVG;
-using VectSharp.Raster;
+using VectSharp.Raster.ImageSharp;
 using System.Runtime.InteropServices;
 
 namespace ExportPDF
 {
     /// <summary>
-    /// This module is used to export the tree plot in PDF, SVG or PNG format.
+    /// This module is used to export the tree plot in PDF, SVG, PNG or TIFF format.
     /// </summary>
 
     public static class MyModule
@@ -27,7 +27,7 @@ namespace ExportPDF
         public const string Name = "Export";
         public const string HelpText = "Exports the tree plot as a PDF, SVG or PNG image.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "d5d75840-4a71-4b81-bfc4-431736792abb";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -35,12 +35,12 @@ namespace ExportPDF
         public static string ParentMenu { get; } = "File";
         public static string GroupName { get; } = "Save";
         public static Avalonia.AvaloniaProperty PropertyAffectingEnabled { get; } = MainWindow.IsTreeOpenedProperty;
-        public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { ( Avalonia.Input.Key.P, Avalonia.Input.KeyModifiers.Control ), ( Avalonia.Input.Key.P, Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Shift ), ( Avalonia.Input.Key.P, Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Alt ) };
+        public static List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; } = new List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>() { (Avalonia.Input.Key.P, Avalonia.Input.KeyModifiers.Control), (Avalonia.Input.Key.P, Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Shift), (Avalonia.Input.Key.P, Avalonia.Input.KeyModifiers.Control | Avalonia.Input.KeyModifiers.Alt) };
         public static bool TriggerInTextBox { get; } = false;
 
         public static double GroupIndex { get; } = 1;
         public static bool IsLargeButton { get; } = false;
-        public static List<(string, Func<double, VectSharp.Page>)> SubItems { get; } = new List<(string, Func<double, VectSharp.Page>)>() { ( "Export PDF", null ), ("Export SVG", null ), ("Export PNG", null) };
+        public static List<(string, Func<double, VectSharp.Page>)> SubItems { get; } = new List<(string, Func<double, VectSharp.Page>)>() { ("Export PDF", null), ("Export SVG", null), ("Export PNG/TIFF", null) };
 
         private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACJSURBVDhPpZJREkAwDETLydz/UuR1NgiptuN9yDbZNYTym73PJmsODslAjVrYq9pvmEoGvE8YTa2DJ0wkA/c+4ZZvYbAYOp9kgczXfIInLd+qOgw3Mq59cJL8xH2E0dQwmIEwOerUElOGjTcscr0GV/U/cR8hNDUMeriPapxfoe5Aukv6I/2jlAOd58tO0u+E4gAAAABJRU5ErkJggg==";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADOSURBVEhL1ZVRDsIgEESpJ+v9L1V5dIhYXdit8OH7cIdxZ0iaGtNyjji7oj5ISHYp1bm8Ttlj2JbsUvcoRzPLFyPYlOzS7lHOmSnLhi3JLtc9yj3ZjaUto7OJVTbMWkEPnuxDcxn/cwGPK/P5VuFKhmmzlHNmyjrBkQxzzVKOx5Q19wKgHJ9ZjdsXWFBOL9P1Q2NHMs5PYYNc+XpMfMoP8y1LKT6zGtMuoBSPKWveBZRyZso6wZEM02bRmfdywJUM48mW11T6FsP/g7Wk9AQmPT9vEy1f+AAAAABJRU5ErkJggg==";
@@ -100,11 +100,11 @@ namespace ExportPDF
 
         public static Task PerformAction(int index, MainWindow window)
         {
-			window.RibbonBar.SelectedIndex = 0;
-			ExportPage pag = window.GetFilePage<ExportPage>(out int ind);
-			window.RibbonFilePage.SelectedIndex = ind;
-			((RibbonFilePageContentTabbedWithButtons)pag.PageContent).SelectedIndex = Math.Max(0, index);
-			
+            window.RibbonBar.SelectedIndex = 0;
+            ExportPage pag = window.GetFilePage<ExportPage>(out int ind);
+            window.RibbonFilePage.SelectedIndex = ind;
+            ((RibbonFilePageContentTabbedWithButtons)pag.PageContent).SelectedIndex = Math.Max(0, index);
+
             return Task.CompletedTask;
         }
     }
@@ -196,7 +196,7 @@ namespace ExportPDF
             {
                 ("Export PDF", "Publication-ready vector format", new DPIAwareBox(GetPDFIcon) { Width = 32, Height = 32 }, GetPDFPage()),
                 ("Export SVG", "Vector format useful for further editing",  new DPIAwareBox(GetSVGIcon) { Width = 32, Height = 32 }, GetSVGPage()),
-                ("Export PNG", "Raster format for easy dissemination",  new DPIAwareBox(GetPNGIcon) { Width = 32, Height = 32 }, GetPNGPage()),
+                ("Export PNG/TIFF", "Raster formats for easy dissemination",  new DPIAwareBox(GetPNGIcon) { Width = 32, Height = 32 }, GetPNGPage()),
             });
 
             this.PageContent = content;
@@ -213,6 +213,7 @@ namespace ExportPDF
         private Control GetPDFPage()
         {
             Grid mainContainer = new Grid() { Margin = new Avalonia.Thickness(25, 0, 0, 0) };
+            mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star) { MaxHeight = 320 });
@@ -236,8 +237,59 @@ namespace ExportPDF
             Grid.SetRow(descriptionPanel, 1);
             mainContainer.Children.Add(descriptionPanel);
 
+            Grid regionRow = new Grid();
+            regionRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto) { MinWidth = 150, MaxWidth = 200 });
+            regionRow.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+            ComboBox cropRegionBox;
+            List<Rectangle> cropRegionRects;
+
+            {
+                TextBlock blk = new TextBlock() { Text = "Crop region:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
+
+                List<string> items = new List<string>() { "Entire plot" };
+
+                cropRegionRects = new List<Rectangle>();
+
+                cropRegionBox = new ComboBox() { Items = items, SelectedIndex = 2, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 150, FontSize = 14 };
+
+                Grid.SetColumn(cropRegionBox, 1);
+                regionRow.Children.Add(blk);
+                regionRow.Children.Add(cropRegionBox);
+
+                Grid.SetRow(regionRow, 2);
+                mainContainer.Children.Add(regionRow);
+            }
+
+            regionRow.IsVisible = cropRegionRects.Count > 0;
+
+            this.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == ExportPage.IsVisibleProperty)
+                {
+                    List<string> items = new List<string>() { "Entire plot" };
+
+                    cropRegionRects = new List<Rectangle>();
+
+                    InstanceStateData stateData = this.FindAncestorOfType<MainWindow>()?.StateData;
+
+                    if (stateData != null && stateData.Tags.TryGetValue("5a8eb0c8-7139-4583-9e9e-375749a98973", out object cropRegionsObject) && cropRegionsObject != null && cropRegionsObject is Dictionary<string, (string, Rectangle)> cropRegions)
+                    {
+                        foreach (KeyValuePair<string, (string, Rectangle)> kvp in cropRegions)
+                        {
+                            items.Add(kvp.Value.Item1);
+                            cropRegionRects.Add(kvp.Value.Item2);
+                        }
+                    }
+
+                    cropRegionBox.Items = items;
+                    cropRegionBox.SelectedIndex = 0;
+                    regionRow.IsVisible = cropRegionRects.Count > 0;
+                }
+            };
+
             ScrollViewer pageLayoutContainer = new ScrollViewer() { HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, AllowAutoHide = false, Padding = new Avalonia.Thickness(0, 0, 17, 0) };
-            Grid.SetRow(pageLayoutContainer, 2);
+            Grid.SetRow(pageLayoutContainer, 3);
             mainContainer.Children.Add(pageLayoutContainer);
 
             Grid pageLayoutGrid = new Grid() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top };
@@ -510,7 +562,7 @@ namespace ExportPDF
 
             Button saveButton = new Button() { Content = saveButtonContent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 5, 0, 0) };
             saveButton.Classes.Add("SideBarButton");
-            Grid.SetRow(saveButton, 3);
+            Grid.SetRow(saveButton, 4);
             mainContainer.Children.Add(saveButton);
 
             bool suppressChange = false;
@@ -546,6 +598,12 @@ namespace ExportPDF
                             double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                             double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
 
+                            if (cropRegionBox.SelectedIndex > 0)
+                            {
+                                plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                                plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                            }
+
                             if (plotWidth > 0 && plotHeight > 0)
                             {
                                 double clientWidth = width * 0.9;
@@ -574,6 +632,12 @@ namespace ExportPDF
                         {
                             double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                             double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
+
+                            if (cropRegionBox.SelectedIndex > 0)
+                            {
+                                plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                                plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                            }
 
                             if (plotWidth > 0 && plotHeight > 0)
                             {
@@ -682,6 +746,12 @@ namespace ExportPDF
                         double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                         double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
 
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
                         if (plotWidth > 0 && plotHeight > 0)
                         {
                             double clientWidth = width * 0.9;
@@ -729,6 +799,12 @@ namespace ExportPDF
                 {
                     double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                     double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
+
+                    if (cropRegionBox.SelectedIndex > 0)
+                    {
+                        plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                        plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                    }
 
                     if (plotWidth > 0 && plotHeight > 0)
                     {
@@ -815,6 +891,11 @@ namespace ExportPDF
 
                         VectSharp.Page pag = parent.RenderPlotToPage();
 
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                        }
+
                         double unitMultiplier = units.SelectedIndex == 0 ? 72 / 2.54 : units.SelectedIndex == 1 ? 72 / 25.4 : 72;
 
                         double width = widthNud.Value * unitMultiplier;
@@ -853,11 +934,12 @@ namespace ExportPDF
                 }
             };
 
-            this.PropertyChanged += (s, e) =>
+            void updatePreviewSize()
             {
-                if (e.Property == ExportPage.IsVisibleProperty && (bool)e.NewValue)
+                MainWindow parent = this.FindAncestorOfType<MainWindow>();
+
+                if (parent != null)
                 {
-                    MainWindow parent = this.FindAncestorOfType<MainWindow>();
 
                     double unitMultiplier = units.SelectedIndex == 0 ? 72 / 2.54 : units.SelectedIndex == 1 ? 72 / 25.4 : 72;
 
@@ -866,14 +948,18 @@ namespace ExportPDF
                         double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                         double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
 
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
                         if (plotWidth > 0 && plotHeight > 0)
                         {
                             double clientWidth = 14400 * 1;
                             double clientHeight = 14400 * 1;
 
                             double scale2 = Math.Min(1, Math.Min(clientWidth / plotWidth, clientHeight / plotHeight));
-
-
 
                             double scaledPlotWidth = plotWidth * scale2;
                             double scaledPlotHeight = plotHeight * scale2;
@@ -893,6 +979,22 @@ namespace ExportPDF
 
                     drawPreview();
                 }
+            }
+
+            this.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == ExportPage.IsVisibleProperty && (bool)e.NewValue)
+                {
+                    updatePreviewSize();
+                }
+            };
+
+            cropRegionBox.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == ComboBox.SelectedIndexProperty)
+                {
+                    updatePreviewSize();
+                }
             };
 
             return mainContainer;
@@ -901,6 +1003,7 @@ namespace ExportPDF
         private Control GetSVGPage()
         {
             Grid mainContainer = new Grid() { Margin = new Avalonia.Thickness(25, 0, 0, 0) };
+            mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
@@ -925,6 +1028,57 @@ namespace ExportPDF
             Grid.SetRow(descriptionPanel, 1);
             mainContainer.Children.Add(descriptionPanel);
 
+            Grid regionRow = new Grid();
+            regionRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto) { MinWidth = 150, MaxWidth = 200 });
+            regionRow.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+            ComboBox cropRegionBox;
+            List<Rectangle> cropRegionRects;
+
+            {
+                TextBlock blk = new TextBlock() { Text = "Crop region:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
+
+                List<string> items = new List<string>() { "Entire plot" };
+
+                cropRegionRects = new List<Rectangle>();
+
+                cropRegionBox = new ComboBox() { Items = items, SelectedIndex = 2, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 150, FontSize = 14 };
+
+                Grid.SetColumn(cropRegionBox, 1);
+                regionRow.Children.Add(blk);
+                regionRow.Children.Add(cropRegionBox);
+
+                Grid.SetRow(regionRow, 2);
+                mainContainer.Children.Add(regionRow);
+            }
+
+            regionRow.IsVisible = cropRegionRects.Count > 0;
+
+            this.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == ExportPage.IsVisibleProperty)
+                {
+                    List<string> items = new List<string>() { "Entire plot" };
+
+                    cropRegionRects = new List<Rectangle>();
+
+                    InstanceStateData stateData = this.FindAncestorOfType<MainWindow>()?.StateData;
+
+                    if (stateData != null && stateData.Tags.TryGetValue("5a8eb0c8-7139-4583-9e9e-375749a98973", out object cropRegionsObject) && cropRegionsObject != null && cropRegionsObject is Dictionary<string, (string, Rectangle)> cropRegions)
+                    {
+                        foreach (KeyValuePair<string, (string, Rectangle)> kvp in cropRegions)
+                        {
+                            items.Add(kvp.Value.Item1);
+                            cropRegionRects.Add(kvp.Value.Item2);
+                        }
+                    }
+
+                    cropRegionBox.Items = items;
+                    cropRegionBox.SelectedIndex = 0;
+                    regionRow.IsVisible = cropRegionRects.Count > 0;
+                }
+            };
+
             Grid textOptionRow = new Grid();
             textOptionRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto) { MinWidth = 150, MaxWidth = 200 });
             textOptionRow.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
@@ -942,7 +1096,7 @@ namespace ExportPDF
                 textOptionRow.Children.Add(blk);
                 textOptionRow.Children.Add(textOptionBox);
 
-                Grid.SetRow(textOptionRow, 2);
+                Grid.SetRow(textOptionRow, 3);
                 mainContainer.Children.Add(textOptionRow);
             }
 
@@ -954,7 +1108,7 @@ namespace ExportPDF
                 Text = "Note: converting all text into paths means that it will always look right, but it will not be selectable, searchable or editable.",
                 Margin = new Avalonia.Thickness(0, 0, 0, 5)
             };
-            Grid.SetRow(note, 3);
+            Grid.SetRow(note, 4);
             mainContainer.Children.Add(note);
 
             StackPanel saveButtonContent = new StackPanel() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
@@ -963,7 +1117,7 @@ namespace ExportPDF
 
             Button saveButton = new Button() { Content = saveButtonContent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 5, 0, 0) };
             saveButton.Classes.Add("SideBarButton");
-            Grid.SetRow(saveButton, 4);
+            Grid.SetRow(saveButton, 5);
             mainContainer.Children.Add(saveButton);
 
             textOptionBox.SelectionChanged += (s, e) =>
@@ -1009,6 +1163,11 @@ namespace ExportPDF
 
                         VectSharp.Page pag = parent.RenderPlotToPage();
 
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                        }
+
                         pag.SaveAsSVG(result, textOptionBox.SelectedIndex == 0 ? SVGContextInterpreter.TextOptions.EmbedFonts : textOptionBox.SelectedIndex == 1 ? SVGContextInterpreter.TextOptions.SubsetFonts : SVGContextInterpreter.TextOptions.ConvertIntoPaths);
 
                         this.FindAncestorOfType<RibbonFilePage>().Close();
@@ -1023,17 +1182,34 @@ namespace ExportPDF
             return mainContainer;
         }
 
+        private static Page ApplyCrop(Page pag, Rectangle cropRegion, VectSharp.Point origin)
+        {
+            VectSharp.Point location = cropRegion.Location;
+            VectSharp.Size size = cropRegion.Size;
+
+            pag.Crop(new VectSharp.Point(-origin.X + 10 + location.X, -origin.Y + 10 + location.Y), size);
+
+            Page pag2 = new Page(size.Width, size.Height);
+
+            pag2.Graphics.SetClippingPath(0, 0, size.Width, size.Height);
+
+            pag2.Graphics.DrawGraphics(0, 0, pag.Graphics);
+
+            pag2.Background = pag.Background;
+
+            return pag2;
+        }
+
         private Control GetPNGPage()
         {
             Grid mainContainer = new Grid() { Margin = new Avalonia.Thickness(25, 0, 0, 0) };
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            mainContainer.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star) { MaxHeight = 170 });
             mainContainer.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-            mainContainer.Children.Add(new TextBlock() { FontSize = 20, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)), Text = "Export PNG" });
+            mainContainer.Children.Add(new TextBlock() { FontSize = 20, Foreground = new SolidColorBrush(Color.FromRgb(0, 114, 178)), Text = "Export PNG/TIFF" });
 
             StackPanel descriptionPanel = new StackPanel();
 
@@ -1043,7 +1219,7 @@ namespace ExportPDF
                 FontSize = 12,
                 Foreground = new SolidColorBrush(Color.FromRgb(102, 102, 102)),
                 TextWrapping = TextWrapping.Wrap,
-                Text = "The PNG format is raster format released in 1996. Being in a raster format, PNG images look blurry when resized, and thus PDF or SVG files are more suited for publication-ready files.",
+                Text = "The PNG and TIFF formats are raster formats released in 1996 and 1986, respectively. Being in a raster format, PNG/TIFF images look blurry when resized, and thus PDF or SVG files are more suited for publication-ready files.",
                 Margin = new Avalonia.Thickness(0, 0, 0, 5)
             });
 
@@ -1052,7 +1228,7 @@ namespace ExportPDF
                 FontSize = 12,
                 Foreground = new SolidColorBrush(Color.FromRgb(102, 102, 102)),
                 TextWrapping = TextWrapping.Wrap,
-                Text = "The advantage of PNG images is that even with large trees and many layers, the file size and rendering time of a PNG image depend mainly on the chosen resolution, and not on the complexity of the plot.",
+                Text = "The advantage of PNG/TIFF images is that even with large trees and many layers, the file size and rendering time of such images depend mainly on the chosen resolution, and not on the complexity of the plot.",
                 Margin = new Avalonia.Thickness(0, 0, 0, 5)
             });
 
@@ -1062,12 +1238,81 @@ namespace ExportPDF
                 FontSize = 12,
                 Foreground = new SolidColorBrush(Color.FromRgb(102, 102, 102)),
                 TextWrapping = TextWrapping.Wrap,
-                Text = "Therefore, a PNG image might be the best choice if you have a very large tree and so many plot elements that a PDF or SVG file become unwieldy.",
+                Text = "Therefore, a PNG or TIFF image might be the best choice if you have a very large tree and so many plot elements that a PDF or SVG file become unwieldy.",
                 Margin = new Avalonia.Thickness(0, 0, 0, 5)
             });
 
             Grid.SetRow(descriptionPanel, 1);
             mainContainer.Children.Add(descriptionPanel);
+
+            Grid regionRow = new Grid();
+            regionRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto) { MinWidth = 150, MaxWidth = 200 });
+            regionRow.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+            ComboBox cropRegionBox;
+            List<Rectangle> cropRegionRects;
+
+            {
+                TextBlock blk = new TextBlock() { Text = "Crop region:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
+
+                List<string> items = new List<string>() { "Entire plot" };
+
+                cropRegionRects = new List<Rectangle>();
+
+                cropRegionBox = new ComboBox() { Items = items, SelectedIndex = 2, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 150, FontSize = 14 };
+
+                Grid.SetColumn(cropRegionBox, 1);
+                regionRow.Children.Add(blk);
+                regionRow.Children.Add(cropRegionBox);
+
+                Grid.SetRow(regionRow, 2);
+                mainContainer.Children.Add(regionRow);
+            }
+
+            regionRow.IsVisible = cropRegionRects.Count > 0;
+
+            this.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == ExportPage.IsVisibleProperty)
+                {
+                    List<string> items = new List<string>() { "Entire plot" };
+
+                    cropRegionRects = new List<Rectangle>();
+
+                    InstanceStateData stateData = this.FindAncestorOfType<MainWindow>()?.StateData;
+
+                    if (stateData != null && stateData.Tags.TryGetValue("5a8eb0c8-7139-4583-9e9e-375749a98973", out object cropRegionsObject) && cropRegionsObject != null && cropRegionsObject is Dictionary<string, (string, Rectangle)> cropRegions)
+                    {
+                        foreach (KeyValuePair<string, (string, Rectangle)> kvp in cropRegions)
+                        {
+                            items.Add(kvp.Value.Item1);
+                            cropRegionRects.Add(kvp.Value.Item2);
+                        }
+                    }
+
+                    cropRegionBox.Items = items;
+                    cropRegionBox.SelectedIndex = 0;
+                    regionRow.IsVisible = cropRegionRects.Count > 0;
+                }
+            };
+
+            ScrollViewer plotSizeContainer = new ScrollViewer() { HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, AllowAutoHide = false, Padding = new Avalonia.Thickness(0, 0, 17, 0) };
+            Grid.SetRow(plotSizeContainer, 3);
+            mainContainer.Children.Add(plotSizeContainer);
+
+            Grid plotSizeGrid = new Grid() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top };
+            plotSizeGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            plotSizeGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            plotSizeGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            plotSizeGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            plotSizeContainer.Content = plotSizeGrid;
 
             {
                 TextBlock blk = new TextBlock()
@@ -1077,18 +1322,16 @@ namespace ExportPDF
                     Text = "Plot size",
                     Margin = new Avalonia.Thickness(0, 0, 0, 5)
                 };
-                Grid.SetRow(blk, 2);
-                mainContainer.Children.Add(blk);
+                Grid.SetColumnSpan(blk, 4);
+                plotSizeGrid.Children.Add(blk);
             }
 
 
             Grid plotSizeRow = new Grid();
 
-            plotSizeRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             plotSizeRow.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
             plotSizeRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
             plotSizeRow.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-            plotSizeRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
 
             TextBlock plotSizePt = new TextBlock()
             {
@@ -1097,75 +1340,128 @@ namespace ExportPDF
                 Text = "10 x 10 pt",
                 Margin = new Avalonia.Thickness(0, 0, 0, 5)
             };
+            Grid.SetColumn(plotSizePt, 1);
             plotSizeRow.Children.Add(plotSizePt);
 
-
-            TextBlock plotSizeCm = new TextBlock()
-            {
-                FontSize = 13,
-                Foreground = new SolidColorBrush(Color.FromRgb(102, 102, 102)),
-                Text = "10 x 10 cm",
-                Margin = new Avalonia.Thickness(0, 0, 0, 5)
-            };
-            Grid.SetColumn(plotSizeCm, 2);
-            plotSizeRow.Children.Add(plotSizeCm);
-
-            TextBlock plotSizeIn = new TextBlock()
-            {
-                FontSize = 13,
-                Foreground = new SolidColorBrush(Color.FromRgb(102, 102, 102)),
-                Text = "10 x 10 in",
-                Margin = new Avalonia.Thickness(0, 0, 0, 5)
-            };
-            Grid.SetColumn(plotSizeIn, 4);
-            plotSizeRow.Children.Add(plotSizeIn);
-
-            Grid.SetRow(plotSizeRow, 3);
-            mainContainer.Children.Add(plotSizeRow);
-
-
-            Grid resolutionGrid = new Grid() { Margin = new Thickness(0, 0, 0, 5) };
-            resolutionGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            resolutionGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            resolutionGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            resolutionGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            resolutionGrid.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
-            resolutionGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto) { MinWidth = 150, MaxWidth = 200 });
-            resolutionGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star) { MinWidth = 200 });
-            resolutionGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
-            Grid.SetRow(resolutionGrid, 4);
-            mainContainer.Children.Add(resolutionGrid);
-
-            resolutionGrid.Children.Add(new TextBlock()
-            {
-                FontSize = 16,
-                FontWeight = FontWeight.Bold,
-                Text = "Image size"
-            });
+            Grid.SetRow(plotSizeRow, 1);
+            Grid.SetColumnSpan(plotSizeRow, 4);
+            plotSizeGrid.Children.Add(plotSizeRow);
 
             {
                 TextBlock blk = new TextBlock()
                 {
-                    FontSize = 14,
-                    Text = "Width:",
-                    Margin = new Avalonia.Thickness(0, 0, 0, 5),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetRow(blk, 1);
-                resolutionGrid.Children.Add(blk);
-            }
-
-            {
-                TextBlock blk = new TextBlock()
-                {
-                    FontSize = 14,
-                    Text = "Height:",
-                    Margin = new Avalonia.Thickness(0, 0, 0, 5),
-                    VerticalAlignment = VerticalAlignment.Center
+                    FontSize = 16,
+                    FontWeight = FontWeight.Bold,
+                    Text = "Image size"
                 };
                 Grid.SetRow(blk, 2);
-                resolutionGrid.Children.Add(blk);
+                Grid.SetColumnSpan(blk, 4);
+                plotSizeGrid.Children.Add(blk);
             }
+
+            {
+                TextBlock blk = new TextBlock()
+                {
+                    FontSize = 14,
+                    Text = "Width",
+                    Margin = new Avalonia.Thickness(0, 0, 0, 5),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                Grid.SetRow(blk, 3);
+                plotSizeGrid.Children.Add(blk);
+            }
+
+            {
+                TextBlock blk = new TextBlock()
+                {
+                    FontSize = 14,
+                    Text = "Height",
+                    Margin = new Avalonia.Thickness(0, 0, 0, 5),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                Grid.SetRow(blk, 3);
+                Grid.SetColumn(blk, 2);
+                plotSizeGrid.Children.Add(blk);
+            }
+
+            {
+                TextBlock blk = new TextBlock()
+                {
+                    FontSize = 14,
+                    Text = "px",
+                    Margin = new Avalonia.Thickness(3, 0, 0, 5),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(blk, 1);
+                Grid.SetRow(blk, 4);
+                plotSizeGrid.Children.Add(blk);
+            }
+
+            {
+                TextBlock blk = new TextBlock()
+                {
+                    FontSize = 14,
+                    Text = "px",
+                    Margin = new Avalonia.Thickness(3, 0, 0, 5),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(blk, 3);
+                Grid.SetRow(blk, 4);
+                plotSizeGrid.Children.Add(blk);
+            }
+
+            ComboBox units = new ComboBox() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Padding = new Avalonia.Thickness(5, 2, 2, 2), FontSize = 13, Margin = new Avalonia.Thickness(5, 0, 0, 0), Width = 65 };
+            units.Items = new List<string>() { "cm", "mm", "in" };
+            units.SelectedIndex = 0;
+
+            Grid.SetColumn(units, 1);
+            Grid.SetRow(units, 5);
+            plotSizeGrid.Children.Add(units);
+
+            TextBlock unitsReplicate = new TextBlock()
+            {
+                FontSize = 14,
+                Text = "cm",
+                Margin = new Avalonia.Thickness(3, 0, 0, 5),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 27
+            };
+
+            Grid.SetColumn(unitsReplicate, 3);
+            Grid.SetRow(unitsReplicate, 5);
+            plotSizeGrid.Children.Add(unitsReplicate);
+
+            NumericUpDown widthPxNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0}", FontSize = 14, Increment = 1 };
+            NumericUpDown heightPxNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0}", FontSize = 14, Increment = 1 };
+
+            Grid.SetRow(widthPxNud, 4);
+            Grid.SetColumn(widthPxNud, 0);
+            plotSizeGrid.Children.Add(widthPxNud);
+
+            Grid.SetRow(heightPxNud, 4);
+            Grid.SetColumn(heightPxNud, 2);
+            plotSizeGrid.Children.Add(heightPxNud);
+
+            NumericUpDown widthCmNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0.##}", FontSize = 14, Increment = 0.1 };
+            NumericUpDown heightCmNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0.##}", FontSize = 14, Increment = 0.1 };
+
+            Grid.SetRow(widthCmNud, 5);
+            Grid.SetColumn(widthCmNud, 0);
+            plotSizeGrid.Children.Add(widthCmNud);
+
+            Grid.SetRow(heightCmNud, 5);
+            Grid.SetColumn(heightCmNud, 2);
+            plotSizeGrid.Children.Add(heightCmNud);
+
+            Grid resolutionGrid = new Grid() { HorizontalAlignment = HorizontalAlignment.Center };
+            resolutionGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            resolutionGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            resolutionGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
 
             {
                 TextBlock blk = new TextBlock()
@@ -1175,35 +1471,7 @@ namespace ExportPDF
                     Margin = new Avalonia.Thickness(0, 0, 0, 5),
                     VerticalAlignment = VerticalAlignment.Center
                 };
-                Grid.SetRow(blk, 3);
-                resolutionGrid.Children.Add(blk);
-            }
 
-            {
-                TextBlock blk = new TextBlock()
-                {
-                    FontSize = 14,
-                    Text = "px",
-                    Margin = new Avalonia.Thickness(3, 0, 0, 5),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetColumn(blk, 2);
-                Grid.SetRow(blk, 1);
-                resolutionGrid.Children.Add(blk);
-            }
-
-            {
-                TextBlock blk = new TextBlock()
-                {
-                    FontSize = 14,
-                    Text = "px",
-                    Margin = new Avalonia.Thickness(3, 0, 0, 5),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetColumn(blk, 2);
-                Grid.SetRow(blk, 2);
                 resolutionGrid.Children.Add(blk);
             }
 
@@ -1213,43 +1481,60 @@ namespace ExportPDF
                     FontSize = 14,
                     Text = "dpi",
                     Margin = new Avalonia.Thickness(3, 0, 0, 5),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Left
                 };
+
                 Grid.SetColumn(blk, 2);
-                Grid.SetRow(blk, 3);
                 resolutionGrid.Children.Add(blk);
             }
 
+            NumericUpDown resolutionNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0.##}", FontSize = 14, Increment = 1, Width = 100 };
 
-            NumericUpDown widthNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0}", FontSize = 14, Increment = 1 };
-            NumericUpDown heightNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0}", FontSize = 14, Increment = 1 };
-            NumericUpDown resolutionNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0.##}", FontSize = 14, Increment = 1 };
-
-            Grid.SetRow(widthNud, 1);
-            Grid.SetColumn(widthNud, 1);
-            resolutionGrid.Children.Add(widthNud);
-
-            Grid.SetRow(heightNud, 2);
-            Grid.SetColumn(heightNud, 1);
-            resolutionGrid.Children.Add(heightNud);
-
-            Grid.SetRow(resolutionNud, 3);
             Grid.SetColumn(resolutionNud, 1);
             resolutionGrid.Children.Add(resolutionNud);
 
-            StackPanel saveButtonContent = new StackPanel() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
-            saveButtonContent.Children.Add(new DPIAwareBox(GetSaveIcon) { Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center });
-            saveButtonContent.Children.Add(new TextBlock() { Text = "Export PNG", Margin = new Thickness(5, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center, Foreground = Brushes.Black });
+            Grid.SetRow(resolutionGrid, 6);
+            Grid.SetColumnSpan(resolutionGrid, 4);
+            plotSizeGrid.Children.Add(resolutionGrid);
 
-            Button saveButton = new Button() { Content = saveButtonContent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 5, 0, 0) };
-            saveButton.Classes.Add("SideBarButton");
-            Grid.SetRow(saveButton, 5);
-            mainContainer.Children.Add(saveButton);
+            Grid saveButtons = new Grid();
+            saveButtons.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            saveButtons.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            saveButtons.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            saveButtons.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+            saveButtons.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            Grid.SetRow(saveButtons, 4);
+            mainContainer.Children.Add(saveButtons);
+
+            Button savePNGButton = new Button() { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 5, 0, 0) };
+            savePNGButton.Classes.Add("SideBarButton");
+            Grid.SetColumn(savePNGButton, 1);
+            saveButtons.Children.Add(savePNGButton);
+
+            {
+                StackPanel saveButtonContent = new StackPanel() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+                saveButtonContent.Children.Add(new DPIAwareBox(GetSaveIcon) { Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center });
+                saveButtonContent.Children.Add(new TextBlock() { Text = "Export PNG", Margin = new Thickness(5, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center, Foreground = Brushes.Black });
+                savePNGButton.Content = saveButtonContent;
+            }
+
+            Button saveTIFFButton = new Button() { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Avalonia.Thickness(0, 5, 0, 0) };
+            saveTIFFButton.Classes.Add("SideBarButton");
+            Grid.SetColumn(saveTIFFButton, 3);
+            saveButtons.Children.Add(saveTIFFButton);
+
+            {
+                StackPanel saveButtonContent = new StackPanel() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+                saveButtonContent.Children.Add(new DPIAwareBox(GetSaveIcon) { Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center });
+                saveButtonContent.Children.Add(new TextBlock() { Text = "Export TIFF", Margin = new Thickness(5, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center, Foreground = Brushes.Black });
+                saveTIFFButton.Content = saveButtonContent;
+            }
+
 
             bool suppressChange = false;
 
-            widthNud.ValueChanged += (s, e) =>
+            widthPxNud.ValueChanged += (s, e) =>
             {
                 if (!suppressChange)
                 {
@@ -1260,19 +1545,37 @@ namespace ExportPDF
                         double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                         double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
 
-                        double scale = widthNud.Value / plotWidth;
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
+                        double scale = widthPxNud.Value / plotWidth;
 
                         suppressChange = true;
 
-                        heightNud.Value = plotHeight * scale;
-                        resolutionNud.Value = widthNud.Value / plotWidth * 72;
+                        heightPxNud.Value = plotHeight * scale;
+
+                        double resolution = widthPxNud.Value / widthCmNud.Value;
+
+                        if (units.SelectedIndex == 0)
+                        {
+                            resolution *= 2.54;
+                        }
+                        else if (units.SelectedIndex == 1)
+                        {
+                            resolution *= 25.4;
+                        }
+
+                        resolutionNud.Value = resolution;
 
                         suppressChange = false;
                     }
                 }
             };
 
-            heightNud.ValueChanged += (s, e) =>
+            heightPxNud.ValueChanged += (s, e) =>
             {
                 if (!suppressChange)
                 {
@@ -1283,12 +1586,30 @@ namespace ExportPDF
                         double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                         double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
 
-                        double scale = heightNud.Value / plotHeight;
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
+                        double scale = heightPxNud.Value / plotHeight;
 
                         suppressChange = true;
 
-                        widthNud.Value = plotWidth * scale;
-                        resolutionNud.Value = heightNud.Value / plotHeight * 72;
+                        widthPxNud.Value = plotWidth * scale;
+
+                        double resolution = heightPxNud.Value / heightCmNud.Value;
+
+                        if (units.SelectedIndex == 0)
+                        {
+                            resolution *= 2.54;
+                        }
+                        else if (units.SelectedIndex == 1)
+                        {
+                            resolution *= 25.4;
+                        }
+
+                        resolutionNud.Value = resolution;
 
                         suppressChange = false;
                     }
@@ -1306,12 +1627,113 @@ namespace ExportPDF
                         double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                         double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
 
-                        double scale = resolutionNud.Value / 72;
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
+                        double resolution = resolutionNud.Value;
+
+                        if (units.SelectedIndex == 0)
+                        {
+                            resolution /= 2.54;
+                        }
+                        else if (units.SelectedIndex == 1)
+                        {
+                            resolution /= 25.4;
+                        }
+
+                        double scale = widthCmNud.Value * resolution / plotWidth;
 
                         suppressChange = true;
 
-                        widthNud.Value = Math.Round(plotWidth * scale);
-                        heightNud.Value = Math.Round(plotHeight * scale);
+                        widthPxNud.Value = Math.Round(plotWidth * scale);
+                        heightPxNud.Value = Math.Round(plotHeight * scale);
+
+                        suppressChange = false;
+                    }
+                }
+            };
+
+            widthCmNud.ValueChanged += (s, e) =>
+            {
+                if (!suppressChange)
+                {
+                    MainWindow parent = this.FindAncestorOfType<MainWindow>();
+
+                    if (parent != null)
+                    {
+                        double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
+                        double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
+
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
+                        double resolution = resolutionNud.Value;
+
+                        if (units.SelectedIndex == 0)
+                        {
+                            resolution /= 2.54;
+                        }
+                        else if (units.SelectedIndex == 1)
+                        {
+                            resolution /= 25.4;
+                        }
+
+                        double scale = widthCmNud.Value * resolution / plotWidth;
+
+                        suppressChange = true;
+
+                        widthPxNud.Value = plotWidth * scale;
+                        heightPxNud.Value = plotHeight * scale;
+
+                        heightCmNud.Value = widthCmNud.Value / plotWidth * plotHeight;
+
+                        suppressChange = false;
+                    }
+                }
+            };
+
+            heightCmNud.ValueChanged += (s, e) =>
+            {
+                if (!suppressChange)
+                {
+                    MainWindow parent = this.FindAncestorOfType<MainWindow>();
+
+                    if (parent != null)
+                    {
+                        double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
+                        double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
+
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
+                        double resolution = resolutionNud.Value;
+
+                        if (units.SelectedIndex == 0)
+                        {
+                            resolution /= 2.54;
+                        }
+                        else if (units.SelectedIndex == 1)
+                        {
+                            resolution /= 25.4;
+                        }
+
+                        double scale = heightCmNud.Value * resolution / plotHeight;
+
+                        suppressChange = true;
+
+                        widthPxNud.Value = plotWidth * scale;
+                        heightPxNud.Value = plotHeight * scale;
+
+                        widthCmNud.Value = heightCmNud.Value / plotHeight * plotWidth;
 
                         suppressChange = false;
                     }
@@ -1329,24 +1751,105 @@ namespace ExportPDF
                         double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
                         double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
 
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                            plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                        }
+
                         plotSizePt.Text = plotWidth.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " x " + plotHeight.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " pt";
 
-                        plotWidth /= 72;
-                        plotHeight /= 72;
+                        suppressChange = true;
 
-                        plotSizeIn.Text = plotWidth.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " x " + plotHeight.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " in";
+                        widthPxNud.Value = Math.Round(plotWidth * 300 / 72);
+                        heightPxNud.Value = Math.Round(plotHeight * 300 / 72);
 
-                        plotWidth *= 2.54;
-                        plotHeight *= 2.54;
+                        widthCmNud.Value = Math.Round(plotWidth * 300 / 72) / 300 * 2.54;
+                        heightCmNud.Value = Math.Round(plotHeight * 300 / 72) / 300 * 2.54;
 
-                        plotSizeCm.Text = plotWidth.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " x " + plotHeight.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " cm";
+                        resolutionNud.Value = 300;
 
-                        resolutionNud.Value = 72;
+                        suppressChange = false;
                     }
                 }
             };
 
-            saveButton.Click += async (s, e) =>
+            units.SelectionChanged += (s, e) =>
+            {
+                switch (units.SelectedIndex)
+                {
+                    case 0:
+                        unitsReplicate.Text = "cm";
+                        break;
+
+                    case 1:
+                        unitsReplicate.Text = "mm";
+                        break;
+
+                    case 2:
+                        unitsReplicate.Text = "in";
+                        break;
+                }
+
+                if (!suppressChange)
+                {
+                    MainWindow parent = this.FindAncestorOfType<MainWindow>();
+
+                    if (parent != null)
+                    {
+                        double resolution = resolutionNud.Value;
+
+                        if (units.SelectedIndex == 0)
+                        {
+                            resolution /= 2.54;
+                        }
+                        else if (units.SelectedIndex == 1)
+                        {
+                            resolution /= 25.4;
+                        }
+
+                        suppressChange = true;
+
+                        widthCmNud.Value = Math.Round(widthPxNud.Value / resolution);
+                        heightCmNud.Value = Math.Round(heightPxNud.Value / resolution);
+
+                        suppressChange = false;
+                    }
+                }
+            };
+
+            cropRegionBox.SelectionChanged += (s, e) =>
+            {
+                MainWindow parent = this.FindAncestorOfType<MainWindow>();
+
+                if (parent != null)
+                {
+                    double plotWidth = parent.PlotBottomRight.X - parent.PlotOrigin.X + 20;
+                    double plotHeight = parent.PlotBottomRight.Y - parent.PlotOrigin.Y + 20;
+
+                    if (cropRegionBox.SelectedIndex > 0)
+                    {
+                        plotWidth = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Width;
+                        plotHeight = cropRegionRects[cropRegionBox.SelectedIndex - 1].Size.Height;
+                    }
+
+                    plotSizePt.Text = plotWidth.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " x " + plotHeight.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " pt";
+
+                    suppressChange = true;
+
+                    widthPxNud.Value = Math.Round(plotWidth * 300 / 72);
+                    heightPxNud.Value = Math.Round(plotHeight * 300 / 72);
+
+                    widthCmNud.Value = Math.Round(plotWidth * 300 / 72) / 300 * 2.54;
+                    heightCmNud.Value = Math.Round(plotHeight * 300 / 72) / 300 * 2.54;
+
+                    resolutionNud.Value = 300;
+
+                    suppressChange = false;
+                }
+            };
+
+            savePNGButton.Click += async (s, e) =>
             {
                 SaveFileDialog dialog = new SaveFileDialog() { Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Name = "PNG file", Extensions = new List<string>() { "png" } } }, Title = "Save tree plot" };
 
@@ -1365,15 +1868,85 @@ namespace ExportPDF
 
                         VectSharp.Page pag = parent.RenderPlotToPage();
 
-                        double scale = resolutionNud.Value / 72;
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                        }
 
-                        pag.SaveAsPNG(result, scale);
+                        double scale = widthPxNud.Value / pag.Width;
+
+                        SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
+
+                        image.Metadata.HorizontalResolution = resolutionNud.Value;
+                        image.Metadata.VerticalResolution = resolutionNud.Value;
+
+                        SixLabors.ImageSharp.ImageExtensions.SaveAsPng(image, result);
 
                         this.FindAncestorOfType<RibbonFilePage>().Close();
                     }
                     catch (Exception ex)
                     {
                         await new MessageBox("Error!", "Error while saving the SVG file:\n" + ex.Message).ShowDialog2(parent);
+                    }
+                }
+            };
+
+            saveTIFFButton.Click += async (s, e) =>
+            {
+                MainWindow parent = this.FindAncestorOfType<MainWindow>();
+
+                if (parent.GraphBackground.A < 1)
+                {
+                    MessageBox box = new MessageBox("Question", "The plot has a transparent background, but the TIFF encoder does not support images with a transparent background. Do you wish to proceed anyways?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
+                    await box.ShowDialog2(parent);
+
+                    if (box.Result != MessageBox.Results.Yes)
+                    {
+                        return;
+                    }
+                }
+
+                SaveFileDialog dialog = new SaveFileDialog() { Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Name = "TIFF file", Extensions = new List<string>() { "tiff", "tif" } } }, Title = "Save tree plot" };
+
+                string result = await dialog.ShowAsync(parent);
+
+                if (!string.IsNullOrEmpty(result))
+                {
+                    try
+                    {
+                        if (System.IO.File.Exists(result))
+                        {
+                            System.IO.File.Delete(result);
+                        }
+
+                        VectSharp.Page pag = parent.RenderPlotToPage();
+
+                        if (cropRegionBox.SelectedIndex > 0)
+                        {
+                            pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                        }
+
+                        pag.Background = pag.Background.WithAlpha(1);
+
+                        double scale = widthPxNud.Value / pag.Width;
+
+                        SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
+
+                        image.Metadata.HorizontalResolution = resolutionNud.Value;
+                        image.Metadata.VerticalResolution = resolutionNud.Value;
+
+                        SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifProfile profile = new SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifProfile();
+                        profile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Software, "TreeViewer");
+
+                        image.Frames.RootFrame.Metadata.ExifProfile = profile;
+
+                        SixLabors.ImageSharp.ImageExtensions.SaveAsTiff(image, result, new SixLabors.ImageSharp.Formats.Tiff.TiffEncoder() { Compression = SixLabors.ImageSharp.Formats.Tiff.Constants.TiffCompression.Lzw });
+
+                        this.FindAncestorOfType<RibbonFilePage>().Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        await new MessageBox("Error!", "Error while saving the TIFF file:\n" + ex.Message).ShowDialog2(parent);
                     }
                 }
             };

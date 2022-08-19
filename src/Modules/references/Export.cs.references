@@ -18,6 +18,7 @@ System.Text.Json.dll
 System.ObjectModel.dll
 System.ComponentModel.Primitives.dll
 VectSharp.SVG.dll
-VectSharp.Raster.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
+VectSharp.Raster.ImageSharp.dll
+SixLabors.ImageSharp.dll
