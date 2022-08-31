@@ -164,12 +164,19 @@ namespace TreeViewer
 
         public static async Task DownloadFileTaskAsync(this System.Net.Http.HttpClient client, Uri address, string fileName)
         {
-            using (Stream remoteStream = await client.GetStreamAsync(address))
+            if (address.Scheme != "file")
             {
-                using (FileStream fs = new FileStream(fileName, FileMode.Create))
+                using (Stream remoteStream = await client.GetStreamAsync(address))
                 {
-                    await remoteStream.CopyToAsync(fs);
+                    using (FileStream fs = new FileStream(fileName, FileMode.Create))
+                    {
+                        await remoteStream.CopyToAsync(fs);
+                    }
                 }
+            }
+            else
+            {
+                File.Copy(address.AbsolutePath, fileName, true);
             }
         }
 
