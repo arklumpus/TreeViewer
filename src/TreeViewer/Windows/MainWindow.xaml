@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:paz="clr-namespace:Avalonia.Controls.PanAndZoom;assembly=Avalonia.Controls.PanAndZoom"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         xmlns:colorpicker="clr-namespace:AvaloniaColorPicker;assembly=AvaloniaColorPicker"
-        mc:Ignorable="d" Width="1000" Height="600" MinWidth="800" MinHeight="400"
+        mc:Ignorable="d" Width="1000" Height="600" MinWidth="975" MinHeight="450"
         x:Class="TreeViewer.MainWindow"
         Title="TreeViewer" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
         KeyUp="KeyPressed" Closed="WindowClosed" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#E7E7E7">
