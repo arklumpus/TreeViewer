@@ -157,22 +157,22 @@ namespace TreeViewer
             NativeMenuItem moduleMenu = new NativeMenuItem() { Header = "Module" };
 
             NativeMenu moduleSubMenu = new NativeMenu();
-            NativeMenuItem loadSourceItem = new NativeMenuItem() { Header = "Load from source...", Command = new SimpleCommand(win => true, a => LoadFromSourceClicked(null, new EventArgs()), null, null) };
+            NativeMenuItem loadSourceItem = new NativeMenuItem() { Header = "Load from source...", Command = new SimpleCommand(win => true, a => LoadFromSourceClicked(null, new EventArgs()), null) };
             moduleSubMenu.Add(loadSourceItem);
-            NativeMenuItem loadItem = new NativeMenuItem() { Header = "Load...", Command = new SimpleCommand(win => true, a => LoadClicked(null, new EventArgs()), null, null) };
+            NativeMenuItem loadItem = new NativeMenuItem() { Header = "Load...", Command = new SimpleCommand(win => true, a => LoadClicked(null, new EventArgs()), null) };
             moduleSubMenu.Add(loadItem);
-            NativeMenuItem loadRepositoryItem = new NativeMenuItem() { Header = "Load from repository...", Command = new SimpleCommand(win => true, async a => { await LoadFromRepositoryClicked(); }, null, null) };
+            NativeMenuItem loadRepositoryItem = new NativeMenuItem() { Header = "Load from repository...", Command = new SimpleCommand(win => true, async a => { await LoadFromRepositoryClicked(); }, null) };
             moduleSubMenu.Add(loadRepositoryItem);
             moduleSubMenu.Add(new NativeMenuItemSeparator());
-            NativeMenuItem installItem = new NativeMenuItem() { Header = "Install...", Command = new SimpleCommand(win => true, a => InstallClicked(null, new EventArgs()), null, null) };
+            NativeMenuItem installItem = new NativeMenuItem() { Header = "Install...", Command = new SimpleCommand(win => true, a => InstallClicked(null, new EventArgs()), null) };
             moduleSubMenu.Add(installItem);
-            NativeMenuItem installRepositoryItem = new NativeMenuItem() { Header = "Install from repository...", Command = new SimpleCommand(win => true, async a => { await InstallFromRepositoryClicked(); }, null, null) };
+            NativeMenuItem installRepositoryItem = new NativeMenuItem() { Header = "Install from repository...", Command = new SimpleCommand(win => true, async a => { await InstallFromRepositoryClicked(); }, null) };
             moduleSubMenu.Add(installRepositoryItem);
             moduleSubMenu.Add(new NativeMenuItemSeparator());
-            NativeMenuItem exportItem = new NativeMenuItem() { Header = "Export...", Command = new SimpleCommand(win => true, a => ExportClicked(null, new EventArgs()), null, null) };
+            NativeMenuItem exportItem = new NativeMenuItem() { Header = "Export...", Command = new SimpleCommand(win => true, a => ExportClicked(null, new EventArgs()), null) };
             moduleSubMenu.Add(exportItem);
             moduleSubMenu.Add(new NativeMenuItemSeparator());
-            NativeMenuItem uninstallItem = new NativeMenuItem() { Header = "Uninstall...", Command = new SimpleCommand(win => true, a => UninstallClicked(null, new EventArgs()), null, null) };
+            NativeMenuItem uninstallItem = new NativeMenuItem() { Header = "Uninstall...", Command = new SimpleCommand(win => true, a => UninstallClicked(null, new EventArgs()), null) };
             moduleSubMenu.Add(uninstallItem);
 
             moduleMenu.Menu = moduleSubMenu;

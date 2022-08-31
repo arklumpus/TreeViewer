@@ -23,7 +23,7 @@ namespace DebuggerClient
                     AboutWindow about = new AboutWindow();
                     about.Show();
                 },
-                null, null)
+                null)
             });
             NativeMenu.SetMenu(this, menu);
         }

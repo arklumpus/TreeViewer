@@ -29,7 +29,7 @@ namespace @NamespaceHere
 
         // The name of the group of buttons in which the button for this module will appear. If multiple modules specify
         // the same group name, they will be placed together. The group name is also shown on the ribbon interface.
-        // In the native menu (displayed on macOS and some Linux environment), modules with the same group name will be
+        // In the native menu (displayed on macOS and some Linux environments), modules with the same group name will be
         // separated by other modules with different group names using separators.
         public static string GroupName { get; } = "Group name";
 
@@ -121,8 +121,18 @@ namespace @NamespaceHere
             return pag;
         }
 
+        // A list of AvaloniaProperty objects on the MainWindow to which the menu item belongs, which affect whether the
+        // menu item action is available or not. Set to null or to an empty list if not applicable. This property is optional,
+        // but either this or PropertyAffectingEnabled must be defined (even though they may be null). This property should be
+        // used when multiple properties on the parent window can cause the menu item to become enabled or disabled.
+        // E.g.
+        //      new List<Avalonia.AvaloniaProperty>() { MainWindow.IsTreeOpened, MainWindow.IsSelectionAvailableProperty }
+        public static List<Avalonia.AvaloniaProperty> PropertiesAffectingEnabled { get; } = new List<Avalonia.AvaloniaProperty>() { MainWindow.IsTreeOpened, MainWindow.IsSelectionAvailableProperty };
+
         // An AvaloniaProperty on the MainWindow to which the menu item belongs, which affects whether the menu item
-        // action is available or not. Set to null if not applicable.
+        // action is available or not. Set to null if not applicable. This property is optional, but either this
+        // or PropertiesAffectingEnabled must be defined (even though they may be null). This property should be used when only
+        // one property on the parent window can cause the menu item to become enabled or disabled.
         // E.g.
         //      MainWindow.IsSelectionAvailableProperty
         public static Avalonia.AvaloniaProperty PropertyAffectingEnabled { get; } = MainWindow.IsSelectionAvailableProperty;

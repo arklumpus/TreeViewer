@@ -72,17 +72,42 @@ namespace TreeViewer
             _execute(parameter);
         }
 
+        public SimpleCommand(Func<object, bool> canExecute, Action<object> execute, Avalonia.Controls.Window parent) : this(canExecute, execute, parent, (Avalonia.AvaloniaProperty)null) { }
+
         public SimpleCommand(Func<object, bool> canExecute, Action<object> execute, Avalonia.Controls.Window parent, Avalonia.AvaloniaProperty property)
         {
             this._canExecute = canExecute;
             this._execute = execute;
             this.cachedCanExecute = canExecute(parent);
 
-            if (parent != null)
+            if (parent != null && property != null)
             {
                 parent.PropertyChanged += (s, e) =>
                 {
                     if (e.Property == property)
+                    {
+                        bool newCanExecute = _canExecute(parent);
+                        if (newCanExecute != cachedCanExecute)
+                        {
+                            cachedCanExecute = newCanExecute;
+                            _canExecuteChanged?.Invoke(this, new EventArgs());
+                        }
+                    }
+                };
+            }
+        }
+
+        public SimpleCommand(Func<object, bool> canExecute, Action<object> execute, Avalonia.Controls.Window parent, List<Avalonia.AvaloniaProperty> properties)
+        {
+            this._canExecute = canExecute;
+            this._execute = execute;
+            this.cachedCanExecute = canExecute(parent);
+
+            if (parent != null && properties != null && properties.Count > 0)
+            {
+                parent.PropertyChanged += (s, e) =>
+                {
+                    if (properties.Contains(e.Property))
                     {
                         bool newCanExecute = _canExecute(parent);
                         if (newCanExecute != cachedCanExecute)
@@ -1155,7 +1180,7 @@ public static Colour? Format(object attribute)
         public Func<MainWindow, List<bool>> IsEnabled { get; set; }
         public List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)> ShortcutKeys { get; set; }
         public bool TriggerInTextBox { get; set; }
-        public Avalonia.AvaloniaProperty PropertyAffectingEnabled { get; set; }
+        public List<Avalonia.AvaloniaProperty> PropertiesAffectingEnabled { get; set; }
 
         public double GroupIndex { get; set; }
         public Func<double, Page> GetIcon { get; set; }
@@ -1335,7 +1360,6 @@ public static Colour? Format(object attribute)
                     ItemText = (string)GetProperty(compiledModule, "ItemText"),
                     ParentMenu = (string)GetProperty(compiledModule, "ParentMenu"),
                     GroupName = (string)GetProperty(compiledModule, "GroupName"),
-                    PropertyAffectingEnabled = (Avalonia.AvaloniaProperty)GetProperty(compiledModule, "PropertyAffectingEnabled"),
                     ShortcutKeys = (List<(Avalonia.Input.Key, Avalonia.Input.KeyModifiers)>)GetProperty(compiledModule, "ShortcutKeys"),
                     TriggerInTextBox = (bool)GetProperty(compiledModule, "TriggerInTextBox"),
                     IsEnabled = (Func<MainWindow, List<bool>>)Delegate.CreateDelegate(typeof(Func<MainWindow, List<bool>>), compiledModule, "IsEnabled"),
@@ -1349,6 +1373,19 @@ public static Colour? Format(object attribute)
                 if (compiledModule.GetMethod("GetFileMenuPage") != null)
                 {
                     mod.GetFileMenuPage = (Func<Avalonia.Controls.Control>)Delegate.CreateDelegate(typeof(Func<Avalonia.Controls.Control>), compiledModule, "GetFileMenuPage");
+                }
+
+                if (HasProperty(compiledModule, "PropertiesAffectingEnabled"))
+                {
+                    mod.PropertiesAffectingEnabled = (List<Avalonia.AvaloniaProperty>)GetProperty(compiledModule, "PropertiesAffectingEnabled");
+                }
+                else if (GetProperty(compiledModule, "PropertyAffectingEnabled") != null)
+                {
+                    mod.PropertiesAffectingEnabled = new List<Avalonia.AvaloniaProperty>() { (Avalonia.AvaloniaProperty)GetProperty(compiledModule, "PropertyAffectingEnabled") };
+                }
+                else
+                {
+                    mod.PropertiesAffectingEnabled = null;
                 }
 
                 return mod;
@@ -1488,6 +1525,11 @@ public static Colour? Format(object attribute)
                 null,
                 null,
                 null);
+        }
+
+        public static bool HasProperty(Type type, string propertyName)
+        {
+            return type.GetProperty(propertyName) != null;
         }
 
         public static object GetProperty(Type type, string propertyName)

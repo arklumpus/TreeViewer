@@ -135,7 +135,7 @@ namespace TreeViewer
                         this.RibbonFilePage.Opacity = 1;
                         this.RibbonFilePage.RenderTransform = TransformOperations.Identity;
                         this.RibbonFilePage.FindControl<Grid>("ThemeGrid").RenderTransform = TransformOperations.Identity;
-                        
+
                         if (Modules.IsWindows)
                         {
                             this.FindControl<Grid>("TitleBarContainer2").IsVisible = true;
@@ -873,18 +873,18 @@ namespace TreeViewer
                 menuItems.Add(("Help", new List<(string, List<MenuActionModule>)>()));
             }
 
-            Dictionary<string, List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>)>> structure = new Dictionary<string, List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>)>>();
+            Dictionary<string, List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>)>> structure = new Dictionary<string, List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>)>>();
 
 
             for (int i = 0; i < menuItems.Count; i++)
             {
                 if (menuItems[i].Item1 != "File")
                 {
-                    List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>)> groups = new List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>)>();
+                    List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>)> groups = new List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>)>();
 
                     for (int j = 0; j < menuItems[i].Item2.Count; j++)
                     {
-                        List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)> groupItems = new List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>();
+                        List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)> groupItems = new List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>();
 
                         for (int k = 0; k < menuItems[i].Item2[j].Item2.Count; k++)
                         {
@@ -900,7 +900,7 @@ namespace TreeViewer
                             groupItems.Add((menuItems[i].Item2[j].Item2[k].ItemText, new DPIAwareBox(menuItems[i].Item2[j].Item2[k].GetIcon), shortcutString, (from el in Enumerable.Range(0, menuItems[i].Item2[j].Item2[k].SubItems.Count) select (menuItems[i].Item2[j].Item2[k].SubItems[el].Item1, (Control)new DPIAwareBox(menuItems[i].Item2[j].Item2[k].SubItems[el].Item2), Modules.GetShortcutString(menuItems[i].Item2[j].Item2[k].ShortcutKeys[el]))).ToList(), menuItems[i].Item2[j].Item2[k].IsLargeButton, menuItems[i].Item2[j].Item2[k].GroupIndex, (Action<int>)(async ind =>
                             {
                                 await action(ind, this);
-                            }), menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled, menuItems[i].Item2[j].Item2[k].IsEnabled, menuItems[i].Item2[j].Item2[k].HelpText));
+                            }), menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled, menuItems[i].Item2[j].Item2[k].IsEnabled, menuItems[i].Item2[j].Item2[k].HelpText));
                         }
 
                         groups.Add((menuItems[i].Item2[j].Item1, groupItems));
@@ -912,7 +912,7 @@ namespace TreeViewer
 
             helpFound = false;
 
-            foreach ((string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>) group in structure["Help"])
+            foreach ((string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>) group in structure["Help"])
             {
                 if (group.Item1 == "Help")
                 {
@@ -938,7 +938,7 @@ namespace TreeViewer
 
             if (!helpFound)
             {
-                structure["Help"].Add(("Help", new List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>() { ("About", new DPIAwareBox((scaling) =>
+                structure["Help"].Add(("Help", new List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>() { ("About", new DPIAwareBox((scaling) =>
                     {
                         if (scaling <= 1)
                         {
@@ -957,11 +957,11 @@ namespace TreeViewer
 
             List<(string, RibbonTabContent)> tbr = new List<(string, RibbonTabContent)>();
 
-            foreach (KeyValuePair<string, List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>)>> tab in structure)
+            foreach (KeyValuePair<string, List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>)>> tab in structure)
             {
                 tab.Value.Sort((el1, el2) => (from el in el1.Item2 select el.Item6).Min().CompareTo((from el in el2.Item2 select el.Item6).Min()));
 
-                foreach ((string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, AvaloniaProperty, Func<MainWindow, List<bool>>, string)>) el in tab.Value)
+                foreach ((string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, List<AvaloniaProperty>, Func<MainWindow, List<bool>>, string)>) el in tab.Value)
                 {
                     el.Item2.Sort((a, b) => a.Item6.CompareTo(b.Item6));
                 }
@@ -979,24 +979,27 @@ namespace TreeViewer
                     {
                         if (tab.Value[i].Item2[j].Item7 != null)
                         {
-                            AvaloniaProperty property = tab.Value[i].Item2[j].Item8;
+                            List<AvaloniaProperty> property = tab.Value[i].Item2[j].Item8;
                             Func<MainWindow, List<bool>> isEnabled = tab.Value[i].Item2[j].Item9;
                             RibbonButton relevantButton = buttons[i][j];
 
-                            this.PropertyChanged += (s, e) =>
+                            if (property != null && property.Count > 0)
                             {
-                                if (e.Property == property)
+                                this.PropertyChanged += (s, e) =>
                                 {
-                                    List<bool> enabled = isEnabled(this);
-
-                                    relevantButton.IsEnabled = enabled[0];
-
-                                    for (int k = 1; k < enabled.Count; k++)
+                                    if (property.Contains(e.Property))
                                     {
-                                        relevantButton.SubItems[k - 1].IsEnabled = enabled[k];
+                                        List<bool> enabled = isEnabled(this);
+
+                                        relevantButton.IsEnabled = enabled[0];
+
+                                        for (int k = 1; k < enabled.Count; k++)
+                                        {
+                                            relevantButton.SubItems[k - 1].IsEnabled = enabled[k];
+                                        }
                                     }
-                                }
-                            };
+                                };
+                            }
 
                             List<bool> enabled = isEnabled(this);
 
@@ -1679,12 +1682,12 @@ namespace TreeViewer
 
                                 string text = menuItems[i].Item2[j].Item2[k].ItemText;
                                 Func<MainWindow, List<bool>> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
-                                if (menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled != null)
+                                if (menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled != null)
                                 {
-                                    AvaloniaProperty prop = menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled;
+                                    List<AvaloniaProperty> prop = menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled;
                                     this.PropertyChanged += (s, e) =>
                                     {
-                                        if (e.Property == prop)
+                                        if (prop.Contains(e.Property))
                                         {
                                             this.RibbonFilePage.SetEnabled(text, isEnabled(this)[0]);
                                         }
@@ -1705,12 +1708,12 @@ namespace TreeViewer
 
                                 string text = menuItems[i].Item2[j].Item2[k].ItemText;
                                 Func<MainWindow, List<bool>> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
-                                if (menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled != null)
+                                if (menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled != null)
                                 {
-                                    AvaloniaProperty prop = menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled;
+                                    List<AvaloniaProperty> prop = menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled;
                                     this.PropertyChanged += (s, e) =>
                                     {
-                                        if (e.Property == prop)
+                                        if (prop.Contains(e.Property))
                                         {
                                             this.RibbonFilePage.SetEnabled(text, isEnabled(this)[0]);
                                         }
@@ -1731,12 +1734,12 @@ namespace TreeViewer
 
                                 string text = menuItems[i].Item2[j].Item2[k].ItemText;
                                 Func<MainWindow, List<bool>> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
-                                if (menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled != null)
+                                if (menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled != null)
                                 {
-                                    AvaloniaProperty prop = menuItems[i].Item2[j].Item2[k].PropertyAffectingEnabled;
+                                    List<AvaloniaProperty> prop = menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled;
                                     this.PropertyChanged += (s, e) =>
                                     {
-                                        if (e.Property == prop)
+                                        if (prop.Contains(e.Property))
                                         {
                                             this.RibbonFilePage.SetEnabled(text, isEnabled(this)[0]);
                                         }
@@ -1802,7 +1805,7 @@ namespace TreeViewer
                 {
                     this.FindControl<Grid>("TitleBarContainer2").Opacity = 0;
                 }
-                
+
 
                 Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                 {
