@@ -34,11 +34,9 @@ namespace TreeViewerCommandLine
 
             new ConsoleTextSpan("  region ", 2, ConsoleColor.Green),
             new ConsoleTextSpan("select ", 2, ConsoleColor.Yellow),
-            new ConsoleTextSpan("Region name\n", 2, ConsoleColor.Blue),
-
-            new ConsoleTextSpan("  region ", 2, ConsoleColor.Green),
-            new ConsoleTextSpan("select ", 2, ConsoleColor.Yellow),
-            new ConsoleTextSpan("Region ID\n", 2, ConsoleColor.Blue),
+            new ConsoleTextSpan("<region ID>", 2, ConsoleColor.Blue),
+            new ConsoleTextSpan("|", 2),
+            new ConsoleTextSpan("<region name>\n", 2, ConsoleColor.Blue),
 
             new ConsoleTextSpan("    Selects the specified ", 4),
             new ConsoleTextSpan("crop region", 4, ConsoleColor.Blue),
@@ -333,7 +331,7 @@ namespace TreeViewerCommandLine
 
                         foreach (string sr in ids)
                         {
-                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(sr, ConsoleColor.Cyan) }, "region select " + sr + " ");
+                            yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(sr, ConsoleColor.Blue) }, "region select " + sr + " ");
                         }
                     }
                     else
@@ -355,7 +353,7 @@ namespace TreeViewerCommandLine
                         {
                             if (sr.StartsWith(partialCommand, StringComparison.OrdinalIgnoreCase))
                             {
-                                yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(sr, ConsoleColor.Cyan) }, "region select " + sr + " ");
+                                yield return (new ConsoleTextSpan[] { new ConsoleTextSpan(sr, ConsoleColor.Blue) }, "region select " + sr + " ");
                             }
                         }
                     }
