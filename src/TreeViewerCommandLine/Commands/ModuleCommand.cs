@@ -295,7 +295,7 @@ namespace TreeViewerCommandLine
                 if (PendingUpdates.Any && !PendingUpdates.NeverAsk)
                 {
                     ConsoleWrapper.WriteLine();
-                    ConsoleWrapper.WriteLine(new ConsoleTextSpan[] { new ConsoleTextSpan("The state of some modules needs to be updated! Use the ", ConsoleColor.Yellow), new ConsoleTextSpan("update", ConsoleColor.Green), new ConsoleTextSpan(" to update them.", ConsoleColor.Yellow) });
+                    ConsoleWrapper.WriteLine(new ConsoleTextSpan[] { new ConsoleTextSpan("The state of some modules needs to be updated! Use the ", ConsoleColor.Yellow), new ConsoleTextSpan("update", ConsoleColor.Green), new ConsoleTextSpan(" command to update them.", ConsoleColor.Yellow) });
                     ConsoleWrapper.Write(new ConsoleTextSpan[] { new ConsoleTextSpan("Do you wish to proceed anyways? [Y(es)/N(o)/I( know what I'm doing, never ask again)] ", ConsoleColor.Yellow) });
 
                     char key = '?';
