@@ -61,13 +61,25 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions timeline](b93f8a2b-8731-4658-92f5-bb80af7292a8)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Plots age distributions on a timeline.
 
 **Module type**: Plotting
 
 **Module ID**: `b93f8a2b-8731-4658-92f5-bb80af7292a8`
+
+<br />
+
+### [Apply crop](6856e046-3553-465a-8b35-c351428120db)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Adds a crop region including the current view or the selected node.
+
+**Module type**: MenuAction
+
+**Module ID**: `6856e046-3553-465a-8b35-c351428120db`
 
 <br />
 
@@ -134,7 +146,7 @@ Safe even when opening huge files.
 
 ### [Branches](7c767b07-71be-48b2-8753-b27f3e973570)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Plots tree branches as lines.
 
@@ -146,7 +158,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Branch extensions](fb385719-b376-49b0-8e99-aab7cf641966)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Extends terminal branches.
 
@@ -303,7 +315,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Copy selected node](debd9130-8451-4413-88f0-6357ec817021)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Copies the selected node to the clipboard.
 
@@ -322,6 +334,30 @@ _Version 1.0.0, by Giorgio Bianchini_
 **Module type**: MenuAction
 
 **Module ID**: `650a0ef5-5322-4511-ae86-68bd87b47ecd`
+
+<br />
+
+### [Crop region](5a8eb0c8-7139-4583-9e9e-375749a98973)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Specifies a region of the plot to be cropped.
+
+**Module type**: Plotting
+
+**Module ID**: `5a8eb0c8-7139-4583-9e9e-375749a98973`
+
+<br />
+
+### [Custom action script](91b732fc-289b-4a91-84ef-b9ee3a89c86b)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Executes custom code.
+
+**Module type**: Action
+
+**Module ID**: `91b732fc-289b-4a91-84ef-b9ee3a89c86b`
 
 <br />
 
@@ -377,7 +413,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Export](d5d75840-4a71-4b81-bfc4-431736792abb)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Exports the tree plot as a PDF, SVG or PNG image.
 
@@ -449,7 +485,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Labels](ac496677-2650-4d92-8646-0812918bab03)
 
-_Version 1.2.1, by Giorgio Bianchini_
+_Version 1.2.2, by Giorgio Bianchini_
 
 **Description**: Draws labels on nodes, tips or branches.
 
@@ -461,7 +497,7 @@ _Version 1.2.1, by Giorgio Bianchini_
 
 ### [Lasso selection](a04dcde8-75e2-43b5-a45b-e78ec8fd1ab6)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Selects tips from the tree.
 
@@ -533,6 +569,18 @@ Safe even when opening huge files.
 
 <br />
 
+### [New tree](36a54db0-4e24-4786-8b84-ad4e188c3285)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Creates a new random tree or builds a tree from a sequence alignment.
+
+**Module type**: MenuAction
+
+**Module ID**: `36a54db0-4e24-4786-8b84-ad4e188c3285`
+
+<br />
+
 ### [NEXUS](31fdfc2f-1921-432e-bb47-51362dd4fabb)
 
 _Version 1.0.0, by Giorgio Bianchini_
@@ -548,7 +596,7 @@ Safe even when opening huge files.
 
 ### [Node bars](319e8f63-d6c9-4dac-9419-0b621dcd5f23)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Draws node bars.
 
@@ -560,7 +608,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Node shapes](7434420a-1afd-46ee-aeea-75ed8a5eeada)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Draws shapes on nodes, tips or branches.
 
@@ -572,7 +620,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Node states](0512b822-044d-4c13-b3bb-bca494c51daa)
 
-_Version 1.2.2, by Giorgio Bianchini_
+_Version 1.2.3, by Giorgio Bianchini_
 
 **Description**: Draws node states based on attributes.
 
@@ -632,7 +680,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Age distributions](5dbe1f3c-dbea-49b3-8f04-f319aefca534)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Plots node age distributions.
 
@@ -668,7 +716,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Polytomise selection](8202afa4-c9a6-47ac-98d5-dd0190c23f63)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Transforms the selected node into a polytomy.
 
@@ -704,7 +752,7 @@ _Version 1.1.1, by Giorgio Bianchini_
 
 ### [Prune selection](f8abf1cd-d79f-403b-b0f2-4bb1412839ff)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Prunes the selected node off the tree.
 
@@ -776,7 +824,7 @@ _Version 1.0.3, by Giorgio Bianchini_
 
 ### [Reroot tree](c6f96861-11c0-4853-9738-6a90cc81d660)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Re-roots the tree using the specified outgroup.
 
@@ -872,9 +920,9 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Search](5f3a7147-f706-43dc-9f57-18ade0c7b15d)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
-**Description**: Searches leaves in the tree.
+**Description**: Searches nodes in the tree.
 
 **Module type**: Action
 
@@ -920,7 +968,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Set up stochastic map](32858c9d-0247-497f-aeee-03f7bfe24158)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Parses the information from a stochastic mapping analysis.
 
@@ -932,7 +980,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Set up stochastic map (attachment)](0e2f5255-2d34-474b-955d-b531ee5ba605)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Parses the information from a stochastic mapping analysis contained in an attachment.
 
@@ -956,7 +1004,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Stochastic mapping branches](f7a20f2f-94b2-4331-8bbf-4e0087da6fba)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Plots branches with data from a stochastic mapping analysis.
 
