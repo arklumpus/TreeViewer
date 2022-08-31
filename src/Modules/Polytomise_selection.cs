@@ -66,10 +66,10 @@ namespace PruneSelection
         public const string Name = "Polytomise selection";
         public const string HelpText = "Transforms the selected node into a polytomy.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const string Id = "8202afa4-c9a6-47ac-98d5-dd0190c23f63";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
-        public static bool IsAvailableInCommandLine { get; } = false;
+        public static bool IsAvailableInCommandLine { get; } = true;
 
         public static string ButtonText { get; } = "Create polytomy";
         public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
@@ -235,147 +235,89 @@ namespace PruneSelection
 
             if (nodeNames.Count == 0 || !selection.IsLastCommonAncestor(nodeNames))
             {
-				if (InstanceStateData.IsUIAvailable)
-				{
-					MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-					box.ShowDialog2(window);
-				}
-				else if (InstanceStateData.IsInteractive)
-				{
-					Console.WriteLine();
-					Console.WriteLine("Attention! The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-					Console.WriteLine();
-				}
-				return;
+                if (InstanceStateData.IsUIAvailable)
+                {
+                    MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                    box.ShowDialog2(window);
+                }
+                else if (InstanceStateData.IsInteractive)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Attention! The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                    Console.WriteLine();
+                }
+                return;
             }
-			
-			if (InstanceStateData.IsUIAvailable)
-			{
-				window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, window.FurtherTransformations.Count);
-			}
+
+            if (InstanceStateData.IsUIAvailable)
+            {
+                window.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, window.FurtherTransformations.Count);
+            }
 
             if (actionIndex == 0)
             {
                 FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
-                Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
+                Action<Dictionary<string, object>> changeParameter = data.AddFurtherTransformationModule(module);
                 changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() } });
 
-				if (InstanceStateData.IsUIAvailable)
-				{
-					Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-					{
-						await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
-						window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
-					});
-				}
+                if (InstanceStateData.IsUIAvailable)
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
+                    });
+                }
             }
             else if (actionIndex == 3)
             {
                 FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
-                Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
+                Action<Dictionary<string, object>> changeParameter = data.AddFurtherTransformationModule(module);
                 changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() }, { "Apply recursively to all children", true } });
 
-				if (InstanceStateData.IsUIAvailable)
-				{
-					Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-					{
-						await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
-						window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
-					});
-				}
+                if (InstanceStateData.IsUIAvailable)
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
+                    });
+                }
             }
             else if (actionIndex == 1)
             {
-				if (InstanceStateData.IsUIAvailable)
-				{
-					Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-					{
+                if (InstanceStateData.IsUIAvailable)
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
 
-						foreach (TreeNode node in selection.Children)
-						{
-							if (node.Children.Count > 1)
-							{
-								List<string> currNodeNames = node.GetNodeNames();
+                        foreach (TreeNode node in selection.Children)
+                        {
+                            if (node.Children.Count > 1)
+                            {
+                                List<string> currNodeNames = node.GetNodeNames();
 
-								if (currNodeNames.Count == 0 || !node.IsLastCommonAncestor(currNodeNames))
-								{
-									MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-									await box.ShowDialog2(window);
-									return;
-								}
+                                if (currNodeNames.Count == 0 || !node.IsLastCommonAncestor(currNodeNames))
+                                {
+                                    MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                                    await box.ShowDialog2(window);
+                                    return;
+                                }
 
-								FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
-								Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
-								changeParameter(new Dictionary<string, object>() { { "Node:", currNodeNames.ToArray() } });
+                                FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
+                                Action<Dictionary<string, object>> changeParameter = data.AddFurtherTransformationModule(module);
+                                changeParameter(new Dictionary<string, object>() { { "Node:", currNodeNames.ToArray() } });
 
-								await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
-							}
-						}
+                                await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+                            }
+                        }
 
-						window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
-					});
-				}
-				else
-				{
-					foreach (TreeNode node in selection.Children)
-					{
-						if (node.Children.Count > 1)
-						{
-							List<string> currNodeNames = node.GetNodeNames();
-
-							if (currNodeNames.Count == 0 || !node.IsLastCommonAncestor(currNodeNames))
-							{
-								if (InstanceStateData.IsInteractive)
-								{
-									Console.WriteLine();
-									Console.WriteLine("Attention! The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-									Console.WriteLine();
-								}
-								
-								return;
-							}
-
-							FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
-							Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
-							changeParameter(new Dictionary<string, object>() { { "Node:", currNodeNames.ToArray() } });
-						}
-					}
-				}
-            }
-            else if (actionIndex == 2)
-            {
-				if (InstanceStateData.IsUIAvailable)
-				{
-					Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
-					{
-
-						foreach (TreeNode node in selection.Children)
-						{
-							if (node.Children.Count > 1)
-							{
-								List<string> currNodeNames = node.GetNodeNames();
-
-								if (currNodeNames.Count == 0 || !node.IsLastCommonAncestor(currNodeNames))
-								{
-									MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-									await box.ShowDialog2(window);
-									return;
-								}
-
-								FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
-								Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
-								changeParameter(new Dictionary<string, object>() { { "Node:", currNodeNames.ToArray() }, { "Apply recursively to all children", true } });
-
-								await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
-							}
-						}
-
-						window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
-					});
-				}
-				else
-				{
-					foreach (TreeNode node in selection.Children)
+                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
+                    });
+                }
+                else
+                {
+                    foreach (TreeNode node in selection.Children)
                     {
                         if (node.Children.Count > 1)
                         {
@@ -383,22 +325,80 @@ namespace PruneSelection
 
                             if (currNodeNames.Count == 0 || !node.IsLastCommonAncestor(currNodeNames))
                             {
-								if (InstanceStateData.IsInteractive)
-								{
-									Console.WriteLine();
-									Console.WriteLine("Attention! The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
-									Console.WriteLine();
-								}
-								
+                                if (InstanceStateData.IsInteractive)
+                                {
+                                    Console.WriteLine();
+                                    Console.WriteLine("Attention! The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                                    Console.WriteLine();
+                                }
+
                                 return;
                             }
 
                             FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
-                            Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
+                            Action<Dictionary<string, object>> changeParameter = data.AddFurtherTransformationModule(module);
+                            changeParameter(new Dictionary<string, object>() { { "Node:", currNodeNames.ToArray() } });
+                        }
+                    }
+                }
+            }
+            else if (actionIndex == 2)
+            {
+                if (InstanceStateData.IsUIAvailable)
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+
+                        foreach (TreeNode node in selection.Children)
+                        {
+                            if (node.Children.Count > 1)
+                            {
+                                List<string> currNodeNames = node.GetNodeNames();
+
+                                if (currNodeNames.Count == 0 || !node.IsLastCommonAncestor(currNodeNames))
+                                {
+                                    MessageBox box = new MessageBox("Attention!", "The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                                    await box.ShowDialog2(window);
+                                    return;
+                                }
+
+                                FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
+                                Action<Dictionary<string, object>> changeParameter = data.AddFurtherTransformationModule(module);
+                                changeParameter(new Dictionary<string, object>() { { "Node:", currNodeNames.ToArray() }, { "Apply recursively to all children", true } });
+
+                                await window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
+                            }
+                        }
+
+                        window.SetSelection(window.TransformedTree.GetLastCommonAncestor(new string[] { nodeNames[0], nodeNames[^1] }));
+                    });
+                }
+                else
+                {
+                    foreach (TreeNode node in selection.Children)
+                    {
+                        if (node.Children.Count > 1)
+                        {
+                            List<string> currNodeNames = node.GetNodeNames();
+
+                            if (currNodeNames.Count == 0 || !node.IsLastCommonAncestor(currNodeNames))
+                            {
+                                if (InstanceStateData.IsInteractive)
+                                {
+                                    Console.WriteLine();
+                                    Console.WriteLine("Attention! The requested node cannot be uniquely identified! Please, make sure that it either has a Name or enough of its children have Names.");
+                                    Console.WriteLine();
+                                }
+
+                                return;
+                            }
+
+                            FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "19d9a555-07e6-4dac-afc1-d5ffcef35f76");
+                            Action<Dictionary<string, object>> changeParameter = data.AddFurtherTransformationModule(module);
                             changeParameter(new Dictionary<string, object>() { { "Node:", currNodeNames.ToArray() }, { "Apply recursively to all children", true } });
                         }
                     }
-				}
+                }
             }
         }
     }

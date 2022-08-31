@@ -19,10 +19,10 @@ namespace PruneSelection
         public const string Name = "Prune selection";
         public const string HelpText = "Prunes the selected node off the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.0.4");
         public const string Id = "f8abf1cd-d79f-403b-b0f2-4bb1412839ff";
         public const ModuleTypes ModuleType = ModuleTypes.SelectionAction;
-        public static bool IsAvailableInCommandLine { get; } = false;
+        public static bool IsAvailableInCommandLine { get; } = true;
 
         public static string ButtonText { get; } = "Prune node";
         public static Avalonia.Input.Key ShortcutKey { get; } = Avalonia.Input.Key.None;
@@ -112,7 +112,7 @@ namespace PruneSelection
 			}
 
             FurtherTransformationModule module = Modules.GetModule(Modules.FurtherTransformationModules, "ffc97742-4cf5-44ef-81aa-d5b51708a003");
-            Action<Dictionary<string, object>> changeParameter = window.AddFurtherTransformation(module);
+            Action<Dictionary<string, object>> changeParameter = data.AddFurtherTransformationModule(module);
             if (selection.Children.Count == 0)
             {
                 changeParameter(new Dictionary<string, object>() { { "Node:", nodeNames.ToArray() }, { "Position:", 0.0 } });
