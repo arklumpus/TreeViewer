@@ -239,10 +239,10 @@ namespace a5a8eb0c8713945839e9e375749a98973
 
             if (showGuides)
             {
-                graphics.StrokePath(new GraphicsPath().MoveTo(left - margin * lineWidth, top).LineTo(right + margin * lineWidth, top), guideColour, lineWidth);
-                graphics.StrokePath(new GraphicsPath().MoveTo(left - margin * lineWidth, bottom).LineTo(right + margin * lineWidth, bottom), guideColour, lineWidth);
-                graphics.StrokePath(new GraphicsPath().MoveTo(left, top - margin * lineWidth).LineTo(left, bottom + margin * lineWidth), guideColour, lineWidth);
-                graphics.StrokePath(new GraphicsPath().MoveTo(right, top - margin * lineWidth).LineTo(right, bottom + margin * lineWidth), guideColour, lineWidth);
+                graphics.StrokePath(new GraphicsPath().MoveTo(left - margin * lineWidth, top).LineTo(right + margin * lineWidth, top), guideColour, lineWidth, tag: anchorNode.Id);
+                graphics.StrokePath(new GraphicsPath().MoveTo(left - margin * lineWidth, bottom).LineTo(right + margin * lineWidth, bottom), guideColour, lineWidth, tag: anchorNode.Id);
+                graphics.StrokePath(new GraphicsPath().MoveTo(left, top - margin * lineWidth).LineTo(left, bottom + margin * lineWidth), guideColour, lineWidth, tag: anchorNode.Id);
+                graphics.StrokePath(new GraphicsPath().MoveTo(right, top - margin * lineWidth).LineTo(right, bottom + margin * lineWidth), guideColour, lineWidth, tag: anchorNode.Id);
 
                 Point center = new Point((left + right) * 0.5, (top + bottom) * 0.5);
 
@@ -256,7 +256,7 @@ namespace a5a8eb0c8713945839e9e375749a98973
                     graphics.Save();
                     graphics.Rotate(Math.Atan2(target.Y, target.X));
                     double shaftLength = target.Modulus() - arrowSize * 2;
-                    graphics.FillPath(new GraphicsPath().MoveTo(shaftLength, arrowSize).LineTo(shaftLength + arrowSize * 2, 0).LineTo(shaftLength, -arrowSize).LineTo(shaftLength, -lineWidth).LineTo(0, 0).LineTo(shaftLength, lineWidth).Close(), guideColour.WithAlpha(guideColour.A * 0.5));
+                    graphics.FillPath(new GraphicsPath().MoveTo(shaftLength, arrowSize).LineTo(shaftLength + arrowSize * 2, 0).LineTo(shaftLength, -arrowSize).LineTo(shaftLength, -lineWidth).LineTo(0, 0).LineTo(shaftLength, lineWidth).Close(), guideColour.WithAlpha(guideColour.A * 0.5), tag: anchorNode.Id);
                     graphics.Restore();
                 }
 
