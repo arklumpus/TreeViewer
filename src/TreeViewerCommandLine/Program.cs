@@ -64,6 +64,7 @@ namespace TreeViewerCommandLine
         private static ModuleParametersContainer _selectedModuleParameters = null;
 
         public static TreeNode SelectedNode;
+        public static string SelectedRegion = null;
 
         public static ModuleParametersContainer SelectedModuleParameters
         {

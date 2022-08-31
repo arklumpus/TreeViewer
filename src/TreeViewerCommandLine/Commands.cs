@@ -45,7 +45,8 @@ namespace TreeViewerCommandLine
                                                             new NexusCommand(),
                                                             new BinaryCommand(),
                                                             new BackgroundCommand(),
-                                                            new AttachmentCommand()
+                                                            new AttachmentCommand(),
+                                                            new RegionCommand()
                                                         }
                                                         orderby el.PrimaryCommand
                                                         select el).ToArray();

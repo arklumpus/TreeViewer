@@ -128,9 +128,32 @@ namespace TreeViewerCommandLine
                 }
 
                 pag.Crop(new Point(minX - 10, minY - 10), new Size(maxX - minX + 20, maxY - minY + 20));
+
+                if (!string.IsNullOrEmpty(Program.SelectedRegion) && Program.StateData.Tags.TryGetValue("5a8eb0c8-7139-4583-9e9e-375749a98973", out object cropRegionsObject) && cropRegionsObject != null && cropRegionsObject is Dictionary<string, (string, VectSharp.Rectangle)> cropRegions && cropRegions.TryGetValue(Program.SelectedRegion, out (string, VectSharp.Rectangle) selectedRegion))
+                {
+                    pag = ApplyCrop(pag, selectedRegion.Item2, new Point(minX, minY));
+                }
             }
 
             return pag;
+        }
+
+        private static Page ApplyCrop(Page pag, Rectangle cropRegion, VectSharp.Point origin)
+        {
+            VectSharp.Point location = cropRegion.Location;
+            VectSharp.Size size = cropRegion.Size;
+
+            pag.Crop(new VectSharp.Point(-origin.X + 10 + location.X, -origin.Y + 10 + location.Y), size);
+
+            Page pag2 = new Page(size.Width, size.Height);
+
+            pag2.Graphics.SetClippingPath(0, 0, size.Width, size.Height);
+
+            pag2.Graphics.DrawGraphics(0, 0, pag.Graphics);
+
+            pag2.Background = pag.Background;
+
+            return pag2;
         }
 
         public override IEnumerable<(ConsoleTextSpan[], string)> GetCompletions(string partialCommand)
