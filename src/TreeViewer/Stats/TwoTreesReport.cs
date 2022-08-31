@@ -1010,7 +1010,7 @@ namespace TreeViewer.Stats
                 markdownSourceBuilder.Append("). ");
 
 
-                markdownSourceBuilder.AppendLine("). [**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of the difference in length between splits from the first tree and the corresponding splits from the second tree.");
+                markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of the difference in length between splits from the first tree and the corresponding splits from the second tree.");
                 markdownSourceBuilder.AppendLine();
 
                 markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");

@@ -59,7 +59,7 @@ namespace TreeViewer.Stats
     internal static class SingleTreeReport
     {
 
-        public static (Markdig.Syntax.MarkdownDocument report, string reportSource) CreateReport(TreeNode tree, Action<string, double> progressAction, Dictionary<string, GetPlot> Plots, Dictionary<string, Func<(string header, IEnumerable<double[]>)>> Data)
+        public static (Markdig.Syntax.MarkdownDocument report, string reportSource) CreateReport(TreeNode tree, bool isFinalTransformed, Action<string, double> progressAction, Dictionary<string, GetPlot> Plots, Dictionary<string, Func<(string header, IEnumerable<double[]>)>> Data)
         {
             List<TreeNode> leaves = tree.GetLeaves();
             List<TreeNode> nodes = tree.GetChildrenRecursive();
@@ -390,7 +390,14 @@ namespace TreeViewer.Stats
             markdownSourceBuilder.AppendLine("## General information");
             markdownSourceBuilder.AppendLine();
 
-            markdownSourceBuilder.Append("The final transformed tree is **");
+            if (isFinalTransformed)
+            {
+                markdownSourceBuilder.Append("The final transformed tree is **");
+            }
+            else
+            {
+                markdownSourceBuilder.Append("The tree is **");
+            }
 
             if (rooted)
             {

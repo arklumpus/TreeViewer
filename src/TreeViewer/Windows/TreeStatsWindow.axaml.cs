@@ -115,7 +115,7 @@ namespace TreeViewer
             {
                 if (FinalTreeReport == null)
                 {
-                    (this.FinalTreeReport, this.FinalTreeReportSource) = SingleTreeReport.CreateReport(parentWindow.TransformedTree, (text, progress) =>
+                    (this.FinalTreeReport, this.FinalTreeReportSource) = SingleTreeReport.CreateReport(parentWindow.TransformedTree, true, (text, progress) =>
                     {
                         Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
                         {
@@ -178,7 +178,7 @@ namespace TreeViewer
             {
                 if (trees.Count == 1)
                 {
-                    (this.CustomTreesReport, this.CustomTreesReportSource) = SingleTreeReport.CreateReport(trees[0], (text, progress) =>
+                    (this.CustomTreesReport, this.CustomTreesReportSource) = SingleTreeReport.CreateReport(trees[0], false, (text, progress) =>
                     {
                         Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
                         {
