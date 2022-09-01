@@ -2132,28 +2132,33 @@ namespace TreeViewer
             refreshAllButtonContents.Children.Add(refreshButtonIcon);
             refreshAllButtonContents.Children.Add(new TextBlock() { Text = "Reset", Margin = new Thickness(5, 0, 0, 0) });
 
-            Button resetButton = new Button() { Content = refreshAllButtonContents, Background = Brushes.Transparent, Padding = new Thickness(5, 2, 5, 2) };
-            Grid.SetColumn(resetButton, 1);
-            resetButton.Classes.Add("SideBarButton");
+            ResetCoordinatesButton = new Button() { Content = refreshAllButtonContents, Background = Brushes.Transparent, Padding = new Thickness(5, 2, 5, 2) };
+            Grid.SetColumn(ResetCoordinatesButton, 1);
+            ResetCoordinatesButton.Classes.Add("SideBarButton");
 
             Style hoverIconStyle = new Style(x => x.Class("HoverIcon"));
             hoverIconStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
-            resetButton.Styles.Add(hoverIconStyle);
+            ResetCoordinatesButton.Styles.Add(hoverIconStyle);
 
             Style hoverIconHoverStyle = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().Class("HoverIcon"));
             hoverIconHoverStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, true));
-            resetButton.Styles.Add(hoverIconHoverStyle);
+            ResetCoordinatesButton.Styles.Add(hoverIconHoverStyle);
 
             Style blurIconHoverStyle = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().Class("BlurIcon"));
             blurIconHoverStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
-            resetButton.Styles.Add(blurIconHoverStyle);
+            ResetCoordinatesButton.Styles.Add(blurIconHoverStyle);
 
-            resetButton.Click += async (s, e) =>
+            Style disabledBackgroundStyle = new Style(x => x.OfType<Button>().Class(":disabled").Template().OfType<Avalonia.Controls.Presenters.ContentPresenter>());
+            disabledBackgroundStyle.Setters.Add(new Setter(Avalonia.Controls.Presenters.ContentPresenter.BackgroundProperty, Brushes.Transparent));
+            disabledBackgroundStyle.Setters.Add(new Setter(Avalonia.Controls.Presenters.ContentPresenter.OpacityProperty, 0.5));
+            ResetCoordinatesButton.Styles.Add(disabledBackgroundStyle);
+
+            ResetCoordinatesButton.Click += async (s, e) =>
             {
                 await ResetDefaultCoordinateModuleParameters();
             };
 
-            panelHeader.Children.Add(resetButton);
+            panelHeader.Children.Add(ResetCoordinatesButton);
 
             this.FindControl<StackPanel>("CoordinatesModuleContainerPanel").Children.Add(panelHeader);
 
@@ -2256,7 +2261,9 @@ namespace TreeViewer
 
         public async Task ResetDefaultCoordinateModuleParameters()
         {
+            ResetCoordinatesButton.IsEnabled = false;
             await resetDefaultCoordinateModuleParameters();
+            ResetCoordinatesButton.IsEnabled = true;
         }
 
         bool SettingCoordinatesModule = false;
@@ -2297,6 +2304,8 @@ namespace TreeViewer
             }
         }
 
+        private Button RefreshAllButton;
+        private Button ResetCoordinatesButton;
 
         private void BuildPlottingPanel(Colour backgroundColour)
         {
@@ -2322,28 +2331,33 @@ namespace TreeViewer
             refreshAllButtonContents.Children.Add(refreshButtonIcon);
             refreshAllButtonContents.Children.Add(new TextBlock() { Text = "Redraw all", Margin = new Thickness(5, 0, 0, 0) });
 
-            Button refreshAllButton = new Button() { Content = refreshAllButtonContents, Background = Brushes.Transparent, Padding = new Thickness(5, 2, 5, 2) };
-            Grid.SetColumn(refreshAllButton, 1);
-            refreshAllButton.Classes.Add("SideBarButton");
+            RefreshAllButton = new Button() { Content = refreshAllButtonContents, Background = Brushes.Transparent, Padding = new Thickness(5, 2, 5, 2) };
+            Grid.SetColumn(RefreshAllButton, 1);
+            RefreshAllButton.Classes.Add("SideBarButton");
 
             Style hoverIconStyle = new Style(x => x.Class("HoverIcon"));
             hoverIconStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
-            refreshAllButton.Styles.Add(hoverIconStyle);
+            RefreshAllButton.Styles.Add(hoverIconStyle);
 
             Style hoverIconHoverStyle = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().Class("HoverIcon"));
             hoverIconHoverStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, true));
-            refreshAllButton.Styles.Add(hoverIconHoverStyle);
+            RefreshAllButton.Styles.Add(hoverIconHoverStyle);
 
             Style blurIconHoverStyle = new Style(x => x.OfType<Button>().Class(":pointerover").Descendant().Class("BlurIcon"));
             blurIconHoverStyle.Setters.Add(new Setter(DPIAwareBox.IsVisibleProperty, false));
-            refreshAllButton.Styles.Add(blurIconHoverStyle);
+            RefreshAllButton.Styles.Add(blurIconHoverStyle);
 
-            refreshAllButton.Click += async (s, e) =>
+            Style disabledBackgroundStyle = new Style(x => x.OfType<Button>().Class(":disabled").Template().OfType<Avalonia.Controls.Presenters.ContentPresenter>());
+            disabledBackgroundStyle.Setters.Add(new Setter(Avalonia.Controls.Presenters.ContentPresenter.BackgroundProperty, Brushes.Transparent));
+            disabledBackgroundStyle.Setters.Add(new Setter(Avalonia.Controls.Presenters.ContentPresenter.OpacityProperty, 0.5));
+            RefreshAllButton.Styles.Add(disabledBackgroundStyle);
+
+            RefreshAllButton.Click += async (s, e) =>
             {
                 await UpdateAllPlotLayers();
             };
 
-            panelHeader.Children.Add(refreshAllButton);
+            panelHeader.Children.Add(RefreshAllButton);
 
             this.FindControl<StackPanel>("PlotActionsContainerPanel").Children.Add(panelHeader);
 

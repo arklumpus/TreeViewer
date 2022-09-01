@@ -672,6 +672,7 @@ namespace TreeViewer
                             this.FindControl<CoolProgressBar>("PlotProgressBar").LabelText = PlottingActions[layer].Name;
 
                             this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 1;
+                            this.RefreshAllButton.IsEnabled = false;
                         }
                         else
                         {
@@ -997,6 +998,8 @@ namespace TreeViewer
                             this.FindControl<CoolProgressBar>("PlotProgressBar").LabelText = " ";
 
                             this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 0;
+
+                            this.RefreshAllButton.IsEnabled = true;
                         }
                     }
                     ActionsWhoseColourHasBeenChanged.RemoveWhere(act => !SelectionCanvas.Children.Contains(act.Parent));
@@ -1073,6 +1076,8 @@ namespace TreeViewer
         {
             if (!StopAllUpdates)
             {
+                this.RefreshAllButton.IsEnabled = false;
+
                 this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").IsVisible = true;
 
                 PlotBounds = new List<(Point, Point)>(new (Point, Point)[PlottingActions.Count]);
@@ -1123,6 +1128,8 @@ namespace TreeViewer
                 UpdatePlotBounds();
 
                 this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 0;
+
+                this.RefreshAllButton.IsEnabled = true;
             }
         }
 
