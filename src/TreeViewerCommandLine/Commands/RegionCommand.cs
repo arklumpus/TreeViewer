@@ -168,7 +168,7 @@ namespace TreeViewerCommandLine
                     ConsoleWrapper.WriteLine();
                 }
             }
-            else if (command.StartsWith("select"))
+            else if (command.StartsWith("select", StringComparison.OrdinalIgnoreCase))
             {
                 if (Program.TransformedTree != null)
                 {
