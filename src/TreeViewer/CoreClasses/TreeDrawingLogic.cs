@@ -35,8 +35,6 @@ namespace TreeViewer
 {
     public partial class MainWindow
     {
-        private static Page alertPage = null;
-
         Avalonia.Media.IBrush graphBackgroundBrush = Avalonia.Media.Brushes.White;
 
         private bool SettingGraphBackground = false;
@@ -159,32 +157,9 @@ namespace TreeViewer
             }
         }
 
-        public static Page AlertPageIcon
+        public static DPIAwareBox GetAlertIcon()
         {
-            get
-            {
-                if (alertPage != null)
-                {
-                    return alertPage;
-                }
-                else
-                {
-                    alertPage = new Page(24, 24);
-
-                    Graphics gpr = alertPage.Graphics;
-
-                    gpr.FillPath(new GraphicsPath().MoveTo(12, 2).LineTo(2, 21).LineTo(21, 21).Close(), Colour.FromRgb(255, 201, 14));
-                    gpr.StrokePath(new GraphicsPath().MoveTo(12, 2).LineTo(2, 21).LineTo(21, 21).Close(), Colour.FromRgb(255, 201, 14), lineWidth: 4, lineJoin: LineJoins.Round);
-                    gpr.FillPath(new GraphicsPath().AddText(10.5, 13, "!", new Font(VectSharp.FontFamily.ResolveFontFamily(VectSharp.FontFamily.StandardFontFamilies.HelveticaBold), 18), TextBaselines.Middle), Colour.FromRgb(0, 0, 0));
-
-                    return alertPage;
-                }
-            }
-        }
-
-        public static Viewbox GetAlertIcon()
-        {
-            return new Viewbox() { Child = AlertPageIcon.PaintToCanvas() };
+            return new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Warning"));
         }
 
         private bool TryRecoverSelectedNode(string id, List<string> nodeNames)
@@ -276,13 +251,17 @@ namespace TreeViewer
                 try
                 {
                     await UpdateOnlyTransformedTree(win);
-
                     TransformerAlert.IsVisible = false;
+                    CurrentExceptions.Remove((string)TransformerParameters[Modules.ModuleIDKey]);
+                    UpdateWarningVisibility();
                 }
                 catch (Exception ex)
                 {
                     TransformerAlert.IsVisible = true;
-                    AvaloniaBugFixes.SetToolTip(TransformerAlert, GetExceptionMessage(ex));
+                    string message = GetExceptionMessage(ex);
+                    AvaloniaBugFixes.SetToolTip(TransformerAlert, message);
+                    CurrentExceptions[(string)TransformerParameters[Modules.ModuleIDKey]] = (Modules.TransformerModules[TransformerComboBox.SelectedIndex], message);
+                    UpdateWarningVisibility();
                     win.Close();
                     return;
                 }
@@ -396,6 +375,9 @@ namespace TreeViewer
                                 {
                                     progressWindow.Progress = progress;
                                 }
+
+                                CurrentExceptions.Remove((string)FurtherTransformationsParameters[j][Modules.ModuleIDKey]);
+                                UpdateWarningVisibility();
                             });
                         }
                         catch (Exception ex)
@@ -403,7 +385,12 @@ namespace TreeViewer
                             _ = Dispatcher.UIThread.InvokeAsync(() =>
                             {
                                 FurtherTransformationsAlerts[j].IsVisible = true;
-                                AvaloniaBugFixes.SetToolTip(FurtherTransformationsAlerts[j], GetExceptionMessage(ex));
+
+                                string message = GetExceptionMessage(ex);
+                                AvaloniaBugFixes.SetToolTip(FurtherTransformationsAlerts[j], message);
+
+                                CurrentExceptions[(string)FurtherTransformationsParameters[j][Modules.ModuleIDKey]] = (FurtherTransformations[j], message);
+                                UpdateWarningVisibility();
                             });
                         }
                     }
@@ -486,6 +473,19 @@ namespace TreeViewer
             }
         }
 
+        private void UpdateWarningVisibility()
+        {
+            if (CurrentExceptions.Count == 0)
+            {
+                this.FindControl<Button>("WarningButton").IsVisible = false;
+            }
+            else
+            {
+                this.FindControl<TextBlock>("WarningCountBlock").Text = CurrentExceptions.Count.ToString();
+                this.FindControl<Button>("WarningButton").IsVisible = true;
+            }
+        }
+
         private static string GetExceptionMessage(Exception exception)
         {
 
@@ -552,11 +552,16 @@ namespace TreeViewer
                 {
                     UpdateOnlyCoordinates();
                     CoordinatesAlert.IsVisible = false;
+                    CurrentExceptions.Remove((string)CoordinatesParameters[Modules.ModuleIDKey]);
+                    UpdateWarningVisibility();
                 }
                 catch (Exception ex)
                 {
                     CoordinatesAlert.IsVisible = true;
-                    AvaloniaBugFixes.SetToolTip(CoordinatesAlert, GetExceptionMessage(ex));
+                    string message = GetExceptionMessage(ex);
+                    AvaloniaBugFixes.SetToolTip(CoordinatesAlert, message);
+                    CurrentExceptions[(string)CoordinatesParameters[Modules.ModuleIDKey]] = (Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex], message);
+                    UpdateWarningVisibility();
                     return;
                 }
 
@@ -868,7 +873,11 @@ namespace TreeViewer
                                         }
 
                                         PlottingAlerts[layer].IsVisible = true;
-                                        AvaloniaBugFixes.SetToolTip(PlottingAlerts[layer], GetExceptionMessage(ex));
+                                        string message = GetExceptionMessage(ex);
+                                        AvaloniaBugFixes.SetToolTip(PlottingAlerts[layer], message);
+
+                                        CurrentExceptions[(string)PlottingParameters[layer][Modules.ModuleIDKey]] = (PlottingActions[layer], message);
+                                        UpdateWarningVisibility();
                                     });
                                 }
                                 catch { }
@@ -947,6 +956,9 @@ namespace TreeViewer
 
                                 PlottingAlerts[layer].IsVisible = false;
 
+                                CurrentExceptions.Remove((string)PlottingParameters[layer][Modules.ModuleIDKey]);
+                                UpdateWarningVisibility();
+
                                 FullPlotCanvas.Width = PlotBottomRight.X - PlotOrigin.X;
                                 FullPlotCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y;
 
@@ -987,7 +999,11 @@ namespace TreeViewer
                                 }
 
                                 PlottingAlerts[layer].IsVisible = true;
-                                AvaloniaBugFixes.SetToolTip(PlottingAlerts[layer], GetExceptionMessage(ex));
+                                string message = GetExceptionMessage(ex);
+                                AvaloniaBugFixes.SetToolTip(PlottingAlerts[layer], message);
+
+                                CurrentExceptions[(string)PlottingParameters[layer][Modules.ModuleIDKey]] = (PlottingActions[layer], message);
+                                UpdateWarningVisibility();
                             }
                             catch { }
                         }

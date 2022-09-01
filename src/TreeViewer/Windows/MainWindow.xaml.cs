@@ -143,6 +143,8 @@ namespace TreeViewer
         public List<Dictionary<string, object>> FurtherTransformationsParameters;
         public List<Action<Dictionary<string, object>>> UpdateFurtherTransformationParameters;
 
+        Dictionary<string, (Module, string)> CurrentExceptions;
+
         List<Action> SelectionActionActions;
 
         private string WindowGuid = System.Guid.NewGuid().ToString();
@@ -430,7 +432,235 @@ namespace TreeViewer
             this.Close();
         }
 
+        private object highlightLock = new object();
+        private bool highlighting = false;
 
+        public async Task HighlightModule(string moduleKey, Module module)
+        {
+            lock (highlightLock)
+            {
+                if (highlighting)
+                {
+                    return;
+                }
+                else
+                {
+                    highlighting = true;
+                }
+            }
+
+            if (module is PlottingModule)
+            {
+                int index = -1;
+
+                for (int i = 0; i < this.PlottingParameters.Count; i++)
+                {
+                    if ((string)this.PlottingParameters[i][Modules.ModuleIDKey] == moduleKey)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+
+                this.IsModulesPanelOpen = true;
+                this.ModulesHeader.SelectedIndex = 3;
+                ((ScrollViewer)this.FindControl<StackPanel>("PlotActionsContainerPanel").Parent).Offset = new Vector(0, ((ScrollViewer)this.FindControl<StackPanel>("PlotActionsContainerPanel").Parent).Offset.Y + ((ScrollViewer)this.FindControl<StackPanel>("PlotActionsContainerPanel").Parent).PointToClient(((Grid)PlottingAlerts[index].Parent.Parent.Parent).PointToScreen(new Avalonia.Point(0, 0))).Y);
+
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    Grid parentGrid = ((Grid)PlottingAlerts[index].Parent.Parent.Parent);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    parentGrid.Transitions = new Avalonia.Animation.Transitions()
+                            {
+                                new Avalonia.Animation.BrushTransition(){ Property = Grid.BackgroundProperty, Duration = TimeSpan.FromMilliseconds(250) }
+                            };
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Transitions = null;
+
+                    parentGrid.ClearValue(Grid.BackgroundProperty);
+                });
+            }
+            else if (module is FurtherTransformationModule)
+            {
+                int index = -1;
+
+                for (int i = 0; i < this.FurtherTransformationsParameters.Count; i++)
+                {
+                    if ((string)this.FurtherTransformationsParameters[i][Modules.ModuleIDKey] == moduleKey)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+
+                this.IsModulesPanelOpen = true;
+                this.ModulesHeader.SelectedIndex = 1;
+                ((ScrollViewer)this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Parent).Offset = new Vector(0, ((ScrollViewer)this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Parent).Offset.Y + ((ScrollViewer)this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Parent).PointToClient(((Grid)FurtherTransformationsAlerts[index].Parent.Parent.Parent).PointToScreen(new Avalonia.Point(0, 0))).Y);
+
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    Grid parentGrid = ((Grid)FurtherTransformationsAlerts[index].Parent.Parent.Parent);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    parentGrid.Transitions = new Avalonia.Animation.Transitions()
+                            {
+                                new Avalonia.Animation.BrushTransition(){ Property = Grid.BackgroundProperty, Duration = TimeSpan.FromMilliseconds(250) }
+                            };
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Transitions = null;
+
+                    parentGrid.ClearValue(Grid.BackgroundProperty);
+                });
+            }
+            else if (module is CoordinateModule)
+            {
+                this.IsModulesPanelOpen = true;
+                this.ModulesHeader.SelectedIndex = 2;
+                ((ScrollViewer)this.FindControl<StackPanel>("CoordinatesModuleContainerPanel").Parent).Offset = new Vector(0, 0);
+
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    Grid parentGrid = ((Grid)CoordinatesAlert.Parent);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    parentGrid.Transitions = new Avalonia.Animation.Transitions()
+                            {
+                                new Avalonia.Animation.BrushTransition(){ Property = Grid.BackgroundProperty, Duration = TimeSpan.FromMilliseconds(250) }
+                            };
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Transitions = null;
+
+                    parentGrid.ClearValue(Grid.BackgroundProperty);
+                });
+            }
+            else if (module is TransformerModule)
+            {
+                this.IsModulesPanelOpen = true;
+                this.ModulesHeader.SelectedIndex = 0;
+                ((ScrollViewer)this.FindControl<StackPanel>("TransformerModuleContainerPanel").Parent).Offset = new Vector(0, 0);
+
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    Grid parentGrid = ((Grid)TransformerAlert.Parent);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    parentGrid.Transitions = new Avalonia.Animation.Transitions()
+                            {
+                                new Avalonia.Animation.BrushTransition(){ Property = Grid.BackgroundProperty, Duration = TimeSpan.FromMilliseconds(250) }
+                            };
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(350);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(64, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Background = new SolidColorBrush(Color.FromArgb(0, 0, 114, 178));
+
+                    await Task.Delay(250);
+
+                    parentGrid.Transitions = null;
+
+                    parentGrid.ClearValue(Grid.BackgroundProperty);
+                });
+            }
+
+            lock (highlightLock)
+            {
+                highlighting = false;
+            }
+        }
 
         private void InitializeComponent()
         {
@@ -519,6 +749,30 @@ namespace TreeViewer
                 TreeStatsWindow win = new TreeStatsWindow(this);
 
                 await win.ShowDialog2(this);
+            };
+
+
+            this.FindControl<Canvas>("WarningIconCanvas").Children.Add(GetAlertIcon());
+            this.FindControl<Button>("WarningButton").Click += async (s, e) =>
+            {
+
+                //await new MessageBox("Attention!", "Warnings while creating plot").ShowDialog2(this);
+
+                /*if (CurrentExceptions.Count > 0)
+                {
+                    KeyValuePair<string, (Module, string)> kvp = CurrentExceptions.ElementAt(0);
+
+                    HighlightModule(kvp.Key, kvp.Value.Item1);
+                }*/
+
+                /*this.TransformerAlert.IsVisible = true;
+
+                HighlightModule(null, Modules.TransformerModules[0]);*/
+
+                PlotWarningWindow win = new PlotWarningWindow(this, CurrentExceptions);
+
+                await win.ShowDialog2(this);
+
             };
 
             this.FindControl<Grid>("LeftMouseButtonContainerGrid").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.LeftMouseButton")));
@@ -1472,7 +1726,7 @@ namespace TreeViewer
             TransformerAlert = GetAlertIcon();
             TransformerAlert.Width = 16;
             TransformerAlert.Height = 16;
-            TransformerAlert.Margin = new Thickness(0, 0, 5, 0);
+            TransformerAlert.Margin = new Thickness(5, 0, 5, 0);
             TransformerAlert.IsVisible = false;
             Grid.SetColumn(TransformerAlert, 1);
 
@@ -1542,6 +1796,9 @@ namespace TreeViewer
 
             TransformerComboBox.SelectionChanged += async (s, e) =>
             {
+                CurrentExceptions.Remove((string)TransformerParameters[Modules.ModuleIDKey]);
+                UpdateWarningVisibility();
+
                 AvaloniaBugFixes.SetToolTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
                 List<(string, string)> parameters = Modules.TransformerModules[TransformerComboBox.SelectedIndex].GetParameters(Trees);
                 parameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
@@ -1565,6 +1822,7 @@ namespace TreeViewer
             FurtherTransformationsAlerts = new List<Control>();
             FurtherTransformationsParameters = new List<Dictionary<string, object>>();
             UpdateFurtherTransformationParameters = new List<Action<Dictionary<string, object>>>();
+            CurrentExceptions = new Dictionary<string, (Module, string)>();
 
             FurtherTransformationsContainer = new StackPanel();
             this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Children.Add(FurtherTransformationsContainer);
@@ -1847,6 +2105,9 @@ namespace TreeViewer
 
                 this.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, index);
 
+                CurrentExceptions.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
+                UpdateWarningVisibility();
+
                 FurtherTransformations.RemoveAt(index);
                 FurtherTransformationsParameters.RemoveAt(index);
                 UpdateFurtherTransformationParameters.RemoveAt(index);
@@ -2078,6 +2339,9 @@ namespace TreeViewer
                 childNames = this.SelectedNode.GetNodeNames();
             }
 
+            CurrentExceptions.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
+            UpdateWarningVisibility();
+
             FurtherTransformations.RemoveAt(index);
             FurtherTransformationsParameters.RemoveAt(index);
             UpdateFurtherTransformationParameters.RemoveAt(index);
@@ -2170,7 +2434,7 @@ namespace TreeViewer
             CoordinatesAlert = GetAlertIcon();
             CoordinatesAlert.Width = 16;
             CoordinatesAlert.Height = 16;
-            CoordinatesAlert.Margin = new Thickness(0, 0, 5, 0);
+            CoordinatesAlert.Margin = new Thickness(5, 0, 5, 0);
             CoordinatesAlert.IsVisible = false;
             Grid.SetColumn(CoordinatesAlert, 1);
 
@@ -2238,6 +2502,8 @@ namespace TreeViewer
 
             CoordinatesComboBox.SelectionChanged += async (s, e) =>
             {
+                CurrentExceptions.Remove((string)CoordinatesParameters[Modules.ModuleIDKey]);
+                UpdateWarningVisibility();
                 await ResetDefaultCoordinateModuleParameters();
             };
 
@@ -2436,6 +2702,9 @@ namespace TreeViewer
 
         public void RemovePlottingModule(int index)
         {
+            CurrentExceptions.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
+            UpdateWarningVisibility();
+
             PlottingActions.RemoveAt(index);
             PlottingParameters.RemoveAt(index);
             PlottingActionsContainer.Children.RemoveAt(index);
@@ -2712,6 +2981,9 @@ namespace TreeViewer
                 int index = PlottingActionsContainer.Children.IndexOf(exp);
 
                 this.PushUndoFrame(UndoFrameLevel.PlotActionModule, index);
+
+                CurrentExceptions.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
+                UpdateWarningVisibility();
 
                 PlottingActions.RemoveAt(index);
                 PlottingParameters.RemoveAt(index);
