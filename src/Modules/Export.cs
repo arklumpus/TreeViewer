@@ -1926,7 +1926,7 @@ namespace ExportPDF
                             pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
                         }
 
-                        pag.Background = pag.Background.WithAlpha(1);
+                        pag.Background = pag.Background.WithAlpha(1.0);
 
                         double scale = widthPxNud.Value / pag.Width;
 
