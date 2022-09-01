@@ -46,7 +46,10 @@ namespace TreeViewerCommandLine
                                                             new BinaryCommand(),
                                                             new BackgroundCommand(),
                                                             new AttachmentCommand(),
-                                                            new RegionCommand()
+                                                            new RegionCommand(),
+                                                            new ResolutionCommand(),
+                                                            new PNGCommand(),
+                                                            new TIFFCommand()
                                                         }
                                                         orderby el.PrimaryCommand
                                                         select el).ToArray();

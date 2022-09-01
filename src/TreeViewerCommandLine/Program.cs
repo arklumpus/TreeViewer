@@ -66,6 +66,9 @@ namespace TreeViewerCommandLine
         public static TreeNode SelectedNode;
         public static string SelectedRegion = null;
 
+        public static double Scale = 300.0 / 72;
+        public static double DPI = 300;
+
         public static ModuleParametersContainer SelectedModuleParameters
         {
             get
