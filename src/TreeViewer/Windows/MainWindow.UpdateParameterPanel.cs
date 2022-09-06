@@ -650,6 +650,11 @@ namespace TreeViewer
 
                             ComboBox box = new ComboBox() { Items = AttributeList, SelectedIndex = defaultIndex, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
 
+                            box.AttachedToVisualTree += (s, e) =>
+                            {
+                                AttributeSelectorTags[box] = (string)tbr[Modules.ModuleIDKey];
+                            };
+
                             FillingControl<ComboBox> wrapper = new FillingControl<ComboBox>(box, 5) { Margin = new Thickness(0, 0, -5, 0) };
 
                             AttributeSelectors.Add(box);
@@ -725,6 +730,11 @@ namespace TreeViewer
                             }
 
                             ComboBox box = new ComboBox() { Items = items, SelectedIndex = 0, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch, FontSize = 13 };
+
+                            box.AttachedToVisualTree += (s, e) =>
+                            {
+                                box.Tag = tbr[Modules.ModuleIDKey];
+                            };
 
                             FillingControl<ComboBox> wrapper = new FillingControl<ComboBox>(box, 5) { Margin = new Thickness(0, 0, -5, 0) };
 

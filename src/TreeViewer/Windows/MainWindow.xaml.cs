@@ -112,6 +112,7 @@ namespace TreeViewer
 
         List<string> AttributeList = null;
         List<ComboBox> AttributeSelectors = null;
+        Dictionary<ComboBox, string> AttributeSelectorTags = null;
 
         List<ComboBox> AttachmentSelectors = null;
 
@@ -1211,6 +1212,7 @@ namespace TreeViewer
             }
 
             AttributeSelectors = new List<ComboBox>();
+            AttributeSelectorTags = new Dictionary<ComboBox, string>();
             AttachmentSelectors = new List<ComboBox>();
 
             for (int i = 0; i < suggestedModules.Count; i++)
@@ -1491,7 +1493,8 @@ namespace TreeViewer
         {
             AllModules,
             ExcludeTransform,
-            ExcludeFurtherTransformation
+            ExcludeFurtherTransformation,
+            DoNotIncludeCoordinateParameters
         }
 
         public string SerializeAllModules(ModuleTarget target, bool addSignature)
@@ -1519,7 +1522,17 @@ namespace TreeViewer
 
             allModules.Add(furtherTransformationModules);
 
-            List<string[]> coordinatesModule = new List<string[]>() { new string[] { Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].Id, SerializeParameters(CoordinatesParameters) } };
+            List<string[]> coordinatesModule;
+
+            if (target != ModuleTarget.DoNotIncludeCoordinateParameters)
+            {
+                coordinatesModule = new List<string[]>() { new string[] { Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].Id, SerializeParameters(CoordinatesParameters) } };
+            }
+            else
+            {
+                coordinatesModule = new List<string[]>() { new string[] { Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].Id, SerializeParameters(new Dictionary<string, object>()) } };
+            }
+
             allModules.Add(coordinatesModule);
 
             List<string[]> plottingActionModules = new List<string[]>();
@@ -2108,6 +2121,9 @@ namespace TreeViewer
                 CurrentExceptions.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
                 UpdateWarningVisibility();
 
+                AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
+                AttributeSelectors.RemoveAll(x => AttributeSelectorTags[x] == (string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
+
                 FurtherTransformations.RemoveAt(index);
                 FurtherTransformationsParameters.RemoveAt(index);
                 UpdateFurtherTransformationParameters.RemoveAt(index);
@@ -2341,6 +2357,9 @@ namespace TreeViewer
 
             CurrentExceptions.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
             UpdateWarningVisibility();
+
+            AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
+            AttributeSelectors.RemoveAll(x => AttributeSelectorTags[x] == (string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
 
             FurtherTransformations.RemoveAt(index);
             FurtherTransformationsParameters.RemoveAt(index);
@@ -2705,6 +2724,9 @@ namespace TreeViewer
             CurrentExceptions.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
             UpdateWarningVisibility();
 
+            AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)PlottingParameters[index][Modules.ModuleIDKey]);
+            AttributeSelectors.RemoveAll(x => AttributeSelectorTags[x] == (string)PlottingParameters[index][Modules.ModuleIDKey]);
+
             PlottingActions.RemoveAt(index);
             PlottingParameters.RemoveAt(index);
             PlottingActionsContainer.Children.RemoveAt(index);
@@ -2984,6 +3006,9 @@ namespace TreeViewer
 
                 CurrentExceptions.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
                 UpdateWarningVisibility();
+
+                AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)PlottingParameters[index][Modules.ModuleIDKey]);
+                AttributeSelectors.RemoveAll(x => AttributeSelectorTags[x] == (string)PlottingParameters[index][Modules.ModuleIDKey]);
 
                 PlottingActions.RemoveAt(index);
                 PlottingParameters.RemoveAt(index);
