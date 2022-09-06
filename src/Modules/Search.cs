@@ -9,6 +9,7 @@ using VectSharp;
 using VectSharp.Canvas;
 using System.Runtime.InteropServices;
 using Avalonia.Media.Transformation;
+using System.Text.Json;
 
 namespace Search
 {
@@ -132,13 +133,45 @@ namespace Search
             return pag;
         }
 
+        public static List<(string, string)> GetGlobalSettings()
+        {
+            return new List<(string, string)>()
+            {
+                /// <param name="Search highlight colour:">
+                /// This global setting determines the colour used to highlight search results.
+                /// </param>
+                ("Search highlight colour:", "Colour:[255, 255, 152,255]")
+            };
+        }
+
         public static void PerformAction(int actionIndex, MainWindow window, InstanceStateData stateData)
         {
-            if (window.TransformedTree == null || window.PlottingActions.Count == 0 || (stateData.Tags.TryGetValue("5f3a7147-f706-43dc-9f57-18ade0c7b15d", out object searchTag) && (bool)searchTag))
+            if (window.TransformedTree == null || window.PlottingActions.Count == 0 || (stateData.Tags.TryGetValue("5f3a7147-f706-43dc-9f57-18ade0c7b15d", out object searchTag) && searchTag != null))
             {
+                if (window.TransformedTree != null && window.PlottingActions.Count != 0 && (stateData.Tags.TryGetValue("5f3a7147-f706-43dc-9f57-18ade0c7b15d", out searchTag) && searchTag is TextBox previousSearchBox))
+                {
+                    previousSearchBox.Focus();
+                }
+
                 return;
             }
             stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = true;
+
+            Colour highlightColour = Colour.FromRgb(255, 255, 152);
+
+            if (TreeViewer.GlobalSettings.Settings.AdditionalSettings.TryGetValue("Search highlight colour:", out object searchHighlightColourValue))
+            {
+                if (searchHighlightColourValue is Colour colourValue)
+                {
+                    highlightColour = colourValue;
+                }
+                else if (searchHighlightColourValue is JsonElement element)
+                {
+                    highlightColour = JsonSerializer.Deserialize<VectSharp.Colour>(element.GetRawText(), GlobalSettings.SerializationOptions);
+                }
+            }
+
+            SkiaSharp.SKColor highlightSKColour = new SkiaSharp.SKColor((byte)(highlightColour.R * 255), (byte)(highlightColour.G * 255), (byte)(highlightColour.B * 255), (byte)(highlightColour.A * 255));
 
             Grid searchGrid = new Grid() { ClipToBounds = true };
 
@@ -166,6 +199,7 @@ namespace Search
             TextBox searchBox = new TextBox() { Margin = new Avalonia.Thickness(0, 0, 5, 0), Padding = new Avalonia.Thickness(5, 2, 5, 2), VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13 };
             Grid.SetColumn(searchBox, 1);
             row1.Children.Add(searchBox);
+            stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = searchBox;
 
             {
                 TextBlock blk = new TextBlock() { Text = "Replace with:", Margin = new Avalonia.Thickness(5, 0, 5, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13 };
@@ -455,18 +489,6 @@ namespace Search
                 searchGrid.MaxHeight = double.PositiveInfinity;
             });
 
-            closeButton.Click += async (s, e) =>
-            {
-                searchGrid.MaxHeight = searchGrid.Bounds.Height;
-                searchGrid.Transitions = openCloseTransitions;
-                searchGrid.MaxHeight = 0;
-
-                await System.Threading.Tasks.Task.Delay(150);
-                window.FindControl<StackPanel>("UpperBarContainer").Children.Remove(searchGrid);
-
-                stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = false;
-            };
-
             attributeBox.SelectionChanged += (s, e) =>
             {
                 string attribute = sortedAttributes[attributeBox.SelectedIndex];
@@ -550,7 +572,6 @@ namespace Search
 
                 Regex reg = regex ? new Regex(needle, options) : null;
 
-                SkiaSharp.SKColor selectionChildColor = window.SelectionChildSKColor;
                 List<string> matchedIds = new List<string>();
                 List<TreeNode> matchedNodes = new List<TreeNode>();
                 int matchedTips = 0;
@@ -636,7 +657,7 @@ namespace Search
                 {
                     foreach ((double, SKRenderAction) pth in MainWindow.FindPaths(window.FullSelectionCanvas, id))
                     {
-                        window.ChangeActionColour(pth.Item2, selectionChildColor);
+                        window.ChangeActionColour(pth.Item2, highlightSKColour);
                     }
                 }
 
@@ -700,7 +721,7 @@ namespace Search
 
                 Regex reg = regex ? new Regex(needle, options) : null;
 
-                SkiaSharp.SKColor selectionChildColor = window.SelectionChildSKColor;
+                SkiaSharp.SKColor selectionColor = window.SelectionSKColor;
                 List<string> matchedIds = new List<string>();
                 List<TreeNode> matchedNodes = new List<TreeNode>();
                 int matchedTips = 0;
@@ -793,12 +814,15 @@ namespace Search
 
                     Point pt = window.Coordinates[matchedIds[foundIndex]];
 
+                    window.SetSelection(matchedNodes[foundIndex]);
+
                     foreach ((double, SKRenderAction) pth in MainWindow.FindPaths(window.FullSelectionCanvas, matchedIds[foundIndex]))
                     {
-                        window.ChangeActionColour(pth.Item2, selectionChildColor);
+                        window.ChangeActionColour(pth.Item2, selectionColor);
                     }
 
                     window.SelectionCanvas.InvalidateVisual();
+
                     window.CenterAt(pt.X, pt.Y);
                 }
                 else
@@ -922,7 +946,6 @@ namespace Search
 
                 Regex reg = regex ? new Regex(needle, options) : null;
 
-                SkiaSharp.SKColor selectionChildColor = window.SelectionChildSKColor;
                 List<string> matchedIds = new List<string>();
                 List<string> matchedNames = new List<string>();
                 List<TreeNode> matchedNodes = new List<TreeNode>();
@@ -1032,7 +1055,7 @@ namespace Search
                 {
                     foreach ((double, SKRenderAction) pth in MainWindow.FindPaths(window.FullSelectionCanvas, id))
                     {
-                        window.ChangeActionColour(pth.Item2, selectionChildColor);
+                        window.ChangeActionColour(pth.Item2, highlightSKColour);
                     }
                 }
 
@@ -1238,13 +1261,45 @@ namespace Search
                 _ = window.UpdateFurtherTransformations(window.FurtherTransformations.Count - 1);
             };
 
+            void windowKeyDownHandler(object sender, Avalonia.Input.KeyEventArgs e)
+            {
+                if (e.Key == Avalonia.Input.Key.F3)
+                {
+                    if (e.KeyModifiers == Avalonia.Input.KeyModifiers.Shift)
+                    {
+                        findNext(-1);
+                    }
+                    else if (e.KeyModifiers == Avalonia.Input.KeyModifiers.None)
+                    {
+                        findNext(1);
+                    }
+                    else
+                    {
+                        findAll();
+                    }
+                }
+            }
+
+            window.KeyDown += windowKeyDownHandler;
+
             searchBox.Focus();
 
             searchBox.KeyDown += async (s, e) =>
             {
                 if (e.Key == Avalonia.Input.Key.Enter)
                 {
-                    findAll();
+                    if (e.KeyModifiers == Avalonia.Input.KeyModifiers.Shift)
+                    {
+                        findNext(-1);
+                    }
+                    else if (e.KeyModifiers == Avalonia.Input.KeyModifiers.None)
+                    {
+                        findNext(1);
+                    }
+                    else
+                    {
+                        findAll();
+                    }
                 }
                 else if (e.Key == Avalonia.Input.Key.Escape)
                 {
@@ -1255,10 +1310,25 @@ namespace Search
                     await System.Threading.Tasks.Task.Delay(150);
                     window.FindControl<StackPanel>("UpperBarContainer").Children.Remove(searchGrid);
 
-                    stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = false;
+                    window.KeyDown -= windowKeyDownHandler;
+
+                    stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = null;
                 }
             };
 
+            closeButton.Click += async (s, e) =>
+            {
+                searchGrid.MaxHeight = searchGrid.Bounds.Height;
+                searchGrid.Transitions = openCloseTransitions;
+                searchGrid.MaxHeight = 0;
+
+                await System.Threading.Tasks.Task.Delay(150);
+                window.FindControl<StackPanel>("UpperBarContainer").Children.Remove(searchGrid);
+
+                window.KeyDown -= windowKeyDownHandler;
+
+                stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = null;
+            };
         }
     }
 }

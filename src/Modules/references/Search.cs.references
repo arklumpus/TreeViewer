@@ -21,3 +21,4 @@ System.Linq.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
 SkiaSharp.dll
+System.Text.Json.dll
