@@ -71,7 +71,7 @@ namespace TreeViewer
         public bool EnableUndoStack { get; set; } = true;
         public bool ClusterAccordingToRFDistances { get; set; } = false;
         public static GlobalSettings Settings { get; }
-        internal List<MainWindow> MainWindows { get; } = new List<MainWindow>();
+        public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
 
         public static JsonSerializerOptions SerializationOptions { get; } = new JsonSerializerOptions()
         {
