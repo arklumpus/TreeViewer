@@ -277,6 +277,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <Setter Property="BorderBrush" Value="Transparent"/>
     </Style>
 
+	<Style Selector="ToggleButton.PlainButton">
+		<Setter Property="RenderTransform" Value="scale(1,1)"/>
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="Foreground" Value="Black" />
+	</Style>
+
+	<Style Selector="ToggleButton.PlainButton /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="BorderBrush" Value="Transparent"/>
+	</Style>
+
+	<Style Selector="ToggleButton.PlainButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="BorderBrush" Value="#808080"/>
+		<Setter Property="Background" Value="#C6C6C6" />
+	</Style>
+
+	<Style Selector="ToggleButton.PlainButton:checked:focus /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="BorderBrush" Value="Black"/>
+	</Style>
+
+	<Style Selector="ToggleButton.PlainButton:hover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#D2D2D2" />
+	</Style>
+	<Style Selector="ToggleButton.PlainButton:checked:hover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#D2D2D2" />
+	</Style>
+
     <Style Selector="editor|Editor ToggleButton">
       <Setter Property="ClickMode" Value="Press"/>
     </Style>
