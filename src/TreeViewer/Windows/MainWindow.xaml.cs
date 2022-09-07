@@ -2533,6 +2533,15 @@ namespace TreeViewer
                 parameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
                 CoordinatesParameters = UpdateParameterPanel(coordinateParameterChange, parameters, async () => await UpdateCoordinates(), out UpdateCoordinatesParameters, out Control content);
                 exp.AccordionContent = content;
+
+                async void updateSelectionWidth(object sender, EventArgs e)
+                {
+                    this.RenderingPassCompleted -= updateSelectionWidth;
+                    await UpdateCoordinates();
+                }
+
+                this.RenderingPassCompleted += updateSelectionWidth;
+
                 await UpdateCoordinates();
             };
 

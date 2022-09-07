@@ -590,6 +590,7 @@ namespace TreeViewer
         private EventWaitHandle RenderingUpdateRequestHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
         private EventWaitHandle RenderingUpdateRequestTerminator = new EventWaitHandle(false, EventResetMode.ManualReset);
 
+        public event EventHandler RenderingPassCompleted;
 
         private void StartPlotUpdaterThread()
         {
@@ -627,6 +628,8 @@ namespace TreeViewer
                                 });
                             }
                         }
+
+                        RenderingPassCompleted?.Invoke(this, new EventArgs());
 
                         // Limit rendering updates to 30fps
                         await Task.Delay(33);
@@ -1144,6 +1147,8 @@ namespace TreeViewer
                 UpdatePlotBounds();
 
                 this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 0;
+
+                RenderingPassCompleted?.Invoke(this, new EventArgs());
 
                 this.RefreshAllButton.IsEnabled = true;
             }
