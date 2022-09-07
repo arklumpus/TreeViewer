@@ -18,3 +18,7 @@ System.Linq.dll
 VectSharp.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
+VectSharp.Canvas.dll
+System.ObjectModel.dll
+System.ComponentModel.Primitives.dll
+SkiaSharp.dll
