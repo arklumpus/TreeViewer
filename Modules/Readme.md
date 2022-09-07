@@ -97,7 +97,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Apply modules to other tree](bb4eb8d4-1925-4f08-8881-c8dd6531e5c4)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Applies the modules that are currently enabled to another tree.
 
