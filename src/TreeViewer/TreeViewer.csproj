@@ -5,7 +5,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <AssemblyName>TreeViewer</AssemblyName>
     <Version>2.0.1</Version>
     <ApplicationIcon>Assets\Program.ico</ApplicationIcon>
@@ -72,9 +72,14 @@
     <EmbeddedResource Include="Assets\Close-16.png" />
     <EmbeddedResource Include="Assets\Close-24.png" />
     <EmbeddedResource Include="Assets\Close-32.png" />
+    <EmbeddedResource Include="Assets\CloseDark-32.png" />
+    <EmbeddedResource Include="Assets\CloseDark-48.png" />
+    <EmbeddedResource Include="Assets\CloseDark-64.png" />
     <EmbeddedResource Include="Assets\ColourFormatter-32.png" />
     <EmbeddedResource Include="Assets\ColourFormatter-48.png" />
     <EmbeddedResource Include="Assets\ColourFormatter-64.png" />
+    <EmbeddedResource Include="Assets\Coordinates-16.png" />
+    <EmbeddedResource Include="Assets\Coordinates-24.png" />
     <EmbeddedResource Include="Assets\Coordinates-32.png" />
     <EmbeddedResource Include="Assets\Coordinates-48.png" />
     <EmbeddedResource Include="Assets\Coordinates-64.png" />
@@ -86,9 +91,28 @@
     <EmbeddedResource Include="Assets\Duplicate-hover-10.png" />
     <EmbeddedResource Include="Assets\Duplicate-hover-15.png" />
     <EmbeddedResource Include="Assets\Duplicate-hover-20.png" />
+    <EmbeddedResource Include="Assets\ExportCSV-32.png" />
+    <EmbeddedResource Include="Assets\ExportCSV-48.png" />
+    <EmbeddedResource Include="Assets\ExportCSV-64.png" />
+    <EmbeddedResource Include="Assets\ExportMDReport-32.png" />
+    <EmbeddedResource Include="Assets\ExportMDReport-48.png" />
+    <EmbeddedResource Include="Assets\ExportMDReport-64.png" />
     <EmbeddedResource Include="Assets\ExportModule-32.png" />
     <EmbeddedResource Include="Assets\ExportModule-48.png" />
     <EmbeddedResource Include="Assets\ExportModule-64.png" />
+    <EmbeddedResource Include="Assets\ExportPDF-32.png" />
+    <EmbeddedResource Include="Assets\ExportPDF-48.png" />
+    <EmbeddedResource Include="Assets\ExportPDF-64.png" />
+    <EmbeddedResource Include="Assets\ExportPDFReport-16.png" />
+    <EmbeddedResource Include="Assets\ExportPDFReport-24.png" />
+    <EmbeddedResource Include="Assets\ExportPDFReport-32.png" />
+    <EmbeddedResource Include="Assets\ExportPDFReport-48.png" />
+    <EmbeddedResource Include="Assets\ExportPDFReport-64.png" />
+    <EmbeddedResource Include="Assets\ExportSVG-16.png" />
+    <EmbeddedResource Include="Assets\ExportSVG-24.png" />
+    <EmbeddedResource Include="Assets\ExportSVG-32.png" />
+    <EmbeddedResource Include="Assets\ExportSVG-48.png" />
+    <EmbeddedResource Include="Assets\ExportSVG-64.png" />
     <EmbeddedResource Include="Assets\FileType-32.png" />
     <EmbeddedResource Include="Assets\FileType-48.png" />
     <EmbeddedResource Include="Assets\FileType-64.png" />
@@ -131,6 +155,11 @@
     <EmbeddedResource Include="Assets\Home-16.png" />
     <EmbeddedResource Include="Assets\Home-24.png" />
     <EmbeddedResource Include="Assets\Home-32.png" />
+    <EmbeddedResource Include="Assets\Image-16.png" />
+    <EmbeddedResource Include="Assets\Image-24.png" />
+    <EmbeddedResource Include="Assets\Image-32.png" />
+    <EmbeddedResource Include="Assets\Image-48.png" />
+    <EmbeddedResource Include="Assets\Image-64.png" />
     <EmbeddedResource Include="Assets\InstallModule-16.png" />
     <EmbeddedResource Include="Assets\InstallModule-24.png" />
     <EmbeddedResource Include="Assets\InstallModule-32.png" />
@@ -214,6 +243,9 @@
     <EmbeddedResource Include="Assets\SourceCode-32.png" />
     <EmbeddedResource Include="Assets\SourceCode-48.png" />
     <EmbeddedResource Include="Assets\SourceCode-64.png" />
+    <EmbeddedResource Include="Assets\Stats-16.png" />
+    <EmbeddedResource Include="Assets\Stats-24.png" />
+    <EmbeddedResource Include="Assets\Stats-32.png" />
     <EmbeddedResource Include="Assets\StringFormatter-32.png" />
     <EmbeddedResource Include="Assets\StringFormatter-48.png" />
     <EmbeddedResource Include="Assets\StringFormatter-64.png" />
@@ -223,6 +255,8 @@
     <EmbeddedResource Include="Assets\TextFile-32.png" />
     <EmbeddedResource Include="Assets\TextFile-48.png" />
     <EmbeddedResource Include="Assets\TextFile-64.png" />
+    <EmbeddedResource Include="Assets\Transformer-16.png" />
+    <EmbeddedResource Include="Assets\Transformer-24.png" />
     <EmbeddedResource Include="Assets\Transformer-32.png" />
     <EmbeddedResource Include="Assets\Transformer-48.png" />
     <EmbeddedResource Include="Assets\Transformer-64.png" />
@@ -241,6 +275,11 @@
     <EmbeddedResource Include="Assets\Updates-32.png" />
     <EmbeddedResource Include="Assets\Updates-48.png" />
     <EmbeddedResource Include="Assets\Updates-64.png" />
+    <EmbeddedResource Include="Assets\Warning-16.png" />
+    <EmbeddedResource Include="Assets\Warning-24.png" />
+    <EmbeddedResource Include="Assets\Warning-32.png" />
+    <EmbeddedResource Include="Assets\Warning-48.png" />
+    <EmbeddedResource Include="Assets\Warning-64.png" />
     <EmbeddedResource Include="Assets\Warning.png" />
     <EmbeddedResource Include="Assets\WindowIcon.png" />
     <EmbeddedResource Include="Assets\WindowTree.svg" />
@@ -324,9 +363,14 @@
     <None Remove="Assets\Close-16.png" />
     <None Remove="Assets\Close-24.png" />
     <None Remove="Assets\Close-32.png" />
+    <None Remove="Assets\CloseDark-32.png" />
+    <None Remove="Assets\CloseDark-48.png" />
+    <None Remove="Assets\CloseDark-64.png" />
     <None Remove="Assets\ColourFormatter-32.png" />
     <None Remove="Assets\ColourFormatter-48.png" />
     <None Remove="Assets\ColourFormatter-64.png" />
+    <None Remove="Assets\Coordinates-16.png" />
+    <None Remove="Assets\Coordinates-24.png" />
     <None Remove="Assets\Coordinates-32.png" />
     <None Remove="Assets\Coordinates-48.png" />
     <None Remove="Assets\Coordinates-64.png" />
@@ -337,9 +381,28 @@
     <None Remove="Assets\Duplicate-hover-10.png" />
     <None Remove="Assets\Duplicate-hover-15.png" />
     <None Remove="Assets\Duplicate-hover-20.png" />
+    <None Remove="Assets\ExportCSV-32.png" />
+    <None Remove="Assets\ExportCSV-48.png" />
+    <None Remove="Assets\ExportCSV-64.png" />
+    <None Remove="Assets\ExportMDReport-32.png" />
+    <None Remove="Assets\ExportMDReport-48.png" />
+    <None Remove="Assets\ExportMDReport-64.png" />
     <None Remove="Assets\ExportModule-32.png" />
     <None Remove="Assets\ExportModule-48.png" />
     <None Remove="Assets\ExportModule-64.png" />
+    <None Remove="Assets\ExportPDF-32.png" />
+    <None Remove="Assets\ExportPDF-48.png" />
+    <None Remove="Assets\ExportPDF-64.png" />
+    <None Remove="Assets\ExportPDFReport-16.png" />
+    <None Remove="Assets\ExportPDFReport-24.png" />
+    <None Remove="Assets\ExportPDFReport-32.png" />
+    <None Remove="Assets\ExportPDFReport-48.png" />
+    <None Remove="Assets\ExportPDFReport-64.png" />
+    <None Remove="Assets\ExportSVG-16.png" />
+    <None Remove="Assets\ExportSVG-24.png" />
+    <None Remove="Assets\ExportSVG-32.png" />
+    <None Remove="Assets\ExportSVG-48.png" />
+    <None Remove="Assets\ExportSVG-64.png" />
     <None Remove="Assets\FileType-32.png" />
     <None Remove="Assets\FileType-48.png" />
     <None Remove="Assets\FileType-64.png" />
@@ -379,6 +442,11 @@
     <None Remove="Assets\Home-16.png" />
     <None Remove="Assets\Home-24.png" />
     <None Remove="Assets\Home-32.png" />
+    <None Remove="Assets\Image-16.png" />
+    <None Remove="Assets\Image-24.png" />
+    <None Remove="Assets\Image-32.png" />
+    <None Remove="Assets\Image-48.png" />
+    <None Remove="Assets\Image-64.png" />
     <None Remove="Assets\InstallModule-16.png" />
     <None Remove="Assets\InstallModule-24.png" />
     <None Remove="Assets\InstallModule-32.png" />
@@ -420,6 +488,9 @@
     <None Remove="Assets\NewCodeWindow-16.png" />
     <None Remove="Assets\NewCodeWindow-24.png" />
     <None Remove="Assets\NewCodeWindow-32.png" />
+    <None Remove="Assets\NewReport-32.png" />
+    <None Remove="Assets\NewReport-48.png" />
+    <None Remove="Assets\NewReport-64.png" />
     <None Remove="Assets\NumberFormatter-32.png" />
     <None Remove="Assets\NumberFormatter-48.png" />
     <None Remove="Assets\NumberFormatter-64.png" />
@@ -456,6 +527,9 @@
     <None Remove="Assets\SourceCode-32.png" />
     <None Remove="Assets\SourceCode-48.png" />
     <None Remove="Assets\SourceCode-64.png" />
+    <None Remove="Assets\Stats-16.png" />
+    <None Remove="Assets\Stats-24.png" />
+    <None Remove="Assets\Stats-32.png" />
     <None Remove="Assets\StringFormatter-32.png" />
     <None Remove="Assets\StringFormatter-48.png" />
     <None Remove="Assets\StringFormatter-64.png" />
@@ -465,6 +539,8 @@
     <None Remove="Assets\TextFile-32.png" />
     <None Remove="Assets\TextFile-48.png" />
     <None Remove="Assets\TextFile-64.png" />
+    <None Remove="Assets\Transformer-16.png" />
+    <None Remove="Assets\Transformer-24.png" />
     <None Remove="Assets\Transformer-32.png" />
     <None Remove="Assets\Transformer-48.png" />
     <None Remove="Assets\Transformer-64.png" />
@@ -477,6 +553,11 @@
     <None Remove="Assets\Updates-32.png" />
     <None Remove="Assets\Updates-48.png" />
     <None Remove="Assets\Updates-64.png" />
+    <None Remove="Assets\Warning-16.png" />
+    <None Remove="Assets\Warning-24.png" />
+    <None Remove="Assets\Warning-32.png" />
+    <None Remove="Assets\Warning-48.png" />
+    <None Remove="Assets\Warning-64.png" />
     <None Remove="Assets\WindowTree.svg" />
     <None Remove="Assets\WindowTreeHome.svg" />
     <None Remove="Assets\Wrench-16.png" />
@@ -496,6 +577,11 @@
     <None Remove="Examples\Support.tbi" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\NewReport-32.png" />
+    <EmbeddedResource Include="Assets\NewReport-48.png" />
+    <EmbeddedResource Include="Assets\NewReport-64.png" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Fonts\OpenSans-Bold.ttf" />
     <EmbeddedResource Include="Fonts\OpenSans-BoldItalic.ttf" />
     <EmbeddedResource Include="Fonts\OpenSans-Italic.ttf" />
@@ -504,26 +590,30 @@
     <EmbeddedResource Include="Fonts\RobotoMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.14" />
+    <PackageReference Include="Accord" Version="3.8.0" />
+    <PackageReference Include="Accord.MachineLearning" Version="3.8.0" />
+    <PackageReference Include="Avalonia" Version="0.10.18" />
     <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="10.14.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.14" />
-    <PackageReference Include="AvaloniaColorPicker" Version="1.3.2" />
-    <PackageReference Include="CSharpEditor" Version="1.1.3-a5" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
+    <PackageReference Include="AvaloniaColorPicker" Version="1.3.4" />
+    <PackageReference Include="CSharpEditor" Version="1.1.3" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-    <PackageReference Include="MDEdit" Version="1.0.2-a5" />
+    <PackageReference Include="MDEdit" Version="1.0.2" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Mono.Options" Version="6.12.0.148" />
-    <PackageReference Include="MuPDFCore" Version="1.5.0" />
+    <PackageReference Include="MuPDFCore" Version="1.6.0" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta15" />
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
-    <PackageReference Include="TreeNode" Version="1.1.3" />
-    <PackageReference Include="VectSharp" Version="2.3.0" />
-    <PackageReference Include="VectSharp.Canvas" Version="2.5.1" />
-    <PackageReference Include="VectSharp.Markdown" Version="1.1.2" />
-    <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.1.2" />
-    <PackageReference Include="VectSharp.MuPDFUtils" Version="1.1.6" />
-    <PackageReference Include="VectSharp.PDF" Version="2.5.2" />
-    <PackageReference Include="VectSharp.Raster" Version="2.1.1" />
-    <PackageReference Include="VectSharp.SVG" Version="1.7.1" />
+    <PackageReference Include="TreeNode" Version="1.2.0" />
+    <PackageReference Include="VectSharp" Version="2.3.2" />
+    <PackageReference Include="VectSharp.Canvas" Version="2.5.3" />
+    <PackageReference Include="VectSharp.Markdown" Version="1.4.0" />
+    <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.4.0" />
+    <PackageReference Include="VectSharp.MuPDFUtils" Version="1.1.8" />
+    <PackageReference Include="VectSharp.PDF" Version="2.5.4" />
+    <PackageReference Include="VectSharp.Raster" Version="2.1.2" />
+    <PackageReference Include="VectSharp.Raster.ImageSharp" Version="1.1.3-beta15" />
+    <PackageReference Include="VectSharp.SVG" Version="1.7.3" />
   </ItemGroup>
 
   <Target Name="_ResolveCopyLocalNuGetPkgXmls" AfterTargets="ResolveReferences">
