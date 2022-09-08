@@ -6,10 +6,6 @@ echo
 
 cd ../../Release/Mac-x64/TreeViewer.app/Contents/MacOs/
 
-chmod +x "Automator Application Stub"
-
-cd ../Resources/TreeViewer.app/Contents/MacOs/
-
 chmod +x TreeViewer TreeViewerCommandLine DebuggerClient
 
 version=$(strings TreeViewer.dll | grep -A3 "Cross-platform software to draw phylogenetic trees" | grep -v "TreeViewer" | tail -n1)
@@ -17,7 +13,6 @@ version=$(strings TreeViewer.dll | grep -A3 "Cross-platform software to draw phy
 echo -e "\033[104m\033[97m Setting version number $version \033[0m"
 echo
 
-sed -i '' "s/@@VersionHere@@/$version/g" ../../../../Info.plist
 sed -i '' "s/@@VersionHere@@/$version/g" ../Info.plist
 sed -i '' "s/@@VersionHere@@/$version/g" ../Resources/DebuggerClient.app/Contents/Info.plist
 
@@ -36,22 +31,20 @@ rm ../Resources/DebuggerClient.app/Contents/MacOs/DebuggerClient
 
 cp "DebuggerClient" "../Resources/DebuggerClient.app/Contents/MacOs/DebuggerClient"
 
-cd ../../../../../../
+cd ../../../
 
 echo -e "\033[104m\033[97m Signing app \033[0m"
 echo
 
-codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/MacOS/Automator Application Stub"
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/MacOs/createdump"
 
-codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/createdump"
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/MacOs/TreeViewer"
 
-codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewer"
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/MacOs/DebuggerClient"
 
-codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/DebuggerClient"
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/DebuggerClient.app/Contents/MacOs/DebuggerClient"
 
-codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/Resources/DebuggerClient.app/Contents/MacOs/DebuggerClient"
-
-codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewerCommandLine"
+codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" "TreeViewer.app/Contents/MacOs/TreeViewerCommandLine"
 
 find TreeViewer.app/ -name "*.dylib" -type f -exec codesign --deep --force --timestamp --options=runtime --entitlements="TreeViewer.entitlements" --sign "$1" {} \;
 

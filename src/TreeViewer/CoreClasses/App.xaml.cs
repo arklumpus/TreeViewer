@@ -48,6 +48,11 @@ namespace TreeViewer
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                if (Modules.IsMac)
+                {
+                    MacOSFileOpener.Initialise();
+                }
+
                 if (!File.Exists(Modules.ModuleListPath) || !Directory.Exists(Modules.ModulePath) || System.Convert.ToBoolean(desktop.Args[0]))
                 {
                     WelcomeWindow welcome = new WelcomeWindow();

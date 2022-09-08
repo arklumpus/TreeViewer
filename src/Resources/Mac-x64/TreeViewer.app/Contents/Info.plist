@@ -2,33 +2,27 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>AMIsApplet</key>
-	<true/>
-	<key>AMStayOpen</key>
-	<false/>
-	<key>CFBundleExecutable</key>
-	<string>Automator Application Stub</string>
 	<key>CFBundleIconFile</key>
 	<string>TreeViewer.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>io.github.arklumpus.TreeViewer.Launcher</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>TreeViewer</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
+	<key>CFBundleExecutable</key>
+	<string>TreeViewer</string>
+	<key>CFBundleIdentifier</key>
+	<string>io.github.arklumpus.TreeViewer</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 	<key>CFBundleVersion</key>
 	<string>@@VersionHere@@</string>
 	<key>CFBundleShortVersionString</key>
 	<string>@@VersionHere@@</string>
-	<key>LSUIElement</key>
-	<true/>
-	<key>NSAppleScriptEnabled</key>
-	<string>YES</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	
+
 	<key>CFBundleDocumentTypes</key>
     <array>
 		<dict>

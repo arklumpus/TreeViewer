@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-version=$(strings ../../Release/Mac-x64/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewer.dll | grep -A3 "Cross-platform software to draw phylogenetic trees" | grep -v "TreeViewer" | tail -n1)
+version=$(strings ../../Release/Mac-x64/TreeViewer.app/Contents/MacOs/TreeViewer.dll | grep -A3 "Cross-platform software to draw phylogenetic trees" | grep -v "TreeViewer" | tail -n1)
 
 echo
 echo -e "\033[104m\033[97m Setting version $version \033[0m"

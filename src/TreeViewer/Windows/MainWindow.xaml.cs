@@ -666,8 +666,15 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-
             Modules.SetIcon(this);
+
+            if (Modules.IsMac && !MacOSFileOpener.InitialisationCompleted)
+            {
+                this.Opened += (s, e) =>
+                {
+                    MacOSFileOpener.Proceed();
+                };
+            }
 
             bool closing = false;
 
