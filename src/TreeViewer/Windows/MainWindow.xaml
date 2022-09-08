@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         mc:Ignorable="d" Width="1000" Height="600" MinWidth="975" MinHeight="450"
         x:Class="TreeViewer.MainWindow"
         Title="TreeViewer" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
-        KeyUp="KeyPressed" Closed="WindowClosed" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#E7E7E7">
+        KeyUp="KeyPressed" Closed="WindowClosed" Background="#E7E7E7">
   <Window.Styles>
     <Style Selector="StackPanel.Attachment Ellipse">
       <Setter Property="Fill" Value="#D9D9D9" />
@@ -636,7 +636,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             <RowDefinition Height="1"/>
             <RowDefinition Height="1*"/>
           </Grid.RowDefinitions>
-          <Canvas Background="#C6C6C6" Grid.ColumnSpan="12"></Canvas>
+          <Canvas Background="#C6C6C6" Grid.ColumnSpan="13"></Canvas>
           <TextBlock Grid.Column="0" Grid.Row="1" FontSize="12" VerticalAlignment="Center" Margin="25,0,10,0" Name="TreeCountLabel"></TextBlock>
           <TextBlock Grid.Column="1" Grid.Row="1" FontSize="12" VerticalAlignment="Center" Margin="10,0,10,0" Name="TipCountLabel"></TextBlock>
           <TextBlock Grid.Column="2" Grid.Row="1" FontSize="12" VerticalAlignment="Center" Margin="10,0,10,0" Name="NodeCountLabel"></TextBlock>

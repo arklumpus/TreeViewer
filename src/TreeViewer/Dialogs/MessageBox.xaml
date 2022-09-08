@@ -24,7 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         x:Class="TreeViewer.MessageBox"
         Title="MessageBox"
         WindowStartupLocation="CenterOwner" CanMaximizeMinimize="False"  SizeToContent="Height"
-        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="14" Opened="MessageBoxOpened" ShowInTaskbar="False" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="14" Opened="MessageBoxOpened" ShowInTaskbar="False">
   <local:ChildWindow.Content>
     <Grid>
       <Grid.RowDefinitions>

@@ -76,6 +76,7 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            Modules.SetIcon(this);
             SetupPlatform();
         }
 

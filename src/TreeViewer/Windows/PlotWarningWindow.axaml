@@ -5,8 +5,7 @@
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="380" Height="350"
         x:Class="TreeViewer.PlotWarningWindow"
-        Title="Plot errors" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner">
+        Title="Plot errors" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" WindowStartupLocation="CenterOwner">
 	<local:ChildWindow.Content>
 		<Grid Margin="10">
 			<Grid.RowDefinitions>

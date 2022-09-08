@@ -282,6 +282,7 @@
     <EmbeddedResource Include="Assets\Warning-64.png" />
     <EmbeddedResource Include="Assets\Warning.png" />
     <EmbeddedResource Include="Assets\WindowIcon.png" />
+    <EmbeddedResource Include="Assets\WindowIcon_macOS.png" />
     <EmbeddedResource Include="Assets\WindowTree.svg" />
     <EmbeddedResource Include="Assets\WindowTreeHome.svg" />
     <EmbeddedResource Include="Assets\Wrench-16.png" />
@@ -558,6 +559,7 @@
     <None Remove="Assets\Warning-32.png" />
     <None Remove="Assets\Warning-48.png" />
     <None Remove="Assets\Warning-64.png" />
+    <None Remove="Assets\WindowIcon_macOS.png" />
     <None Remove="Assets\WindowTree.svg" />
     <None Remove="Assets\WindowTreeHome.svg" />
     <None Remove="Assets\Wrench-16.png" />

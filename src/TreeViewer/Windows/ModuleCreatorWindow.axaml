@@ -23,8 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:mdc="clr-namespace:VectSharp.MarkdownCanvas;assembly=VectSharp.MarkdownCanvas"
         mc:Ignorable="d" Width="830" Height="625"
         x:Class="TreeViewer.ModuleCreatorWindow"
-        Title="Module creator" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        Title="Module creator" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" >
   <Window.Styles>
     <Style Selector=".WindowsStyle Canvas.RibbonSeparator">
       <Setter Property="Background" Value="#B1B1B1" />

@@ -22,8 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="980" Height="450"
         x:Class="TreeViewer.MarkdownEditorWindow"
-        Title="Markdown editor" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner">
+        Title="Markdown editor" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15" WindowStartupLocation="CenterOwner">
   <local:ChildWindow.Content>
     <Grid Margin="0, 0, 0, 10" Name="MainGrid">
       <Grid.RowDefinitions>

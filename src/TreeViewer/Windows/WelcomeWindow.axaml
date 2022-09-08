@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeViewer.WelcomeWindow" SizeToContent="WidthAndHeight" CanResize="False"
         FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Title="Welcome" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        Title="Welcome">
   <local:ChildWindow.Content>
     <Grid Margin="10" Width="800">
       <Grid.RowDefinitions>

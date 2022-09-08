@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         mc:Ignorable="d" Width="400" Height="450"
         x:Class="TreeViewer.NodeChoiceWindow"
         Title="Select node..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        WindowStartupLocation="CenterOwner" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" SizeToContent="Height">
+        WindowStartupLocation="CenterOwner" SizeToContent="Height">
   <local:ChildWindow.Content>
     <Grid Margin="10">
       <Grid.RowDefinitions>

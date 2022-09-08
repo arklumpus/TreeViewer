@@ -22,8 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="360" Height="350"
         x:Class="TreeViewer.ChooseReferencesWindow"
-        Title="Choose references..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner">
+        Title="Choose references..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" WindowStartupLocation="CenterOwner">
     <local:ChildWindow.Content>
     <Grid Margin="10">
       <Grid.ColumnDefinitions>

@@ -344,6 +344,17 @@ namespace TreeViewer
             }
         }
 
+        public static void SetIcon(Avalonia.Controls.Window window)
+        {
+            if (Modules.IsMac)
+            {
+                window.Icon = new Avalonia.Controls.WindowIcon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.WindowIcon_macOS.png"));
+            }
+            else
+            {
+                window.Icon = new Avalonia.Controls.WindowIcon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.WindowIcon.png"));
+            }
+        }
 
 
         public const string RootNodeId = "650a0ef5-5322-4511-ae86-68bd87b47ecd";

@@ -22,8 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeViewer.ChildWindow"
-        Title="ChildWindow" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#F3F3F3">
+        Title="ChildWindow" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" Background="#F3F3F3">
   <Window.Styles>
     <Style Selector=".MacOSStyle ScrollBar[IsExpanded=true] /template/ Rectangle#TrackRect">
       <Setter Property="Fill" Value="#00000000" />

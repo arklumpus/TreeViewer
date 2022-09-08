@@ -6,8 +6,7 @@
         xmlns:acp="clr-namespace:AvaloniaColorPicker;assembly=AvaloniaColorPicker"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeViewer.ColourPickerWindow"
-        SizeToContent="WidthAndHeight" Title="Colour picker" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" WindowStartupLocation="CenterOwner" Background="#F0F0F0">
+        SizeToContent="WidthAndHeight" Title="Colour picker" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" WindowStartupLocation="CenterOwner" Background="#F0F0F0">
   <local:ChildWindow.Content>
     <Grid Margin="10">
       <Grid.RowDefinitions>

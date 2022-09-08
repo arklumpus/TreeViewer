@@ -12,9 +12,11 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="WindowIcon.png" />
+    <None Remove="WindowIcon_macOS.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WindowIcon.png" />
+    <EmbeddedResource Include="WindowIcon_macOS.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.18" />

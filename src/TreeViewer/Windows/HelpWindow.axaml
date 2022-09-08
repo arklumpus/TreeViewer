@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="800" Height="450"
         x:Class="TreeViewer.HelpWindow"
-        Title="Help" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="White" WindowStartupLocation="CenterOwner">
+        Title="Help" Background="White" WindowStartupLocation="CenterOwner">
   <local:ChildWindow.Content>
     <mdc:MarkdownCanvasControl Margin="10" Name="MarkdownCanvas" MaxRenderWidth="1000">
 

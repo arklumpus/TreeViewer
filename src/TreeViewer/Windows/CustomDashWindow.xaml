@@ -22,8 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="250" Height="250"
         x:Class="TreeViewer.CustomDashWindow"
-        Title="Custom dash..."  FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="14"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" SizeToContent="Height" WindowStartupLocation="CenterOwner">
+        Title="Custom dash..."  FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="14" SizeToContent="Height" WindowStartupLocation="CenterOwner">
   <local:ChildWindow.Content>
     <Grid Margin="10">
       <Grid.RowDefinitions>

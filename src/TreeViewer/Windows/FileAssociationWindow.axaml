@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         mc:Ignorable="d" Width="410" Height="500"
         x:Class="TreeViewer.FileAssociationWindow"
         FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Title="File associations" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        Title="File associations">
   <local:ChildWindow.Content>
     <Grid Margin="10">
       <Grid.RowDefinitions>

@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" CanResize="False" Width="534" Height="297" HasSystemDecorations="False"
         x:Class="TreeViewer.SplashScreen" Topmost="True" WindowStartupLocation="CenterScreen" SystemDecorations="None" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"
-        Title="SplashScreen" ShowInTaskbar="False" Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#1a91d3">
+        Title="SplashScreen" ShowInTaskbar="False" Background="#1a91d3">
   <Window.Styles>
     <Style Selector="Canvas#CloseCanvas">
       <Setter Property="Background" Value="Transparent"/>

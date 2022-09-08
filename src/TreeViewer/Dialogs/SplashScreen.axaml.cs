@@ -258,6 +258,7 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            Modules.SetIcon(this);
 
             this.FindControl<Grid>("BannerContainer").Children.Add(new DPIAwareBox(Icons.GetIcon("TreeViewer.Assets.Banner_dark-500.png", "TreeViewer.Assets.Banner_dark-750.png", "TreeViewer.Assets.Banner_dark-1000.png", 500, 178)) { Width = 500, Height = 178 });
 

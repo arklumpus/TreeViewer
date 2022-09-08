@@ -22,8 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="1000" Height="600"
         x:Class="TreeViewer.ModuleRepositoryWindow"
-        Title="Module repository" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer" Background="#F3F3F3" WindowStartupLocation="Manual" TitleAlignment="Center">
+        Title="Module repository" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" Background="#F3F3F3" WindowStartupLocation="Manual" TitleAlignment="Center">
 
   <local:ChildWindow.Styles>
     <Style Selector="Grid.TabItem">

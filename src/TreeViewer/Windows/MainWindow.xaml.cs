@@ -667,6 +667,8 @@ namespace TreeViewer
         {
             AvaloniaXamlLoader.Load(this);
 
+            Modules.SetIcon(this);
+
             bool closing = false;
 
             this.Closing += async (s, e) =>

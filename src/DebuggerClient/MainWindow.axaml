@@ -22,6 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:treeviewer="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" Width="800" Height="450"
         x:Class="DebuggerClient.MainWindow" Topmost="True"
-        Title="Breakpoint viewer" Icon="resm:DebuggerClient.WindowIcon.png?assembly=DebuggerClient">
+        Title="Breakpoint viewer">
 
 </treeviewer:ChildWindow>

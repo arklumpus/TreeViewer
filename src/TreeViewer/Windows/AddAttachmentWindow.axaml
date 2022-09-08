@@ -22,8 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         mc:Ignorable="d" SizeToContent="Height" Width="320"
         x:Class="TreeViewer.AddAttachmentWindow"
-        Title="Add attachment" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" WindowStartupLocation="CenterOwner" CanResize="False"
-        Icon="resm:TreeViewer.Assets.WindowIcon.png?assembly=TreeViewer">
+        Title="Add attachment" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13" WindowStartupLocation="CenterOwner" CanResize="False">
   <local:ChildWindow.Styles>
     <Style Selector="local|Accordion Grid#HeaderGrid">
       <Setter Property="Background" Value="{Binding $parent[1].HeaderBackground}"/>
