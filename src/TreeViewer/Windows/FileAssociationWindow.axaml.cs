@@ -127,7 +127,14 @@ namespace TreeViewer
             {
                 if (Program.WaitingForRebootAfterAdmin)
                 {
-                    ((IControlledApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown();
+                    if (!Modules.IsMac)
+                    {
+                        ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Process.GetCurrentProcess().Kill();
+                    }
                 }
                 else
                 {
@@ -173,7 +180,14 @@ namespace TreeViewer
 
                 if (Program.WaitingForRebootAfterAdmin)
                 {
-                    ((IControlledApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown();
+                    if (!Modules.IsMac)
+                    {
+                        ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Process.GetCurrentProcess().Kill();
+                    }
                 }
                 else
                 {

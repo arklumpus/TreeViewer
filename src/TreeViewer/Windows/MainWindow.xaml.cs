@@ -690,7 +690,7 @@ namespace TreeViewer
                     {
                         e.Cancel = true;
 
-                        if (GlobalSettings.Settings.MainWindows.Count == 1)
+                        if (GlobalSettings.Settings.MainWindows.Count == 1 && !Modules.IsMac)
                         {
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
                             return;
@@ -1165,7 +1165,14 @@ namespace TreeViewer
                         if (box.Result == MessageBox.Results.Yes)
                         {
                             Program.Reboot(new string[] { "--module-creator" }, true);
-                            ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                            if (!Modules.IsMac)
+                            {
+                                ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                            }
+                            else
+                            {
+                                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                            }
                         }
                     }, this);
                     creatorItem.CommandParameter = this;
@@ -3397,7 +3404,14 @@ namespace TreeViewer
                     if (box.Result == MessageBox.Results.Yes)
                     {
                         Program.Reboot(new string[] { "--module-creator" }, true);
-                        ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                        if (!Modules.IsMac)
+                        {
+                            ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Process.GetCurrentProcess().Kill();
+                        }
                     }
                 }
                 else if (e.Key == Key.K && e.KeyModifiers == Modules.ControlModifier)

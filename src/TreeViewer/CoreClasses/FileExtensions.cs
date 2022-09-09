@@ -203,7 +203,14 @@ namespace TreeViewer
 
                 System.Diagnostics.Process.Start(info);
 
-                ((IControlledApplicationLifetime)Avalonia.Application.Current.ApplicationLifetime).Shutdown();
+                if (!Modules.IsMac)
+                {
+                    ((IClassicDesktopStyleApplicationLifetime)Avalonia.Application.Current.ApplicationLifetime).Shutdown(0);
+                }
+                else
+                {
+                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+                }
             }
         }
     }

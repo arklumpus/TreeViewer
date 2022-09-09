@@ -795,7 +795,14 @@ namespace TreeViewer
                     }
 
                     Program.Reboot(newArgs.ToArray(), true);
-                    ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                    if (!Modules.IsMac)
+                    {
+                        ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Process.GetCurrentProcess().Kill();
+                    }
                 }
                 else
                 {

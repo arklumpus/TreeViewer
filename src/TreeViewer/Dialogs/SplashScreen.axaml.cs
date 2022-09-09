@@ -275,7 +275,14 @@ namespace TreeViewer
 
                 if (position.X >= 0 && position.X <= 24 && position.Y >= 0 && position.Y <= 24)
                 {
-                    ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                    if (!Modules.IsMac)
+                    {
+                        ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Process.GetCurrentProcess().Kill();
+                    }
                 }
             };
 

@@ -1371,7 +1371,14 @@ namespace TreeViewer
                             if (box.Result == MessageBox.Results.Yes)
                             {
                                 Program.Reboot(new string[] { "--module-creator" }, true);
-                                ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                                if (!Modules.IsMac)
+                                {
+                                    ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+                                }
                             }
                         }), "Closes the program and restarts it opening the module creator window." )
                     }),

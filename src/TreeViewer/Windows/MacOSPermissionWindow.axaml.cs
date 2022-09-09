@@ -62,7 +62,14 @@ namespace TreeViewer
             this.FindControl<Button>("RestartButton").Click += (s, e) =>
             {
                 Program.Reboot(new string[0], false);
-                ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                if (!Modules.IsMac)
+                {
+                    ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                }
+                else
+                {
+                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+                }
             };
 
         }

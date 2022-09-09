@@ -367,7 +367,15 @@ namespace TreeViewer
                     if (box.Result == MessageBox.Results.Yes)
                     {
                         Program.Reboot(new string[] { }, true);
-                        ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+
+                        if (!Modules.IsMac)
+                        {
+                            ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Shutdown(0);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Process.GetCurrentProcess().Kill();
+                        }
                     }
                     else
                     {
