@@ -27,7 +27,11 @@ namespace TreeViewer
                     {
                         try
                         {
-                            await GlobalSettings.Settings.MainWindows[0].LoadFile(url, false);
+                            Uri uri = new Uri(url);
+                            if (uri.IsFile)
+                            {
+                                await GlobalSettings.Settings.MainWindows[0].LoadFile(uri.AbsolutePath, false);
+                            }
                         }
                         catch { }
                     });
