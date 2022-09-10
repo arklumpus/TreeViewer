@@ -96,7 +96,7 @@ namespace TreeViewer
                 grd.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
                 grd.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
 
-                grd.Children.Add(new TextBlock() { Text = "Loaded tree #" + treeIndex.ToString(), Margin = new Thickness(5) });
+                grd.Children.Add(new TextBlock() { Text = "Loaded tree #" + (treeIndex + 1).ToString(), Margin = new Thickness(5) });
 
                 Button deleteButton = new Button() { Width = 20, Height = 20, Background = Avalonia.Media.Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 10, Height = 10, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Data = Icons.CrossGeometry, StrokeThickness = 2 }, Padding = new Avalonia.Thickness(2) };
                 deleteButton.Classes.Add("SideBarButton");
