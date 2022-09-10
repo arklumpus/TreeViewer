@@ -278,7 +278,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Compressed memory loader](3174e194-24a5-46f9-9836-b706cf0be326)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Loads the tree in memory in a compressed format.
 Safe even when using large files.
@@ -387,7 +387,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Disk loader](71727eb5-550d-435e-8e9b-37606d3b0a4e)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Lazily accesses the trees from disk.
 Safe even when using huge files.
@@ -533,7 +533,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Memory loader](a22ff194-c486-4215-a4bf-7a006d6f88fa)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Loads all the trees from the file into memory.
 Huge files may cause the program to run out of memory.
