@@ -54,7 +54,7 @@ namespace TreeViewerCommandLine
             {
                 if (Program.FileOpener != null)
                 {
-                    LoadFile(null);
+                    _ = LoadFile(null);
                 }
                 else
                 {
@@ -95,7 +95,7 @@ namespace TreeViewerCommandLine
                         {
                             if (mod.Name.Equals(command, StringComparison.OrdinalIgnoreCase) || mod.Id.Equals(command, StringComparison.OrdinalIgnoreCase))
                             {
-                                LoadFile(mod.Id);
+                                _ = LoadFile(mod.Id);
                                 found = true;
                                 break;
                             }
@@ -195,7 +195,7 @@ namespace TreeViewerCommandLine
             return priorities;
         }
 
-        internal static void LoadFile(string moduleId)
+        internal static async System.Threading.Tasks.Task LoadFile(string moduleId)
         {
             if (string.IsNullOrEmpty(moduleId))
             {
@@ -217,7 +217,7 @@ namespace TreeViewerCommandLine
 
             Action<double> progressAction = (_) => { };
 
-            coll = Modules.GetModule(Modules.LoadFileModules, moduleId).Load(null, Program.OpenedFileInfo, Program.OpenerModuleId, Program.FileOpener, moduleSuggestions, ref progressAction, (val) => { progressAction(val); });
+            (coll, progressAction) = await Modules.GetModule(Modules.LoadFileModules, moduleId).Load(null, Program.OpenedFileInfo, Program.OpenerModuleId, Program.FileOpener, moduleSuggestions, progressAction, (val) => { progressAction(val); });
 
             Program.Trees = coll;
             Program.LoaderModuleId = moduleId;

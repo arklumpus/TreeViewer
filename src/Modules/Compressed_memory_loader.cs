@@ -36,7 +36,7 @@ namespace CompressedMemoryLoader
         public const string Name = "Compressed memory loader";
         public const string HelpText = "Loads the tree in memory in a compressed format.\nSafe even when using large files.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "3174e194-24a5-46f9-9836-b706cf0be326";
         public const ModuleTypes ModuleType = ModuleTypes.LoadFile;
 
@@ -82,7 +82,7 @@ namespace CompressedMemoryLoader
             }
         }
 
-        public static TreeCollection Load(Avalonia.Controls.Window parentWindow, FileInfo fileInfo, string filetypeModuleId, IEnumerable<TreeNode> treeLoader, List<(string, Dictionary<string, object>)> moduleSuggestions, ref Action<double> openerProgressAction, Action<double> progressAction)
+        public static async Task<(TreeCollection, Action<double>)> Load(Avalonia.Controls.Window parentWindow, FileInfo fileInfo, string filetypeModuleId, IEnumerable<TreeNode> treeLoader, List<(string, Dictionary<string, object>)> moduleSuggestions, Action<double> openerProgressAction, Action<double> progressAction)
         {
             long largeFileThreshold = 26214400;
 
@@ -107,9 +107,7 @@ namespace CompressedMemoryLoader
 
                 if (InstanceStateData.IsUIAvailable)
                 {
-                    EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset);
-
-                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         ChildWindow settingsWindow = new ChildWindow() { Width = 450, SizeToContent = SizeToContent.Height, FontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"), FontSize = 14, Title = "Skip trees...", WindowStartupLocation = WindowStartupLocation.CenterOwner };
 
@@ -212,11 +210,7 @@ namespace CompressedMemoryLoader
                         {
                             until = (int)Math.Round(untilNud.Value);
                         }
-
-                        handle.Set();
                     });
-
-                    handle.WaitOne();
                 }
                 else
                 {
@@ -225,7 +219,7 @@ namespace CompressedMemoryLoader
 
                 if (!result)
                 {
-                    return null;
+                    return (null, openerProgressAction);
                 }
                 else
                 {
@@ -290,7 +284,7 @@ namespace CompressedMemoryLoader
                         disposable.Dispose();
                     }
 
-                    return tbr;
+                    return (tbr, openerProgressAction);
                 }
             }
             else
@@ -320,7 +314,7 @@ namespace CompressedMemoryLoader
                         disposable.Dispose();
                     }
 
-                    return tbr;
+                    return (tbr, openerProgressAction);
                 }
                 else
                 {
@@ -348,7 +342,7 @@ namespace CompressedMemoryLoader
                         disposable.Dispose();
                     }
 
-                    return tbr;
+                    return (tbr, openerProgressAction);
                 }
             }
         }

@@ -33,7 +33,7 @@ namespace DiskLoader
         public const string Name = "Disk loader";
         public const string HelpText = "Lazily accesses the trees from disk.\nSafe even when using huge files.\nIf the input file is not in binary tree format, it will be converted to a temporary file.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "71727eb5-550d-435e-8e9b-37606d3b0a4e";
         public const ModuleTypes ModuleType = ModuleTypes.LoadFile;
 
@@ -89,7 +89,7 @@ namespace DiskLoader
             }
         }
 
-        public static TreeCollection Load(Avalonia.Controls.Window parentWindow, FileInfo fileInfo, string filetypeModuleId, IEnumerable<TreeNode> treeLoader, List<(string, Dictionary<string, object>)> moduleSuggestions, ref Action<double> openerProgressAction, Action<double> progressAction)
+        public static async Task<(TreeCollection, Action<double>)> Load(Avalonia.Controls.Window parentWindow, FileInfo fileInfo, string filetypeModuleId, IEnumerable<TreeNode> treeLoader, List<(string, Dictionary<string, object>)> moduleSuggestions, Action<double> openerProgressAction, Action<double> progressAction)
         {
             long largeFileThreshold = 26214400;
 
@@ -117,7 +117,7 @@ namespace DiskLoader
                     }
                 }
 
-                return coll;
+                return (coll, openerProgressAction);
             }
             else
             {
@@ -130,9 +130,7 @@ namespace DiskLoader
 
                     if (InstanceStateData.IsUIAvailable)
                     {
-                        EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset);
-
-                        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                         {
                             Window settingsWindow = new Window() { Width = 450, Height = 300, FontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"), FontSize = 15, Title = "Skip trees...", WindowStartupLocation = WindowStartupLocation.CenterOwner };
 
@@ -220,11 +218,7 @@ namespace DiskLoader
                             {
                                 until = (int)Math.Round(untilNud.Value);
                             }
-
-                            handle.Set();
                         });
-
-                        handle.WaitOne();
                     }
                     else
                     {
@@ -238,7 +232,7 @@ namespace DiskLoader
                             disposable.Dispose();
                         }
 
-                        return null;
+                        return (null, openerProgressAction);
                     }
                     else
                     {
@@ -283,7 +277,7 @@ namespace DiskLoader
                             disposable.Dispose();
                         }
 
-                        return tbr;
+                        return (tbr, openerProgressAction);
                     }
                 }
                 else
@@ -313,7 +307,7 @@ namespace DiskLoader
                         disposable.Dispose();
                     }
 
-                    return tbr;
+                    return (tbr, openerProgressAction);
                 }
             }
         }

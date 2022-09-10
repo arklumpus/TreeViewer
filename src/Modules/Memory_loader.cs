@@ -29,7 +29,7 @@ namespace MemoryLoader
         public const string Name = "Memory loader";
         public const string HelpText = "Loads all the trees from the file into memory.\nHuge files may cause the program to run out of memory.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "a22ff194-c486-4215-a4bf-7a006d6f88fa";
         public const ModuleTypes ModuleType = ModuleTypes.LoadFile;
 
@@ -78,7 +78,7 @@ namespace MemoryLoader
             }
         }
 
-        public static TreeCollection Load(Window parentWindow, FileInfo fileInfo, string loaderModuleId, IEnumerable<TreeNode> treeLoader, List<(string, Dictionary<string, object>)> moduleSuggestions, ref Action<double> openerProgressAction, Action<double> progressAction)
+        public static async Task<(TreeCollection, Action<double>)> Load(Window parentWindow, FileInfo fileInfo, string loaderModuleId, IEnumerable<TreeNode> treeLoader, List<(string, Dictionary<string, object>)> moduleSuggestions, Action<double> openerProgressAction, Action<double> progressAction)
         {
             long largeFileThreshold = 26214400;
 
@@ -103,9 +103,7 @@ namespace MemoryLoader
 
                 if (InstanceStateData.IsUIAvailable)
                 {
-                    EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset);
-
-                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         ChildWindow settingsWindow = new ChildWindow() { Width = 450, SizeToContent = SizeToContent.Height, FontFamily = Avalonia.Media.FontFamily.Parse("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"), FontSize = 14, Title = "Skip trees...", WindowStartupLocation = WindowStartupLocation.CenterOwner };
 
@@ -208,11 +206,7 @@ namespace MemoryLoader
                         {
                             until = (int)Math.Round(untilNud.Value);
                         }
-
-                        handle.Set();
                     });
-
-                    handle.WaitOne();
                 }
                 else
                 {
@@ -227,7 +221,7 @@ namespace MemoryLoader
                         disposable.Dispose();
                     }
 
-                    return null;
+                    return (null, openerProgressAction);
                 }
                 else
                 {
@@ -253,7 +247,7 @@ namespace MemoryLoader
                                 disposable.Dispose();
                             }
 
-                            return tbr;
+                            return (tbr, openerProgressAction);
                         }
                         else
                         {
@@ -272,7 +266,7 @@ namespace MemoryLoader
                                 disposable.Dispose();
                             }
 
-                            return tbr;
+                            return (tbr, openerProgressAction);
                         }
                     }
                     else
@@ -305,7 +299,7 @@ namespace MemoryLoader
                             disposable.Dispose();
                         }
 
-                        return tbr;
+                        return (tbr, openerProgressAction);
                     }
                 }
             }
@@ -328,7 +322,7 @@ namespace MemoryLoader
                     disposable.Dispose();
                 }
 
-                return tbr;
+                return (tbr, openerProgressAction);
             }
         }
     }

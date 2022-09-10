@@ -343,7 +343,7 @@ namespace TreeViewer
                         {
                             try
                             {
-                                coll = Modules.LoadFileModules[maxLoadIndex].Load(this, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, ref openerProgressAction, progressAction);
+                                (coll, openerProgressAction) = await Modules.LoadFileModules[maxLoadIndex].Load(this, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, openerProgressAction, progressAction);
                             }
                             catch (Exception ex)
                             {
@@ -765,20 +765,6 @@ namespace TreeViewer
             this.FindControl<Canvas>("WarningIconCanvas").Children.Add(GetAlertIcon());
             this.FindControl<Button>("WarningButton").Click += async (s, e) =>
             {
-
-                //await new MessageBox("Attention!", "Warnings while creating plot").ShowDialog2(this);
-
-                /*if (CurrentExceptions.Count > 0)
-                {
-                    KeyValuePair<string, (Module, string)> kvp = CurrentExceptions.ElementAt(0);
-
-                    HighlightModule(kvp.Key, kvp.Value.Item1);
-                }*/
-
-                /*this.TransformerAlert.IsVisible = true;
-
-                HighlightModule(null, Modules.TransformerModules[0]);*/
-
                 PlotWarningWindow win = new PlotWarningWindow(this, CurrentExceptions);
 
                 await win.ShowDialog2(this);
@@ -3370,11 +3356,13 @@ namespace TreeViewer
             {
                 if (e.Key == Key.H && e.KeyModifiers == (Modules.ControlModifier | KeyModifiers.Shift))
                 {
+                    e.Handled = true;
                     this.RibbonBar.SelectedIndex = 0;
                     this.RibbonFilePage.SelectedIndex = 0;
                 }
                 else if (e.Key == Key.A && e.KeyModifiers == (Modules.ControlModifier | KeyModifiers.Shift))
                 {
+                    e.Handled = true;
                     this.RibbonBar.SelectedIndex = 0;
                     AutosavesPage page = this.GetFilePage<AutosavesPage>(out int ind);
                     this.RibbonFilePage.SelectedIndex = ind;
@@ -3382,22 +3370,26 @@ namespace TreeViewer
                 }
                 else if (e.Key == Key.R && e.KeyModifiers == Modules.ControlModifier)
                 {
+                    e.Handled = true;
                     this.RibbonBar.SelectedIndex = 0;
                     this.GetFilePage<PreferencesPage>(out int ind);
                     this.RibbonFilePage.SelectedIndex = ind;
                 }
                 else if (e.Key == Key.M && e.KeyModifiers == Modules.ControlModifier)
                 {
+                    e.Handled = true;
                     ModuleManagerWindow win2 = new ModuleManagerWindow();
                     await win2.ShowDialog2(this);
                 }
                 else if (e.Key == Key.H && e.KeyModifiers == Modules.ControlModifier)
                 {
+                    e.Handled = true;
                     AboutWindow win2 = new AboutWindow();
                     await win2.ShowDialog2(this);
                 }
                 else if (e.Key == Key.M && e.KeyModifiers == (Modules.ControlModifier | KeyModifiers.Shift))
                 {
+                    e.Handled = true;
                     MessageBox box = new MessageBox("Attention", "The program will now be rebooted to open the module creator (we will do our best to recover the files that are currently open). Do you wish to proceed?", MessageBox.MessageBoxButtonTypes.YesNo, MessageBox.MessageBoxIconTypes.QuestionMark);
                     await box.ShowDialog2(this);
 
@@ -3416,6 +3408,7 @@ namespace TreeViewer
                 }
                 else if (e.Key == Key.K && e.KeyModifiers == Modules.ControlModifier)
                 {
+                    e.Handled = true;
                     this.FindControl<TextBox>("CommandBox").Focus();
                 }
             }

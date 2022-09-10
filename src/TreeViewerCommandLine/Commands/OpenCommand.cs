@@ -182,7 +182,7 @@ namespace TreeViewerCommandLine
                     {
                         Program.InputFileName = command;
                         OpenFile(Program.InputFileName, null);
-                        LoadCommand.LoadFile(null);
+                        _ = LoadCommand.LoadFile(null);
                     }
                     else
                     {

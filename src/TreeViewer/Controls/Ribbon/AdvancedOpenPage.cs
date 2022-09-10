@@ -364,9 +364,9 @@ namespace TreeViewer
 
                     SemaphoreSlim semaphore = new SemaphoreSlim(0, 1);
 
-                    Thread thr = new Thread(() =>
+                    Thread thr = new Thread(async () =>
                     {
-                        LoadedTrees = Modules.LoadFileModules[slfm].Load(parent, OpenedFileInfo, Modules.FileTypeModules[sftm].Id, OpenedFile, ModuleSuggestions, ref OpenerProgressAction, progressAction);
+                        (LoadedTrees, OpenerProgressAction) = await Modules.LoadFileModules[slfm].Load(parent, OpenedFileInfo, Modules.FileTypeModules[sftm].Id, OpenedFile, ModuleSuggestions, OpenerProgressAction, progressAction);
 
                         semaphore.Release();
                     });

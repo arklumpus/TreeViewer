@@ -227,13 +227,13 @@ namespace TreeViewerCommandLine
             StateData.GetFurtherTransformationModulesParamters = (index) => FurtherTransformations[index].Item2.Parameters;
             StateData.GetPlottingModulesParameters = (index) => PlotActions[index].Item2.Parameters;
 
-            StateData.OpenFile = (fileName, deleteAfter) =>
+            StateData.OpenFile = async (fileName, deleteAfter) =>
                 {
                     try
                     {
                         Program.InputFileName = fileName;
                         OpenCommand.OpenFile(Program.InputFileName, null);
-                        LoadCommand.LoadFile(null);
+                        await LoadCommand.LoadFile(null);
 
                         if (deleteAfter)
                         {

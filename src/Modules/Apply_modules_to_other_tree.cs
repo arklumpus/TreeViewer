@@ -415,7 +415,7 @@ namespace abb4eb8d419254f088881c8dd6531e5c4
                         {
                             try
                             {
-                                coll = Modules.LoadFileModules[maxLoadIndex].Load(window, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, ref openerProgressAction, progressAction);
+                                (coll, openerProgressAction) = await Modules.LoadFileModules[maxLoadIndex].Load(window, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, openerProgressAction, progressAction);
                             }
                             catch (Exception ex)
                             {

@@ -7,6 +7,7 @@ using PhyloTree.Formats;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace a7476c9e405b14a928d36aa878d22cceb
 {
@@ -86,7 +87,7 @@ namespace a7476c9e405b14a928d36aa878d22cceb
             return pag;
         }
 
-        public static void PerformAction(int actionIndex, MainWindow window, InstanceStateData stateData)
+        public static async void PerformAction(int actionIndex, MainWindow window, InstanceStateData stateData)
         {
             ConsoleWrapper.WriteLine();
             ConsoleWrapper.Write("Enter path to the other tree file: ");
@@ -97,7 +98,7 @@ namespace a7476c9e405b14a928d36aa878d22cceb
                 if (File.Exists(fileName))
                 {
                     
-                    TreeCollection coll = LoadFile(fileName);
+                    TreeCollection coll = await LoadFile(fileName);
 
                     if (coll != null)
                     {
@@ -159,7 +160,7 @@ namespace a7476c9e405b14a928d36aa878d22cceb
             }
         }
 
-        private static TreeCollection LoadFile(string fileName)
+        private static async Task<TreeCollection> LoadFile(string fileName)
         {
             double maxResult = 0;
             int maxIndex = -1;
@@ -224,7 +225,7 @@ namespace a7476c9e405b14a928d36aa878d22cceb
                     {
                         try
                         {
-                            coll = Modules.LoadFileModules[maxLoadIndex].Load(null, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, ref openerProgressAction, a => { });
+                            (coll, openerProgressAction) = await Modules.LoadFileModules[maxLoadIndex].Load(null, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, openerProgressAction, a => { });
                         }
                         catch (Exception ex)
                         {

@@ -1007,7 +1007,7 @@ public static Colour? Format(object attribute)
                         {
                             try
                             {
-                                coll = Modules.LoadFileModules[maxLoadIndex].Load(parentWindow, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, ref openerProgressAction, progressAction);
+                                (coll, openerProgressAction) = await Modules.LoadFileModules[maxLoadIndex].Load(parentWindow, finfo, Modules.FileTypeModules[maxIndex].Id, loader, moduleSuggestions, openerProgressAction, progressAction);
                             }
                             catch (Exception ex)
                             {
@@ -1073,7 +1073,7 @@ public static Colour? Format(object attribute)
         }
     }
 
-    public delegate TreeCollection LoadFileDelegate(Avalonia.Controls.Window parentWindow, FileInfo fileInfo, string filetypeModuleId, IEnumerable<TreeNode> loader, List<(string, Dictionary<string, object>)> moduleSuggestions, ref Action<double> openerProgressAction, Action<double> progressAction);
+    public delegate Task<(TreeCollection treeCollection, Action<double> openerProgressAction)> LoadFileDelegate(Avalonia.Controls.Window parentWindow, FileInfo fileInfo, string filetypeModuleId, IEnumerable<TreeNode> loader, List<(string, Dictionary<string, object>)> moduleSuggestions, Action<double> openerProgressAction, Action<double> progressAction);
 
     public class LoadFileModule : Module
     {
