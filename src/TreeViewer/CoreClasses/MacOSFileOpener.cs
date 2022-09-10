@@ -30,7 +30,16 @@ namespace TreeViewer
                             Uri uri = new Uri(url);
                             if (uri.IsFile)
                             {
-                                await GlobalSettings.Settings.MainWindows[0].LoadFile(uri.AbsolutePath, false);
+                                if (GlobalSettings.Settings.MainWindows.Count > 0)
+                                {
+                                    await GlobalSettings.Settings.MainWindows[0].LoadFile(uri.AbsolutePath, false);
+                                }
+                                else
+                                {
+                                    MainWindow mainWindow = new MainWindow();
+                                    mainWindow.Show();
+                                    await mainWindow.LoadFile(uri.AbsolutePath, false);
+                                }
                             }
                         }
                         catch { }

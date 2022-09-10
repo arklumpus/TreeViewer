@@ -88,7 +88,17 @@ namespace TreeViewer
                                             {
                                                 try
                                                 {
-                                                    await GlobalSettings.Settings.MainWindows[0].LoadFile(file, deleteFiles);
+
+                                                    if (GlobalSettings.Settings.MainWindows.Count > 0)
+                                                    {
+                                                        await GlobalSettings.Settings.MainWindows[0].LoadFile(file, deleteFiles);
+                                                    }
+                                                    else
+                                                    {
+                                                        MainWindow mainWindow = new MainWindow();
+                                                        mainWindow.Show();
+                                                        await mainWindow.LoadFile(file, deleteFiles);
+                                                    }
                                                 }
                                                 catch { }
                                             });

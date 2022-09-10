@@ -574,7 +574,14 @@ namespace TreeViewer
             filesToOpen.Insert(2, moduleCreator.ToString());
             filesToOpen.Insert(3, deleteFiles.ToString());
 
-            BuildAvaloniaApp().StartWithClassicDesktopLifetime(filesToOpen.ToArray());
+            if (!Modules.IsMac)
+            {
+                BuildAvaloniaApp().StartWithClassicDesktopLifetime(filesToOpen.ToArray());
+            }
+            else
+            {
+                BuildAvaloniaApp().StartWithClassicDesktopLifetime(filesToOpen.ToArray(), Avalonia.Controls.ShutdownMode.OnExplicitShutdown);
+            }
 
             return 0;
         }

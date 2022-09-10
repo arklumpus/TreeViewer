@@ -41,6 +41,16 @@ namespace TreeViewer
                 },
                 null)
             });
+            menu.Add(new NativeMenuItem()
+            {
+                Header = "New window...",
+                Command = new SimpleCommand(win => true, a =>
+                {
+                    MainWindow window = new MainWindow();
+                    window.Show();
+                },
+                null)
+            });
             NativeMenu.SetMenu(this, menu);
         }
 
