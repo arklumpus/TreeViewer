@@ -71,6 +71,8 @@ namespace TreeViewer
         public bool EnableUndoStack { get; set; } = true;
         public bool ClusterAccordingToRFDistances { get; set; } = false;
         public static GlobalSettings Settings { get; }
+
+        [JsonIgnore]
         public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
 
         public static JsonSerializerOptions SerializationOptions { get; } = new JsonSerializerOptions()
@@ -423,10 +425,7 @@ namespace TreeViewer
                 string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Assembly.GetAssembly(typeof(Modules)).GetName().Name, "settings.json");
                 File.WriteAllText(settingsPath, System.Text.Json.JsonSerializer.Serialize(GlobalSettings.Settings, SerializationOptions));
             }
-            catch
-            {
-
-            }
+            catch { }
         }
 
         internal void UpdateAdditionalSettings()
