@@ -1242,22 +1242,25 @@ namespace TreeViewer
 
                             if (LoadedTreesReport == null)
                             {
-                                ProgressWindow win;
-
-                                if (parentWindow.Trees.Count > 2)
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                                 {
-                                    win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 4, LabelText = "Computing tree splits" };
-                                }
-                                else
-                                {
-                                    win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 2, LabelText = "Sampling trees under the YHK model" };
-                                }
+                                    ProgressWindow win;
 
-                                _ = win.ShowDialog2(this);
+                                    if (parentWindow.Trees.Count > 2)
+                                    {
+                                        win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 4, LabelText = "Computing tree splits" };
+                                    }
+                                    else
+                                    {
+                                        win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 2, LabelText = "Sampling trees under the YHK model" };
+                                    }
 
-                                await Task.Run(() => CreateLoadedTreesReport(parentWindow, win));
+                                    _ = win.ShowDialog2(this);
 
-                                win.Close();
+                                    await Task.Run(() => CreateLoadedTreesReport(parentWindow, win));
+
+                                    win.Close();
+                                }, Avalonia.Threading.DispatcherPriority.MinValue);
                             }
 
                             lock (LoadedTreesReportLock)
@@ -1293,75 +1296,6 @@ namespace TreeViewer
                             compareTab.RenderTransform = TransformOperations.Identity;
                             compareTab.Opacity = 1;
                             compareTab.IsHitTestVisible = true;
-
-                            if (CustomTreesReport == null)
-                            {
-                                CreateReportWindow win = new CreateReportWindow(this.parentWindow);
-
-                                await win.ShowDialog2(this);
-
-                                if (win.Result && win.Trees != null && win.Trees.Count > 0)
-                                {
-                                    int totalCount = 0;
-
-                                    for (int i = 0; i < win.Trees.Count; i++)
-                                    {
-                                        if (win.Trees[i] != null)
-                                        {
-                                            totalCount += win.Trees[i].Count;
-                                        }
-                                    }
-
-                                    if (totalCount > 0)
-                                    {
-                                        List<TreeNode> trees = new List<TreeNode>(totalCount);
-
-                                        for (int i = 0; i < win.Trees.Count; i++)
-                                        {
-                                            if (win.Trees[i] != null)
-                                            {
-                                                trees.AddRange(win.Trees[i]);
-                                            }
-                                        }
-
-                                        ProgressWindow pwin;
-
-                                        if (trees.Count > 2)
-                                        {
-                                            pwin = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 4, LabelText = "Computing tree splits" };
-                                        }
-                                        else
-                                        {
-                                            pwin = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 2, LabelText = "Sampling trees under the YHK model" };
-                                        }
-
-                                        _ = pwin.ShowDialog2(this);
-
-                                        await Task.Run(() => CreateCustomTreesReport(parentWindow, pwin, trees));
-
-                                        pwin.Close();
-                                    }
-                                }
-                            }
-
-                            if (CustomTreesReport == null)
-                            {
-                                bar.SelectedIndex = PlotType;
-                                cancelled = true;
-                            }
-                            else
-                            {
-                                lock (CustomTreesReportLock)
-                                {
-                                    lock (DocumentLock)
-                                    {
-                                        this.Document = CustomTreesReport;
-
-                                        forcedRerender = true;
-                                        RenderDocument();
-                                    }
-                                }
-                            }
                             break;
 
                         case 3:
@@ -1410,12 +1344,97 @@ namespace TreeViewer
                         });
                     }
 
-                    if ((int)e.NewValue != 3 && !cancelled)
+                    if ((int)e.NewValue != 3 && (int)e.NewValue != 2 && !cancelled)
                     {
                         PlotType = (int)e.NewValue;
                     }
                 }
             };
+
+            async void CompareClicked()
+            {
+                bool cancelled = false;
+
+                if (CustomTreesReport == null)
+                {
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        CreateReportWindow win = new CreateReportWindow(this.parentWindow);
+
+                        await win.ShowDialog2(this);
+
+                        if (win.Result && win.Trees != null && win.Trees.Count > 0)
+                        {
+                            int totalCount = 0;
+
+                            for (int i = 0; i < win.Trees.Count; i++)
+                            {
+                                if (win.Trees[i] != null)
+                                {
+                                    totalCount += win.Trees[i].Count;
+                                }
+                            }
+
+                            if (totalCount > 0)
+                            {
+                                List<TreeNode> trees = new List<TreeNode>(totalCount);
+
+                                for (int i = 0; i < win.Trees.Count; i++)
+                                {
+                                    if (win.Trees[i] != null)
+                                    {
+                                        trees.AddRange(win.Trees[i]);
+                                    }
+                                }
+
+                                ProgressWindow pwin;
+
+                                if (trees.Count > 2)
+                                {
+                                    pwin = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 4, LabelText = "Computing tree splits" };
+                                }
+                                else
+                                {
+                                    pwin = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 2, LabelText = "Sampling trees under the YHK model" };
+                                }
+
+                                _ = pwin.ShowDialog2(this);
+
+                                await Task.Run(() => CreateCustomTreesReport(parentWindow, pwin, trees));
+
+                                pwin.Close();
+                            }
+                        }
+                    }, Avalonia.Threading.DispatcherPriority.MinValue);
+                }
+
+                if (CustomTreesReport == null)
+                {
+                    bar.SelectedIndex = PlotType;
+                    cancelled = true;
+                }
+                else
+                {
+                    lock (CustomTreesReportLock)
+                    {
+                        lock (DocumentLock)
+                        {
+                            this.Document = CustomTreesReport;
+
+                            forcedRerender = true;
+                            RenderDocument();
+                        }
+                    }
+                }
+
+                if (!cancelled)
+                {
+                    PlotType = 2;
+                }
+            }
+
+            bar.GridItems[2].PointerPressed += (s, e) => { e.Pointer.Capture(null); CompareClicked(); };
+
 
             this.FindControl<Grid>("LeftMouseButtonContainerGrid").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.LeftMouseButton")));
             this.FindControl<Grid>("MouseWheelContainerGrid").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.MouseWheel")));
@@ -1505,8 +1524,6 @@ namespace TreeViewer
             }
 
             this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotViewBox").Transitions = null;
-
-            //WasAutoFitted = true;
         }
     }
 }
