@@ -65,13 +65,27 @@ namespace TreeViewer
                 {
                     if (owner is IWindowWithToolTips win)
                     {
-                        foreach (Control control in win.ControlsWithToolTips)
+                        subject.Opened += async (s, e) =>
                         {
-                            if (ToolTip.GetIsOpen(control))
+                            await Task.Delay(50);
+                            foreach (Control control in win.ControlsWithToolTips)
                             {
-                                ToolTip.SetIsOpen(control, false);
+                                if (ToolTip.GetIsOpen(control))
+                                {
+                                    _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => ToolTip.SetIsOpen(control, false), Avalonia.Threading.DispatcherPriority.MinValue);
+                                }
+
+                                ((ToolTip)ToolTip.GetTip(control)).IsEnabled = false;
                             }
-                        }
+                        };
+
+                        subject.Closed += (s, e) =>
+                        {
+                            foreach (Control control in win.ControlsWithToolTips)
+                            {
+                                ((ToolTip)ToolTip.GetTip(control)).IsEnabled = true;
+                            }
+                        };
                     }
                 }
 
@@ -102,14 +116,14 @@ namespace TreeViewer
                     };
                 }
 
-                ToolTip.SetTip(control, tip);
+                ToolTip.SetTip(control, new ToolTip() { Content = tip });
             }
             // Workaround for https://github.com/AvaloniaUI/Avalonia/issues/3536
             else if (!Modules.IsLinux)
             {
-                ToolTip.SetTip(control, tip);
+                ToolTip.SetTip(control, new ToolTip() { Content = tip });
             }
-            
+
         }
     }
 }

@@ -1352,7 +1352,7 @@ namespace TreeViewer
                             ("Open module repository to temporarily load modules", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ModuleRepository")), null),
                         }, false, 0, (Action<int>)(async ind => {
                              ModuleManagerWindow win2 = new ModuleManagerWindow();
-                            _ = win2.ShowDialog2(GlobalSettings.Settings.MainWindows[0]);
+                            _ = win2.ShowDialog2(this);
 
                             try
                             {
