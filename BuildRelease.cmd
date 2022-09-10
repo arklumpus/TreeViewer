@@ -9,9 +9,10 @@ set found=0
 if "%platform%" == "Linux-x64" set found=1
 if "%platform%" == "Win-x64" set found=1
 if "%platform%" == "Mac-x64" set found=1
+if "%platform%" == "Mac-arm64" set found=1
 
 if %found% == 0 (
-	echo [91mInvalid platform specified![0m Valid options are: [94mLinux-64[0m, [94mWin-x64[0m or [94mMac-x64[0m
+	echo [91mInvalid platform specified![0m Valid options are: [94mLinux-64[0m, [94mWin-x64[0m, [94mMac-x64[0m, or [94mMac-arm64[0m
 	exit /B 64
 )
 
