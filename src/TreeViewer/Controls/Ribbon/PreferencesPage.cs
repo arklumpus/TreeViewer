@@ -53,7 +53,7 @@ namespace TreeViewer
             ScrollViewer mainScrollViewer = new ScrollViewer() { HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled, VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto, AllowAutoHide = false, Padding = new Thickness(0, 0, 17, 0) };
             mainScrollViewer.Content = pageContent;
 
-            DockPanel parentContainer = new DockPanel() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, MaxWidth = 700, LastChildFill = true, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            DockPanel parentContainer = new DockPanel() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Width = 700, LastChildFill = true, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
 
             this.PageContent = parentContainer;
 
