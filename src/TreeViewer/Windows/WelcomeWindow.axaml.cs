@@ -139,23 +139,16 @@ namespace TreeViewer
 
                         progressWindow.Close();
 
-                        if (!Modules.IsMac)
+
+                        if (!Modules.IsMac && Modules.FileTypeModules.Count > 0)
                         {
-                            if (Modules.FileTypeModules.Count > 0)
-                            {
-                                FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
-                                fileAssociationWindow.Show();
-                            }
-                            else
-                            {
-                                MainWindow mainWindow = new MainWindow();
-                                mainWindow.Show();
-                            }
+                            FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
+                            fileAssociationWindow.Show();
                         }
                         else
                         {
-                            MacOSPermissionWindow window = new MacOSPermissionWindow();
-                            window.Show();
+                            MainWindow mainWindow = new MainWindow();
+                            mainWindow.Show();
                         }
 
                         this.Close();
@@ -180,23 +173,15 @@ namespace TreeViewer
                         File.WriteAllText(Modules.ModuleListPath, "[]");
                         await Modules.LoadInstalledModules(true, null);
 
-                        if (!Modules.IsMac)
+                        if (!Modules.IsMac && Modules.FileTypeModules.Count > 0)
                         {
-                            if (Modules.FileTypeModules.Count > 0)
-                            {
-                                FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
-                                fileAssociationWindow.Show();
-                            }
-                            else
-                            {
-                                MainWindow mainWindow = new MainWindow();
-                                mainWindow.Show();
-                            }
+                            FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
+                            fileAssociationWindow.Show();
                         }
                         else
                         {
-                            MacOSPermissionWindow window = new MacOSPermissionWindow();
-                            window.Show();
+                            MainWindow mainWindow = new MainWindow();
+                            mainWindow.Show();
                         }
 
                         this.Close();
