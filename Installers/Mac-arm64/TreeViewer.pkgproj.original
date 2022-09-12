@@ -727,7 +727,44 @@
 		<key>PROJECT_REQUIREMENTS</key>
 		<dict>
 			<key>LIST</key>
-			<array/>
+			<array>
+				<dict>
+					<key>BEHAVIOR</key>
+					<integer>3</integer>
+					<key>DICTIONARY</key>
+					<dict>
+						<key>IC_REQUIREMENT_CPU_ARCHITECTURE_FAMILY</key>
+						<integer>3</integer>
+						<key>IC_REQUIREMENT_CPU_INTEL_ARCHITECTURE_TYPE</key>
+						<integer>0</integer>
+						<key>IC_REQUIREMENT_CPU_MINIMUM_CPU_CORES_COUNT</key>
+						<integer>1</integer>
+						<key>IC_REQUIREMENT_CPU_MINIMUM_FREQUENCY</key>
+						<integer>866666</integer>
+						<key>IC_REQUIREMENT_CPU_POWERPC_ARCHITECTURE_TYPE</key>
+						<integer>0</integer>
+					</dict>
+					<key>IC_REQUIREMENT_CHECK_TYPE</key>
+					<integer>0</integer>
+					<key>IDENTIFIER</key>
+					<string>fr.whitebox.Packages.requirement.cpu</string>
+					<key>MESSAGE</key>
+					<array>
+						<dict>
+							<key>LANGUAGE</key>
+							<string>English</string>
+							<key>SECONDARY_VALUE</key>
+							<string>This is the installer package for the Apple Silicon (ARM64) version of TreeViewer. You appear to be using a Mac with an Intel 64-bit processor instead; please download the correct installation package from https://treeviewer.org.</string>
+							<key>VALUE</key>
+							<string>Incompatible system architecture</string>
+						</dict>
+					</array>
+					<key>NAME</key>
+					<string>Processor</string>
+					<key>STATE</key>
+					<true/>
+				</dict>
+			</array>
 			<key>RESOURCES</key>
 			<array/>
 			<key>ROOT_VOLUME_ONLY</key>
