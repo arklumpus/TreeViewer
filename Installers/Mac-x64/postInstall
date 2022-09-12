@@ -6,4 +6,4 @@ sudo mkdir -p /usr/local/bin/
 
 sudo rm -f /usr/local/bin/TreeViewer /usr/local/bin/TreeViewerCommandLine
 
-sudo ln -s /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewer /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewerCommandLine /usr/local/bin/
+sudo ln -s /Applications/TreeViewer.app/Contents/MacOS/TreeViewer /Applications/TreeViewer.app/Contents/MacOS/TreeViewerCommandLine /usr/local/bin/
