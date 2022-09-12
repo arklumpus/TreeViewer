@@ -19,8 +19,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace TreeViewer
@@ -32,8 +30,6 @@ namespace TreeViewer
 
     public static class AvaloniaBugFixes
     {
-        private static readonly Dictionary<string, VectSharp.FontFamily> manifestFonts = new Dictionary<string, VectSharp.FontFamily>();
-
         public static Avalonia.Size MeasureText(string text, Avalonia.Media.FontFamily fontFamily, Avalonia.Media.FontStyle fontStyle, Avalonia.Media.FontWeight fontWeight, double fontSize, Size? availableSize = null)
         {
             if (string.IsNullOrEmpty(text))
@@ -49,12 +45,6 @@ namespace TreeViewer
         public static double MeasureTextWidth(string text, Avalonia.Media.FontFamily fontFamily, Avalonia.Media.FontStyle fontStyle, Avalonia.Media.FontWeight fontWeight, double fontSize)
         {
             return MeasureText(text, fontFamily, fontStyle, fontWeight, fontSize).Width;
-        }
-
-
-        private static Stream GetManifestResourceStream(string name)
-        {
-            return typeof(AvaloniaBugFixes).Assembly.GetManifestResourceStream(name);
         }
 
         public static async Task ShowDialog2(this Window subject, Window owner)
