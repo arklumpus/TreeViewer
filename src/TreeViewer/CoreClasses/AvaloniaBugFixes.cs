@@ -57,43 +57,44 @@ namespace TreeViewer
             return typeof(AvaloniaBugFixes).Assembly.GetManifestResourceStream(name);
         }
 
-        public static Task ShowDialog2(this Window subject, Window owner)
+        public static async Task ShowDialog2(this Window subject, Window owner)
         {
             if (owner.IsVisible)
             {
+                Dictionary<Control, object> toolTips = null;
+
                 if (Modules.IsMac)
                 {
                     if (owner is IWindowWithToolTips win)
                     {
-                        subject.Opened += async (s, e) =>
-                        {
-                            await Task.Delay(50);
-                            foreach (Control control in win.ControlsWithToolTips)
-                            {
-                                if (ToolTip.GetIsOpen(control))
-                                {
-                                    _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => ToolTip.SetIsOpen(control, false), Avalonia.Threading.DispatcherPriority.MinValue);
-                                }
+                        toolTips = new Dictionary<Control, object>();
 
-                                ((ToolTip)ToolTip.GetTip(control)).IsEnabled = false;
-                            }
-                        };
-
-                        subject.Closed += (s, e) =>
+                        foreach (Control control in win.ControlsWithToolTips)
                         {
-                            foreach (Control control in win.ControlsWithToolTips)
+                            object tip = ToolTip.GetTip(control);
+                            
+                            if (tip != null)
                             {
-                                ((ToolTip)ToolTip.GetTip(control)).IsEnabled = true;
+                                ToolTip.SetIsOpen(control, false);
+                                toolTips[control] = tip;
+                                ToolTip.SetTip(control, null);
                             }
-                        };
+                        }
                     }
                 }
 
-                return subject.ShowDialog(owner);
-            }
-            else
-            {
-                return Task.CompletedTask;
+                await subject.ShowDialog(owner);
+
+                if (Modules.IsMac)
+                {
+                    if (owner is IWindowWithToolTips win)
+                    {
+                        foreach (KeyValuePair<Control, object> kvp in toolTips)
+                        {
+                            ToolTip.SetTip(kvp.Key, kvp.Value);
+                        }
+                    }
+                }
             }
         }
 
