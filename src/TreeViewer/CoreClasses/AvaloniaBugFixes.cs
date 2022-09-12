@@ -119,12 +119,10 @@ namespace TreeViewer
 
                 ToolTip.SetTip(control, new ToolTip() { Content = tip });
             }
-            // Workaround for https://github.com/AvaloniaUI/Avalonia/issues/3536
-            else if (!Modules.IsLinux)
+            else
             {
                 ToolTip.SetTip(control, new ToolTip() { Content = tip });
             }
-
         }
     }
 }
