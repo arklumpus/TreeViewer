@@ -620,7 +620,7 @@ _Version 1.0.3, by Giorgio Bianchini_
 
 ### [Node states](0512b822-044d-4c13-b3bb-bca494c51daa)
 
-_Version 1.2.3, by Giorgio Bianchini_
+_Version 1.2.4, by Giorgio Bianchini_
 
 **Description**: Draws node states based on attributes.
 
@@ -1004,7 +1004,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Stochastic mapping branches](f7a20f2f-94b2-4331-8bbf-4e0087da6fba)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Plots branches with data from a stochastic mapping analysis.
 
