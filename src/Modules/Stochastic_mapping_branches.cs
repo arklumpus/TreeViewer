@@ -50,7 +50,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
         public const string Name = "Stochastic mapping branches";
         public const string HelpText = "Plots branches with data from a stochastic mapping analysis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "f7a20f2f-94b2-4331-8bbf-4e0087da6fba";
@@ -256,7 +256,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
                 { "Total characters:", ControlStatus.Disabled }
             };
 
-            if ((int)currentParameterValues["Style:"] == 0 || (int)currentParameterValues["Style:"] == 2)
+            if ((int)currentParameterValues["Style:"] == 0)
             {
                 controlStatus["Dominance threshold:"] = ControlStatus.Hidden;
                 controlStatus["Exclusion threshold:"] = ControlStatus.Hidden;
@@ -269,6 +269,14 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
                 controlStatus["Dominance threshold:"] = ControlStatus.Enabled;
                 controlStatus["Exclusion threshold:"] = ControlStatus.Enabled;
                 controlStatus["Dash unit:"] = ControlStatus.Enabled;
+                controlStatus["Gradually increase thickness"] = ControlStatus.Hidden;
+                controlStatus["Thickness maximum:"] = ControlStatus.Hidden;
+            }
+            else if ((int)currentParameterValues["Style:"] == 2)
+            {
+                controlStatus["Dominance threshold:"] = ControlStatus.Hidden;
+                controlStatus["Exclusion threshold:"] = ControlStatus.Hidden;
+                controlStatus["Dash unit:"] = ControlStatus.Hidden;
                 controlStatus["Gradually increase thickness"] = ControlStatus.Hidden;
                 controlStatus["Thickness maximum:"] = ControlStatus.Hidden;
             }
@@ -1625,7 +1633,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
                 for (int j = 0; j < states[i].Length; j++)
                 {
-                    Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid() { Background = new Avalonia.Media.SolidColorBrush(BlendWithWhite(GetColour(Array.IndexOf(states[j], states[i][j]), states[j].Length), 0.25).ToAvalonia()) };
+                    Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid() { Background = new Avalonia.Media.SolidColorBrush(BlendWithWhite(GetColour(Array.IndexOf(states[i], states[i][j]), states[i].Length), 0.25).ToAvalonia()) };
 
                     if (j > 0)
                     {

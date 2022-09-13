@@ -83,7 +83,7 @@ namespace NodeStates
         public const string Name = "Node states";
         public const string HelpText = "Draws node states based on attributes.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.3");
+        public static Version Version = new Version("1.2.4");
         public const string Id = "0512b822-044d-4c13-b3bb-bca494c51daa";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -2110,7 +2110,7 @@ namespace NodeStates
 
                 for (int j = 0; j < states[i].Length; j++)
                 {
-                    Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid() { Background = new Avalonia.Media.SolidColorBrush(BlendWithWhite(GetColour(Array.IndexOf(states[j], states[i][j]), states[j].Length), 0.25).ToAvalonia()) };
+                    Avalonia.Controls.Grid grd = new Avalonia.Controls.Grid() { Background = new Avalonia.Media.SolidColorBrush(BlendWithWhite(GetColour(Array.IndexOf(states[i], states[i][j]), states[i].Length), 0.25).ToAvalonia()) };
 
                     if (j > 0)
                     {
