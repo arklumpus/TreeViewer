@@ -569,6 +569,11 @@ namespace TreeViewer
                 }
             }
 
+            if (Modules.IsWindows)
+            {
+                ConsoleWrapperUI.WriteLine();
+            }
+
             filesToOpen.Insert(0, showWelcome.ToString());
             filesToOpen.Insert(1, showFileAssociations.ToString());
             filesToOpen.Insert(2, moduleCreator.ToString());
