@@ -240,8 +240,8 @@ namespace TreeViewer
             }
             else if (attributeType == "Number")
             {
-                this.FindControl<NumericUpDown>("DefaultValueNud").Minimum = (double)parameters[1];
-                this.FindControl<NumericUpDown>("DefaultValueNud").Maximum = (double)parameters[2];
+                this.FindControl<NumericUpDown>("DefaultValueNud").Minimum = Convert.ToDouble(parameters[1]);
+                this.FindControl<NumericUpDown>("DefaultValueNud").Maximum = Convert.ToDouble(parameters[2]);
                 initialText = SetupNumber(parameters);
             }
 
