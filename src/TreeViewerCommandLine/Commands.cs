@@ -49,7 +49,8 @@ namespace TreeViewerCommandLine
                                                             new RegionCommand(),
                                                             new ResolutionCommand(),
                                                             new PNGCommand(),
-                                                            new TIFFCommand()
+                                                            new TIFFCommand(),
+                                                            new CSCCommand()
                                                         }
                                                         orderby el.PrimaryCommand
                                                         select el).ToArray();

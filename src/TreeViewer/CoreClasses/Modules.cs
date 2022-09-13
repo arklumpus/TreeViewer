@@ -828,7 +828,7 @@ public static Colour? Format(object attribute)
 
         private static List<CSharpEditor.CachedMetadataReference> cachedReferences = null;
 
-        internal static List<CSharpEditor.CachedMetadataReference> CachedReferences
+        public static List<CSharpEditor.CachedMetadataReference> CachedReferences
         {
             get
             {
@@ -858,6 +858,33 @@ public static Colour? Format(object attribute)
                 {
                     cachedReferences.Add(CSharpEditor.CachedMetadataReference.CreateFromFile(location, Path.Combine(Path.GetDirectoryName(location), Path.GetFileNameWithoutExtension(location) + ".xml")));
                 }
+            }
+        }
+
+        public static unsafe bool IsDLLManaged(string dllPath)
+        {
+            using FileStream fs = File.OpenRead(dllPath);
+            using BinaryReader reader = new BinaryReader(fs);
+
+            fs.Seek(60, SeekOrigin.Begin);
+            int offset = reader.ReadInt32();
+
+            fs.Seek(offset + 24, SeekOrigin.Begin);
+            ushort imageType = reader.ReadUInt16();
+
+            if (imageType == 0x10b)
+            {
+                fs.Seek(offset + 24 + 208 + 4, SeekOrigin.Begin);
+                return reader.ReadUInt32() > 0;
+            }
+            else if (imageType == 0x20b)
+            {
+                fs.Seek(offset + 24 + 224 + 4, SeekOrigin.Begin);
+                return reader.ReadUInt32() > 0;
+            }
+            else
+            {
+                return false;
             }
         }
 
