@@ -73,6 +73,11 @@ namespace TreeViewer
         public static GlobalSettings Settings { get; }
 
         [JsonIgnore]
+        public HashSet<string> CurrentlyDismissedMessages { get; } = new HashSet<string>();
+
+        public HashSet<string> PermanentlyDismissedMessages { get; set; } = new HashSet<string>();
+
+        [JsonIgnore]
         public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
 
         public static JsonSerializerOptions SerializationOptions { get; } = new JsonSerializerOptions()

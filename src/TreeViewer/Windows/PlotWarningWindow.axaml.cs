@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,32 +10,65 @@ namespace TreeViewer
 {
     public partial class PlotWarningWindow : ChildWindow
     {
-        public PlotWarningWindow(MainWindow parent, Dictionary<string, (Module, string)> exceptions) : this()
+        public PlotWarningWindow(MainWindow parent, Dictionary<string, (Module, string)> exceptions, Dictionary<string, (Module, string)> warnings) : this()
         {
-            List<(string, TransformerModule, string)> transformers = new List<(string, TransformerModule, string)>();
-            List<(string, FurtherTransformationModule, string, int)> furtherTransformations = new List<(string, FurtherTransformationModule, string, int)>();
-            List<(string, CoordinateModule, string)> coordinates = new List<(string, CoordinateModule, string)>();
-            List<(string, PlottingModule, string, int)> plotActions = new List<(string, PlottingModule, string, int)>();
+            if (exceptions.Count > 0)
+            {
+                this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Warning")) { Width = 32, Height = 32 });
+                this.FindControl<TextBlock>("WarningMessageBlock").Text = "Errors occurred while creating the tree plot.";
+            }
+            else
+            {
+                this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Information")) { Width = 32, Height = 32 });
+                this.FindControl<TextBlock>("WarningMessageBlock").Text = "Warnings occurred while creating the tree plot.";
+            }
+
+            List<(string, TransformerModule, string, bool)> transformers = new List<(string, TransformerModule, string, bool)>();
+            List<(string, FurtherTransformationModule, string, int, bool)> furtherTransformations = new List<(string, FurtherTransformationModule, string, int, bool)>();
+            List<(string, CoordinateModule, string, bool)> coordinates = new List<(string, CoordinateModule, string, bool)>();
+            List<(string, PlottingModule, string, int, bool)> plotActions = new List<(string, PlottingModule, string, int, bool)>();
 
             foreach (KeyValuePair<string, (Module, string)> kvp in exceptions)
             {
                 if (kvp.Value.Item1 is TransformerModule transf)
                 {
-                    transformers.Add((kvp.Key, transf, kvp.Value.Item2));
+                    transformers.Add((kvp.Key, transf, kvp.Value.Item2, false));
                 }
                 else if (kvp.Value.Item1 is FurtherTransformationModule ftransf)
                 {
                     int index = parent.FurtherTransformationsParameters.FindIndex(x => (string)x[Modules.ModuleIDKey] == kvp.Key);
-                    furtherTransformations.Add((kvp.Key, ftransf, kvp.Value.Item2, index));
+                    furtherTransformations.Add((kvp.Key, ftransf, kvp.Value.Item2, index, false));
                 }
                 else if (kvp.Value.Item1 is CoordinateModule coord)
                 {
-                    coordinates.Add((kvp.Key, coord, kvp.Value.Item2));
+                    coordinates.Add((kvp.Key, coord, kvp.Value.Item2, false));
                 }
                 else if (kvp.Value.Item1 is PlottingModule plot)
                 {
                     int index = parent.PlottingParameters.FindIndex(x => (string)x[Modules.ModuleIDKey] == kvp.Key);
-                    plotActions.Add((kvp.Key, plot, kvp.Value.Item2, index));
+                    plotActions.Add((kvp.Key, plot, kvp.Value.Item2, index, false));
+                }
+            }
+
+            foreach (KeyValuePair<string, (Module, string)> kvp in warnings)
+            {
+                if (kvp.Value.Item1 is TransformerModule transf)
+                {
+                    transformers.Add((kvp.Key, transf, kvp.Value.Item2, true));
+                }
+                else if (kvp.Value.Item1 is FurtherTransformationModule ftransf)
+                {
+                    int index = parent.FurtherTransformationsParameters.FindIndex(x => (string)x[Modules.ModuleIDKey] == kvp.Key);
+                    furtherTransformations.Add((kvp.Key, ftransf, kvp.Value.Item2, index, true));
+                }
+                else if (kvp.Value.Item1 is CoordinateModule coord)
+                {
+                    coordinates.Add((kvp.Key, coord, kvp.Value.Item2, true));
+                }
+                else if (kvp.Value.Item1 is PlottingModule plot)
+                {
+                    int index = parent.PlottingParameters.FindIndex(x => (string)x[Modules.ModuleIDKey] == kvp.Key);
+                    plotActions.Add((kvp.Key, plot, kvp.Value.Item2, index, true));
                 }
             }
 
@@ -52,18 +86,54 @@ namespace TreeViewer
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-                    DPIAwareBox icon = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Transformer")) { Width = 16, Height = 16, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 10, 5, 0) };
-                    Grid.SetRowSpan(icon, 2);
-                    pnl.Children.Add(icon);
+                    StackPanel iconPanel = new StackPanel() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 5, 5, 0) };
+                    Grid.SetRowSpan(iconPanel, 2);
+                    pnl.Children.Add(iconPanel);
+
+                    DPIAwareBox icon = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Transformer")) { Width = 16, Height = 16, Margin = new Avalonia.Thickness(0, 0, 0, 5) };
+                    iconPanel.Children.Add(icon);
+
+                    if (transformers[i].Item4)
+                    {
+                        iconPanel.Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Information")) { Width = 16, Height = 16 });
+
+                        VectSharp.MarkdownCanvas.MarkdownCanvasControl description = new VectSharp.MarkdownCanvas.MarkdownCanvasControl() { Margin = new Avalonia.Thickness(0, 0, 0, 5), FontSize = 12 };
+                        description.TextConversionOption = VectSharp.Canvas.AvaloniaContextInterpreter.TextOptions.NeverConvert;
+                        description.Renderer.IndentWidth = 15;
+                        description.Renderer.RegularFontFamily = Modules.UIVectSharpFontFamily;
+                        description.Renderer.ItalicFontFamily = Modules.UIVectSharpFontFamilyItalic;
+                        description.Renderer.BoldFontFamily = Modules.UIVectSharpFontFamilyBold;
+                        description.Renderer.BoldItalicFontFamily = Modules.UIVectSharpFontFamilyBoldItalic;
+
+                        for (int j = 0; j < description.Renderer.Bullets.Count; j++)
+                        {
+                            Action<VectSharp.Graphics, VectSharp.Colour> originalBullet = description.Renderer.Bullets[j];
+
+                            description.Renderer.Bullets[j] = (g, c) => { g.Scale(0.75, 0.75); g.Translate(0, 0.1); originalBullet(g, c); };
+                        }
+
+                        description.Renderer.SpaceAfterParagraph = 0.25;
+                        description.Renderer.BackgroundColour = VectSharp.Colour.FromRgba(0, 0, 0, 0);
+                        description.Renderer.Margins = new VectSharp.Markdown.Margins(-3, 0, 0, -7);
+                        description.DocumentSource = transformers[i].Item3;
+
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
+                    else
+                    {
+                        iconPanel.Children.Add(MainWindow.GetAlertIcon());
+
+                        TextBlock description = new TextBlock() { Text = transformers[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
 
                     TextBlock name = new TextBlock() { Text = transformers[i].Item2.Name, FontSize = 14, Margin = new Avalonia.Thickness(0, 0, 0, 0), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
                     Grid.SetColumn(name, 1);
                     pnl.Children.Add(name);
-
-                    TextBlock description = new TextBlock() { Text = transformers[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap };
-                    Grid.SetColumn(description, 1);
-                    Grid.SetRow(description, 1);
-                    pnl.Children.Add(description);
 
                     Button btn = new Button() { Margin = new Avalonia.Thickness(0, 0, 0, 5), Background = Brushes.Transparent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
                     btn.Classes.Add("SideBarButton");
@@ -98,18 +168,54 @@ namespace TreeViewer
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-                    DPIAwareBox icon = new DPIAwareBox(furtherTransformations[i].Item2.GetIcon) { Width = 16, Height = 16, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 10, 5, 0) };
-                    Grid.SetRowSpan(icon, 2);
-                    pnl.Children.Add(icon);
+                    StackPanel iconPanel = new StackPanel() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 5, 5, 0) };
+                    Grid.SetRowSpan(iconPanel, 2);
+                    pnl.Children.Add(iconPanel);
+
+                    DPIAwareBox icon = new DPIAwareBox(furtherTransformations[i].Item2.GetIcon) { Width = 16, Height = 16, Margin = new Avalonia.Thickness(0, 0, 0, 5) };
+                    iconPanel.Children.Add(icon);
+
+                    if (furtherTransformations[i].Item5)
+                    {
+                        iconPanel.Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Information")) { Width = 16, Height = 16 });
+
+                        VectSharp.MarkdownCanvas.MarkdownCanvasControl description = new VectSharp.MarkdownCanvas.MarkdownCanvasControl() { Margin = new Avalonia.Thickness(0, 0, 0, 5), FontSize = 12 };
+                        description.TextConversionOption = VectSharp.Canvas.AvaloniaContextInterpreter.TextOptions.NeverConvert;
+                        description.Renderer.IndentWidth = 15;
+                        description.Renderer.RegularFontFamily = Modules.UIVectSharpFontFamily;
+                        description.Renderer.ItalicFontFamily = Modules.UIVectSharpFontFamilyItalic;
+                        description.Renderer.BoldFontFamily = Modules.UIVectSharpFontFamilyBold;
+                        description.Renderer.BoldItalicFontFamily = Modules.UIVectSharpFontFamilyBoldItalic;
+
+                        for (int j = 0; j < description.Renderer.Bullets.Count; j++)
+                        {
+                            Action<VectSharp.Graphics, VectSharp.Colour> originalBullet = description.Renderer.Bullets[j];
+
+                            description.Renderer.Bullets[j] = (g, c) => { g.Scale(0.75, 0.75); g.Translate(0, 0.1); originalBullet(g, c); };
+                        }
+
+                        description.Renderer.SpaceAfterParagraph = 0.25;
+                        description.Renderer.BackgroundColour = VectSharp.Colour.FromRgba(0, 0, 0, 0);
+                        description.Renderer.Margins = new VectSharp.Markdown.Margins(-3, 0, 0, -7);
+                        description.DocumentSource = furtherTransformations[i].Item3;
+
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
+                    else
+                    {
+                        iconPanel.Children.Add(MainWindow.GetAlertIcon());
+
+                        TextBlock description = new TextBlock() { Text = furtherTransformations[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
 
                     TextBlock name = new TextBlock() { Text = furtherTransformations[i].Item2.Name, FontSize = 14, Margin = new Avalonia.Thickness(0, 0, 0, 0), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
                     Grid.SetColumn(name, 1);
                     pnl.Children.Add(name);
-
-                    TextBlock description = new TextBlock() { Text = furtherTransformations[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap };
-                    Grid.SetColumn(description, 1);
-                    Grid.SetRow(description, 1);
-                    pnl.Children.Add(description);
 
                     Button btn = new Button() { Margin = new Avalonia.Thickness(0, 0, 0, 5), Background = Brushes.Transparent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
                     btn.Classes.Add("SideBarButton");
@@ -142,18 +248,55 @@ namespace TreeViewer
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-                    DPIAwareBox icon = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Coordinates")) { Width = 16, Height = 16, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 10, 5, 0) };
-                    Grid.SetRowSpan(icon, 2);
-                    pnl.Children.Add(icon);
+                    StackPanel iconPanel = new StackPanel() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 5, 5, 0) };
+                    Grid.SetRowSpan(iconPanel, 2);
+                    pnl.Children.Add(iconPanel);
+
+                    DPIAwareBox icon = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Coordinates")) { Width = 16, Height = 16, Margin = new Avalonia.Thickness(0, 0, 0, 5) };
+                    iconPanel.Children.Add(icon);
+
+                    if (coordinates[i].Item4)
+                    {
+                        iconPanel.Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Information")) { Width = 16, Height = 16 });
+
+                        VectSharp.MarkdownCanvas.MarkdownCanvasControl description = new VectSharp.MarkdownCanvas.MarkdownCanvasControl() { Margin = new Avalonia.Thickness(0, 0, 0, 5), FontSize = 12 };
+                        description.TextConversionOption = VectSharp.Canvas.AvaloniaContextInterpreter.TextOptions.NeverConvert;
+                        description.Renderer.IndentWidth = 15;
+                        description.Renderer.RegularFontFamily = Modules.UIVectSharpFontFamily;
+                        description.Renderer.ItalicFontFamily = Modules.UIVectSharpFontFamilyItalic;
+                        description.Renderer.BoldFontFamily = Modules.UIVectSharpFontFamilyBold;
+                        description.Renderer.BoldItalicFontFamily = Modules.UIVectSharpFontFamilyBoldItalic;
+
+
+                        for (int j = 0; j < description.Renderer.Bullets.Count; j++)
+                        {
+                            Action<VectSharp.Graphics, VectSharp.Colour> originalBullet = description.Renderer.Bullets[j];
+
+                            description.Renderer.Bullets[j] = (g, c) => { g.Scale(0.75, 0.75); g.Translate(0, 0.1); originalBullet(g, c); };
+                        }
+
+                        description.Renderer.SpaceAfterParagraph = 0.25;
+                        description.Renderer.BackgroundColour = VectSharp.Colour.FromRgba(0, 0, 0, 0);
+                        description.Renderer.Margins = new VectSharp.Markdown.Margins(-3, 0, 0, -7);
+                        description.DocumentSource = coordinates[i].Item3;
+
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
+                    else
+                    {
+                        iconPanel.Children.Add(MainWindow.GetAlertIcon());
+
+                        TextBlock description = new TextBlock() { Text = coordinates[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
 
                     TextBlock name = new TextBlock() { Text = coordinates[i].Item2.Name, FontSize = 14, Margin = new Avalonia.Thickness(0, 0, 0, 0), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
                     Grid.SetColumn(name, 1);
                     pnl.Children.Add(name);
-
-                    TextBlock description = new TextBlock() { Text = coordinates[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap };
-                    Grid.SetColumn(description, 1);
-                    Grid.SetRow(description, 1);
-                    pnl.Children.Add(description);
 
                     Button btn = new Button() { Margin = new Avalonia.Thickness(0, 0, 0, 5), Background = Brushes.Transparent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
                     btn.Classes.Add("SideBarButton");
@@ -188,18 +331,54 @@ namespace TreeViewer
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
                     pnl.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
-                    DPIAwareBox icon = new DPIAwareBox(plotActions[i].Item2.GetIcon) { Width = 16, Height = 16, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 10, 5, 0) };
-                    Grid.SetRowSpan(icon, 2);
-                    pnl.Children.Add(icon);
+                    StackPanel iconPanel = new StackPanel() { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Margin = new Avalonia.Thickness(0, 5, 5, 0) };
+                    Grid.SetRowSpan(iconPanel, 2);
+                    pnl.Children.Add(iconPanel);
+
+                    DPIAwareBox icon = new DPIAwareBox(plotActions[i].Item2.GetIcon) { Width = 16, Height = 16, Margin = new Avalonia.Thickness(0, 0, 0, 5) };
+                    iconPanel.Children.Add(icon);
+
+                    if (plotActions[i].Item5)
+                    {
+                        iconPanel.Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Information")) { Width = 16, Height = 16 });
+
+                        VectSharp.MarkdownCanvas.MarkdownCanvasControl description = new VectSharp.MarkdownCanvas.MarkdownCanvasControl() { Margin = new Avalonia.Thickness(0, 0, 0, 5), FontSize = 12 };
+                        description.TextConversionOption = VectSharp.Canvas.AvaloniaContextInterpreter.TextOptions.NeverConvert;
+                        description.Renderer.IndentWidth = 15;
+                        description.Renderer.RegularFontFamily = Modules.UIVectSharpFontFamily;
+                        description.Renderer.ItalicFontFamily = Modules.UIVectSharpFontFamilyItalic;
+                        description.Renderer.BoldFontFamily = Modules.UIVectSharpFontFamilyBold;
+                        description.Renderer.BoldItalicFontFamily = Modules.UIVectSharpFontFamilyBoldItalic;
+
+                        for (int j = 0; j < description.Renderer.Bullets.Count; j++)
+                        {
+                            Action<VectSharp.Graphics, VectSharp.Colour> originalBullet = description.Renderer.Bullets[j];
+
+                            description.Renderer.Bullets[j] = (g, c) => { g.Scale(0.75, 0.75); g.Translate(0, 0.1); originalBullet(g, c); };
+                        }
+
+                        description.Renderer.SpaceAfterParagraph = 0.25;
+                        description.Renderer.BackgroundColour = VectSharp.Colour.FromRgba(0, 0, 0, 0);
+                        description.Renderer.Margins = new VectSharp.Markdown.Margins(-10, 0, 0, -7);
+                        description.DocumentSource = plotActions[i].Item3;
+
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
+                    else
+                    {
+                        iconPanel.Children.Add(MainWindow.GetAlertIcon());
+
+                        TextBlock description = new TextBlock() { Text = plotActions[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
+                        Grid.SetColumn(description, 1);
+                        Grid.SetRow(description, 1);
+                        pnl.Children.Add(description);
+                    }
 
                     TextBlock name = new TextBlock() { Text = plotActions[i].Item2.Name, FontSize = 14, Margin = new Avalonia.Thickness(0, 0, 0, 0), TextWrapping = TextWrapping.Wrap, Foreground = Brushes.Black };
                     Grid.SetColumn(name, 1);
                     pnl.Children.Add(name);
-
-                    TextBlock description = new TextBlock() { Text = plotActions[i].Item3, FontSize = 12, Margin = new Avalonia.Thickness(0, 0, 0, 5), TextWrapping = TextWrapping.Wrap };
-                    Grid.SetColumn(description, 1);
-                    Grid.SetRow(description, 1);
-                    pnl.Children.Add(description);
 
                     Button btn = new Button() { Margin = new Avalonia.Thickness(0, 0, 0, 5), Background = Brushes.Transparent, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch };
                     btn.Classes.Add("SideBarButton");
@@ -227,7 +406,6 @@ namespace TreeViewer
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Warning")) { Width = 32, Height = 32 });
         }
 
         private void OKClicked(object sender, RoutedEventArgs e)

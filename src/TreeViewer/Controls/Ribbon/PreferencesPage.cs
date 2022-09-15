@@ -302,6 +302,23 @@ namespace TreeViewer
 
             currRow++;
 
+            pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+            {
+                Button button = new Button() { Margin = new Thickness(0, 0, 0, 10), Content = "Restore all dismissed module messages", FontSize = 14 };
+                Grid.SetColumnSpan(button, 2);
+                Grid.SetRow(button, currRow);
+                pageContent.Children.Add(button);
+
+                button.Click += (s, e) =>
+                {
+                    GlobalSettings.Settings.CurrentlyDismissedMessages.Clear();
+                    GlobalSettings.Settings.PermanentlyDismissedMessages.Clear();
+                    GlobalSettings.SaveSettings();
+                };
+            }
+
+            currRow++;
+
             foreach (KeyValuePair<string, string> kvp in GlobalSettings.Settings.AdditionalSettingsList)
             {
                 pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));

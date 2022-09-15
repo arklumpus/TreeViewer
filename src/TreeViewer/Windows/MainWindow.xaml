@@ -649,6 +649,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 		<Button Grid.Column="4" Grid.Row="1" FontSize="12" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="10, 0, 10, 0" Padding="5,0,5,0" Height="22" Classes="PlainButton" Background="Transparent" Name="WarningButton">
 			<StackPanel Orientation="Horizontal">
 				<Canvas Width="16" Height="16" Name="WarningIconCanvas"></Canvas>
+				<Canvas Width="16" Height="16" Name="InfoIconCanvas"></Canvas>
 				<TextBlock Margin="5,0,0,0" Name="WarningCountBlock">999</TextBlock>
 			</StackPanel>
 		</Button>

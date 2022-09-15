@@ -58,10 +58,197 @@ namespace TreeViewer
             throw new ArgumentException("The parameter list was not found!");
         }
 
-        private Dictionary<string, object> UpdateParameterPanel(GenericParameterChangeDelegate parameterChangeDelegate, List<(string, string)> parameters, Action updateAction, out Action<Dictionary<string, object>> UpdateParameterAction, out Control panel)
+        private Dictionary<string, object> UpdateParameterPanel(Module module, GenericParameterChangeDelegate parameterChangeDelegate, List<(string, string)> parameters, Action updateAction, out Action<Dictionary<string, object>> UpdateParameterAction, out Control panel)
         {
             StackPanel controlsPanel = new StackPanel();
             Dictionary<string, object> tbr = new Dictionary<string, object>();
+
+            Avalonia.Media.Transformation.TransformOperations.Builder builder = new Avalonia.Media.Transformation.TransformOperations.Builder(1);
+            builder.AppendTranslate(-10, 0);
+
+            Avalonia.Media.Transformation.TransformOperations offscreen = builder.Build();
+
+            {
+                Border brd = new Border() { BorderThickness = new Thickness(1), BorderBrush = new SolidColorBrush(Color.FromRgb(0, 114, 178)), Background = new SolidColorBrush(Color.FromArgb(128, 184, 214, 223)), Padding = new Thickness(5), Margin = new Thickness(0, 5, 0, 5), IsVisible = false, Opacity = 0, RenderTransform = offscreen, Height = 0 };
+                brd.Transitions = new Avalonia.Animation.Transitions()
+                {
+                    new Avalonia.Animation.DoubleTransition(){ Property = Border.OpacityProperty, Duration= TimeSpan.FromMilliseconds(100) },
+                    new Avalonia.Animation.DoubleTransition(){ Property = Border.HeightProperty, Duration= TimeSpan.FromMilliseconds(100) },
+                    new Avalonia.Animation.TransformOperationsTransition(){ Property = Border.RenderTransformProperty, Duration = TimeSpan.FromMilliseconds(100) }
+                };
+
+                controlsPanel.Children.Add(brd);
+
+                Grid warningGrid = new Grid() { };
+                warningGrid.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto));
+                warningGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+
+                StackPanel iconPanel = new StackPanel();
+                iconPanel.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
+
+                DPIAwareBox icon = new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Information")) { Width = 16, Height = 16 };
+                iconPanel.Children.Add(icon);
+
+                Button dismissForSession = new Button() { Margin = new Thickness(0, 4, 0, 2), Width = 16, Height = 16, Background = Brushes.Transparent, Content = new DPIAwareBox(Icons.GetIcon8("TreeViewer.Assets.Dismiss")) { Width = 8, Height = 8 } };
+                dismissForSession.Classes.Add("SideBarButton");
+                AvaloniaBugFixes.SetToolTip(dismissForSession, new TextBlock() { Text = "Dismiss for this session", Foreground = Brushes.Black });
+                iconPanel.Children.Add(dismissForSession);
+
+                Button dismissPermanently = new Button() { Margin = new Thickness(0, 2, 0, 2), Width = 16, Height = 16, Background = Brushes.Transparent, Content = new Avalonia.Controls.Shapes.Path() { Width = 8, Height = 8, Data = Geometry.Parse("M0,0 L8,8 M8,0 L0,8"), StrokeThickness = 2, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center } };
+                dismissPermanently.Classes.Add("SideBarButton");
+                AvaloniaBugFixes.SetToolTip(dismissPermanently, new TextBlock() { Text = "Dismiss permanently", Foreground = Brushes.Black });
+                iconPanel.Children.Add(dismissPermanently);
+
+                warningGrid.Children.Add(iconPanel);
+
+                VectSharp.MarkdownCanvas.MarkdownCanvasControl canvasControl = new VectSharp.MarkdownCanvas.MarkdownCanvasControl() { Background = Brushes.Transparent };
+                canvasControl.Renderer.IndentWidth = 15;
+
+                for (int i = 0; i < canvasControl.Renderer.Bullets.Count; i++)
+                {
+                    Action<VectSharp.Graphics, VectSharp.Colour> originalBullet = canvasControl.Renderer.Bullets[i];
+
+                    canvasControl.Renderer.Bullets[i] = (g, c) => { g.Scale(0.75, 0.75); g.Translate(0, 0.1); originalBullet(g, c); };
+                }
+
+                canvasControl.Renderer.SpaceAfterParagraph = 0.25;
+                canvasControl.Renderer.BackgroundColour = VectSharp.Colour.FromRgba(0, 0, 0, 0);
+                canvasControl.Renderer.Margins = new VectSharp.Markdown.Margins(-3, 0, 0, -7);
+                Grid.SetColumn(canvasControl, 1);
+                warningGrid.Children.Add(canvasControl);
+
+                brd.Child = warningGrid;
+
+                tbr[Modules.WarningMessageControlID] = new Action<string, string>((message, messageId) =>
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        if (string.IsNullOrEmpty(message))
+                        {
+                            CurrentWarnings.Remove((string)tbr[Modules.ModuleIDKey]);
+
+                            if (brd.IsVisible)
+                            {
+                                brd.Opacity = 0;
+                                brd.RenderTransform = offscreen;
+                                brd.Height = 0;
+                                await System.Threading.Tasks.Task.Delay(100);
+                                brd.IsVisible = false;
+
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    brd.FindAncestorOfType<Accordion>()?.InvalidateHeight();
+                                }, Avalonia.Threading.DispatcherPriority.MinValue);
+                            }
+                        }
+                        else
+                        {
+                            if (!GlobalSettings.Settings.PermanentlyDismissedMessages.Contains(messageId) && !GlobalSettings.Settings.CurrentlyDismissedMessages.Contains(messageId))
+                            {
+                                CurrentWarnings[(string)tbr[Modules.ModuleIDKey]] = (module, message);
+
+                                canvasControl.DocumentSource = message;
+                                brd.Tag = messageId;
+
+                                if (!brd.IsVisible)
+                                {
+                                    brd.IsVisible = true;
+                                    brd.Opacity = 1;
+                                    double renderedHeight = canvasControl.Renderer.RenderSinglePage(canvasControl.Document, brd.Parent.Bounds.Width - 12 - 16 - 10 - 13, out _).Height;
+
+                                    brd.Height = Math.Max(renderedHeight, 56) + 12;
+                                    brd.RenderTransform = Avalonia.Media.Transformation.TransformOperations.Identity;
+
+                                    await System.Threading.Tasks.Task.Delay(200);
+
+                                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                    {
+                                        brd.FindAncestorOfType<Accordion>()?.InvalidateHeight();
+                                    }, Avalonia.Threading.DispatcherPriority.MinValue);
+                                }
+                                else
+                                {
+                                    double renderedHeight = canvasControl.Renderer.RenderSinglePage(canvasControl.Document, brd.Parent.Bounds.Width - 12 - 16 - 10 - 13, out _).Height;
+                                    brd.Height = Math.Max(renderedHeight, 56) + 12;
+
+                                    await System.Threading.Tasks.Task.Delay(200);
+
+                                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                    {
+                                        brd.FindAncestorOfType<Accordion>()?.InvalidateHeight();
+                                    }, Avalonia.Threading.DispatcherPriority.MinValue);
+                                }
+                            }
+                            else
+                            {
+                                CurrentWarnings.Remove((string)tbr[Modules.ModuleIDKey]);
+                                if (brd.IsVisible)
+                                {
+                                    brd.Opacity = 0;
+                                    brd.RenderTransform = offscreen;
+                                    brd.Height = 0;
+                                    await System.Threading.Tasks.Task.Delay(100);
+                                    brd.IsVisible = false;
+
+                                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                    {
+                                        brd.FindAncestorOfType<Accordion>()?.InvalidateHeight();
+                                    }, Avalonia.Threading.DispatcherPriority.MinValue);
+                                }
+                            }
+                        }
+                    });
+                });
+
+                dismissForSession.Click += async (s, e) =>
+                {
+                    CurrentWarnings.Remove((string)tbr[Modules.ModuleIDKey]);
+
+                    if (brd.Tag is string sr)
+                    {
+                        GlobalSettings.Settings.CurrentlyDismissedMessages.Add(sr);
+                    }
+
+                    if (brd.IsVisible)
+                    {
+                        brd.Opacity = 0;
+                        brd.RenderTransform = offscreen;
+                        brd.Height = 0;
+                        await System.Threading.Tasks.Task.Delay(100);
+                        brd.IsVisible = false;
+
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            brd.FindAncestorOfType<Accordion>()?.InvalidateHeight();
+                        }, Avalonia.Threading.DispatcherPriority.MinValue);
+                    }
+                };
+
+                dismissPermanently.Click += async (s, e) =>
+                {
+                    CurrentWarnings.Remove((string)tbr[Modules.ModuleIDKey]);
+
+                    if (brd.Tag is string sr)
+                    {
+                        GlobalSettings.Settings.PermanentlyDismissedMessages.Add(sr);
+                        GlobalSettings.SaveSettings();
+                    }
+
+                    if (brd.IsVisible)
+                    {
+                        brd.Opacity = 0;
+                        brd.RenderTransform = offscreen;
+                        brd.Height = 0;
+                        await System.Threading.Tasks.Task.Delay(100);
+                        brd.IsVisible = false;
+
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            brd.FindAncestorOfType<Accordion>()?.InvalidateHeight();
+                        }, Avalonia.Threading.DispatcherPriority.MinValue);
+                    }
+                };
+            }
 
             if (parameters.Count > 1)
             {
@@ -1268,7 +1455,8 @@ namespace TreeViewer
                                 }
                             };
 
-                            slid.AddValueChangeEndHandler(() => {
+                            slid.AddValueChangeEndHandler(() =>
+                            {
                                 if (causedUpdate)
                                 {
                                     CommitUndoFrame();

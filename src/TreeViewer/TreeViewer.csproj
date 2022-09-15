@@ -85,6 +85,9 @@
     <EmbeddedResource Include="Assets\Coordinates-64.png" />
     <EmbeddedResource Include="Assets\CoordinatesTemplate.png" />
     <EmbeddedResource Include="Assets\DarkArrow.png" />
+    <EmbeddedResource Include="Assets\Dismiss-12.png" />
+    <EmbeddedResource Include="Assets\Dismiss-16.png" />
+    <EmbeddedResource Include="Assets\Dismiss-8.png" />
     <EmbeddedResource Include="Assets\Duplicate-10.png" />
     <EmbeddedResource Include="Assets\Duplicate-15.png" />
     <EmbeddedResource Include="Assets\Duplicate-20.png" />
@@ -160,6 +163,11 @@
     <EmbeddedResource Include="Assets\Image-32.png" />
     <EmbeddedResource Include="Assets\Image-48.png" />
     <EmbeddedResource Include="Assets\Image-64.png" />
+    <EmbeddedResource Include="Assets\Information-16.png" />
+    <EmbeddedResource Include="Assets\Information-24.png" />
+    <EmbeddedResource Include="Assets\Information-32.png" />
+    <EmbeddedResource Include="Assets\Information-48.png" />
+    <EmbeddedResource Include="Assets\Information-64.png" />
     <EmbeddedResource Include="Assets\InstallModule-16.png" />
     <EmbeddedResource Include="Assets\InstallModule-24.png" />
     <EmbeddedResource Include="Assets\InstallModule-32.png" />
@@ -376,6 +384,9 @@
     <None Remove="Assets\Coordinates-48.png" />
     <None Remove="Assets\Coordinates-64.png" />
     <None Remove="Assets\DarkArrow.png" />
+    <None Remove="Assets\Dismiss-12.png" />
+    <None Remove="Assets\Dismiss-16.png" />
+    <None Remove="Assets\Dismiss-8.png" />
     <None Remove="Assets\Duplicate-10.png" />
     <None Remove="Assets\Duplicate-15.png" />
     <None Remove="Assets\Duplicate-20.png" />
@@ -448,6 +459,11 @@
     <None Remove="Assets\Image-32.png" />
     <None Remove="Assets\Image-48.png" />
     <None Remove="Assets\Image-64.png" />
+    <None Remove="Assets\Information-16.png" />
+    <None Remove="Assets\Information-24.png" />
+    <None Remove="Assets\Information-32.png" />
+    <None Remove="Assets\Information-48.png" />
+    <None Remove="Assets\Information-64.png" />
     <None Remove="Assets\InstallModule-16.png" />
     <None Remove="Assets\InstallModule-24.png" />
     <None Remove="Assets\InstallModule-32.png" />

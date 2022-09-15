@@ -22,7 +22,7 @@
 
 				<TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Plot errors" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
 			</Grid>
-			<TextBlock Grid.Row="1" FontSize="14" Margin="0,0,0,5" TextWrapping="Wrap">Errors occurred while creating the tree plot.</TextBlock>
+			<TextBlock Grid.Row="1" FontSize="14" Margin="0,0,0,5" TextWrapping="Wrap" Name="WarningMessageBlock">Errors occurred while creating the tree plot.</TextBlock>
 			<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False" Padding="0,0,20,0" Margin="0,0,0,5">
 				<StackPanel Margin="0,0,0,0">
 					<StackPanel Name="ErrorContainer">

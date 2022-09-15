@@ -318,6 +318,10 @@ namespace TreeViewer
         }
 
         public static VectSharp.FontFamily CodeFontFamily = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.RobotoMono-Regular.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono");
+        public static VectSharp.FontFamily UIVectSharpFontFamily = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-Regular.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans");
+        public static VectSharp.FontFamily UIVectSharpFontFamilyItalic = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-Italic.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans");
+        public static VectSharp.FontFamily UIVectSharpFontFamilyBold = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-Bold.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans");
+        public static VectSharp.FontFamily UIVectSharpFontFamilyBoldItalic = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-BoldItalic.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans");
 
         public static bool IsMac
         {
@@ -359,6 +363,7 @@ namespace TreeViewer
 
         public const string RootNodeId = "650a0ef5-5322-4511-ae86-68bd87b47ecd";
         public const string ModuleIDKey = "eee4a077-63b2-4126-9f35-5f66d40aa2cf";
+        public const string WarningMessageControlID = "6c88ef83-1a84-4a37-8af6-77976ddcc7b5";
         public const string FileMenuFirstAreaId = "638a680b-fbc4-4ed5-adca-b2819b71b986";
         public const string FileMenuThirdAreaId = "c46dd264-4831-4a8a-a979-0884e293c6c8";
         public static readonly string[] AttributeTypes = { "String", "Number" };

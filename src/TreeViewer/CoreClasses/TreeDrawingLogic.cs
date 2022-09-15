@@ -475,13 +475,29 @@ namespace TreeViewer
 
         private void UpdateWarningVisibility()
         {
-            if (CurrentExceptions.Count == 0)
+            if (CurrentExceptions.Count == 0 && CurrentWarnings.Count == 0)
             {
                 this.FindControl<Button>("WarningButton").IsVisible = false;
             }
+            else if (CurrentExceptions.Count > 0 && CurrentWarnings.Count == 0)
+            {
+                this.FindControl<Canvas>("WarningIconCanvas").IsVisible = true;
+                this.FindControl<Canvas>("InfoIconCanvas").IsVisible = false;
+                this.FindControl<TextBlock>("WarningCountBlock").Text = CurrentExceptions.Count.ToString();
+                this.FindControl<Button>("WarningButton").IsVisible = true;
+            }
+            else if (CurrentExceptions.Count == 0 && CurrentWarnings.Count > 0)
+            {
+                this.FindControl<Canvas>("WarningIconCanvas").IsVisible = false;
+                this.FindControl<Canvas>("InfoIconCanvas").IsVisible = true;
+                this.FindControl<TextBlock>("WarningCountBlock").Text = CurrentWarnings.Count.ToString();
+                this.FindControl<Button>("WarningButton").IsVisible = true;
+            }
             else
             {
-                this.FindControl<TextBlock>("WarningCountBlock").Text = CurrentExceptions.Count.ToString();
+                this.FindControl<Canvas>("WarningIconCanvas").IsVisible = true;
+                this.FindControl<Canvas>("InfoIconCanvas").IsVisible = true;
+                this.FindControl<TextBlock>("WarningCountBlock").Text = (CurrentExceptions.Count + CurrentWarnings.Count).ToString();
                 this.FindControl<Button>("WarningButton").IsVisible = true;
             }
         }

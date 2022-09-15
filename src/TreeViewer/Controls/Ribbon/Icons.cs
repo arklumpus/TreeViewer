@@ -212,6 +212,29 @@ namespace TreeViewer
             };
         }
 
+        public static Func<double, Image> GetIcon8(string imageName)
+        {
+            return scaling =>
+            {
+                Image image = new Image() { Width = 8, Height = 8 };
+
+                if (scaling <= 1)
+                {
+                    image.Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(imageName + "-8.png"));
+                }
+                else if (scaling <= 1.5)
+                {
+                    image.Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(imageName + "-12.png"));
+                }
+                else
+                {
+                    image.Source = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(imageName + "-16.png"));
+                }
+
+                return image;
+            };
+        }
+
         public static Func<double, Image> GetIcon32(string imageName)
         {
             return scaling =>

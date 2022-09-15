@@ -145,6 +145,7 @@ namespace TreeViewer
         public List<Action<Dictionary<string, object>>> UpdateFurtherTransformationParameters;
 
         Dictionary<string, (Module, string)> CurrentExceptions;
+        Dictionary<string, (Module, string)> CurrentWarnings;
 
         List<Action> SelectionActionActions;
 
@@ -763,9 +764,10 @@ namespace TreeViewer
 
 
             this.FindControl<Canvas>("WarningIconCanvas").Children.Add(GetAlertIcon());
+            this.FindControl<Canvas>("InfoIconCanvas").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Information")) { Width = 16, Height = 16 });
             this.FindControl<Button>("WarningButton").Click += async (s, e) =>
             {
-                PlotWarningWindow win = new PlotWarningWindow(this, CurrentExceptions);
+                PlotWarningWindow win = new PlotWarningWindow(this, CurrentExceptions, CurrentWarnings);
 
                 await win.ShowDialog2(this);
 
@@ -1812,17 +1814,18 @@ namespace TreeViewer
             TransformerComboBox.SelectionChanged += async (s, e) =>
             {
                 CurrentExceptions.Remove((string)TransformerParameters[Modules.ModuleIDKey]);
+                CurrentWarnings.Remove((string)TransformerParameters[Modules.ModuleIDKey]);
                 UpdateWarningVisibility();
 
                 AvaloniaBugFixes.SetToolTip(helpButton, Modules.TransformerModules[TransformerComboBox.SelectedIndex].HelpText);
                 List<(string, string)> parameters = Modules.TransformerModules[TransformerComboBox.SelectedIndex].GetParameters(Trees);
                 parameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
-                TransformerParameters = UpdateParameterPanel(transformerParameterChange, parameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters, out Control content);
+                TransformerParameters = UpdateParameterPanel(Modules.TransformerModules[TransformerComboBox.SelectedIndex], transformerParameterChange, parameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters, out Control content);
                 exp.AccordionContent = content;
                 await UpdateTransformedTree();
             };
 
-            TransformerParameters = UpdateParameterPanel(transformerParameterChange, transformerParameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters, out Control content);
+            TransformerParameters = UpdateParameterPanel(Modules.TransformerModules[moduleIndex], transformerParameterChange, transformerParameters, async () => { await UpdateTransformedTree(); }, out UpdateTransformerParameters, out Control content);
             exp.AccordionContent = content;
 
             this.FindControl<StackPanel>("TransformerModuleContainerPanel").Children.Add(exp);
@@ -1838,6 +1841,7 @@ namespace TreeViewer
             FurtherTransformationsParameters = new List<Dictionary<string, object>>();
             UpdateFurtherTransformationParameters = new List<Action<Dictionary<string, object>>>();
             CurrentExceptions = new Dictionary<string, (Module, string)>();
+            CurrentWarnings = new Dictionary<string, (Module, string)>();
 
             FurtherTransformationsContainer = new StackPanel();
             this.FindControl<StackPanel>("FurtherTransformationsContainerPanel").Children.Add(FurtherTransformationsContainer);
@@ -2121,6 +2125,7 @@ namespace TreeViewer
                 this.PushUndoFrame(UndoFrameLevel.FurtherTransformationModule, index);
 
                 CurrentExceptions.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
+                CurrentWarnings.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
                 UpdateWarningVisibility();
 
                 AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
@@ -2325,7 +2330,7 @@ namespace TreeViewer
                 }
             };
 
-            FurtherTransformationsParameters.Add(UpdateParameterPanel(plottingParameterChange, moduleParameters, async () =>
+            FurtherTransformationsParameters.Add(UpdateParameterPanel(module, plottingParameterChange, moduleParameters, async () =>
             {
                 int index = FurtherTransformationsContainer.Children.IndexOf(exp);
                 await UpdateFurtherTransformations(index);
@@ -2358,6 +2363,7 @@ namespace TreeViewer
             }
 
             CurrentExceptions.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
+            CurrentWarnings.Remove((string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
             UpdateWarningVisibility();
 
             AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)FurtherTransformationsParameters[index][Modules.ModuleIDKey]);
@@ -2524,6 +2530,7 @@ namespace TreeViewer
             CoordinatesComboBox.SelectionChanged += async (s, e) =>
             {
                 CurrentExceptions.Remove((string)CoordinatesParameters[Modules.ModuleIDKey]);
+                CurrentWarnings.Remove((string)CoordinatesParameters[Modules.ModuleIDKey]);
                 UpdateWarningVisibility();
                 await ResetDefaultCoordinateModuleParameters();
             };
@@ -2533,7 +2540,7 @@ namespace TreeViewer
                 AvaloniaBugFixes.SetToolTip(helpButton, Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].HelpText);
                 List<(string, string)> parameters = Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex].GetParameters(TransformedTree);
                 parameters.Add((Modules.ModuleIDKey, "Id:" + Guid.NewGuid().ToString()));
-                CoordinatesParameters = UpdateParameterPanel(coordinateParameterChange, parameters, async () => await UpdateCoordinates(), out UpdateCoordinatesParameters, out Control content);
+                CoordinatesParameters = UpdateParameterPanel(Modules.CoordinateModules[CoordinatesComboBox.SelectedIndex], coordinateParameterChange, parameters, async () => await UpdateCoordinates(), out UpdateCoordinatesParameters, out Control content);
                 exp.AccordionContent = content;
 
                 async void updateSelectionWidth(object sender, EventArgs e)
@@ -2547,7 +2554,7 @@ namespace TreeViewer
                 await UpdateCoordinates();
             };
 
-            CoordinatesParameters = UpdateParameterPanel(coordinateParameterChange, coordinateParameters, async () => await UpdateCoordinates(), out UpdateCoordinatesParameters, out Control content);
+            CoordinatesParameters = UpdateParameterPanel(Modules.CoordinateModules[moduleIndex], coordinateParameterChange, coordinateParameters, async () => await UpdateCoordinates(), out UpdateCoordinatesParameters, out Control content);
             exp.AccordionContent = content;
 
             this.FindControl<StackPanel>("CoordinatesModuleContainerPanel").Children.Add(exp);
@@ -2733,6 +2740,7 @@ namespace TreeViewer
         public void RemovePlottingModule(int index)
         {
             CurrentExceptions.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
+            CurrentWarnings.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
             UpdateWarningVisibility();
 
             AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)PlottingParameters[index][Modules.ModuleIDKey]);
@@ -3016,6 +3024,7 @@ namespace TreeViewer
                 this.PushUndoFrame(UndoFrameLevel.PlotActionModule, index);
 
                 CurrentExceptions.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
+                CurrentWarnings.Remove((string)PlottingParameters[index][Modules.ModuleIDKey]);
                 UpdateWarningVisibility();
 
                 AttachmentSelectors.RemoveAll(x => (string)x.Tag == (string)PlottingParameters[index][Modules.ModuleIDKey]);
@@ -3153,7 +3162,7 @@ namespace TreeViewer
                 return module.OnParameterChange(TransformedTree, previousParameterValues, currentParameterValues, out controlStatus, out parametersToChange);
             };
 
-            PlottingParameters.Add(UpdateParameterPanel(plottingParameterChange, moduleParameters, () => { _ = UpdatePlotLayer(PlottingActionsContainer.Children.IndexOf(exp), true); }, out Action<Dictionary<string, object>> updateParameterAction, out Control content));
+            PlottingParameters.Add(UpdateParameterPanel(module, plottingParameterChange, moduleParameters, () => { _ = UpdatePlotLayer(PlottingActionsContainer.Children.IndexOf(exp), true); }, out Action<Dictionary<string, object>> updateParameterAction, out Control content));
             exp.AccordionContent = content;
 
             UpdatePlottingParameters.Add(updateParameterAction);
