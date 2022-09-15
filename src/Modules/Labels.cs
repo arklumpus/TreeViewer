@@ -27,7 +27,7 @@ namespace Labels
         public const string Name = "Labels";
         public const string HelpText = "Draws labels on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.2");
+        public static Version Version = new Version("1.3.0");
         public const string Id = "ac496677-2650-4d92-8646-0812918bab03";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -379,6 +379,7 @@ namespace Labels
 
         public static Point[] PlotAction(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates, Graphics graphics)
         {
+            CheckCoordinates(tree, parameterValues, coordinates);
             List<TreeNode> nodes = tree.GetChildrenRecursive();
 
             string attribute = (string)parameterValues["Attribute:"];
@@ -1013,6 +1014,53 @@ namespace Labels
             else
             {
                 return new Point[] { new Point(), new Point() };
+            }
+        }
+
+        private const string WrongReferenceMessageId = "";
+
+        private static void CheckCoordinates(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates)
+        {
+            string message = "";
+            string messageId = Id;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+
+                if ((int)parameterValues["Branch reference:"] != 0)
+                {
+                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Rectangular`.";
+
+                    messageId = WrongReferenceMessageId;
+                }
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+
+                 if ((int)parameterValues["Branch reference:"] != 2)
+                {
+                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Circular`.";
+
+                    messageId = WrongReferenceMessageId;
+                }
+            }
+            else
+            {
+                // Radial coordinates
+
+                 if ((int)parameterValues["Branch reference:"] != 1)
+                {
+                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Radial`.";
+
+                    messageId = WrongReferenceMessageId;
+                }
+            }
+
+            if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+            {
+                setWarning(message, messageId);
             }
         }
     }
