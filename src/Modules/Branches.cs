@@ -26,11 +26,11 @@ namespace Branches
         public const string Name = "Branches";
         public const string HelpText = "Plots tree branches as lines.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "7c767b07-71be-48b2-8753-b27f3e973570";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
-		
-		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABmSURBVDhPtZIBCsAgCEVt7MQexCsvAoM/meaMHoRB8fxGjQow86PbGihwE6y6iEicPhLg2aX1N0My1iuG7bqMaUGBlXmUR5jcWj/JpGjbcyPZuZFwhEla7F2MBOE/QI69TcrqC4g6l/szDtdX0MEAAAAASUVORK5CYII=";
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABmSURBVDhPtZIBCsAgCEVt7MQexCsvAoM/meaMHoRB8fxGjQow86PbGihwE6y6iEicPhLg2aX1N0My1iuG7bqMaUGBlXmUR5jcWj/JpGjbcyPZuZFwhEla7F2MBOE/QI69TcrqC4g6l/szDtdX0MEAAAAASUVORK5CYII=";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACySURBVEhLxZQBDoAgCEWtdWIvUF3AK5eWOjWsL1K9jTGbgnzIQQmitV6sm8/Vyei9FFlwcWwFmzO/PIAkokq/wxgT46ISfV86RY9Ex6G0dArqEpP3EbupSe+C1Vp29nIj6haBpwooqk12wYL5Tyykf7QLryeo9iCV5q4vTwy1w0UC9mRBCURxCXskKYF6UNIiGXeK+I8fIhGyJ1CVCAEZBEoi92D9S5dECC0ycqcIlFGpHcxKWZgwW1sLAAAAAElFTkSuQmCC";
         private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAC8SURBVFhH7ZaBDkAwDETHJ+8H8AP7ZYYh2G3aVI14iSyTJVuvd6MySlhrWz8082yjDqMGp81V8Qr04xOmK5oKRCF7APXyKs653Z4cBcrsZY5PeWCq4tjLHEg1TQW6MO6AVfgTJ91OVQCRUqBMt6P3XB5PwX+AVAqieZfs/whHgWieuVS5iqTyjnjcAxDpvCPelwKEX8/6U5JUQPbbQfUAdf1C+R6gQr03UgqI3ni38z0PUOF6RlIBhmeMGQCR0VXP7KODKgAAAABJRU5ErkJggg==";
 
@@ -216,6 +216,8 @@ namespace Branches
 
         public static Point[] PlotAction(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates, Graphics graphics)
         {
+            CheckCoordinates(tree, parameterValues, coordinates);
+
             double minX = double.MaxValue;
             double maxX = double.MinValue;
             double minY = double.MaxValue;
@@ -506,6 +508,94 @@ namespace Branches
             }
 
             return new Point[] { new Point(minX - defaultWeight * 2, minY - defaultWeight * 2), new Point(maxX + defaultWeight * 2, maxY + defaultWeight * 2) };
+        }
+
+        private const string WrongShapeMessageId = "ed5b737d-e0b5-4c1b-a95f-8d1fa258476e";
+        private const string RootBranchMessageId = "b05de536-158d-4159-8996-d3207e2c6802";
+        private const string WrongShapeAndRootBranchMessageId = "1303f833-15f7-49ac-9518-2538753d22ec";
+
+        private static void CheckCoordinates(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates)
+        {
+            string message = "";
+            string messageId = Id;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+
+                if ((double)parameterValues["Shape:"] != 0.0)
+                {
+                    message = "With the current Coordinates module, a value of `0.0` for the _Shape_ parameter is recommended.";
+
+                    messageId = WrongShapeMessageId;
+                }
+
+                if (tree.Children.Count > 2 && (bool)parameterValues["Root branch"])
+                {
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        message += "\n\n";
+                        messageId = WrongShapeAndRootBranchMessageId;
+                    }
+                    else
+                    {
+                        messageId = RootBranchMessageId;
+                    }
+
+                    message += "The tree appears to be unrooted; thus, drawing the `Root branch` may be inappropriate.";
+                }
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+
+                if ((double)parameterValues["Shape:"] != 2.0)
+                {
+                    message = "With the current Coordinates module, a value of `2.0` for the _Shape_ parameter is recommended.";
+
+                    messageId = WrongShapeMessageId;
+                }
+
+                if (tree.Children.Count > 2 && (bool)parameterValues["Root branch"])
+                {
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        message += "\n\n";
+                        messageId = WrongShapeAndRootBranchMessageId;
+                    }
+                    else
+                    {
+                        messageId = RootBranchMessageId;
+                    }
+
+                    message += "The tree appears to be unrooted; thus, drawing the `Root branch` may be inappropriate.";
+                }
+            }
+            else
+            {
+                // Radial coordinates
+
+                if ((double)parameterValues["Shape:"] != 1.0 && (bool)parameterValues["Root branch"])
+                {
+                    message = "With the current Coordinates module, a value of `1.0` for the _Shape_ parameter is recommended. It is also not recommended to draw the `Root branch`.";
+                    messageId = WrongShapeAndRootBranchMessageId;
+                }
+                else if ((double)parameterValues["Shape:"] != 1.0 && !(bool)parameterValues["Root branch"])
+                {
+                    message = "With the current Coordinates module, a value of `1.0` for the _Shape_ parameter is recommended.";
+                    messageId = WrongShapeMessageId;
+                }
+                else if ((double)parameterValues["Shape:"] == 1.0 && (bool)parameterValues["Root branch"])
+                {
+                    message = "With the current Coordinates module, it is not recommended to draw the `Root branch`.";
+                    messageId = RootBranchMessageId;
+                }
+            }
+
+            if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+            {
+                setWarning(message, messageId);
+            }
         }
     }
 }
