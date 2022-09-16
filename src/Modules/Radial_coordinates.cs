@@ -35,7 +35,7 @@ namespace Radial_coordinates
         public const string Name = "Radial";
         public const string HelpText = "Computes the coordinates for a radial tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "95b61284-b870-48b9-b51c-3276f7d89df1";
         public const ModuleTypes ModuleType = ModuleTypes.Coordinate;
 
@@ -45,7 +45,7 @@ namespace Radial_coordinates
 
             return new List<(string, string)>()
             {
-                ( "Tree size", "Group:2" ),
+                ( "Tree size", "Group:3" ),
                 
                 /// <param name="Width:" default="14 $\cdot n$">
                 /// This parameter determines the width of the area covered by the tree.
@@ -56,6 +56,13 @@ namespace Radial_coordinates
                 /// This parameter determines the height of the area covered by the tree.
                 /// </param>
                 ( "Height:", "NumericUpDown:" + defaultHeight.ToString(0) + "[\"0\",\"Infinity\"]" ),
+
+                /// <param name="Preserve aspect ratio">
+                /// If this check box is checked, the tree is stretched uniformly to fill the area specified by the [Width](#width)
+                /// and [Height](#height); otherwise, the aspect ratio of the tree is not preserved. This has the effect that
+                /// branches with the same length may appear to have a different length in the plot.
+                /// </param>
+                ( "Preserve aspect ratio", "CheckBox:false"),
 
                 ( "Tree area", "Group:2" ),
                 
@@ -179,6 +186,14 @@ namespace Radial_coordinates
 
             double hFactor = maxX != minX ? ((maxX - minX) / width) : 1;
             double vFactor = maxY != minY ? ((maxY - minY) / height) : 1;
+
+            bool preserveAspectRatio = (bool)parameterValues["Preserve aspect ratio"];
+
+            if (preserveAspectRatio)
+            {
+                hFactor = Math.Max(hFactor, vFactor);
+                vFactor = hFactor;
+            }
 
             for (int i = 0; i < nodeIds.Count; i++)
             {
