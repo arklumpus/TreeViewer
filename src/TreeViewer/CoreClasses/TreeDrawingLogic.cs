@@ -714,6 +714,7 @@ namespace TreeViewer
                             {
                                 Page pag = new Page(1, 1);
                                 Graphics plotGraphics = pag.Graphics;
+                                plotGraphics.UseUniqueTags = false;
 
                                 Point[] bounds = PlottingActions[layer].PlotAction(TransformedTree, PlottingParameters[layer], Coordinates, plotGraphics);
                                 minX = Math.Min(minX, bounds[0].X);
@@ -1175,6 +1176,7 @@ namespace TreeViewer
             UpdateOnlyCoordinates();
 
             Page pag = new Page(1, 1) { Background = StateData.GraphBackgroundColour };
+            pag.Graphics.UseUniqueTags = false;
 
             if (PlottingActions.Count > 0)
             {
