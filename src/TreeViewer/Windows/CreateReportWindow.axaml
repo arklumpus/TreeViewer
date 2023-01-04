@@ -68,7 +68,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
               <StackPanel Orientation="Horizontal">
                 <Path Width="8" Height="8" Data="M 4,0 L4,8 M0,4 L8,4" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" />
                 <TextBlock Text="Add loaded tree: #" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="13" />
-                <NumericUpDown Margin="2,0,0,0" Minimum="1" Maximum="1000" Value="1" Width="100" Padding="3,0,3,0" Opacity="0.75" FormatString="0" Name="LoadedTreeIndexNUD"></NumericUpDown>
+                <NumericUpDown Margin="2,0,0,0" Minimum="1" Maximum="1000" Value="1" Width="100" Padding="3,-1,3,0" Opacity="0.75" FormatString="0" Name="LoadedTreeIndexNUD"></NumericUpDown>
               </StackPanel>
             </Button>
             <Button Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" Height="20" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="AddTreeFile" Click="AddTreeFileClicked">
