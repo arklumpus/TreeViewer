@@ -154,7 +154,7 @@ namespace TreeViewer
                                 {
                                     brd.IsVisible = true;
                                     brd.Opacity = 1;
-                                    double renderedHeight = canvasControl.Renderer.RenderSinglePage(canvasControl.Document, brd.Parent.Bounds.Width - 12 - 16 - 10 - 13, out _).Height;
+                                    double renderedHeight = canvasControl.Renderer.RenderSinglePage(canvasControl.Document, Math.Max(243, brd.Parent.Bounds.Width) - 12 - 16 - 10 - 13, out _).Height;
 
                                     brd.Height = Math.Max(renderedHeight, 56) + 12;
                                     brd.RenderTransform = Avalonia.Media.Transformation.TransformOperations.Identity;
@@ -168,7 +168,7 @@ namespace TreeViewer
                                 }
                                 else
                                 {
-                                    double renderedHeight = canvasControl.Renderer.RenderSinglePage(canvasControl.Document, brd.Parent.Bounds.Width - 12 - 16 - 10 - 13, out _).Height;
+                                    double renderedHeight = canvasControl.Renderer.RenderSinglePage(canvasControl.Document, Math.Max(243, brd.Parent.Bounds.Width) - 12 - 16 - 10 - 13, out _).Height;
                                     brd.Height = Math.Max(renderedHeight, 56) + 12;
 
                                     await System.Threading.Tasks.Task.Delay(200);
