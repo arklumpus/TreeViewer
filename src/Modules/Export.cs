@@ -277,8 +277,11 @@ namespace ExportPDF
                     {
                         foreach (KeyValuePair<string, (string, Rectangle)> kvp in cropRegions)
                         {
-                            items.Add(kvp.Value.Item1);
-                            cropRegionRects.Add(kvp.Value.Item2);
+                            if (IsAlive(kvp.Key, this.FindAncestorOfType<MainWindow>()))
+                            {
+                                items.Add(kvp.Value.Item1);
+                                cropRegionRects.Add(kvp.Value.Item2);
+                            }
                         }
                     }
 
@@ -1068,8 +1071,11 @@ namespace ExportPDF
                     {
                         foreach (KeyValuePair<string, (string, Rectangle)> kvp in cropRegions)
                         {
-                            items.Add(kvp.Value.Item1);
-                            cropRegionRects.Add(kvp.Value.Item2);
+                            if (IsAlive(kvp.Key, this.FindAncestorOfType<MainWindow>()))
+                            {
+                                items.Add(kvp.Value.Item1);
+                                cropRegionRects.Add(kvp.Value.Item2);
+                            }
                         }
                     }
 
@@ -1187,7 +1193,7 @@ namespace ExportPDF
             VectSharp.Point location = cropRegion.Location;
             VectSharp.Size size = cropRegion.Size;
 
-            pag.Crop(new VectSharp.Point(-origin.X + 10 + location.X, -origin.Y + 10 + location.Y), size);
+            pag.Crop(new VectSharp.Point(-origin.X + 10 + location.X, -origin.Y + 10 + location.Y), size, removeClippedGraphics: true);
 
             Page pag2 = new Page(size.Width, size.Height);
 
@@ -1285,8 +1291,11 @@ namespace ExportPDF
                     {
                         foreach (KeyValuePair<string, (string, Rectangle)> kvp in cropRegions)
                         {
-                            items.Add(kvp.Value.Item1);
-                            cropRegionRects.Add(kvp.Value.Item2);
+                            if (IsAlive(kvp.Key, this.FindAncestorOfType<MainWindow>()))
+                            {
+                                items.Add(kvp.Value.Item1);
+                                cropRegionRects.Add(kvp.Value.Item2);
+                            }
                         }
                     }
 
@@ -1489,7 +1498,7 @@ namespace ExportPDF
                 resolutionGrid.Children.Add(blk);
             }
 
-            NumericUpDown resolutionNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 0), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0.##}", FontSize = 14, Increment = 1, Width = 100 };
+            NumericUpDown resolutionNud = new NumericUpDown() { Margin = new Avalonia.Thickness(5, 0, 0, 5), Padding = new Avalonia.Thickness(2, 0, 2, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Minimum = 0, FormatString = "{0:0.##}", FontSize = 14, Increment = 1, Width = 100 };
 
             Grid.SetColumn(resolutionNud, 1);
             resolutionGrid.Children.Add(resolutionNud);
@@ -1859,34 +1868,53 @@ namespace ExportPDF
 
                 if (!string.IsNullOrEmpty(result))
                 {
-                    try
+                    ProgressWindow win = new ProgressWindow() { ProgressText = "Exporting PNG image..." };
+
+                    Task winTask = win.ShowDialog2(parent);
+
+                    Exception exception = null;
+
+                    await Task.Run(() =>
                     {
-                        if (System.IO.File.Exists(result))
+                        try
                         {
-                            System.IO.File.Delete(result);
+                            if (System.IO.File.Exists(result))
+                            {
+                                System.IO.File.Delete(result);
+                            }
+
+                            VectSharp.Page pag = parent.RenderPlotToPage();
+
+                            if (cropRegionBox.SelectedIndex > 0)
+                            {
+                                pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                            }
+
+                            double scale = widthPxNud.Value / pag.Width;
+
+                            SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
+
+                            image.Metadata.HorizontalResolution = resolutionNud.Value;
+                            image.Metadata.VerticalResolution = resolutionNud.Value;
+
+                            SixLabors.ImageSharp.ImageExtensions.SaveAsPng(image, result);
                         }
-
-                        VectSharp.Page pag = parent.RenderPlotToPage();
-
-                        if (cropRegionBox.SelectedIndex > 0)
+                        catch (Exception ex)
                         {
-                            pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                            exception = ex;
                         }
+                    });
 
-                        double scale = widthPxNud.Value / pag.Width;
+                    win.Close();
+                    await winTask;
 
-                        SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
-
-                        image.Metadata.HorizontalResolution = resolutionNud.Value;
-                        image.Metadata.VerticalResolution = resolutionNud.Value;
-
-                        SixLabors.ImageSharp.ImageExtensions.SaveAsPng(image, result);
-
-                        this.FindAncestorOfType<RibbonFilePage>().Close();
+                    if (exception != null)
+                    {
+                        await new MessageBox("Error!", "Error while saving the PNG file:\n" + exception.Message).ShowDialog2(parent);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        await new MessageBox("Error!", "Error while saving the SVG file:\n" + ex.Message).ShowDialog2(parent);
+                        this.FindAncestorOfType<RibbonFilePage>().Close();
                     }
                 }
             };
@@ -1912,46 +1940,79 @@ namespace ExportPDF
 
                 if (!string.IsNullOrEmpty(result))
                 {
-                    try
+                    ProgressWindow win = new ProgressWindow() { ProgressText = "Exporting TIFF image..." };
+
+                    Task winTask = win.ShowDialog2(parent);
+
+                    Exception exception = null;
+
+                    await Task.Run(() =>
                     {
-                        if (System.IO.File.Exists(result))
+
+                        try
                         {
-                            System.IO.File.Delete(result);
+                            if (System.IO.File.Exists(result))
+                            {
+                                System.IO.File.Delete(result);
+                            }
+
+                            VectSharp.Page pag = parent.RenderPlotToPage();
+
+                            if (cropRegionBox.SelectedIndex > 0)
+                            {
+                                pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                            }
+
+                            pag.Background = pag.Background.WithAlpha(1.0);
+
+                            double scale = widthPxNud.Value / pag.Width;
+
+                            SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
+
+                            image.Metadata.HorizontalResolution = resolutionNud.Value;
+                            image.Metadata.VerticalResolution = resolutionNud.Value;
+
+                            SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifProfile profile = new SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifProfile();
+                            profile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Software, "TreeViewer");
+
+                            image.Frames.RootFrame.Metadata.ExifProfile = profile;
+
+                            SixLabors.ImageSharp.ImageExtensions.SaveAsTiff(image, result, new SixLabors.ImageSharp.Formats.Tiff.TiffEncoder() { Compression = SixLabors.ImageSharp.Formats.Tiff.Constants.TiffCompression.Lzw });
                         }
-
-                        VectSharp.Page pag = parent.RenderPlotToPage();
-
-                        if (cropRegionBox.SelectedIndex > 0)
+                        catch (Exception ex)
                         {
-                            pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
+                            exception = ex;
                         }
+                    });
 
-                        pag.Background = pag.Background.WithAlpha(1.0);
+                    win.Close();
+                    await winTask;
 
-                        double scale = widthPxNud.Value / pag.Width;
-
-                        SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
-
-                        image.Metadata.HorizontalResolution = resolutionNud.Value;
-                        image.Metadata.VerticalResolution = resolutionNud.Value;
-
-                        SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifProfile profile = new SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifProfile();
-                        profile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Software, "TreeViewer");
-
-                        image.Frames.RootFrame.Metadata.ExifProfile = profile;
-
-                        SixLabors.ImageSharp.ImageExtensions.SaveAsTiff(image, result, new SixLabors.ImageSharp.Formats.Tiff.TiffEncoder() { Compression = SixLabors.ImageSharp.Formats.Tiff.Constants.TiffCompression.Lzw });
-
-                        this.FindAncestorOfType<RibbonFilePage>().Close();
+                    if (exception != null)
+                    {
+                        await new MessageBox("Error!", "Error while saving the TIFF file:\n" + exception.Message).ShowDialog2(parent);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        await new MessageBox("Error!", "Error while saving the TIFF file:\n" + ex.Message).ShowDialog2(parent);
+                        this.FindAncestorOfType<RibbonFilePage>().Close();
                     }
                 }
             };
 
             return mainContainer;
+        }
+
+        private static bool IsAlive(string guid, MainWindow parent)
+        {
+            foreach (Dictionary<string, object> dict in parent.PlottingParameters)
+            {
+                if (dict.TryGetValue(Modules.ModuleIDKey, out object moduleIdObject) && moduleIdObject is string moduleId && moduleId == guid)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
