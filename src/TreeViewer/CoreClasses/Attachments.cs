@@ -15,11 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
+using PhyloTree;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 
 namespace TreeViewer
 {
@@ -32,11 +34,13 @@ namespace TreeViewer
         public string Name { get; }
         public long StreamStart { get; }
         public int StreamLength { get; }
-
         private string TempFileName { get; }
         private bool DeleteTempFileOnDispose { get; }
 
         private AttachmentFontFamily fontFamilyCache = null;
+
+        private ImmutableList<TreeNode> treesCache = null;
+
         public AttachmentFontFamily GetFontFamily()
         {
             if (CacheResults)
@@ -317,6 +321,92 @@ namespace TreeViewer
                 writer.Write(encoded);
 
                 bytesWritten += readBytes.Length;
+            }
+        }
+
+        private TreeNode[] ReadTrees()
+        {
+            string fileName = Path.GetTempFileName();
+
+            try
+            {
+                using (FileStream fs = new FileStream(fileName, FileMode.Create))
+                {
+                    this.WriteToStream(fs);
+                }
+
+                double maxResult = 0;
+                int maxIndex = -1;
+
+                for (int i = 0; i < Modules.FileTypeModules.Count; i++)
+                {
+                    try
+                    {
+                        double priority = Modules.FileTypeModules[i].IsSupported(fileName);
+                        if (priority > maxResult)
+                        {
+                            maxResult = priority;
+                            maxIndex = i;
+                        }
+                    }
+                    catch { }
+                }
+
+                if (maxIndex >= 0)
+                {
+                    try
+                    {
+                        List<(string, Dictionary<string, object>)> moduleSuggestions = new List<(string, Dictionary<string, object>)>()
+                                {
+                                    ("32914d41-b182-461e-b7c6-5f0263cc1ccd", new Dictionary<string, object>()),
+                                    ("68e25ec6-5911-4741-8547-317597e1b792", new Dictionary<string, object>()),
+                                };
+
+                        Action<double> openerProgressAction = (_) => { };
+
+                        bool askForCodePermission(RSAParameters? publicKey)
+                        {
+                            return false;
+                        };
+
+                        IEnumerable<TreeNode> loader = Modules.FileTypeModules[maxIndex].OpenFile(fileName, moduleSuggestions, (val) => { openerProgressAction(val); }, askForCodePermission);
+
+                        return loader.ToArray();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("An error has occurred while opening the file!\n" + ex.Message, ex);
+                    }
+                }
+                else
+                {
+                    throw new Exception("The file type is not supported by any of the currently installed modules!");
+                }
+            }
+            finally
+            {
+                try
+                {
+                    File.Delete(fileName);
+                }
+                catch { }
+            }
+        }
+
+        public IReadOnlyList<TreeNode> GetTrees()
+        {
+            if (CacheResults)
+            {
+                if (treesCache == null)
+                {
+                    treesCache = ImmutableList.Create<TreeNode>(this.ReadTrees());
+                }
+
+                return treesCache;
+            }
+            else
+            {
+                return this.ReadTrees();
             }
         }
 
