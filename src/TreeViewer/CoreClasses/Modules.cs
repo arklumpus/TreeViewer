@@ -293,7 +293,7 @@ namespace TreeViewer
             string myPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
 
 #if DEBUG
-            return new CSharpEditor.InterprocessDebuggerServer(Path.Combine(myPath, "..", "..", "..", "..", "DebuggerClient", "bin", "Debug", "net6.0", exeName));
+            return new CSharpEditor.InterprocessDebuggerServer(Path.Combine(myPath, "..", "..", "..", "..", "DebuggerClient", "bin", "Debug", "net7.0", exeName));
 #else
             if (!IsMac)
             {
