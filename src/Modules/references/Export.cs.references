@@ -22,3 +22,5 @@ VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
 VectSharp.Raster.ImageSharp.dll
 SixLabors.ImageSharp.dll
+System.Xml.ReaderWriter.dll
+System.Private.Xml.dll

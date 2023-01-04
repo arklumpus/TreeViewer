@@ -3,8 +3,8 @@ System.Private.CoreLib.dll
 netstandard.dll
 System.Collections.dll
 TreeViewer.dll
-System.Security.Cryptography.Algorithms.dll
 System.Linq.dll
 PhyloTree.TreeNode.dll
 System.Text.Json.dll
 VectSharp.dll
+System.Security.Cryptography.dll

@@ -4,4 +4,4 @@ netstandard.dll
 System.Collections.dll
 TreeViewer.dll
 PhyloTree.TreeNode.dll
-System.Security.Cryptography.Algorithms.dll
+System.Security.Cryptography.dll

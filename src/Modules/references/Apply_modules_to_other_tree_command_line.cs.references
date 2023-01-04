@@ -5,9 +5,9 @@ System.Collections.dll
 TreeViewer.dll
 System.Console.dll
 PhyloTree.TreeNode.dll
-System.Security.Cryptography.Algorithms.dll
 Avalonia.Controls.dll
 VectSharp.dll
 Avalonia.Input.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
+System.Security.Cryptography.dll

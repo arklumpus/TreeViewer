@@ -6,8 +6,6 @@ TreeViewer.dll
 Avalonia.Controls.dll
 VectSharp.dll
 System.Text.Json.dll
-System.Security.Cryptography.Csp.dll
-System.Security.Cryptography.Algorithms.dll
 Avalonia.Input.dll
 Avalonia.Base.dll
 Avalonia.Visuals.dll
@@ -25,3 +23,4 @@ VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
 System.Linq.dll
 System.Threading.Tasks.Parallel.dll
+System.Security.Cryptography.dll

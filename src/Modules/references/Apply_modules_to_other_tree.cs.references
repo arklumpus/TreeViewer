@@ -8,7 +8,6 @@ Avalonia.Controls.dll
 System.Threading.dll
 PhyloTree.TreeNode.dll
 Avalonia.Input.dll
-System.Security.Cryptography.Algorithms.dll
 Avalonia.Interactivity.dll
 Avalonia.Layout.dll
 Avalonia.Visuals.dll
@@ -22,3 +21,4 @@ VectSharp.Canvas.dll
 System.ObjectModel.dll
 System.ComponentModel.Primitives.dll
 SkiaSharp.dll
+System.Security.Cryptography.dll
