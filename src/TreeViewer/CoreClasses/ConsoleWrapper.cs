@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Avalonia.Controls.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -368,12 +369,18 @@ namespace TreeViewer
         {
             if (ConsoleEnabled && !Console.IsOutputRedirected)
             {
-                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                int shift = 0;
+
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) && ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight >= 0)
                 {
-                    Console.MoveBufferArea(0, ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight, ConsoleWrapper.BufferWidth, ConsoleWrapper.WindowHeight, 0, 0);
+                        Console.MoveBufferArea(0, ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight, ConsoleWrapper.BufferWidth, ConsoleWrapper.WindowHeight, 0, 0);
+                }
+                else
+                {
+                    shift = ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight + 1;
                 }
 
-                ConsoleWrapper.SetCursorPosition(ConsoleWrapper.CursorLeft, ConsoleWrapper.WindowHeight);
+                ConsoleWrapper.SetCursorPosition(ConsoleWrapper.CursorLeft, ConsoleWrapper.WindowHeight - 1 + shift);
 
                 if (ConsoleWrapper.BufferHeight >= 3 * ConsoleWrapper.WindowHeight)
                 {
@@ -382,7 +389,7 @@ namespace TreeViewer
 
                     while (bottom > 2 * ConsoleWrapper.WindowHeight)
                     {
-                        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) && bottom - heightToClear / 2 >= 0)
                         {
                             Console.MoveBufferArea(0, bottom - heightToClear / 2, ConsoleWrapper.BufferWidth, heightToClear / 2, 0, ConsoleWrapper.WindowHeight);
                         }
@@ -391,7 +398,7 @@ namespace TreeViewer
                         bottom -= heightToClear;
                     }
 
-                    ConsoleWrapper.SetCursorPosition(ConsoleWrapper.CursorLeft, ConsoleWrapper.WindowHeight);
+                    ConsoleWrapper.SetCursorPosition(ConsoleWrapper.CursorLeft, ConsoleWrapper.WindowHeight - 1);
                     for (int i = 0; i < ConsoleWrapper.WindowHeight; i++)
                     {
                         ConsoleWrapper.WriteLine(new string(Whitespace, ConsoleWrapper.BufferWidth));
@@ -410,7 +417,7 @@ namespace TreeViewer
                     Console.WindowTop = 0;
                 }
 
-                ConsoleWrapper.SetCursorPosition(ConsoleWrapper.CursorLeft, ConsoleWrapper.WindowHeight - 1);
+                ConsoleWrapper.SetCursorPosition(ConsoleWrapper.CursorLeft, ConsoleWrapper.WindowHeight - 1 + shift);
             }
         }
 
