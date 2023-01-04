@@ -228,6 +228,7 @@ namespace TreeViewerCommandLine
             Program.CoordinatesModuleId = null;
             Program.CoordinatesParameters = null;
             Program.PlotActions.Clear();
+            Program.StateData.Attachments.Clear();
 
             ConsoleWrapper.WriteLine();
             ConsoleWrapper.WriteLine(new ConsoleTextSpan("  Suggested modules:", 2));
