@@ -305,6 +305,7 @@ namespace TreeViewer
             pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             {
                 Button button = new Button() { Margin = new Thickness(0, 0, 0, 10), Content = "Restore all dismissed module messages", FontSize = 14 };
+                button.Classes.Add("PlainButton");
                 Grid.SetColumnSpan(button, 2);
                 Grid.SetRow(button, currRow);
                 pageContent.Children.Add(button);
