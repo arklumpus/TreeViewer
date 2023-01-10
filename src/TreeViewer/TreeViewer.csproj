@@ -623,7 +623,7 @@
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta15" />
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
     <PackageReference Include="TreeNode" Version="1.2.0" />
-    <PackageReference Include="VectSharp" Version="2.4.1-a1" />
+    <PackageReference Include="VectSharp" Version="2.4.1-a4" />
     <PackageReference Include="VectSharp.Canvas" Version="2.6.0" />
     <PackageReference Include="VectSharp.Markdown" Version="1.4.1" />
     <PackageReference Include="VectSharp.MarkdownCanvas" Version="1.4.1" />
@@ -631,7 +631,7 @@
     <PackageReference Include="VectSharp.PDF" Version="2.6.0" />
     <PackageReference Include="VectSharp.Raster" Version="2.2.0" />
     <PackageReference Include="VectSharp.Raster.ImageSharp" Version="1.2.0-beta15" />
-    <PackageReference Include="VectSharp.SVG" Version="1.8.0" />
+    <PackageReference Include="VectSharp.SVG" Version="1.8.1-a3" />
   </ItemGroup>
 
   <Target Name="_ResolveCopyLocalNuGetPkgXmls" AfterTargets="ResolveReferences">
