@@ -1086,7 +1086,7 @@ namespace ExportPDF
             };
 
             Grid textOptionRow = new Grid();
-            textOptionRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto) { MinWidth = 150, MaxWidth = 200 });
+            textOptionRow.ColumnDefinitions.Add(new ColumnDefinition(0, GridUnitType.Auto) { MinWidth = 120, MaxWidth = 200 });
             textOptionRow.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
 
             ComboBox textOptionBox;
@@ -1094,9 +1094,9 @@ namespace ExportPDF
             {
                 TextBlock blk = new TextBlock() { Text = "Text rendering:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
 
-                List<string> items = new List<string>() { "Embed full font", "Embed subsetted font", "Convert into paths" };
+                List<string> items = new List<string>() { "Embed full font", "Embed subsetted font", "Convert into paths", "Convert into paths using glyphs" };
 
-                textOptionBox = new ComboBox() { Items = items, SelectedIndex = 2, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 150, FontSize = 14 };
+                textOptionBox = new ComboBox() { Items = items, SelectedIndex = 3, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 150, FontSize = 14 };
 
                 Grid.SetColumn(textOptionBox, 1);
                 textOptionRow.Children.Add(blk);
@@ -1138,7 +1138,11 @@ namespace ExportPDF
                 }
                 else if (textOptionBox.SelectedIndex == 2)
                 {
-                    note.Text = "Note: converting all text into paths means that it will always look right, but it will not be selectable, searchable or editable.";
+                    note.Text = "Note: converting all text into paths means that it will always look right, but it will not be selectable, searchable or editable. The output file will be rather large (use the \"Convert into paths using glyphs\" option to address this).";
+                }
+				else if (textOptionBox.SelectedIndex == 3)
+                {
+                    note.Text = "Note: converting all text into paths means that it will always look right, but it will not be selectable, searchable or editable. Using glyphs means that the output file will not be too large, but some editors do not support embedded glyphs.";
                 }
             };
 
@@ -1146,7 +1150,7 @@ namespace ExportPDF
             {
                 if (e.Property == ExportPage.IsVisibleProperty && (bool)e.NewValue)
                 {
-                    textOptionBox.SelectedIndex = 2;
+                    textOptionBox.SelectedIndex = 3;
                 }
             };
 
@@ -1174,7 +1178,7 @@ namespace ExportPDF
                             pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
                         }
 
-                        pag.SaveAsSVG(result, textOptionBox.SelectedIndex == 0 ? SVGContextInterpreter.TextOptions.EmbedFonts : textOptionBox.SelectedIndex == 1 ? SVGContextInterpreter.TextOptions.SubsetFonts : SVGContextInterpreter.TextOptions.ConvertIntoPaths);
+                        pag.SaveAsSVG(result, textOptionBox.SelectedIndex == 0 ? SVGContextInterpreter.TextOptions.EmbedFonts : textOptionBox.SelectedIndex == 1 ? SVGContextInterpreter.TextOptions.SubsetFonts : textOptionBox.SelectedIndex == 2 ? SVGContextInterpreter.TextOptions.ConvertIntoPaths : SVGContextInterpreter.TextOptions.ConvertIntoPathsUsingGlyphs);
 
                         this.FindAncestorOfType<RibbonFilePage>().Close();
                     }
