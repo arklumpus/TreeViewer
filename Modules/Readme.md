@@ -146,7 +146,7 @@ Safe even when opening huge files.
 
 ### [Branches](7c767b07-71be-48b2-8753-b27f3e973570)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Plots tree branches as lines.
 
@@ -273,6 +273,18 @@ _Version 1.0.1, by Giorgio Bianchini_
 **Module type**: MenuAction
 
 **Module ID**: `5c99fbfb-a6c6-4e07-915d-670b07d255c8`
+
+<br />
+
+### [Compare trees](36ca9f8c-25b2-4b2b-aa16-308227788e5d)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Compares a tree with another tree loaded as an attachment or from the loaded trees.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `36ca9f8c-25b2-4b2b-aa16-308227788e5d`
 
 <br />
 
@@ -485,7 +497,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Labels](ac496677-2650-4d92-8646-0812918bab03)
 
-_Version 1.2.2, by Giorgio Bianchini_
+_Version 1.3.0, by Giorgio Bianchini_
 
 **Description**: Draws labels on nodes, tips or branches.
 
@@ -764,7 +776,7 @@ _Version 1.0.4, by Giorgio Bianchini_
 
 ### [Radial](95b61284-b870-48b9-b51c-3276f7d89df1)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a radial tree.
 
@@ -867,6 +879,19 @@ _Version 1.0.0, by Giorgio Bianchini_
 **Module type**: FurtherTransformation
 
 **Module ID**: `45e08b70-0852-4141-ac67-8c8cd574926d`
+
+<br />
+
+### [RevBayes trace](89f05f57-dc57-4cc4-bace-84e52c201769)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Opens a tree trace file produced by RevBayes.
+Safe even when opening huge files.
+
+**Module type**: FileType
+
+**Module ID**: `89f05f57-dc57-4cc4-bace-84e52c201769`
 
 <br />
 
