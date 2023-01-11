@@ -672,7 +672,7 @@ namespace TreeViewer
             }
         }
 
-        private async Task ActuallyUpdatePlotLayer(int layer, bool updatePlotBounds, bool updatingAllLayers = false)
+        private async Task ActuallyUpdatePlotLayer(int layer, bool updatePlotBounds, bool updatingAllLayers = false, bool slowDown = false)
         {
             if (!StopAllUpdates)
             {
@@ -908,95 +908,102 @@ namespace TreeViewer
                         {
                             if (success)
                             {
-
-                                Point newOrigin = new Point(Math.Min(minX, PlotOrigin.X), Math.Min(minY, PlotOrigin.Y));
-
-                                if (double.IsNaN(PlotOrigin.X) || double.IsNaN(PlotOrigin.Y))
+                                lock (FullPlotCanvas.RenderLock)
                                 {
-                                    newOrigin = new Point(minX, minY);
-                                }
-
-                                PlotBottomRight = new Point(Math.Max(maxX, PlotBottomRight.X), Math.Max(maxY, PlotBottomRight.Y));
-                                if (double.IsNaN(PlotBottomRight.X) || double.IsNaN(PlotBottomRight.Y))
-                                {
-                                    PlotBottomRight = new Point(maxX, maxY);
-                                }
-
-                                if (newOrigin.Y != PlotOrigin.Y || newOrigin.X != PlotOrigin.X)
-                                {
-                                    for (int i = 0; i < PlotCanvases.Count; i++)
+                                    if (slowDown)
                                     {
-                                        if (i != layer && PlotCanvases[i] != null)
-                                        {
-                                            if (LayerTransforms[i] != null)
-                                            {
-                                                SkiaSharp.SKMatrix newTransformMatrix = LayerTransforms[i].Transform.Value.PreConcat(SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y)));
-                                                LayerTransforms[i].Transform = newTransformMatrix;
-                                                FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
-                                                FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
-                                            }
-                                            else
-                                            {
-                                                SkiaSharp.SKMatrix newTransformMatrix = SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y));
-                                                LayerTransforms[i] = SKRenderAction.TransformAction(newTransformMatrix);
-                                                FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
-                                                FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
-                                            }
-                                        }
+                                        Thread.Sleep(10);
                                     }
 
-                                    PlotOrigin = newOrigin;
+                                    Point newOrigin = new Point(Math.Min(minX, PlotOrigin.X), Math.Min(minY, PlotOrigin.Y));
+
+                                    if (double.IsNaN(PlotOrigin.X) || double.IsNaN(PlotOrigin.Y))
+                                    {
+                                        newOrigin = new Point(minX, minY);
+                                    }
+
+                                    PlotBottomRight = new Point(Math.Max(maxX, PlotBottomRight.X), Math.Max(maxY, PlotBottomRight.Y));
+                                    if (double.IsNaN(PlotBottomRight.X) || double.IsNaN(PlotBottomRight.Y))
+                                    {
+                                        PlotBottomRight = new Point(maxX, maxY);
+                                    }
+
+                                    if (newOrigin.Y != PlotOrigin.Y || newOrigin.X != PlotOrigin.X)
+                                    {
+                                        for (int i = 0; i < PlotCanvases.Count; i++)
+                                        {
+                                            if (i != layer && PlotCanvases[i] != null)
+                                            {
+                                                if (LayerTransforms[i] != null)
+                                                {
+                                                    SkiaSharp.SKMatrix newTransformMatrix = LayerTransforms[i].Transform.Value.PreConcat(SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y)));
+                                                    LayerTransforms[i].Transform = newTransformMatrix;
+                                                    FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                                    FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                                }
+                                                else
+                                                {
+                                                    SkiaSharp.SKMatrix newTransformMatrix = SkiaSharp.SKMatrix.CreateTranslation((float)(-newOrigin.X + PlotOrigin.X), (float)(-newOrigin.Y + PlotOrigin.Y));
+                                                    LayerTransforms[i] = SKRenderAction.TransformAction(newTransformMatrix);
+                                                    FullPlotCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                                    FullSelectionCanvas.LayerTransforms[i] = LayerTransforms[i];
+                                                }
+                                            }
+                                        }
+
+                                        PlotOrigin = newOrigin;
+                                    }
+
+                                    SKRenderAction newLayerTransform = SKRenderAction.TransformAction(SkiaSharp.SKMatrix.CreateTranslation((float)(minX - PlotOrigin.X), (float)(minY - PlotOrigin.Y)));
+
+                                    Canvas parent = this.FindControl<Canvas>("PlotCanvas");
+                                    Canvas selectionParent = this.FindControl<Canvas>("SelectionCanvas");
+
+                                    if (PlotCanvases[layer] != null)
+                                    {
+                                        FullPlotCanvas.UpdateLayer(layer, newContext, newLayerTransform);
+                                        FullSelectionCanvas.UpdateLayer(layer, newSelectionContext, newLayerTransform);
+
+                                        PlotCanvases[layer] = newContext;
+                                        PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
+                                        SelectionCanvases[layer] = newSelectionContext;
+                                        LayerTransforms[layer] = newLayerTransform;
+                                    }
+                                    else
+                                    {
+                                        FullPlotCanvas.AddLayer(newContext, newLayerTransform);
+                                        FullSelectionCanvas.AddLayer(newSelectionContext, newLayerTransform);
+
+                                        PlotCanvases[layer] = newContext;
+                                        PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
+                                        SelectionCanvases[layer] = newSelectionContext;
+                                        LayerTransforms[layer] = newLayerTransform;
+                                    }
+
+                                    PlottingAlerts[layer].IsVisible = false;
+
+                                    CurrentExceptions.Remove((string)PlottingParameters[layer][Modules.ModuleIDKey]);
+                                    UpdateWarningVisibility();
+
+                                    FullPlotCanvas.Width = PlotBottomRight.X - PlotOrigin.X;
+                                    FullPlotCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y;
+
+                                    FullPlotCanvas.PageWidth = PlotBottomRight.X - PlotOrigin.X;
+                                    FullPlotCanvas.PageHeight = PlotBottomRight.Y - PlotOrigin.Y;
+
+                                    FullSelectionCanvas.Width = PlotBottomRight.X - PlotOrigin.X;
+                                    FullSelectionCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y;
+
+                                    FullSelectionCanvas.PageWidth = PlotBottomRight.X - PlotOrigin.X;
+                                    FullSelectionCanvas.PageHeight = PlotBottomRight.Y - PlotOrigin.Y;
+
+                                    Canvas containerCanvas = this.FindControl<Canvas>("ContainerCanvas");
+                                    containerCanvas.Background = GraphBackgroundBrush;
+                                    containerCanvas.Width = PlotBottomRight.X - PlotOrigin.X + 20;
+                                    containerCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y + 20;
+
+                                    UpdateSelectionWidth(FullSelectionCanvas);
                                 }
-
-                                SKRenderAction newLayerTransform = SKRenderAction.TransformAction(SkiaSharp.SKMatrix.CreateTranslation((float)(minX - PlotOrigin.X), (float)(minY - PlotOrigin.Y)));
-
-                                Canvas parent = this.FindControl<Canvas>("PlotCanvas");
-                                Canvas selectionParent = this.FindControl<Canvas>("SelectionCanvas");
-
-                                if (PlotCanvases[layer] != null)
-                                {
-                                    FullPlotCanvas.UpdateLayer(layer, newContext, newLayerTransform);
-                                    FullSelectionCanvas.UpdateLayer(layer, newSelectionContext, newLayerTransform);
-
-                                    PlotCanvases[layer] = newContext;
-                                    PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
-                                    SelectionCanvases[layer] = newSelectionContext;
-                                    LayerTransforms[layer] = newLayerTransform;
-                                }
-                                else
-                                {
-                                    FullPlotCanvas.AddLayer(newContext, newLayerTransform);
-                                    FullSelectionCanvas.AddLayer(newSelectionContext, newLayerTransform);
-
-                                    PlotCanvases[layer] = newContext;
-                                    PlotBounds[layer] = (new Point(minX, minY), new Point(maxX, maxY));
-                                    SelectionCanvases[layer] = newSelectionContext;
-                                    LayerTransforms[layer] = newLayerTransform;
-                                }
-
-                                PlottingAlerts[layer].IsVisible = false;
-
-                                CurrentExceptions.Remove((string)PlottingParameters[layer][Modules.ModuleIDKey]);
-                                UpdateWarningVisibility();
-
-                                FullPlotCanvas.Width = PlotBottomRight.X - PlotOrigin.X;
-                                FullPlotCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y;
-
-                                FullPlotCanvas.PageWidth = PlotBottomRight.X - PlotOrigin.X;
-                                FullPlotCanvas.PageHeight = PlotBottomRight.Y - PlotOrigin.Y;
-
-                                FullSelectionCanvas.Width = PlotBottomRight.X - PlotOrigin.X;
-                                FullSelectionCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y;
-
-                                FullSelectionCanvas.PageWidth = PlotBottomRight.X - PlotOrigin.X;
-                                FullSelectionCanvas.PageHeight = PlotBottomRight.Y - PlotOrigin.Y;
-
-                                Canvas containerCanvas = this.FindControl<Canvas>("ContainerCanvas");
-                                containerCanvas.Background = GraphBackgroundBrush;
-                                containerCanvas.Width = PlotBottomRight.X - PlotOrigin.X + 20;
-                                containerCanvas.Height = PlotBottomRight.Y - PlotOrigin.Y + 20;
-
-                                UpdateSelectionWidth(FullSelectionCanvas);
                             }
                         }
                         catch (Exception ex)
@@ -1108,66 +1115,77 @@ namespace TreeViewer
 
         }
 
+        SemaphoreSlim PlotLayerUpdateLock = new SemaphoreSlim(1, 1);
+
         private async Task UpdateAllPlotLayers()
         {
             if (!StopAllUpdates)
             {
-                this.RefreshAllButton.IsEnabled = false;
-
-                this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").IsVisible = true;
-
-                PlotBounds = new List<(Point, Point)>(new (Point, Point)[PlottingActions.Count]);
-                PlotCanvases = new List<SKRenderContext>(new SKRenderContext[PlottingActions.Count]);
-                LayerTransforms = new List<SKRenderAction>(new SKRenderAction[PlottingActions.Count]);
-
-                while (FullPlotCanvas.LayerTransforms.Count > 0)
+                await PlotLayerUpdateLock.WaitAsync();
+                
+                try
                 {
-                    FullPlotCanvas.RemoveLayer(0);
-                }
+                    this.RefreshAllButton.IsEnabled = false;
 
-                while (FullSelectionCanvas.LayerTransforms.Count > 0)
-                {
-                    FullSelectionCanvas.RemoveLayer(0);
-                }
+                    this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer").IsVisible = true;
 
-                SelectionCanvases = new List<SKRenderContext>(new SKRenderContext[PlottingActions.Count]);
+                    PlotBounds = new List<(Point, Point)>(new (Point, Point)[PlottingActions.Count]);
+                    PlotCanvases = new List<SKRenderContext>(new SKRenderContext[PlottingActions.Count]);
+                    LayerTransforms = new List<SKRenderAction>(new SKRenderAction[PlottingActions.Count]);
 
-                PlotOrigin = new Point(double.NaN, double.NaN);
-                PlotBottomRight = new Point(double.NaN, double.NaN);
-
-                if (PlottingActions.Count <= Math.Floor(this.FindControl<CoolProgressBar>("PlotProgressBar").Bounds.Width / 13))
-                {
-                    List<double> steps = new List<double>();
-
-                    for (int i = 0; i < PlottingActions.Count - 1; i++)
+                    while (FullPlotCanvas.LayerTransforms.Count > 0)
                     {
-                        steps.Add((double)(i + 1) / PlottingActions.Count);
+                        FullPlotCanvas.RemoveLayer(0);
                     }
 
-                    this.FindControl<CoolProgressBar>("PlotProgressBar").IntermediateSteps = System.Collections.Immutable.ImmutableList.Create(steps.ToArray());
+                    while (FullSelectionCanvas.LayerTransforms.Count > 0)
+                    {
+                        FullSelectionCanvas.RemoveLayer(0);
+                    }
+
+                    SelectionCanvases = new List<SKRenderContext>(new SKRenderContext[PlottingActions.Count]);
+
+                    PlotOrigin = new Point(double.NaN, double.NaN);
+                    PlotBottomRight = new Point(double.NaN, double.NaN);
+
+                    if (PlottingActions.Count <= Math.Floor(this.FindControl<CoolProgressBar>("PlotProgressBar").Bounds.Width / 13))
+                    {
+                        List<double> steps = new List<double>();
+
+                        for (int i = 0; i < PlottingActions.Count - 1; i++)
+                        {
+                            steps.Add((double)(i + 1) / PlottingActions.Count);
+                        }
+
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").IntermediateSteps = System.Collections.Immutable.ImmutableList.Create(steps.ToArray());
+                    }
+                    else
+                    {
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").IntermediateSteps = System.Collections.Immutable.ImmutableList<double>.Empty;
+                    }
+
+
+                    this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = 0;
+                    this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 1;
+
+                    for (int i = 0; i < PlottingActions.Count; i++)
+                    {
+                        await ActuallyUpdatePlotLayer(i, false, true, true);
+                        this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = (double)(i + 1) / PlottingActions.Count;
+                    }
+
+                    UpdatePlotBounds();
+
+                    this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 0;
+
+                    RenderingPassCompleted?.Invoke(this, new EventArgs());
+
+                    this.RefreshAllButton.IsEnabled = true;
                 }
-                else
+                finally
                 {
-                    this.FindControl<CoolProgressBar>("PlotProgressBar").IntermediateSteps = System.Collections.Immutable.ImmutableList<double>.Empty;
+                    PlotLayerUpdateLock.Release();
                 }
-
-
-                this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = 0;
-                this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 1;
-
-                for (int i = 0; i < PlottingActions.Count; i++)
-                {
-                    await ActuallyUpdatePlotLayer(i, false, true);
-                    this.FindControl<CoolProgressBar>("PlotProgressBar").Progress = (double)(i + 1) / PlottingActions.Count;
-                }
-
-                UpdatePlotBounds();
-
-                this.FindControl<CoolProgressBar>("PlotProgressBar").Opacity = 0;
-
-                RenderingPassCompleted?.Invoke(this, new EventArgs());
-
-                this.RefreshAllButton.IsEnabled = true;
             }
         }
 
