@@ -1101,20 +1101,24 @@ namespace TreeViewer
                     {
                         ( "", null, null ),
                         ( "Transform text into paths", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ExportSVG")), null ),
+                        ( "Transform text into paths using glyphs", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ExportSVG")), null ),
                         ( "Embed subsetted fonts", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ExportSVG")), null ),
                         ( "Embed full fonts", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ExportSVG")), null ),
                     }, true, 0, (Action<int>)(ind =>
                     {
                         switch (ind)
                         {
-                            case -1:
                             case 0:
                                 ExportSVG(CurrentPlotID, SVGContextInterpreter.TextOptions.ConvertIntoPaths);
                                 break;
+                            case -1:
                             case 1:
-                                ExportSVG(CurrentPlotID, SVGContextInterpreter.TextOptions.SubsetFonts);
+                                ExportSVG(CurrentPlotID, SVGContextInterpreter.TextOptions.ConvertIntoPathsUsingGlyphs);
                                 break;
                             case 2:
+                                ExportSVG(CurrentPlotID, SVGContextInterpreter.TextOptions.SubsetFonts);
+                                break;
+                            case 3:
                                 ExportSVG(CurrentPlotID, SVGContextInterpreter.TextOptions.EmbedFonts);
                                 break;
                         }
