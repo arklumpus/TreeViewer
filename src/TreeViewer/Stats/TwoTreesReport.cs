@@ -165,8 +165,9 @@ namespace TreeViewer.Stats
                 splitLengthDiffDistribution = Stats.SplitLengthDifferences.GetPlot(splitLengthDiffs, splitLengthDiffPlotGuid);
                 (splitLengthDiffUnderflow, splitLengthDiffUnderflowCount, splitLengthDiffOverflow, splitLengthDiffOverflowCount) = Stats.Histogram.GetOverUnderflow(splitLengthDiffs);
 
-                Plots.Add(splitLengthDiffPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                Plots.Add(splitLengthDiffPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                 {
+                    clickActions = null;
                     return TreeViewer.Stats.Histogram.GetPlot(splitLengthDiffs, "Split length difference", "Distribution of split length differences", null, out descriptions, interactive);
                 });
 
@@ -314,8 +315,9 @@ namespace TreeViewer.Stats
 
                         sackinDistributionPlotGuid = Guid.NewGuid().ToString();
                         sackinDistribution = Stats.SackinDistribution.GetPlot(sackinYuleDistribution, sackinPdaDistribution, sackinYule1, sackinPDA1, sackinYuleP, sackinPDAP, sackinDistributionPlotGuid);
-                        Plots.Add(sackinDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                        Plots.Add(sackinDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                         {
+                            clickActions = null;
                             return TreeViewer.Stats.Distribution.GetPlot(sackinYuleDistribution, sackinPdaDistribution, sackinYule1, sackinPDA1, sackinYuleP, sackinPDAP, "Density (YHK model)", "Density (PDA model)", "Normalised Sackin index", "Sackin index distribution", "S", null, out descriptions, interactive);
                         });
 
@@ -344,8 +346,9 @@ namespace TreeViewer.Stats
 
                         collessDistributionPlotGuid = Guid.NewGuid().ToString();
                         collessDistribution = Stats.CollessDistribution.GetPlot(collessYuleDistribution, collessPdaDistribution, collessYule1, collessPDA1, collessYuleP, collessPDAP, collessDistributionPlotGuid);
-                        Plots.Add(collessDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                        Plots.Add(collessDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                         {
+                            clickActions = null;
                             return TreeViewer.Stats.Distribution.GetPlot(collessYuleDistribution, collessPdaDistribution, collessYule1, collessPDA1, collessYuleP, collessPDAP, "Density (YHK model)", "Density (PDA model)", "Normalised Colless index", "Colless index distribution", "C", null, out descriptions, interactive);
                         });
 
@@ -533,8 +536,9 @@ namespace TreeViewer.Stats
 
                         sackinDistributionPlotGuid = Guid.NewGuid().ToString();
                         sackinDistribution = Stats.SackinDistribution.GetPlotTwoTailed(sackinYuleDistribution, sackinPdaDistribution, sackinMinValue, sackinMaxValue, sackinYule1 - sackinYule2, sackinPDA1 - sackinPDA2, sackinYuleP, sackinPDAP, sackinDistributionPlotGuid);
-                        Plots.Add(sackinDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                        Plots.Add(sackinDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                         {
+                            clickActions = null;
                             return TreeViewer.Stats.Distribution.GetPlotTwoTailed(sackinYuleDistribution, sackinPdaDistribution, sackinMinValue, sackinMaxValue, sackinYule1 - sackinYule2, sackinPDA1 - sackinPDA2, sackinYuleP, sackinPDAP, "Density (YHK model)", "Density (PDA model)", "Normalised Sackin index difference", "Sackin index difference distribution", "ΔS", null, out descriptions, interactive);
                         });
 
@@ -559,8 +563,9 @@ namespace TreeViewer.Stats
 
                         collessDistributionPlotGuid = Guid.NewGuid().ToString();
                         collessDistribution = Stats.CollessDistribution.GetPlotTwoTailed(collessYuleDistribution, collessPdaDistribution, sackinMinValue, sackinMaxValue, collessYule1 - collessYule2, collessPDA1 - collessPDA2, collessYuleP, collessPDAP, collessDistributionPlotGuid);
-                        Plots.Add(collessDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                        Plots.Add(collessDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                         {
+                            clickActions = null;
                             return TreeViewer.Stats.Distribution.GetPlotTwoTailed(collessYuleDistribution, collessPdaDistribution, sackinMinValue, sackinMaxValue, collessYule1 - collessYule2, collessPDA1 - collessPDA2, collessYuleP, collessPDAP, "Density (YHK model)", "Density (PDA model)", "Normalised Colless index difference", "Colless index difference distribution", "ΔC", null, out descriptions, interactive);
                         });
 
@@ -606,8 +611,9 @@ namespace TreeViewer.Stats
 
                 numberOfCherriesDistributionPlotGuid = Guid.NewGuid().ToString();
                 numberOfCherriesDistribution = Stats.NumberOfCherriesDistribution.GetPlot(cherryYuleDistribution, cherryPdaDistribution, numberOfCherriesYule1, numberOfCherriesPDA1, numberOfCherriesYuleP, numberOfCherriesPDAP, numberOfCherriesDistributionPlotGuid);
-                Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                 {
+                    clickActions = null;
                     return TreeViewer.Stats.Distribution.GetPlotWithStandardNormal(cherryYuleDistribution, cherryPdaDistribution, numberOfCherriesYule1, numberOfCherriesPDA1, numberOfCherriesYuleP, numberOfCherriesPDAP, "Density (YHK model)", "Density (PDA model)", "Density (limit distribution)", "Normalised number of cherries", "Distribution of the number of cherries", "K", null, out descriptions, interactive);
                 });
 
@@ -721,8 +727,9 @@ namespace TreeViewer.Stats
 
                 numberOfCherriesDistributionPlotGuid = Guid.NewGuid().ToString();
                 numberOfCherriesDistribution = Stats.NumberOfCherriesDistribution.GetPlotTwoTailed(cherryYuleDistribution, cherryPdaDistribution, cherryMinValue, cherryMaxValue, numberOfCherriesYule1 - numberOfCherriesYule2, numberOfCherriesPDA1 - numberOfCherriesPDA2, numberOfCherriesYuleP, numberOfCherriesPDAP, numberOfCherriesDistributionPlotGuid);
-                Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                 {
+                    clickActions = null;
                     return TreeViewer.Stats.Distribution.GetPlotWithStandardNormalTwoTailed(cherryYuleDistribution, cherryPdaDistribution, cherryMinValue, cherryMaxValue, numberOfCherriesYule1 - numberOfCherriesYule2, numberOfCherriesPDA1 - numberOfCherriesPDA2, numberOfCherriesYuleP, numberOfCherriesPDAP, "Density (YHK model)", "Density (PDA model)", "Density (limit distribution)", "Normalised cherry index difference", "Cherry index difference distribution", "ΔK", null, out descriptions, interactive);
                 });
 

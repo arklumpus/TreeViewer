@@ -70,6 +70,7 @@ namespace TreeViewer
         public UpdateCheckModes UpdateCheckMode { get; set; } = UpdateCheckModes.ProgramAndAllModules;
         public bool EnableUndoStack { get; set; } = true;
         public bool ClusterAccordingToRFDistances { get; set; } = false;
+        public bool PairwiseTreeComparisons { get; set; } = false;
         public static GlobalSettings Settings { get; }
 
         [JsonIgnore]
@@ -218,6 +219,16 @@ namespace TreeViewer
                     else
                     {
                         GlobalSettings.Settings.EnableUndoStack = Convert.ToBoolean(settingValue);
+                    }
+                    break;
+                case "PairwiseTreeComparisons":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.PairwiseTreeComparisons = false;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.PairwiseTreeComparisons = Convert.ToBoolean(settingValue);
                     }
                     break;
                 case "InterfaceStyle":

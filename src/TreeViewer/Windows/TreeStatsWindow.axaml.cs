@@ -150,7 +150,7 @@ namespace TreeViewer
 
                                 progressWindow.Progress = progress;
                             });
-                        }, Plots, Data);
+                        }, Plots, Data, this);
                     }
                     else if (parentWindow.Trees.Count == 2)
                     {
@@ -204,7 +204,7 @@ namespace TreeViewer
 
                             progressWindow.Progress = progress;
                         });
-                    }, Plots, Data);
+                    }, Plots, Data, this);
                 }
                 else if (trees.Count == 2)
                 {
@@ -629,7 +629,7 @@ namespace TreeViewer
 
             if (!string.IsNullOrEmpty(result))
             {
-                Page pag = Plots[plotID](false, out _);
+                Page pag = Plots[plotID](false, out _, out _);
                 pag.SaveAsSVG(result, textOption);
             }
         }
@@ -642,7 +642,7 @@ namespace TreeViewer
 
             if (!string.IsNullOrEmpty(result))
             {
-                Page pag = Plots[plotID](false, out _);
+                Page pag = Plots[plotID](false, out _, out _);
                 Document doc = new Document();
                 doc.Pages.Add(pag);
                 doc.SaveAsPDF(result);
@@ -673,7 +673,7 @@ namespace TreeViewer
 
             if (!string.IsNullOrEmpty(result))
             {
-                Page pag = Plots[plotID](false, out _);
+                Page pag = Plots[plotID](false, out _, out _);
 
                 if (outputFormat != OutputFormats.PNG)
                 {
@@ -770,7 +770,7 @@ namespace TreeViewer
                 new DoubleTransition() { Property = Grid.MinHeightProperty, Duration = TimeSpan.FromMilliseconds(100) },
             };
 
-            Page pag = Plots[plotID](true, out Dictionary<string, (Colour, Colour, string)> descriptions);
+            Page pag = Plots[plotID](true, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Window>> clickActions);
 
 
             Dictionary<string, Delegate> taggedActions = new Dictionary<string, Delegate>();
@@ -809,6 +809,14 @@ namespace TreeViewer
                         this.FindControl<Border>("HoverBorder").Transitions = null;
                         this.FindControl<Border>("HoverBorder").Opacity = 0;
                     };
+
+                    if (clickActions != null && clickActions.TryGetValue(kvp.Key, out Action<Window> action))
+                    {
+                        act.PointerReleased += (s, e) =>
+                        {
+                            action(this);
+                        };
+                    }
 
                     return new RenderAction[] { act };
                 }));

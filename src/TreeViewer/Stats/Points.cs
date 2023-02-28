@@ -1,7 +1,10 @@
-﻿using MathNet.Numerics.Distributions;
+﻿using Accord.MachineLearning;
+using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using MathNet.Numerics.Statistics;
+using PhyloTree;
+using PhyloTree.Formats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,13 +47,15 @@ namespace TreeViewer.Stats
             return new Point(x.X + deltaX, x.Y + deltaY);
         }
 
-        public static Page GetPlot(double[,] distMat, double[,] points, string xAxisName, string yAxisName, string title, string tag, out Dictionary<string, (Colour, Colour, string)> interactiveDescriptions, bool interactive = false)
+        public static Page GetPlot(double[,] distMat, double[,] points, string xAxisName, string yAxisName, string title, string tag, out Dictionary<string, (Colour, Colour, string)> interactiveDescriptions, out Dictionary<string, Action<Avalonia.Controls.Window, IList<TreeNode>>> clickActions, bool interactive = false)
         {
             interactiveDescriptions = null;
+            clickActions = null;
 
             if (interactive)
             {
                 interactiveDescriptions = new Dictionary<string, (Colour, Colour, string)>();
+                clickActions = new Dictionary<string, Action<Avalonia.Controls.Window, IList<TreeNode>>>();
             }
 
             int pointCount = points.GetLength(0);
@@ -183,11 +188,32 @@ namespace TreeViewer.Stats
                                 ellipse1 = ellipse1.Linearise(0.01).Transform(x => Translate(Scale(Translate(Translate(Rotate(Scale(x, ellipsoids[i, 0], ellipsoids[i, 1]), ellipsoids[i, 2]), centroids[i, 0], centroids[i, 1]), -minX, -minY), plotWidth / (maxX - minX), -plotHeight / (maxY - minY)), 0, plotHeight));
 
                                 string clusterTag = Guid.NewGuid().ToString();
-                                int countPoints = centroidAssignments.Count(x => newAssignments[x] == i);
+
+                                List<int> clusterPoints = new List<int>();
+
+                                for (int j = 0; j < centroidAssignments.Length; j++)
+                                {
+                                    if (newAssignments[centroidAssignments[j]] == i)
+                                    {
+                                        clusterPoints.Add(j);
+                                    }
+                                }
+
+                                //int countPoints = centroidAssignments.Count(x => newAssignments[x] == i);
+                                int countPoints = clusterPoints.Count;
 
                                 interactiveDescriptions.Add(clusterTag, (Colour.FromRgba(0, 0, 0, 0), Colour.FromRgb(col.R * 0.5 + bgCol.R * 0.5, col.G * 0.5 + bgCol.G * 0.5, col.B * 0.5 + bgCol.B * 0.5), "Cluster " + (i + 1).ToString() + ": " + countPoints.ToString() + " points (" + ((double)countPoints / centroidAssignments.Length).ToString("0%") + ")"));
 
                                 gpr.FillPath(ellipse1, Colour.FromRgba(0, 0, 0, 0), tag: clusterTag);
+
+                                clickActions.Add(clusterTag, async (win, trees) => {
+                                    
+                                    string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+
+                                    BinaryTree.WriteAllTrees(from el in clusterPoints select trees[el], tempFile);
+
+                                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => { await GlobalSettings.Settings.MainWindows[0].LoadFile(tempFile, true); });
+                                });
                             }
                         }
                     }
@@ -198,7 +224,10 @@ namespace TreeViewer.Stats
             {
                 if (!interactive)
                 {
-                    gpr.FillPath(new GraphicsPath().Arc((points[i, 0] - minX) / (maxX - minX) * plotWidth, plotHeight - (points[i, 1] - minY) / (maxY - minY) * plotHeight, 2, 0, 2 * Math.PI), clusterColours[newAssignments[centroidAssignments[i]] % clusterColours.Length]);
+                    string cluster = clusterCount > 1 ? ("(cluster " + (newAssignments[centroidAssignments[i]] + 1).ToString() + ")") : "";
+                    string pointTag = "Tree#" + (i + 1).ToString() + cluster;
+
+                    gpr.FillPath(new GraphicsPath().Arc((points[i, 0] - minX) / (maxX - minX) * plotWidth, plotHeight - (points[i, 1] - minY) / (maxY - minY) * plotHeight, 2, 0, 2 * Math.PI), clusterColours[newAssignments[centroidAssignments[i]] % clusterColours.Length], tag: pointTag);
                 }
                 else
                 {

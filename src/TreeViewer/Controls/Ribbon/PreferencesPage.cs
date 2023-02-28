@@ -19,6 +19,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.VisualTree;
+using AvaloniaColorPicker;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -225,7 +226,7 @@ namespace TreeViewer
                 TextBlock blk = new TextBlock() { Text = "Selection colour:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
 
                 ColorButton colorButton = new ColorButton() { Color = ((VectSharp.Colour)GlobalSettings.Settings.SelectionColour).ToAvalonia(), Margin = new Thickness(0, 0, 0, 10), FontSize = 14 };
-
+                colorButton.Classes.Add("PlainButton");
                 Grid.SetRow(colorButton, currRow);
                 Grid.SetColumn(colorButton, 1);
                 Grid.SetRow(blk, currRow);
@@ -254,6 +255,29 @@ namespace TreeViewer
 
                     GlobalSettings.Settings.EnableUndoStack = checkBox.IsChecked == true;
                     return hasChanged;
+                });
+            }
+
+            currRow++;
+            pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+
+            {
+                TextBlock blk = new TextBlock() { Text = "Tree comparisons:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
+
+                List<string> items = new List<string>() { "Pairwise", "Globally shared tips" };
+
+                ComboBox comboBox = new ComboBox() { Items = items, SelectedIndex = GlobalSettings.Settings.PairwiseTreeComparisons ? 0 : 1, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 200, FontSize = 14 };
+
+                Grid.SetRow(comboBox, currRow);
+                Grid.SetColumn(comboBox, 1);
+                Grid.SetRow(blk, currRow);
+                pageContent.Children.Add(comboBox);
+                pageContent.Children.Add(blk);
+
+                applyChanges.Add(() =>
+                {
+                    GlobalSettings.Settings.PairwiseTreeComparisons = (comboBox.SelectedIndex == 0);
+                    return false;
                 });
             }
 
@@ -431,6 +455,7 @@ namespace TreeViewer
                 GlobalSettings.Settings.DragInterval = 250;
                 GlobalSettings.Settings.InterfaceStyle = Modules.IsMac ? GlobalSettings.InterfaceStyles.MacOSStyle : GlobalSettings.InterfaceStyles.WindowsStyle;
                 GlobalSettings.Settings.RibbonStyle = Modules.IsMac ? GlobalSettings.RibbonStyles.Grey : GlobalSettings.RibbonStyles.Colourful;
+                GlobalSettings.Settings.PairwiseTreeComparisons = false;
 
                 GlobalSettings.Settings.SelectionColour = VectSharp.Colour.FromRgb(35, 127, 255);
 
@@ -885,7 +910,7 @@ namespace TreeViewer
                     }
 
                     ColorButton but = new ColorButton() { Color = col.ToAvalonia(), Margin = new Thickness(0, 0, 0, 10), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left, FontSize = 14, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
-
+                    but.Classes.Add("PlainButton");
                     Grid.SetRow(but, currRow);
                     Grid.SetColumn(but, 1);
                     pageContent.Children.Add(but);

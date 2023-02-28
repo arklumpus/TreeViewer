@@ -14,7 +14,7 @@ namespace TreeViewer.Stats
 {
     internal static class TreeReport
     {
-        public delegate Page GetPlot(bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions);
+        public delegate Page GetPlot(bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions);
         public static string GetSVGBase64(Page pag)
         {
             using (MemoryStream ms = new MemoryStream())
@@ -112,8 +112,9 @@ namespace TreeViewer.Stats
             Page branchLengthDistribution = hasLengths ? Stats.BranchLengthDistribution.GetPlot(branchLengths, branchLengthDistributionPlotGuid) : null;
             (double branchLengthUnderflow, int branchLengthUnderflowCount, double branchLengthOverflow, int branchLengthOverflowCount) = hasLengths ? Stats.Histogram.GetOverUnderflow(branchLengths) : (0, 0, 0, 0);
 
-            Plots.Add(branchLengthDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+            Plots.Add(branchLengthDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
             {
+                clickActions = null;
                 return TreeViewer.Stats.Histogram.GetPlot(branchLengths, "Branch length", "Branch length distribution", null, out descriptions, interactive);
             });
 
@@ -208,8 +209,9 @@ namespace TreeViewer.Stats
                 leafDepthDistribution = Stats.LeafDepthDistribution.GetPlot(leafDepths, leafDepthDistributionPlotGuid);
                 (leafDepthUnderflow, leafDepthUnderflowCount, leafDepthOverflow, leafDepthOverflowCount) = Stats.Histogram.GetOverUnderflow(leafDepths);
 
-                Plots.Add(leafDepthDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                Plots.Add(leafDepthDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                 {
+                    clickActions = null;
                     return TreeViewer.Stats.Histogram.GetPlot(leafDepths, "Leaf depth", "Leaf depth distribution", null, out descriptions, interactive);
                 });
 
@@ -238,8 +240,9 @@ namespace TreeViewer.Stats
 
                     sackinDistributionPlotGuid = Guid.NewGuid().ToString();
                     sackinDistribution = Stats.SackinDistribution.GetPlot(sackinYuleDistribution, sackinPdaDistribution, sackinYule, sackinPDA, sackinYuleP, sackinPDAP, sackinDistributionPlotGuid);
-                    Plots.Add(sackinDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                    Plots.Add(sackinDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                     {
+                        clickActions = null;
                         return TreeViewer.Stats.Distribution.GetPlot(sackinYuleDistribution, sackinPdaDistribution, sackinYule, sackinPDA, sackinYuleP, sackinPDAP, "Density (YHK model)", "Density (PDA model)", "Normalised Sackin index", "Sackin index distribution", "S", null, out descriptions, interactive);
                     });
 
@@ -272,8 +275,9 @@ namespace TreeViewer.Stats
 
                     collessDistributionPlotGuid = Guid.NewGuid().ToString();
                     collessDistribution = Stats.CollessDistribution.GetPlot(collessYuleDistribution, collessPdaDistribution, collessYule, collessPDA, collessYuleP, collessPDAP, collessDistributionPlotGuid);
-                    Plots.Add(collessDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                    Plots.Add(collessDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                     {
+                        clickActions = null;
                         return TreeViewer.Stats.Distribution.GetPlot(collessYuleDistribution, collessPdaDistribution, collessYule, collessPDA, collessYuleP, collessPDAP, "Density (YHK model)", "Density (PDA model)", "Normalised Colless index", "Colless index distribution", "C", null, out descriptions, interactive);
                     });
 
@@ -307,8 +311,9 @@ namespace TreeViewer.Stats
                     leafHeightDistribution = Stats.LeafHeightDistribution.GetPlot(leafHeights, leafHeightDistributionPlotGuid);
                     (leafHeightUnderflow, leafHeightUnderflowCount, leafHeightOverflow, leafHeightOverflowCount) = Stats.Histogram.GetOverUnderflow(leafHeights);
 
-                    Plots.Add(leafHeightDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                    Plots.Add(leafHeightDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                     {
+                        clickActions = null;
                         return TreeViewer.Stats.Histogram.GetPlot(leafHeights, "Leaf height", "Leaf height distribution", null, out descriptions, interactive);
                     });
 
@@ -355,8 +360,9 @@ namespace TreeViewer.Stats
 
                 numberOfCherriesDistributionPlotGuid = Guid.NewGuid().ToString();
                 numberOfCherriesDistribution = Stats.NumberOfCherriesDistribution.GetPlot(cherryYuleDistribution, cherryPdaDistribution, numberOfCherriesYule, numberOfCherriesPDA, numberOfCherriesYuleP, numberOfCherriesPDAP, numberOfCherriesDistributionPlotGuid);
-                Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                 {
+                    clickActions = null;
                     return TreeViewer.Stats.Distribution.GetPlotWithStandardNormal(cherryYuleDistribution, cherryPdaDistribution, numberOfCherriesYule, numberOfCherriesPDA, numberOfCherriesYuleP, numberOfCherriesPDAP, "Density (YHK model)", "Density (PDA model)", "Density (limit distribution)", "Normalised number of cherries", "Distribution of the number of cherries", "K", null, out descriptions, interactive);
                 });
 

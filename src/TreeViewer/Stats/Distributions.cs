@@ -92,11 +92,11 @@ namespace TreeViewer.Stats
         {
             if (weighted)
             {
-                return Points.GetPlot(distMat, points, "wRF distance component 1", "wRF distance component 2", "Tree space", tag, out _);
+                return Points.GetPlot(distMat, points, "wRF distance component 1", "wRF distance component 2", "Tree space", tag, out _, out _);
             }
             else
             {
-                return Points.GetPlot(distMat, points, "RF distance component 1", "RF distance component 2", "Tree space", tag, out _);
+                return Points.GetPlot(distMat, points, "RF distance component 1", "RF distance component 2", "Tree space", tag, out _, out _);
             }
         }
     }

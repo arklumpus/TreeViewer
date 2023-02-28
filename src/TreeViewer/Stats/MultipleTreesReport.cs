@@ -17,7 +17,10 @@ namespace TreeViewer.Stats
 {
     internal static class MultipleTreesReport
     {
-        private static (int[], double[], double[]) GetRobinsonFouldsDistances(IList<TreeNode> trees, Action<string, double> progressAction)
+        private static bool PairWise => GlobalSettings.Settings.PairwiseTreeComparisons;
+
+
+        private static (int[], double[], double[]) GetRobinsonFouldsDistancesGlobal(IList<TreeNode> trees, Action<string, double> progressAction)
         {
             progressAction("Computing tree splits", 0);
 
@@ -79,6 +82,126 @@ namespace TreeViewer.Stats
                         else
                         {
                             (robinsonFouldsDistances[i], weightedRobinsonFouldsDistances[i], edgeLengthDistances[i]) = Comparisons.RobinsonFouldsDistance(splits[x], splits[y]);
+                        }
+
+                        itemsDone++;
+                    }
+                }
+
+                lock (progressLock)
+                {
+                    completed += itemsDone;
+                    progressAction(null, (double)completed / robinsonFouldsDistances.Length * 0.5 + 0.5);
+                }
+            });
+
+            return (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances);
+        }
+
+
+        private static (int[], double[], double[]) GetRobinsonFouldsDistancesPairwise(IList<TreeNode> trees, Action<string, double> progressAction)
+        {
+            progressAction("Computing tree splits", 0);
+
+            List<(HashSet<string>, HashSet<string>, double)>[] splits = new List<(HashSet<string>, HashSet<string>, double)>[trees.Count];
+
+            HashSet<string>[] leaves = new HashSet<string>[trees.Count];
+
+            object progressLock = new object();
+            int completed = 0;
+            Parallel.For(0, (int)Math.Ceiling((double)trees.Count / 20), j =>
+            {
+                for (int i = j * 20; i < (j + 1) * 20; i++)
+                {
+                    if (i < trees.Count)
+                    {
+                        splits[i] = (from el in trees[i].GetSplits()
+                                     select (
+                                     (from el1 in el.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToHashSet(),
+                                     (from el2 in el.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToHashSet(),
+                                     el.branchLength
+                                     )).ToList();
+
+                        leaves[i] = trees[i].GetLeafNames().ToHashSet();
+
+                        if (trees[i].IsRooted())
+                        {
+                            leaves[i].Add("@Root");
+                        }
+                    }
+                }
+
+                lock (progressLock)
+                {
+                    completed += 20;
+                    progressAction(null, (double)completed / trees.Count * 0.5);
+                }
+            });
+
+            int[] robinsonFouldsDistances = new int[trees.Count * (trees.Count + 1) / 2];
+            double[] weightedRobinsonFouldsDistances = new double[trees.Count * (trees.Count + 1) / 2];
+            double[] edgeLengthDistances = new double[trees.Count * (trees.Count + 1) / 2];
+
+            for (int i = 0; i < robinsonFouldsDistances.Length; i++)
+            {
+                robinsonFouldsDistances[i] = -1;
+            }
+
+            progressAction("Computing Robinson-Foulds distances", 0.5);
+
+            completed = 0;
+
+            const int itemsForStep = 1000;
+
+            Parallel.For(0, (int)Math.Ceiling((double)robinsonFouldsDistances.Length / itemsForStep), j =>
+            {
+                int itemsDone = 0;
+
+                for (int i = j * itemsForStep; i < (j + 1) * itemsForStep; i++)
+                {
+                    if (i < robinsonFouldsDistances.Length)
+                    {
+                        (int x, int y) = GetIndices(i);
+
+                        if (x == y)
+                        {
+                            robinsonFouldsDistances[i] = 0;
+                        }
+                        else
+                        {
+                            HashSet<string> commonLeaves = new HashSet<string>(leaves[x]);
+                            commonLeaves.IntersectWith(leaves[y]);
+
+                            List<(HashSet<string>, HashSet<string>, double)> splitsX = new List<(HashSet<string>, HashSet<string>, double)>(splits[x].Count);
+                            for (int k = 0; k < splits[x].Count; k++)
+                            {
+                                HashSet<string> left = new HashSet<string>(splits[x][k].Item1);
+                                left.IntersectWith(commonLeaves);
+
+                                HashSet<string> right = new HashSet<string>(splits[x][k].Item2);
+                                right.IntersectWith(commonLeaves);
+
+                                if (left.Count >= 0 || right.Count >= 0)
+                                {
+                                    splitsX.Add((left, right, splits[x][k].Item3));
+                                }
+                            }
+
+                            List<(HashSet<string>, HashSet<string>, double)> splitsY = new List<(HashSet<string>, HashSet<string>, double)>(splits[y].Count);
+                            for (int k = 0; k < splits[y].Count; k++)
+                            {
+                                HashSet<string> left = new HashSet<string>(splits[y][k].Item1);
+                                left.IntersectWith(commonLeaves);
+
+                                HashSet<string> right = new HashSet<string>(splits[y][k].Item2);
+                                right.IntersectWith(commonLeaves);
+
+                                if (left.Count >= 0 || right.Count >= 0)
+                                {
+                                    splitsY.Add((left, right, splits[y][k].Item3));
+                                }
+                            }
+                            (robinsonFouldsDistances[i], weightedRobinsonFouldsDistances[i], edgeLengthDistances[i]) = Comparisons.RobinsonFouldsDistance(splitsX, splitsY);
                         }
 
                         itemsDone++;
@@ -195,7 +318,7 @@ namespace TreeViewer.Stats
         }
 
 
-        public static (Markdig.Syntax.MarkdownDocument report, string reportSource) CreateReport(IList<TreeNode> trees, Action<string, double> progressAction, Dictionary<string, GetPlot> Plots, Dictionary<string, Func<(string header, IEnumerable<double[]>)>> Data)
+        public static (Markdig.Syntax.MarkdownDocument report, string reportSource) CreateReport(IList<TreeNode> trees, Action<string, double> progressAction, Dictionary<string, GetPlot> Plots, Dictionary<string, Func<(string header, IEnumerable<double[]>)>> Data, Avalonia.Controls.Window window)
         {
             HashSet<string> union = null;
             List<string> intersection = null;
@@ -274,11 +397,11 @@ namespace TreeViewer.Stats
             Page edgeLengthTreeSpacePlot = null;
             PointClustering edgeLengthClustering = null;
 
-            if (sameLeaves || intersection.Count > 3)
+            if (sameLeaves || intersection.Count > 3 || PairWise)
             {
                 IList<TreeNode> currentTrees;
 
-                if (!sameLeaves)
+                if (!sameLeaves && !PairWise)
                 {
                     currentTrees = new List<TreeNode>(trees.Count);
 
@@ -326,7 +449,17 @@ namespace TreeViewer.Stats
                     }
                 }
 
-                (int[] robinsonFouldsDistances, double[] weightedRobinsonFouldsDistances, double[] edgeLengthDistances) = GetRobinsonFouldsDistances(currentTrees, (p, x) => progressAction(p, x * 0.5));
+                (int[] robinsonFouldsDistances, double[] weightedRobinsonFouldsDistances, double[] edgeLengthDistances) = (null, null, null);
+
+                if (!PairWise)
+                {
+                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesGlobal(currentTrees, (p, x) => progressAction(p, x * 0.5));
+                }
+                else
+                {
+                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesPairwise(trees, (p, x) => progressAction(p, x * 0.5));
+                }
+                
 
                 maxDistance = robinsonFouldsDistances.Max();
                 maxWeightedDistance = weightedRobinsonFouldsDistances.Max();
@@ -350,9 +483,21 @@ namespace TreeViewer.Stats
 
                         treeSpacePlotGuid = Guid.NewGuid().ToString();
                         treeSpacePlot = Stats.RobinsonFouldsDistancePoints.GetPlot(distMat, points, false, treeSpacePlotGuid);
-                        Plots.Add(treeSpacePlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                        Plots.Add(treeSpacePlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                         {
-                            return Points.GetPlot(distMat, points, "RF distance component 1", "RF distance component 2", "Tree space", null, out descriptions, interactive);
+                            Page pag = Points.GetPlot(distMat, points, "RF distance component 1", "RF distance component 2", "Tree space", null, out descriptions, out Dictionary<string, Action<Avalonia.Controls.Window, IList<TreeNode>>> clickActions2, interactive);
+
+                            clickActions = new Dictionary<string, Action<Avalonia.Controls.Window>>();
+
+                            if (clickActions2 != null)
+                            {
+                                foreach (KeyValuePair<string, Action<Avalonia.Controls.Window, IList<TreeNode>>> kvp in clickActions2)
+                                {
+                                    clickActions.Add(kvp.Key, win => kvp.Value(win, currentTrees));
+                                }
+                            }
+
+                            return pag;
                         });
 
                         {
@@ -394,9 +539,21 @@ namespace TreeViewer.Stats
 
                         weightedTreeSpacePlotGuid = Guid.NewGuid().ToString();
                         weightedTreeSpacePlot = Stats.RobinsonFouldsDistancePoints.GetPlot(distMat, points, true, weightedTreeSpacePlotGuid);
-                        Plots.Add(weightedTreeSpacePlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                        Plots.Add(weightedTreeSpacePlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                         {
-                            return Points.GetPlot(distMat, points, "wRF distance component 1", "wRF distance component 2", "Tree space", null, out descriptions, interactive);
+                            Page pag = Points.GetPlot(distMat, points, "wRF distance component 1", "wRF distance component 2", "Tree space", null, out descriptions, out Dictionary<string, Action<Avalonia.Controls.Window, IList<TreeNode>>> clickActions2, interactive);
+
+                            clickActions = new Dictionary<string, Action<Avalonia.Controls.Window>>();
+
+                            if (clickActions2 != null)
+                            {
+                                foreach (KeyValuePair<string, Action<Avalonia.Controls.Window, IList<TreeNode>>> kvp in clickActions2)
+                                {
+                                    clickActions.Add(kvp.Key, win => kvp.Value(win, currentTrees));
+                                }
+                            }
+
+                            return pag;
                         });
 
                         {
@@ -448,8 +605,9 @@ namespace TreeViewer.Stats
                         sackinIndexDistribution = Stats.SackinDistribution.GetPlot(sackinIndices, sackinIndexDistributionPlotGuid);
                         (sackinIndexUnderflow, sackinIndexUnderflowCount, sackinIndexOverflow, sackinIndexOverflowCount) = Stats.Histogram.GetOverUnderflow(sackinIndices);
 
-                        Plots.Add(sackinIndexDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                        Plots.Add(sackinIndexDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                         {
+                            clickActions = null;
                             return TreeViewer.Stats.Histogram.GetPlot(sackinIndices, "Sackin index", "Sackin index distribution", null, out descriptions, interactive);
                         });
 
@@ -474,8 +632,9 @@ namespace TreeViewer.Stats
                             collessIndexDistribution = Stats.CollessDistribution.GetPlot(collessIndices, collessIndexDistributionPlotGuid);
                             (collessIndexUnderflow, collessIndexUnderflowCount, collessIndexOverflow, collessIndexOverflowCount) = Stats.Histogram.GetOverUnderflow(collessIndices);
 
-                            Plots.Add(collessIndexDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                            Plots.Add(collessIndexDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                             {
+                                clickActions = null;
                                 return TreeViewer.Stats.Histogram.GetPlot(collessIndices, "Colless index", "Colless index distribution", null, out descriptions, interactive);
                             });
 
@@ -500,8 +659,9 @@ namespace TreeViewer.Stats
                     numberOfCherriesDistribution = Stats.NumberOfCherriesDistribution.GetPlot(numbersOfCherries, numberOfCherriesDistributionPlotGuid);
                     (numberOfCherriesUnderflow, numberOfCherriesUnderflowCount, numberOfCherriesOverflow, numberOfCherriesOverflowCount) = Stats.Histogram.GetOverUnderflow(numbersOfCherries);
 
-                    Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                    Plots.Add(numberOfCherriesDistributionPlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                     {
+                        clickActions = null;
                         return TreeViewer.Stats.Histogram.GetPlot(numbersOfCherries, "Number of cherries", "Distribution of the number of cherries", null, out descriptions, interactive);
                     });
 
@@ -538,9 +698,21 @@ namespace TreeViewer.Stats
 
                     edgeLengthTreeSpacePlotGuid = Guid.NewGuid().ToString();
                     edgeLengthTreeSpacePlot = Stats.RobinsonFouldsDistancePoints.GetPlot(distMat, points, false, edgeLengthTreeSpacePlotGuid);
-                    Plots.Add(edgeLengthTreeSpacePlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions) =>
+                    Plots.Add(edgeLengthTreeSpacePlotGuid, (bool interactive, out Dictionary<string, (Colour, Colour, string)> descriptions, out Dictionary<string, Action<Avalonia.Controls.Window>> clickActions) =>
                     {
-                        return Points.GetPlot(distMat, points, "EL distance component 1", "EL distance component 2", "Tree space", null, out descriptions, interactive);
+                        Page pag = Points.GetPlot(distMat, points, "EL distance component 1", "EL distance component 2", "Tree space", null, out descriptions, out Dictionary<string, Action<Avalonia.Controls.Window, IList<TreeNode>>> clickActions2, interactive);
+
+                        clickActions = new Dictionary<string, Action<Avalonia.Controls.Window>>();
+
+                        if (clickActions2 != null)
+                        {
+                            foreach (KeyValuePair<string, Action<Avalonia.Controls.Window, IList<TreeNode>>> kvp in clickActions2)
+                            {
+                                clickActions.Add(kvp.Key, win => kvp.Value(win, currentTrees));
+                            }
+                        }
+
+                        return pag;
                     });
 
                     {
@@ -599,6 +771,10 @@ namespace TreeViewer.Stats
                 {
                     markdownSourceBuilder.AppendLine(" The following analyses were performed on the subset of tips that are shared among all trees.");
                 }
+                else if (PairWise)
+                {
+                    markdownSourceBuilder.AppendLine(" The following analyses were performed using pairwise comparisons between trees.");
+                }
                 else
                 {
                     markdownSourceBuilder.AppendLine();
@@ -608,7 +784,7 @@ namespace TreeViewer.Stats
             }
 
 
-            if (sameLeaves || intersection.Count > 3)
+            if (sameLeaves || intersection.Count > 3 || PairWise)
             {
                 if (sameTopology)
                 {
