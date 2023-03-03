@@ -285,6 +285,29 @@ namespace TreeViewer
             pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
 
             {
+                TextBlock blk = new TextBlock() { Text = "Tree clustering metric:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
+
+                List<string> items = new List<string>() { "Raw distances", "2D metric" };
+
+                ComboBox comboBox = new ComboBox() { Items = items, SelectedIndex = GlobalSettings.Settings.ClusterAccordingToRFDistances ? 0 : 1, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 200, FontSize = 14 };
+
+                Grid.SetRow(comboBox, currRow);
+                Grid.SetColumn(comboBox, 1);
+                Grid.SetRow(blk, currRow);
+                pageContent.Children.Add(comboBox);
+                pageContent.Children.Add(blk);
+
+                applyChanges.Add(() =>
+                {
+                    GlobalSettings.Settings.ClusterAccordingToRFDistances = (comboBox.SelectedIndex == 0);
+                    return false;
+                });
+            }
+
+            currRow++;
+            pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+
+            {
                 TextBlock blk = new TextBlock() { Text = "Module repository:", Margin = new Thickness(0, 0, 10, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 14 };
                 TextBox textBox = new TextBox() { Text = GlobalSettings.Settings.ModuleRepositoryBaseUri, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 200, FontSize = 14, Padding = new Thickness(5, 2, 5, 2), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
 
@@ -456,6 +479,7 @@ namespace TreeViewer
                 GlobalSettings.Settings.InterfaceStyle = Modules.IsMac ? GlobalSettings.InterfaceStyles.MacOSStyle : GlobalSettings.InterfaceStyles.WindowsStyle;
                 GlobalSettings.Settings.RibbonStyle = Modules.IsMac ? GlobalSettings.RibbonStyles.Grey : GlobalSettings.RibbonStyles.Colourful;
                 GlobalSettings.Settings.PairwiseTreeComparisons = false;
+                GlobalSettings.Settings.ClusterAccordingToRFDistances = false;
 
                 GlobalSettings.Settings.SelectionColour = VectSharp.Colour.FromRgb(35, 127, 255);
 
