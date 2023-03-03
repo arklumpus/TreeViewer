@@ -1067,7 +1067,10 @@ namespace TreeViewer
                 {
                     ("Export Markdown", new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.ExportMDReport")), null, new List<(string, Control, string)>(), true, 0, (Action<int>)(ind =>
                     {
-
+                         lock (CustomTreesReportLock)
+                         {
+                            ExportMarkdown(CustomTreesReportSource);
+                         }
                     }), "Exports the Markdown source for the report."),
 
                     ("Export as PDF", new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.ExportPDFReport")), null, new List<(string, Control, string)>()
@@ -1077,7 +1080,23 @@ namespace TreeViewer
                         ( "US letter paper size", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.ExportPDFReport")), null ),
                     }, true, 0, (Action<int>)(ind =>
                     {
+                        switch (ind)
+                        {
+                            case -1:
+                            case 0:
+                                lock (CustomTreesReportLock)
+                                {
+                                    ExportPDF(CustomTreesReport, false);
+                                }
+                                break;
 
+                            case 1:
+                                lock (CustomTreesReportLock)
+                                {
+                                    ExportPDF(CustomTreesReport, true);
+                                }
+                                break;
+                        }
                     }), "Exports the the report as a PDF file.")
                 }),
 
