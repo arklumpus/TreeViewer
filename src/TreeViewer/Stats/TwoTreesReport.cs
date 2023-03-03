@@ -115,6 +115,11 @@ namespace TreeViewer.Stats
                     }
                 }
 
+                if (!rooted1)
+                {
+                    currTree1 = currTree1.GetUnrootedTree();
+                }
+                
                 currTree2 = tree2.Clone();
 
                 List<TreeNode> leaves2 = currTree2.GetLeaves();
@@ -125,6 +130,11 @@ namespace TreeViewer.Stats
                     {
                         currTree2 = currTree2.Prune(leaves2[j], false);
                     }
+                }
+
+                if (!rooted2)
+                {
+                    currTree2 = currTree2.GetUnrootedTree();
                 }
             }
 
@@ -337,7 +347,7 @@ namespace TreeViewer.Stats
                                 }
                             }
 
-                            Data.Add(sackinDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                            Data.Add(sackinDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                         }
 
                         collessYuleP = (double)collessYuleDistribution.Count(x => x >= collessYule1) / collessYuleDistribution.Length;
@@ -368,7 +378,7 @@ namespace TreeViewer.Stats
                                 }
                             }
 
-                            Data.Add(collessDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                            Data.Add(collessDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                         }
                     }
                     else
@@ -549,16 +559,16 @@ namespace TreeViewer.Stats
                                 {
                                     if (i == 0)
                                     {
-                                        yield return new double[] { sackinYuleDistribution[i], sackinPdaDistribution[i], sackinYule1 - sackinYule2, sackinPDA1 - sackinPDA2 };
+                                        yield return new double[] { sackinMinValue + (sackinMaxValue - sackinMinValue) / 99 * i, sackinYuleDistribution[i], sackinPdaDistribution[i], sackinYule1 - sackinYule2, sackinPDA1 - sackinPDA2 };
                                     }
                                     else
                                     {
-                                        yield return new double[] { sackinYuleDistribution[i], sackinPdaDistribution[i] };
+                                        yield return new double[] { sackinMinValue + (sackinMaxValue - sackinMinValue) / 99 * i, sackinYuleDistribution[i], sackinPdaDistribution[i] };
                                     }
                                 }
                             }
 
-                            Data.Add(sackinDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                            Data.Add(sackinDistributionPlotGuid, () => ("x\tDensity (YHK model)\tDensity (PDA model)\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                         }
 
                         collessDistributionPlotGuid = Guid.NewGuid().ToString();
@@ -576,16 +586,16 @@ namespace TreeViewer.Stats
                                 {
                                     if (i == 0)
                                     {
-                                        yield return new double[] { collessYuleDistribution[i], collessPdaDistribution[i], collessYule1 - collessYule2, collessPDA1 - collessPDA2 };
+                                        yield return new double[] { collessMinValue + (collessMaxValue - collessMinValue) / 99 * i, collessYuleDistribution[i], collessPdaDistribution[i], collessYule1 - collessYule2, collessPDA1 - collessPDA2 };
                                     }
                                     else
                                     {
-                                        yield return new double[] { collessYuleDistribution[i], collessPdaDistribution[i] };
+                                        yield return new double[] { collessMinValue + (collessMaxValue - collessMinValue) / 99 * i, collessYuleDistribution[i], collessPdaDistribution[i] };
                                     }
                                 }
                             }
 
-                            Data.Add(collessDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                            Data.Add(collessDistributionPlotGuid, () => ("x\tDensity (YHK model)\tDensity (PDA model)\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                         }
 
                     }
@@ -633,7 +643,7 @@ namespace TreeViewer.Stats
                         }
                     }
 
-                    Data.Add(numberOfCherriesDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                    Data.Add(numberOfCherriesDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                 }
             }
             else if (binary1 && binary2 && intersection.Count >= 6)
@@ -740,16 +750,16 @@ namespace TreeViewer.Stats
                         {
                             if (i == 0)
                             {
-                                yield return new double[] { cherryYuleDistribution[i], cherryPdaDistribution[i], numberOfCherriesYule1 - numberOfCherriesYule2, numberOfCherriesPDA1 - numberOfCherriesPDA2 };
+                                yield return new double[] { cherryMinValue + (cherryMaxValue - cherryMinValue) / 99 * i, cherryYuleDistribution[i], cherryPdaDistribution[i], numberOfCherriesYule1 - numberOfCherriesYule2, numberOfCherriesPDA1 - numberOfCherriesPDA2 };
                             }
                             else
                             {
-                                yield return new double[] { cherryYuleDistribution[i], cherryPdaDistribution[i] };
+                                yield return new double[] { cherryMinValue + (cherryMaxValue - cherryMinValue) / 99 * i, cherryYuleDistribution[i], cherryPdaDistribution[i] };
                             }
                         }
                     }
 
-                    Data.Add(numberOfCherriesDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                    Data.Add(numberOfCherriesDistributionPlotGuid, () => ("x\tDensity (YHK model)\tDensity (PDA model)\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                 }
             }
 
@@ -874,6 +884,27 @@ namespace TreeViewer.Stats
                 {
                     markdownSourceBuilder.Append("| ");
 
+                    if (i < intersection.Count)
+                    {
+                        markdownSourceBuilder.Append("`");
+                        markdownSourceBuilder.Append(intersection[i]);
+                        if (i < intersection.Count - 1)
+                        {
+                            markdownSourceBuilder.Append("` ");
+                        }
+                        else
+                        {
+                            markdownSourceBuilder.Append("` ");
+                        }
+                        markdownSourceBuilder.Append(' ', maxLength - 3 - intersection[i].Length);
+                    }
+                    else
+                    {
+                        markdownSourceBuilder.Append(' ', maxLength);
+                    }
+
+                    markdownSourceBuilder.Append(" | ");
+
                     if (i < diff1.Count)
                     {
                         markdownSourceBuilder.Append("`");
@@ -908,27 +939,6 @@ namespace TreeViewer.Stats
                             markdownSourceBuilder.Append("` ");
                         }
                         markdownSourceBuilder.Append(' ', maxLength - 3 - diff2[i].Length);
-                    }
-                    else
-                    {
-                        markdownSourceBuilder.Append(' ', maxLength);
-                    }
-
-                    markdownSourceBuilder.Append(" | ");
-
-                    if (i < intersection.Count)
-                    {
-                        markdownSourceBuilder.Append("`");
-                        markdownSourceBuilder.Append(intersection[i]);
-                        if (i < intersection.Count - 1)
-                        {
-                            markdownSourceBuilder.Append("` ");
-                        }
-                        else
-                        {
-                            markdownSourceBuilder.Append("` ");
-                        }
-                        markdownSourceBuilder.Append(' ', maxLength - 3 - intersection[i].Length);
                     }
                     else
                     {
@@ -1020,7 +1030,7 @@ namespace TreeViewer.Stats
                 markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of the difference in length between splits from the first tree and the corresponding splits from the second tree.");
                 markdownSourceBuilder.AppendLine();
 
-                markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                 markdownSourceBuilder.Append(GetSVGBase64(splitLengthDiffDistribution));
 
@@ -1131,7 +1141,7 @@ namespace TreeViewer.Stats
                         markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of Sackin index values under the YHK and PDA models.");
                         markdownSourceBuilder.AppendLine();
 
-                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                         markdownSourceBuilder.Append(GetSVGBase64(sackinDistribution));
 
@@ -1190,7 +1200,7 @@ namespace TreeViewer.Stats
                         markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of Colless index values under the YHK and PDA models.");
                         markdownSourceBuilder.AppendLine();
 
-                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                         markdownSourceBuilder.Append(GetSVGBase64(collessDistribution));
 
@@ -1270,7 +1280,7 @@ namespace TreeViewer.Stats
                         markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of the number of cherries under the YHK and PDA models.");
                         markdownSourceBuilder.AppendLine();
 
-                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                         markdownSourceBuilder.Append(GetSVGBase64(numberOfCherriesDistribution));
 
@@ -1353,7 +1363,7 @@ namespace TreeViewer.Stats
                         markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of Sackin index differences under the YHK and PDA models.");
                         markdownSourceBuilder.AppendLine();
 
-                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                         markdownSourceBuilder.Append(GetSVGBase64(sackinDistribution));
 
@@ -1418,7 +1428,7 @@ namespace TreeViewer.Stats
                         markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of Colless index differences under the YHK and PDA models.");
                         markdownSourceBuilder.AppendLine();
 
-                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                         markdownSourceBuilder.Append(GetSVGBase64(collessDistribution));
 
@@ -1506,7 +1516,7 @@ namespace TreeViewer.Stats
                         markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of the difference between the numbers of cherries under the YHK and PDA models.");
                         markdownSourceBuilder.AppendLine();
 
-                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                         markdownSourceBuilder.Append(GetSVGBase64(numberOfCherriesDistribution));
 
