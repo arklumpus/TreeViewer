@@ -767,7 +767,7 @@ namespace TreeViewer.Stats
                 markdownSourceBuilder.Append(union.Count.ToString());
                 markdownSourceBuilder.Append("** different tip labels in total.");
 
-                if (intersection.Count > 3)
+                if (intersection.Count > 3 && !PairWise)
                 {
                     markdownSourceBuilder.AppendLine(" The following analyses were performed on the subset of tips that are shared among all trees.");
                 }
@@ -797,7 +797,7 @@ namespace TreeViewer.Stats
                     markdownSourceBuilder.AppendLine();
 
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(edgeLengthTreeSpacePlot));
 
@@ -880,7 +880,7 @@ namespace TreeViewer.Stats
                     markdownSourceBuilder.AppendLine();
 
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(treeSpacePlot));
 
@@ -941,7 +941,7 @@ namespace TreeViewer.Stats
 
 
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(weightedTreeSpacePlot));
 
@@ -1018,7 +1018,7 @@ namespace TreeViewer.Stats
                         markdownSourceBuilder.AppendLine("). [**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of Sackin index values among the trees.");
                         markdownSourceBuilder.AppendLine();
 
-                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                        markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                         markdownSourceBuilder.Append(GetSVGBase64(sackinIndexDistribution));
 
@@ -1074,7 +1074,7 @@ namespace TreeViewer.Stats
                             markdownSourceBuilder.AppendLine("). [**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of Colless index values among the trees.");
                             markdownSourceBuilder.AppendLine();
 
-                            markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                            markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                             markdownSourceBuilder.Append(GetSVGBase64(collessIndexDistribution));
 
@@ -1141,7 +1141,7 @@ namespace TreeViewer.Stats
                     markdownSourceBuilder.AppendLine("). [**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of the number of cherries among the trees.");
                     markdownSourceBuilder.AppendLine();
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(numberOfCherriesDistribution));
 

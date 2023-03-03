@@ -262,7 +262,7 @@ namespace TreeViewer.Stats
                             }
                         }
 
-                        Data.Add(sackinDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                        Data.Add(sackinDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                     }
 
                     collessIndex = (int)tree.CollessIndex(TreeNode.NullHypothesis.None);
@@ -297,7 +297,7 @@ namespace TreeViewer.Stats
                             }
                         }
 
-                        Data.Add(collessDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                        Data.Add(collessDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                     }
                 }
 
@@ -382,7 +382,7 @@ namespace TreeViewer.Stats
                         }
                     }
 
-                    Data.Add(numberOfCherriesDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value(PDA model)", getData()));
+                    Data.Add(numberOfCherriesDistributionPlotGuid, () => ("Samples from YHK model\tSamples from PDA model\tObserved value (YHK model)\tObserved value (PDA model)", getData()));
                 }
             }
 
@@ -483,7 +483,7 @@ namespace TreeViewer.Stats
                 markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of branch lengths in the tree.");
                 markdownSourceBuilder.AppendLine();
 
-                markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                 markdownSourceBuilder.Append(GetSVGBase64(branchLengthDistribution));
 
@@ -536,11 +536,14 @@ namespace TreeViewer.Stats
 
             markdownSourceBuilder.AppendLine();
 
-            markdownSourceBuilder.AppendLine("<br type=\"page\"/>");
-            markdownSourceBuilder.AppendLine();
+            if (rooted || leaves.Count >= 6)
+            {
+                markdownSourceBuilder.AppendLine("<br type=\"page\"/>");
+                markdownSourceBuilder.AppendLine();
 
-            markdownSourceBuilder.AppendLine("## Tree shape statistics");
-            markdownSourceBuilder.AppendLine();
+                markdownSourceBuilder.AppendLine("## Tree shape statistics");
+                markdownSourceBuilder.AppendLine();
+            }
 
             if (rooted)
             {
@@ -553,7 +556,7 @@ namespace TreeViewer.Stats
                 markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of leaf depths.");
                 markdownSourceBuilder.AppendLine();
 
-                markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                 markdownSourceBuilder.Append(GetSVGBase64(leafDepthDistribution));
 
@@ -606,7 +609,7 @@ namespace TreeViewer.Stats
                     markdownSourceBuilder.AppendLine(". [**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the distribution of leaf heights.");
                     markdownSourceBuilder.AppendLine();
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(leafHeightDistribution));
 
@@ -704,7 +707,7 @@ namespace TreeViewer.Stats
                     markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of Sackin index values under the YHK and PDA models.");
                     markdownSourceBuilder.AppendLine();
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(sackinDistribution));
 
@@ -763,7 +766,7 @@ namespace TreeViewer.Stats
                     markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of Colless index values under the YHK and PDA models.");
                     markdownSourceBuilder.AppendLine();
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(collessDistribution));
 
@@ -842,7 +845,7 @@ namespace TreeViewer.Stats
                     markdownSourceBuilder.AppendLine("[**Figure " + figNum.ToString() + "**](#fig" + figNum.ToString() + ") shows the expected distribution of the number of cherries under the YHK and PDA models.");
                     markdownSourceBuilder.AppendLine();
 
-                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" /><img src=\"");
+                    markdownSourceBuilder.Append("<p align=\"center\"><a name=\"fig" + figNum.ToString() + "\" ></a><img src=\"");
 
                     markdownSourceBuilder.Append(GetSVGBase64(numberOfCherriesDistribution));
 
