@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.LinearAlgebra;
+﻿using Accord.MachineLearning;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using MathNet.Numerics.Statistics;
 using System;
@@ -67,218 +68,380 @@ namespace TreeViewer.Stats
 
         private static (double[,] centroids, double[,] ellipsoids, int[] centroidAssignments, double silhouetteScore, double clusterSizeVariance, double error) KMedoidsClustering(double[][] points, int k)
         {
-            Accord.MachineLearning.KMedoids kMedoids = new Accord.MachineLearning.KMedoids(k);
-            kMedoids.Learn(points);
-
-            double[,] centroids = new double[k, 2];
-
-            for (int i = 0; i < k; i++)
+            if (k > 1)
             {
-                centroids[i, 0] = kMedoids.Clusters[i].Centroid[0];
-                centroids[i, 1] = kMedoids.Clusters[i].Centroid[1];
-            }
+                Accord.MachineLearning.KMedoids kMedoids = new Accord.MachineLearning.KMedoids(k);
+                kMedoids.Learn(points);
 
-            int[] clusterAssignments = new int[points.Length];
-            kMedoids.Clusters.Decide(points, clusterAssignments);
+                double[,] centroids = new double[k, 2];
 
-            double[,] ellipsoids = new double[kMedoids.K, 3];
-
-            for (int i = 0; i < kMedoids.K; i++)
-            {
-                /*(double meanX, double varianceX) = (from el in Enumerable.Range(0, points.Length) where clusterAssignments[el] == i select points[el][0]).MeanVariance();
-                (double meanY, double varianceY) = (from el in Enumerable.Range(0, points.Length) where clusterAssignments[el] == i select points[el][1]).MeanVariance();
-
-                double covariance = (from el in Enumerable.Range(0, points.Length) where clusterAssignments[el] == i select points[el][0] * points[el][1]).Mean() - meanX * meanY;*/
-
-                double varianceX = 0;
-                double varianceY = 0;
-                double covariance = 0;
-                int count = 0;
-
-                for (int j = 0; j < points.Length; j++)
+                for (int i = 0; i < k; i++)
                 {
-                    if (clusterAssignments[j] == i)
+                    centroids[i, 0] = kMedoids.Clusters[i].Centroid[0];
+                    centroids[i, 1] = kMedoids.Clusters[i].Centroid[1];
+                }
+
+                int[] clusterAssignments = new int[points.Length];
+                kMedoids.Clusters.Decide(points, clusterAssignments);
+
+                double[,] ellipsoids = new double[kMedoids.K, 3];
+
+                for (int i = 0; i < kMedoids.K; i++)
+                {
+                    double varianceX = 0;
+                    double varianceY = 0;
+                    double covariance = 0;
+                    int count = 0;
+
+                    for (int j = 0; j < points.Length; j++)
                     {
-                        varianceX += (points[j][0] - centroids[i, 0]) * (points[j][0] - centroids[i, 0]);
-                        varianceY += (points[j][1] - centroids[i, 1]) * (points[j][1] - centroids[i, 1]);
-                        covariance += (points[j][0] - centroids[i, 0]) * (points[j][1] - centroids[i, 1]);
+                        if (clusterAssignments[j] == i)
+                        {
+                            varianceX += (points[j][0] - centroids[i, 0]) * (points[j][0] - centroids[i, 0]);
+                            varianceY += (points[j][1] - centroids[i, 1]) * (points[j][1] - centroids[i, 1]);
+                            covariance += (points[j][0] - centroids[i, 0]) * (points[j][1] - centroids[i, 1]);
+                            count++;
+                        }
+                    }
+
+                    varianceX /= count;
+                    varianceY /= count;
+                    covariance /= count;
+
+
+                    Matrix<double> covarianceMatrix = Matrix<double>.Build.DenseOfArray(new double[,] { { varianceX, covariance }, { covariance, varianceY } });
+                    Evd<double> evd = covarianceMatrix.Evd();
+
+                    double r1 = Math.Sqrt(10.5797 * evd.EigenValues[0].Real);
+                    double r2 = Math.Sqrt(10.5797 * evd.EigenValues[1].Real);
+
+                    double theta = Math.Atan2(evd.EigenVectors[1, 0], evd.EigenVectors[0, 0]);
+
+                    ellipsoids[i, 0] = r1;
+                    ellipsoids[i, 1] = r2;
+                    ellipsoids[i, 2] = theta;
+                }
+
+                double[] silhouetteScores = new double[points.Length];
+
+                Parallel.For(0, points.Length, i =>
+                {
+                    double[] distances = new double[kMedoids.K];
+                    int[] counts = new int[kMedoids.K];
+
+                    for (int j = 0; j < points.Length; j++)
+                    {
+                        if (j != i)
+                        {
+                            distances[clusterAssignments[j]] += Math.Sqrt((points[i][0] - points[j][0]) * (points[i][0] - points[j][0]) + (points[i][1] - points[j][1]) * (points[i][1] - points[j][1]));
+                            counts[clusterAssignments[j]]++;
+                        }
+                    }
+
+                    for (int j = 0; j < kMedoids.K; j++)
+                    {
+                        distances[j] /= counts[j];
+                    }
+
+                    if (counts[clusterAssignments[i]] > 0 && points.Length - 1 - counts[clusterAssignments[i]] > 0)
+                    {
+                        double a = distances[clusterAssignments[i]];
+                        double b = (from el in Enumerable.Range(0, kMedoids.K) where el != clusterAssignments[i] select distances[el]).Min();
+
+                        silhouetteScores[i] = (b - a) / Math.Max(a, b);
+                    }
+                    else
+                    {
+                        silhouetteScores[i] = 0;
+                    }
+                });
+
+                double clusterSizeVariance = (from el in Enumerable.Range(0, kMedoids.K) select (double)clusterAssignments.Count(x => x == el)).Variance();
+
+                double squaredError = 0;
+
+                for (int i = 0; i < points.Length; i++)
+                {
+                    squaredError += (points[i][0] - centroids[clusterAssignments[i], 0]) * (points[i][0] - centroids[clusterAssignments[i], 0]) + (points[i][1] - centroids[clusterAssignments[i], 1]) * (points[i][1] - centroids[clusterAssignments[i], 1]);
+                }
+
+                return (centroids, ellipsoids, clusterAssignments, silhouetteScores.Average(), clusterSizeVariance, squaredError);
+            }
+            else
+            {
+                double[] distances = new double[points.Length * (points.Length - 1) / 2];
+
+                static int getIndex(int i, int j, int n)
+                {
+                    return n * (n - 1) / 2 - (n - i) * (n - i - 1) / 2 + j - i - 1;
+                }
+
+                static (int i, int j) getIndices(int index, int n)
+                {
+                    int i = n - 2 - (int)Math.Floor(Math.Sqrt(-8 * index + 4 * n * (n - 1) - 7) / 2 - 0.5);
+                    int j = index + i + 1 - n * (n - 1) / 2 + (n - i) * ((n - i) - 1) / 2;
+                    return (i, j);
+                }
+
+                Parallel.For(0, points.Length * (points.Length - 1) / 2, index =>
+                {
+                    (int i, int j) = getIndices(index, points.Length);
+
+                    distances[index] = (points[i][0] - points[j][0]) * (points[i][0] - points[j][0]) + (points[i][1] - points[j][1]) * (points[i][1] - points[j][1]);
+                });
+
+                double minSum = double.MaxValue;
+                int minIndex = -1;
+                object minLock = new object();
+
+                Parallel.For(0, points.Length, i =>
+                {
+                    double sum = 0;
+
+                    for (int j = 0; j < points.Length; j++)
+                    {
+                        if (j != i)
+                        {
+                            sum += distances[getIndex(Math.Min(i, j), Math.Max(i, j), points.Length)];
+                        }
+                        
+                    }
+
+                    lock (minLock)
+                    {
+                        if (sum < minSum)
+                        {
+                            minSum = sum;
+                            minIndex = i;
+                        }
+                    }
+                });
+
+                double[,] centroids = new double[1, 2] { { points[minIndex][0], points[minIndex][1] } };
+
+                int[] clusterAssignments = new int[points.Length];
+
+                double[,] ellipsoids = new double[1, 3];
+
+                {
+                    double varianceX = 0;
+                    double varianceY = 0;
+                    double covariance = 0;
+                    int count = 0;
+
+                    for (int j = 0; j < points.Length; j++)
+                    {
+                        varianceX += (points[j][0] - centroids[0, 0]) * (points[j][0] - centroids[0, 0]);
+                        varianceY += (points[j][1] - centroids[0, 1]) * (points[j][1] - centroids[0, 1]);
+                        covariance += (points[j][0] - centroids[0, 0]) * (points[j][1] - centroids[0, 1]);
                         count++;
                     }
+
+                    varianceX /= count;
+                    varianceY /= count;
+                    covariance /= count;
+
+
+                    Matrix<double> covarianceMatrix = Matrix<double>.Build.DenseOfArray(new double[,] { { varianceX, covariance }, { covariance, varianceY } });
+                    Evd<double> evd = covarianceMatrix.Evd();
+
+                    double r1 = Math.Sqrt(10.5797 * evd.EigenValues[0].Real);
+                    double r2 = Math.Sqrt(10.5797 * evd.EigenValues[1].Real);
+
+                    double theta = Math.Atan2(evd.EigenVectors[1, 0], evd.EigenVectors[0, 0]);
+
+                    ellipsoids[0, 0] = r1;
+                    ellipsoids[0, 1] = r2;
+                    ellipsoids[0, 2] = theta;
                 }
 
-                varianceX /= count;
-                varianceY /= count;
-                covariance /= count;
+                double clusterSizeVariance = 0;
 
+                double squaredError = minSum;
 
-                Matrix<double> covarianceMatrix = Matrix<double>.Build.DenseOfArray(new double[,] { { varianceX, covariance }, { covariance, varianceY } });
-                Evd<double> evd = covarianceMatrix.Evd();
-
-                double r1 = Math.Sqrt(10.5797 * evd.EigenValues[0].Real);
-                double r2 = Math.Sqrt(10.5797 * evd.EigenValues[1].Real);
-
-                double theta = Math.Atan2(evd.EigenVectors[1, 0], evd.EigenVectors[0, 0]);
-
-                ellipsoids[i, 0] = r1;
-                ellipsoids[i, 1] = r2;
-                ellipsoids[i, 2] = theta;
+                return (centroids, ellipsoids, clusterAssignments, 0, clusterSizeVariance, squaredError);
             }
-
-            double[] silhouetteScores = new double[points.Length];
-
-            Parallel.For(0, points.Length, i =>
-            {
-                double[] distances = new double[kMedoids.K];
-                int[] counts = new int[kMedoids.K];
-
-                for (int j = 0; j < points.Length; j++)
-                {
-                    if (j != i)
-                    {
-                        distances[clusterAssignments[j]] += Math.Sqrt((points[i][0] - points[j][0]) * (points[i][0] - points[j][0]) + (points[i][1] - points[j][1]) * (points[i][1] - points[j][1]));
-                        counts[clusterAssignments[j]]++;
-                    }
-                }
-
-                for (int j = 0; j < kMedoids.K; j++)
-                {
-                    distances[j] /= counts[j];
-                }
-
-                if (counts[clusterAssignments[i]] > 0 && points.Length - 1 - counts[clusterAssignments[i]] > 0)
-                {
-                    double a = distances[clusterAssignments[i]];
-                    double b = (from el in Enumerable.Range(0, kMedoids.K) where el != clusterAssignments[i] select distances[el]).Min();
-
-                    silhouetteScores[i] = (b - a) / Math.Max(a, b);
-                }
-                else
-                {
-                    silhouetteScores[i] = 0;
-                }
-            });
-
-            double clusterSizeVariance = (from el in Enumerable.Range(0, kMedoids.K) select (double)clusterAssignments.Count(x => x == el)).Variance();
-
-            double squaredError = 0;
-
-            for (int i = 0; i < points.Length; i++)
-            {
-                squaredError += (points[i][0] - centroids[clusterAssignments[i], 0]) * (points[i][0] - centroids[clusterAssignments[i], 0]) + (points[i][1] - centroids[clusterAssignments[i], 1]) * (points[i][1] - centroids[clusterAssignments[i], 1]);
-            }
-
-            return (centroids, ellipsoids, clusterAssignments, silhouetteScores.Average(), clusterSizeVariance, squaredError);
         }
 
         private static (double[,] centroids, double[,] ellipsoids, int[] centroidAssignments, double silhouetteScore, double clusterSizeVariance, double error) KMedoidsClustering(double[,] distMat, double[][] points, int k)
         {
-            int[][] indices = (from el in Enumerable.Range(0, distMat.GetLength(0)) select new int[] { el }).ToArray();
-
-            DistanceMatrixDistance distance = new DistanceMatrixDistance(distMat);
-
-            Accord.MachineLearning.KMedoids<int> kMedoids = new Accord.MachineLearning.KMedoids<int>(k, distance);
-            kMedoids.Learn(indices);
-
-            double[,] centroids = new double[k, 2];
-
-            for (int i = 0; i < k; i++)
+            if (k > 1)
             {
-                centroids[i, 0] = points[kMedoids.Clusters[i].Centroid[0]][0];
-                centroids[i, 1] = points[kMedoids.Clusters[i].Centroid[0]][1];
-            }
+                int[][] indices = (from el in Enumerable.Range(0, distMat.GetLength(0)) select new int[] { el }).ToArray();
 
-            int[] clusterAssignments = new int[indices.Length];
-            kMedoids.Clusters.Decide(indices, clusterAssignments);
+                DistanceMatrixDistance distance = new DistanceMatrixDistance(distMat);
 
-            double[,] ellipsoids = new double[kMedoids.K, 3];
+                Accord.MachineLearning.KMedoids<int> kMedoids = new Accord.MachineLearning.KMedoids<int>(k, distance);
+                kMedoids.Learn(indices);
 
-            for (int i = 0; i < kMedoids.K; i++)
-            {
-                /*(double meanX, double varianceX) = (from el in Enumerable.Range(0, points.Length) where clusterAssignments[el] == i select points[el][0]).MeanVariance();
-                (double meanY, double varianceY) = (from el in Enumerable.Range(0, points.Length) where clusterAssignments[el] == i select points[el][1]).MeanVariance();
+                double[,] centroids = new double[k, 2];
 
-                double covariance = (from el in Enumerable.Range(0, points.Length) where clusterAssignments[el] == i select points[el][0] * points[el][1]).Mean() - meanX * meanY;*/
-
-                double varianceX = 0;
-                double varianceY = 0;
-                double covariance = 0;
-                int count = 0;
-
-                for (int j = 0; j < indices.Length; j++)
+                for (int i = 0; i < k; i++)
                 {
-                    if (clusterAssignments[j] == i)
+                    centroids[i, 0] = points[kMedoids.Clusters[i].Centroid[0]][0];
+                    centroids[i, 1] = points[kMedoids.Clusters[i].Centroid[0]][1];
+                }
+
+                int[] clusterAssignments = new int[indices.Length];
+                kMedoids.Clusters.Decide(indices, clusterAssignments);
+
+                double[,] ellipsoids = new double[kMedoids.K, 3];
+
+                for (int i = 0; i < kMedoids.K; i++)
+                {
+                    double varianceX = 0;
+                    double varianceY = 0;
+                    double covariance = 0;
+                    int count = 0;
+
+                    for (int j = 0; j < indices.Length; j++)
                     {
-                        varianceX += (points[j][0] - centroids[i, 0]) * (points[j][0] - centroids[i, 0]);
-                        varianceY += (points[j][1] - centroids[i, 1]) * (points[j][1] - centroids[i, 1]);
-                        covariance += (points[j][0] - centroids[i, 0]) * (points[j][1] - centroids[i, 1]);
+                        if (clusterAssignments[j] == i)
+                        {
+                            varianceX += (points[j][0] - centroids[i, 0]) * (points[j][0] - centroids[i, 0]);
+                            varianceY += (points[j][1] - centroids[i, 1]) * (points[j][1] - centroids[i, 1]);
+                            covariance += (points[j][0] - centroids[i, 0]) * (points[j][1] - centroids[i, 1]);
+                            count++;
+                        }
+                    }
+
+                    varianceX /= count;
+                    varianceY /= count;
+                    covariance /= count;
+
+
+                    Matrix<double> covarianceMatrix = Matrix<double>.Build.DenseOfArray(new double[,] { { varianceX, covariance }, { covariance, varianceY } });
+                    Evd<double> evd = covarianceMatrix.Evd();
+
+                    double r1 = Math.Sqrt(10.5797 * evd.EigenValues[0].Real);
+                    double r2 = Math.Sqrt(10.5797 * evd.EigenValues[1].Real);
+
+                    double theta = Math.Atan2(evd.EigenVectors[1, 0], evd.EigenVectors[0, 0]);
+
+                    ellipsoids[i, 0] = r1;
+                    ellipsoids[i, 1] = r2;
+                    ellipsoids[i, 2] = theta;
+                }
+
+                double[] silhouetteScores = new double[indices.Length];
+
+                Parallel.For(0, indices.Length, i =>
+                {
+                    double[] distances = new double[kMedoids.K];
+                    int[] counts = new int[kMedoids.K];
+
+                    for (int j = 0; j < indices.Length; j++)
+                    {
+                        if (j != i)
+                        {
+                            distances[clusterAssignments[j]] += distance.Distance(i, j);
+                            counts[clusterAssignments[j]]++;
+                        }
+                    }
+
+                    for (int j = 0; j < kMedoids.K; j++)
+                    {
+                        distances[j] /= counts[j];
+                    }
+
+                    if (counts[clusterAssignments[i]] > 0 && indices.Length - 1 - counts[clusterAssignments[i]] > 0)
+                    {
+                        double a = distances[clusterAssignments[i]];
+                        double b = (from el in Enumerable.Range(0, kMedoids.K) where el != clusterAssignments[i] select distances[el]).Min();
+
+                        silhouetteScores[i] = (b - a) / Math.Max(a, b);
+                    }
+                    else
+                    {
+                        silhouetteScores[i] = 0;
+                    }
+                });
+
+                double clusterSizeVariance = (from el in Enumerable.Range(0, kMedoids.K) select (double)clusterAssignments.Count(x => x == el)).Variance();
+
+                double squaredError = 0;
+
+                for (int i = 0; i < points.Length; i++)
+                {
+                    double dist = distance.Distance(i, kMedoids.Clusters[clusterAssignments[i]].Centroid[0]);
+
+                    squaredError += dist * dist;
+                }
+
+                return (centroids, ellipsoids, clusterAssignments, silhouetteScores.Average(), clusterSizeVariance, squaredError);
+            }
+            else
+            {
+                double minSum = double.MaxValue;
+                int minIndex = -1;
+                object minLock = new object();
+
+                Parallel.For(0, points.Length, i =>
+                {
+                    double sum = 0;
+
+                    for (int j = 0; j < points.Length; j++)
+                    {
+                        if (j != i)
+                        {
+                            sum += distMat[Math.Min(i, j), Math.Max(i, j)];
+                        }
+                    }
+
+                    lock (minLock)
+                    {
+                        if (sum < minSum)
+                        {
+                            minSum = sum;
+                            minIndex = i;
+                        }
+                    }
+                });
+
+                double[,] centroids = new double[1, 2] { { points[minIndex][0], points[minIndex][1] } };
+
+                int[] clusterAssignments = new int[points.Length];
+
+                double[,] ellipsoids = new double[1, 3];
+
+                {
+                    double varianceX = 0;
+                    double varianceY = 0;
+                    double covariance = 0;
+                    int count = 0;
+
+                    for (int j = 0; j < points.Length; j++)
+                    {
+                        varianceX += (points[j][0] - centroids[0, 0]) * (points[j][0] - centroids[0, 0]);
+                        varianceY += (points[j][1] - centroids[0, 1]) * (points[j][1] - centroids[0, 1]);
+                        covariance += (points[j][0] - centroids[0, 0]) * (points[j][1] - centroids[0, 1]);
                         count++;
                     }
+
+                    varianceX /= count;
+                    varianceY /= count;
+                    covariance /= count;
+
+
+                    Matrix<double> covarianceMatrix = Matrix<double>.Build.DenseOfArray(new double[,] { { varianceX, covariance }, { covariance, varianceY } });
+                    Evd<double> evd = covarianceMatrix.Evd();
+
+                    double r1 = Math.Sqrt(10.5797 * evd.EigenValues[0].Real);
+                    double r2 = Math.Sqrt(10.5797 * evd.EigenValues[1].Real);
+
+                    double theta = Math.Atan2(evd.EigenVectors[1, 0], evd.EigenVectors[0, 0]);
+
+                    ellipsoids[0, 0] = r1;
+                    ellipsoids[0, 1] = r2;
+                    ellipsoids[0, 2] = theta;
                 }
 
-                varianceX /= count;
-                varianceY /= count;
-                covariance /= count;
+                double clusterSizeVariance = 0;
 
+                double squaredError = minSum;
 
-                Matrix<double> covarianceMatrix = Matrix<double>.Build.DenseOfArray(new double[,] { { varianceX, covariance }, { covariance, varianceY } });
-                Evd<double> evd = covarianceMatrix.Evd();
-
-                double r1 = Math.Sqrt(10.5797 * evd.EigenValues[0].Real);
-                double r2 = Math.Sqrt(10.5797 * evd.EigenValues[1].Real);
-
-                double theta = Math.Atan2(evd.EigenVectors[1, 0], evd.EigenVectors[0, 0]);
-
-                ellipsoids[i, 0] = r1;
-                ellipsoids[i, 1] = r2;
-                ellipsoids[i, 2] = theta;
+                return (centroids, ellipsoids, clusterAssignments, 0, clusterSizeVariance, squaredError);
             }
-
-            double[] silhouetteScores = new double[indices.Length];
-
-            Parallel.For(0, indices.Length, i =>
-            {
-                double[] distances = new double[kMedoids.K];
-                int[] counts = new int[kMedoids.K];
-
-                for (int j = 0; j < indices.Length; j++)
-                {
-                    if (j != i)
-                    {
-                        distances[clusterAssignments[j]] += distance.Distance(i, j);
-                        counts[clusterAssignments[j]]++;
-                    }
-                }
-
-                for (int j = 0; j < kMedoids.K; j++)
-                {
-                    distances[j] /= counts[j];
-                }
-
-                if (counts[clusterAssignments[i]] > 0 && indices.Length - 1 - counts[clusterAssignments[i]] > 0)
-                {
-                    double a = distances[clusterAssignments[i]];
-                    double b = (from el in Enumerable.Range(0, kMedoids.K) where el != clusterAssignments[i] select distances[el]).Min();
-
-                    silhouetteScores[i] = (b - a) / Math.Max(a, b);
-                }
-                else
-                {
-                    silhouetteScores[i] = 0;
-                }
-            });
-
-            double clusterSizeVariance = (from el in Enumerable.Range(0, kMedoids.K) select (double)clusterAssignments.Count(x => x == el)).Variance();
-
-            double squaredError = 0;
-
-            for (int i = 0; i < points.Length; i++)
-            {
-                double dist = distance.Distance(i, kMedoids.Clusters[clusterAssignments[i]].Centroid[0]);
-
-                squaredError += dist * dist;
-            }
-
-            return (centroids, ellipsoids, clusterAssignments, silhouetteScores.Average(), clusterSizeVariance, squaredError);
         }
 
 
