@@ -19,203 +19,59 @@ namespace TreeViewer.Stats
     {
         private static bool PairWise => GlobalSettings.Settings.PairwiseTreeComparisons;
 
-
-        private static (int[], double[], double[]) GetRobinsonFouldsDistancesGlobal(IList<TreeNode> trees, Action<string, double> progressAction)
+        private static double Max(this double[,] array)
         {
-            progressAction("Computing tree splits", 0);
+            double maxVal = double.MinValue;
 
-            List<(string[], string[], double)>[] splits = new List<(string[], string[], double)>[trees.Count];
-
-            object progressLock = new object();
-            int completed = 0;
-            Parallel.For(0, (int)Math.Ceiling((double)trees.Count / 20), j =>
+            for (int i = 0; i < array.GetLength(0); i++)
             {
-                for (int i = j * 20; i < (j + 1) * 20; i++)
+                for (int j = 0; j < array.GetLength(1); j++)
                 {
-                    if (i < trees.Count)
-                    {
-                        splits[i] = (from el in trees[i].GetSplits()
-                                     select (
-                                     (from el1 in el.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(),
-                                     (from el2 in el.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(),
-                                     el.branchLength
-                                     )).ToList();
-                    }
+                    maxVal = Math.Max(maxVal, array[i, j]);
                 }
-
-                lock (progressLock)
-                {
-                    completed += 20;
-                    progressAction(null, (double)completed / trees.Count * 0.5);
-                }
-            });
-
-            int[] robinsonFouldsDistances = new int[trees.Count * (trees.Count + 1) / 2];
-            double[] weightedRobinsonFouldsDistances = new double[trees.Count * (trees.Count + 1) / 2];
-            double[] edgeLengthDistances = new double[trees.Count * (trees.Count + 1) / 2];
-
-            for (int i = 0; i < robinsonFouldsDistances.Length; i++)
-            {
-                robinsonFouldsDistances[i] = -1;
             }
 
-            progressAction("Computing Robinson-Foulds distances", 0.5);
-
-            completed = 0;
-
-            const int itemsForStep = 1000;
-
-            Parallel.For(0, (int)Math.Ceiling((double)robinsonFouldsDistances.Length / itemsForStep), j =>
-            {
-                int itemsDone = 0;
-
-                for (int i = j * itemsForStep; i < (j + 1) * itemsForStep; i++)
-                {
-                    if (i < robinsonFouldsDistances.Length)
-                    {
-                        (int x, int y) = GetIndices(i);
-
-                        if (x == y)
-                        {
-                            robinsonFouldsDistances[i] = 0;
-                        }
-                        else
-                        {
-                            (robinsonFouldsDistances[i], weightedRobinsonFouldsDistances[i], edgeLengthDistances[i]) = Comparisons.RobinsonFouldsDistance(splits[x], splits[y]);
-                        }
-
-                        itemsDone++;
-                    }
-                }
-
-                lock (progressLock)
-                {
-                    completed += itemsDone;
-                    progressAction(null, (double)completed / robinsonFouldsDistances.Length * 0.5 + 0.5);
-                }
-            });
-
-            return (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances);
+            return maxVal;
         }
 
-
-        private static (int[], double[], double[]) GetRobinsonFouldsDistancesPairwise(IList<TreeNode> trees, Action<string, double> progressAction)
+        private static bool Any(this double[,] array, Func<double, bool> func)
         {
-            progressAction("Computing tree splits", 0);
-
-            List<(HashSet<string>, HashSet<string>, double)>[] splits = new List<(HashSet<string>, HashSet<string>, double)>[trees.Count];
-
-            HashSet<string>[] leaves = new HashSet<string>[trees.Count];
-
-            object progressLock = new object();
-            int completed = 0;
-            Parallel.For(0, (int)Math.Ceiling((double)trees.Count / 20), j =>
+            for (int i = 0; i < array.GetLength(0); i++)
             {
-                for (int i = j * 20; i < (j + 1) * 20; i++)
+                for (int j = 0; j < array.GetLength(1); j++)
                 {
-                    if (i < trees.Count)
+                    if (func(array[i, j]))
                     {
-                        splits[i] = (from el in trees[i].GetSplits()
-                                     select (
-                                     (from el1 in el.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToHashSet(),
-                                     (from el2 in el.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToHashSet(),
-                                     el.branchLength
-                                     )).ToList();
-
-                        leaves[i] = trees[i].GetLeafNames().ToHashSet();
-
-                        if (trees[i].IsRooted())
-                        {
-                            leaves[i].Add("@Root");
-                        }
+                        return true;
                     }
                 }
-
-                lock (progressLock)
-                {
-                    completed += 20;
-                    progressAction(null, (double)completed / trees.Count * 0.5);
-                }
-            });
-
-            int[] robinsonFouldsDistances = new int[trees.Count * (trees.Count + 1) / 2];
-            double[] weightedRobinsonFouldsDistances = new double[trees.Count * (trees.Count + 1) / 2];
-            double[] edgeLengthDistances = new double[trees.Count * (trees.Count + 1) / 2];
-
-            for (int i = 0; i < robinsonFouldsDistances.Length; i++)
-            {
-                robinsonFouldsDistances[i] = -1;
             }
 
-            progressAction("Computing Robinson-Foulds distances", 0.5);
+            return false;
+        }
 
-            completed = 0;
+        private static (double[,], double[,], double[,]) GetRobinsonFouldsDistancesGlobal(IReadOnlyList<TreeNode> trees, Action<string, double> progressAction)
+        {
+            progressAction("Computing Robinson-Foulds distances", 0);
 
-            const int itemsForStep = 1000;
+            double lastProgress = 0;
 
-            Parallel.For(0, (int)Math.Ceiling((double)robinsonFouldsDistances.Length / itemsForStep), j =>
-            {
-                int itemsDone = 0;
+            TreeNode.TreeDistances(trees, out double[,] rfDistances, out double[,] wRFDistances, out double[,] ELDistances, TreeNode.TreeComparisonPruningMode.Global, maxThreadCount: Environment.ProcessorCount - 1, progress: new Progress<double>(x => { if (x - lastProgress >= 0.01) { lastProgress = x; progressAction(null, x); } }));
+            progressAction(null, 1);
 
-                for (int i = j * itemsForStep; i < (j + 1) * itemsForStep; i++)
-                {
-                    if (i < robinsonFouldsDistances.Length)
-                    {
-                        (int x, int y) = GetIndices(i);
+            return (rfDistances, wRFDistances, ELDistances);
+        }
 
-                        if (x == y)
-                        {
-                            robinsonFouldsDistances[i] = 0;
-                        }
-                        else
-                        {
-                            HashSet<string> commonLeaves = new HashSet<string>(leaves[x]);
-                            commonLeaves.IntersectWith(leaves[y]);
+        private static (double[,], double[,], double[,]) GetRobinsonFouldsDistancesPairwise(IReadOnlyList<TreeNode> trees, Action<string, double> progressAction)
+        {
+            progressAction("Computing Robinson-Foulds distances", 0);
 
-                            List<(HashSet<string>, HashSet<string>, double)> splitsX = new List<(HashSet<string>, HashSet<string>, double)>(splits[x].Count);
-                            for (int k = 0; k < splits[x].Count; k++)
-                            {
-                                HashSet<string> left = new HashSet<string>(splits[x][k].Item1);
-                                left.IntersectWith(commonLeaves);
+            double lastProgress = 0;
 
-                                HashSet<string> right = new HashSet<string>(splits[x][k].Item2);
-                                right.IntersectWith(commonLeaves);
+            TreeNode.TreeDistances(trees, out double[,] rfDistances, out double[,] wRFDistances, out double[,] ELDistances, TreeNode.TreeComparisonPruningMode.Pairwise, maxThreadCount: Environment.ProcessorCount - 1, progress: new Progress<double>(x => { if (x - lastProgress >= 0.01) { lastProgress = x; progressAction(null, x); } }));
+            progressAction(null, 1);
 
-                                if (left.Count >= 0 || right.Count >= 0)
-                                {
-                                    splitsX.Add((left, right, splits[x][k].Item3));
-                                }
-                            }
-
-                            List<(HashSet<string>, HashSet<string>, double)> splitsY = new List<(HashSet<string>, HashSet<string>, double)>(splits[y].Count);
-                            for (int k = 0; k < splits[y].Count; k++)
-                            {
-                                HashSet<string> left = new HashSet<string>(splits[y][k].Item1);
-                                left.IntersectWith(commonLeaves);
-
-                                HashSet<string> right = new HashSet<string>(splits[y][k].Item2);
-                                right.IntersectWith(commonLeaves);
-
-                                if (left.Count >= 0 || right.Count >= 0)
-                                {
-                                    splitsY.Add((left, right, splits[y][k].Item3));
-                                }
-                            }
-                            (robinsonFouldsDistances[i], weightedRobinsonFouldsDistances[i], edgeLengthDistances[i]) = Comparisons.RobinsonFouldsDistance(splitsX, splitsY);
-                        }
-
-                        itemsDone++;
-                    }
-                }
-
-                lock (progressLock)
-                {
-                    completed += itemsDone;
-                    progressAction(null, (double)completed / robinsonFouldsDistances.Length * 0.5 + 0.5);
-                }
-            });
-
-            return (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances);
+            return (rfDistances, wRFDistances, ELDistances);
         }
 
 
@@ -258,7 +114,7 @@ namespace TreeViewer.Stats
             return (distMat, points);
         }
 
-        private static (double[,] distMat, double[,] points) PerformMDS(int treeCount, double[] distances)
+        private static (double[,] distMat, double[,] points) PerformMDS(int treeCount, double[,] distances)
         {
             Matrix<double> dSq = Matrix<double>.Build.Dense(treeCount, treeCount);
             double[,] distMat = new double[treeCount, treeCount];
@@ -269,7 +125,7 @@ namespace TreeViewer.Stats
             {
                 for (int i = 0; i < j; i++)
                 {
-                    double val = distances[GetIndex(j, i)];
+                    double val = distances[j, i];
 
                     dSq[i, j] = val * val;
                     dSq[j, i] = val * val;
@@ -358,7 +214,7 @@ namespace TreeViewer.Stats
 
             bool sameLeaves = union.Count == intersection.Count;
             bool sameTopology = false;
-            int maxDistance = -1;
+            double maxDistance = -1;
             string treeSpacePlotGuid = null;
             Page treeSpacePlot = null;
             PointClustering unweightedRFClustering = null;
@@ -449,15 +305,15 @@ namespace TreeViewer.Stats
                     }
                 }
 
-                (int[] robinsonFouldsDistances, double[] weightedRobinsonFouldsDistances, double[] edgeLengthDistances) = (null, null, null);
+                (double[,] robinsonFouldsDistances, double[,] weightedRobinsonFouldsDistances, double[,] edgeLengthDistances) = (null, null, null);
 
                 if (!PairWise)
                 {
-                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesGlobal(currentTrees, (p, x) => progressAction(p, x * 0.5));
+                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesGlobal((IReadOnlyList<TreeNode>)currentTrees, (p, x) => progressAction(p, x * 0.5));
                 }
                 else
                 {
-                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesPairwise(trees, (p, x) => progressAction(p, x * 0.5));
+                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesPairwise((IReadOnlyList<TreeNode>)trees, (p, x) => progressAction(p, x * 0.5));
                 }
                 
 
@@ -509,7 +365,7 @@ namespace TreeViewer.Stats
 
                                     for (int i = 0; i < j; i++)
                                     {
-                                        double val = robinsonFouldsDistances[GetIndex(j, i)];
+                                        double val = robinsonFouldsDistances[j, i];
 
                                         row[i] = val;
                                     }
@@ -565,7 +421,7 @@ namespace TreeViewer.Stats
 
                                     for (int i = 0; i < j; i++)
                                     {
-                                        double val = weightedRobinsonFouldsDistances[GetIndex(j, i)];
+                                        double val = weightedRobinsonFouldsDistances[j, i];
 
                                         row[i] = val;
                                     }
@@ -724,7 +580,7 @@ namespace TreeViewer.Stats
 
                                 for (int i = 0; i < j; i++)
                                 {
-                                    double val = edgeLengthDistances[GetIndex(j, i)];
+                                    double val = edgeLengthDistances[j, i];
 
                                     row[i] = val;
                                 }
@@ -859,7 +715,7 @@ namespace TreeViewer.Stats
                 else
                 {
                     markdownSourceBuilder.Append("The trees have different topologies. The maximum unweighted Robinson-Foulds distance between two trees is **");
-                    markdownSourceBuilder.Append(maxDistance.ToString());
+                    markdownSourceBuilder.Append(maxDistance.ToString(maxDistance.GetDigits()));
                     markdownSourceBuilder.Append("**. ");
 
                     if (haveLengths)
@@ -976,16 +832,16 @@ namespace TreeViewer.Stats
 
                         if (!GlobalSettings.Settings.ClusterAccordingToRFDistances)
                         {
-                            if (unweightedRFClustering.MultipleClustersPValue > 0.001)
+                            if (weightedRFClustering.MultipleClustersPValue > 0.001)
                             {
                                 markdownSourceBuilder.Append("The Duda-Hart test was used to determine that the trees do not show significance evidence for clustering (p &asymp; ");
-                                markdownSourceBuilder.Append(unweightedRFClustering.MultipleClustersPValue.ToString(unweightedRFClustering.MultipleClustersPValue.GetDigits()));
+                                markdownSourceBuilder.Append(weightedRFClustering.MultipleClustersPValue.ToString(weightedRFClustering.MultipleClustersPValue.GetDigits()));
                                 markdownSourceBuilder.Append(", α = 0.001), based on the 2D metric obtained after the MDS analysis.");
                             }
                             else
                             {
                                 markdownSourceBuilder.Append("Clustering was attempted based on the 2D metric obtained after the MDS analysis. The presence of multiple clusters was determined using the Duda-Hart test (p &asymp; ");
-                                markdownSourceBuilder.Append(unweightedRFClustering.MultipleClustersPValue.ToString(unweightedRFClustering.MultipleClustersPValue.GetDigits()));
+                                markdownSourceBuilder.Append(weightedRFClustering.MultipleClustersPValue.ToString(weightedRFClustering.MultipleClustersPValue.GetDigits()));
                                 markdownSourceBuilder.Append(", α = 0.001); however, all clusterings with up to 12 clusters had an average silhouette score &leq; 0.5 and were therefore discarded.");
                             }
                         }
