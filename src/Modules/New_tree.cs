@@ -2512,7 +2512,18 @@ namespace a36a54db04e2447868b84ad4e188c3285
                     for (int j = 0; j < i; j++)
                     {
                         System.Text.RegularExpressions.Match match = whitespace.Match(line, currIndex);
-                        float value = float.Parse(line.Substring(currIndex, match.Index - currIndex));
+                        
+						float value;
+						
+						if (match.Success)
+                        {
+                            value = float.Parse(line.Substring(currIndex, match.Index - currIndex));
+                        }
+                        else
+                        {
+                            value = float.Parse(line.Substring(currIndex));
+                        }
+						
                         tbr[i][j] = value;
                         currIndex = match.Index + match.Length;
                     }
