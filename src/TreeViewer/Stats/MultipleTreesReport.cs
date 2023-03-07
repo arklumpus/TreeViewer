@@ -328,7 +328,7 @@ namespace TreeViewer.Stats
                     {
                         (double[,] distMat, double[,] points) = PerformMDS(currentTrees.Count, robinsonFouldsDistances);
 
-                        if (GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             unweightedRFClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (unweighted)", x / 4 + 0.5));
                         }
@@ -384,7 +384,7 @@ namespace TreeViewer.Stats
                     {
                         (double[,] distMat, double[,] points) = PerformMDS(currentTrees.Count, weightedRobinsonFouldsDistances);
 
-                        if (GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             weightedRFClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (weighted)", x / 4 + 0.75));
                         }
@@ -543,7 +543,7 @@ namespace TreeViewer.Stats
 
                     (double[,] distMat, double[,] points) = PerformMDS(currentTrees.Count, edgeLengthDistances);
 
-                    if (GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                    if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                     {
                         edgeLengthClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (edge-length distances)", x / 4 + 0.5));
                     }
@@ -664,7 +664,7 @@ namespace TreeViewer.Stats
                     {
                         markdownSourceBuilder.Append("**Figure " + figNum.ToString() + ". 2-dimensional representation of the trees.** _Left plot_: each tree is represented by a point, whose position was determined using multidimensional scaling (MDS); the distance between two points is approximately proportional to the edge-length distance between the corresponding trees. ");
 
-                        if (GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             markdownSourceBuilder.Append("Clustering was performed based on the edge-length distances. ");
                         }
@@ -686,7 +686,7 @@ namespace TreeViewer.Stats
                     {
                         markdownSourceBuilder.Append("**Figure " + figNum.ToString() + ". 2-dimensional representation of the trees.** Each tree is represented by a point, whose position was determined using multidimensional scaling (MDS); the distance between two points is approximately proportional to the edge-length distance between the corresponding trees. ");
 
-                        if (!GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (!GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             if (edgeLengthClustering.MultipleClustersPValue > 0.001)
                             {
@@ -747,7 +747,7 @@ namespace TreeViewer.Stats
                     {
                         markdownSourceBuilder.Append("**Figure " + figNum.ToString() + ". 2-dimensional representation of the trees.** _Left plot_: each tree is represented by a point, whose position was determined using multidimensional scaling (MDS); the distance between two points is approximately proportional to the unweighted Robinson-Foulds distance between the corresponding trees. ");
 
-                        if (GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             markdownSourceBuilder.Append("Clustering was performed based on the Robinson-Foulds distances. ");
                         }
@@ -769,7 +769,7 @@ namespace TreeViewer.Stats
                     {
                         markdownSourceBuilder.Append("**Figure " + figNum.ToString() + ". 2-dimensional representation of the trees.** Each tree is represented by a point, whose position was determined using multidimensional scaling (MDS); the distance between two points is approximately proportional to the unweighted Robinson-Foulds distance between the corresponding trees. ");
 
-                        if (!GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (!GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             if (unweightedRFClustering.MultipleClustersPValue > 0.001)
                             {
@@ -808,7 +808,7 @@ namespace TreeViewer.Stats
                     {
                         markdownSourceBuilder.Append("**Figure " + figNum.ToString() + ". 2-dimensional representation of the trees.** _Left plot_: each tree is represented by a point, whose position was determined using multidimensional scaling (MDS); the distance between two points is approximately proportional to the weighted Robinson-Foulds distance between the corresponding trees. ");
 
-                        if (GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             markdownSourceBuilder.Append("Clustering was performed based on the Robinson-Foulds distances. ");
                         }
@@ -830,7 +830,7 @@ namespace TreeViewer.Stats
                     {
                         markdownSourceBuilder.Append("**Figure " + figNum.ToString() + ". 2-dimensional representation of the trees.** Each tree is represented by a point, whose position was determined using multidimensional scaling (MDS); the distance between two points is approximately proportional to the weighted Robinson-Foulds distance between the corresponding trees. ");
 
-                        if (!GlobalSettings.Settings.ClusterAccordingToRFDistances)
+                        if (!GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
                             if (weightedRFClustering.MultipleClustersPValue > 0.001)
                             {

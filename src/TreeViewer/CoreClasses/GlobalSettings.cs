@@ -69,8 +69,8 @@ namespace TreeViewer
         public long UpdateCheckDate { get; set; } = 0;
         public UpdateCheckModes UpdateCheckMode { get; set; } = UpdateCheckModes.ProgramAndAllModules;
         public bool EnableUndoStack { get; set; } = true;
-        public bool ClusterAccordingToRFDistances { get; set; } = false;
-        public bool PairwiseTreeComparisons { get; set; } = false;
+        public bool ClusterAccordingToRawDistances { get; set; } = false;
+        public bool PairwiseTreeComparisons { get; set; } = true;
         public static GlobalSettings Settings { get; }
 
         [JsonIgnore]
@@ -214,7 +214,7 @@ namespace TreeViewer
                 case "EnableUndoStack":
                     if (string.IsNullOrEmpty(settingValue))
                     {
-                        GlobalSettings.Settings.EnableUndoStack = false;
+                        GlobalSettings.Settings.EnableUndoStack = true;
                     }
                     else
                     {
@@ -224,11 +224,21 @@ namespace TreeViewer
                 case "PairwiseTreeComparisons":
                     if (string.IsNullOrEmpty(settingValue))
                     {
-                        GlobalSettings.Settings.PairwiseTreeComparisons = false;
+                        GlobalSettings.Settings.PairwiseTreeComparisons = true;
                     }
                     else
                     {
                         GlobalSettings.Settings.PairwiseTreeComparisons = Convert.ToBoolean(settingValue);
+                    }
+                    break;
+                case "ClusterAccordingToRawDistances":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.ClusterAccordingToRawDistances = false;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.ClusterAccordingToRawDistances = Convert.ToBoolean(settingValue);
                     }
                     break;
                 case "InterfaceStyle":

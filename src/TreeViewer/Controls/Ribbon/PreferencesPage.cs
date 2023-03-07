@@ -289,7 +289,7 @@ namespace TreeViewer
 
                 List<string> items = new List<string>() { "Raw distances", "2D metric" };
 
-                ComboBox comboBox = new ComboBox() { Items = items, SelectedIndex = GlobalSettings.Settings.ClusterAccordingToRFDistances ? 0 : 1, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 200, FontSize = 14 };
+                ComboBox comboBox = new ComboBox() { Items = items, SelectedIndex = GlobalSettings.Settings.ClusterAccordingToRawDistances ? 0 : 1, Margin = new Thickness(0, 0, 0, 10), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, MinWidth = 200, FontSize = 14 };
 
                 Grid.SetRow(comboBox, currRow);
                 Grid.SetColumn(comboBox, 1);
@@ -299,7 +299,7 @@ namespace TreeViewer
 
                 applyChanges.Add(() =>
                 {
-                    GlobalSettings.Settings.ClusterAccordingToRFDistances = (comboBox.SelectedIndex == 0);
+                    GlobalSettings.Settings.ClusterAccordingToRawDistances = (comboBox.SelectedIndex == 0);
                     return false;
                 });
             }
@@ -479,7 +479,7 @@ namespace TreeViewer
                 GlobalSettings.Settings.InterfaceStyle = Modules.IsMac ? GlobalSettings.InterfaceStyles.MacOSStyle : GlobalSettings.InterfaceStyles.WindowsStyle;
                 GlobalSettings.Settings.RibbonStyle = Modules.IsMac ? GlobalSettings.RibbonStyles.Grey : GlobalSettings.RibbonStyles.Colourful;
                 GlobalSettings.Settings.PairwiseTreeComparisons = false;
-                GlobalSettings.Settings.ClusterAccordingToRFDistances = false;
+                GlobalSettings.Settings.ClusterAccordingToRawDistances = false;
 
                 GlobalSettings.Settings.SelectionColour = VectSharp.Colour.FromRgb(35, 127, 255);
 

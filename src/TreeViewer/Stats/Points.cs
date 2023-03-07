@@ -103,7 +103,7 @@ namespace TreeViewer.Stats
 
             PointClustering clustering;
 
-            if (GlobalSettings.Settings.ClusterAccordingToRFDistances)
+            if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
             {
                 clustering = PointClustering.GetClustering(distMat, points, x => { });
             }
