@@ -472,7 +472,6 @@ namespace TreeViewer
                 GlobalSettings.Settings.DrawTreeWhenOpened = true;
                 GlobalSettings.Settings.ShowLegacyUpDownArrows = false;
                 GlobalSettings.Settings.EnableUndoStack = true;
-                GlobalSettings.Settings.BackgroundColour = VectSharp.Colour.FromRgb(240, 244, 250);
                 GlobalSettings.Settings.ModuleRepositoryBaseUri = GlobalSettings.DefaultModuleRepository;
                 GlobalSettings.Settings.UpdateCheckMode = GlobalSettings.UpdateCheckModes.ProgramAndAllModules;
                 GlobalSettings.Settings.DragInterval = 250;

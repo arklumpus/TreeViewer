@@ -62,7 +62,6 @@ namespace TreeViewer
         public int KeepRecentFilesFor { get; set; } = 30;
         public bool DrawTreeWhenOpened { get; set; } = true;
         public Colour SelectionColour { get; set; } = Colour.FromRgb(35, 127, 255);
-        public Colour BackgroundColour { get; set; } = Colour.FromRgb(240, 244, 250);
         public Dictionary<string, object> AdditionalSettings { get; set; } = new Dictionary<string, object>();
         internal Dictionary<string, string> AdditionalSettingsList { get; } = new Dictionary<string, string>();
         public string ModuleRepositoryBaseUri { get; set; } = DefaultModuleRepository;
@@ -179,16 +178,6 @@ namespace TreeViewer
                     else
                     {
                         GlobalSettings.Settings.SelectionColour = Colour.FromCSSString(settingValue) ?? Colour.FromRgb(35, 127, 255);
-                    }
-                    break;
-                case "BackgroundColour":
-                    if (string.IsNullOrEmpty(settingValue))
-                    {
-                        GlobalSettings.Settings.BackgroundColour = Colour.FromRgb(240, 244, 250);
-                    }
-                    else
-                    {
-                        GlobalSettings.Settings.BackgroundColour = Colour.FromCSSString(settingValue) ?? Colour.FromRgb(240, 244, 250);
                     }
                     break;
                 case "ModuleRepositoryBaseUri":
