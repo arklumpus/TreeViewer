@@ -1,6 +1,6 @@
 ﻿/*
     TreeViewer - Cross-platform software to draw phylogenetic trees
-    Copyright (C) 2021  Giorgio Bianchini
+    Copyright (C) 2023  Giorgio Bianchini, University of Bristol
  
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -15,17 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Accord.Collections;
 using PhyloTree;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using TreeViewer;
-using VectSharp;
-using VectSharp.Raster.ImageSharp;
 
 namespace TreeViewerCommandLine
 {
@@ -66,7 +61,7 @@ namespace TreeViewerCommandLine
             new ConsoleTextSpan("    wRF ", 4, ConsoleColor.Yellow),
             new ConsoleTextSpan("- Weighted Robinson-Foulds distances.\n", 10),
             new ConsoleTextSpan("    EL  ", 4, ConsoleColor.Yellow),
-            new ConsoleTextSpan("- Edge-length distances (only suited for trees with identical topologies).\n", 10),
+            new ConsoleTextSpan("- Edge-length distances (only suited for trees with identical topologies).", 10),
 
           };
 
