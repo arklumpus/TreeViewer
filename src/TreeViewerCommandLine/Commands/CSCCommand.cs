@@ -29,7 +29,7 @@ namespace TreeViewerCommandLine
         {
             new ConsoleTextSpan("  csc ", 2, ConsoleColor.Green),
             new ConsoleTextSpan("<path to script file>\n", 2, ConsoleColor.Blue),
-            new ConsoleTextSpan("    Compiles and executed the C# code contained in the specified ", 4),
+            new ConsoleTextSpan("    Compiles and executes the C# code contained in the specified ", 4),
             new ConsoleTextSpan("input file", 4, ConsoleColor.Blue),
             new ConsoleTextSpan(".", 4)
         };
