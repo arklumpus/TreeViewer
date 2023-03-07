@@ -34,7 +34,7 @@ namespace TreeViewerCommandLine
         {
             get
             {
-                return AssemblyName.GetAssemblyName(Assembly.GetExecutingAssembly().Location).Version.ToString();
+                return AssemblyName.GetAssemblyName(Assembly.GetExecutingAssembly().Location).Version.ToString(3);
             }
         }
 
