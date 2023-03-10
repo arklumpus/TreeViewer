@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using PhyloTree;
@@ -6,20 +7,23 @@ using VectSharp;
 using System.Runtime.InteropServices;
 using System.Linq;
 using PhyloTree.Extensions;
+using System.Threading.Tasks;
 
 namespace a36ca9f8c25b24b2baa16308227788e5d
 {
     /// <summary>
-    /// This module compares the current tree with another tree. The other tree can be specified either as an attachment, or it can be one
-    /// of the loaded trees.
+    /// This module compares the current tree with another tree or another set of trees. The other tree can be specified either as an attachment
+    /// containing one or more trees, or it can be one of the loaded trees.
     /// 
     /// For each branch in the current tree, the model will determine whether the split induced by the branch is present or compatible
-    /// with the other tree. The results of these comparisons (`Yes` or `No`) are stored in the attributes `prefix_Present` and
-    /// `prefix_Compatible` for each node (where `prefix_` is the value of the [Prefix](#prefix) attribute).
+    /// with the other tree(s). The results of these comparisons (`Yes` or `No`) are stored in the attributes `prefix_Present` and
+    /// `prefix_Compatible` for each node (where `prefix_` is the value of the [Prefix](#prefix) attribute). If multiple trees have been
+	/// selected, the value of these attributes will be a number ranging from 0 to 1, showing in what proportion of the trees the split
+	/// is present or compatible.
     /// 
-    /// If the [Store attributes on equivalent splits](#store-attributes-on-equivalent-splits) check box is checked, for each split
-    /// that is present in both trees, all the attributes from the other tree are copied on the current tree too, with the specified
-    /// [Prefix](#prefix).
+    /// If the [Store attributes on equivalent splits](#store-attributes-on-equivalent-splits) check box is checked (and only one tree is selected
+	/// for comparison), for each split that is present in both trees, all the attributes from the other tree are copied on the current tree too,
+	/// with the specified [Prefix](#prefix).
     /// </summary>
     public static class MyModule
     {
@@ -175,7 +179,7 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
             string prefix = (string)parameterValues["Prefix:"];
             bool storeAttributes = (bool)parameterValues["Store attributes on equivalent splits"];
 
-            TreeNode otherTree = null;
+            IReadOnlyList<TreeNode> otherTrees = null;
 
             if (treeSource == 1)
             {
@@ -183,7 +187,7 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
 
                 if (otherTreeAtt != null)
                 {
-                    otherTree = otherTreeAtt.GetTrees()[0];
+                    otherTrees = otherTreeAtt.GetTrees();
 
                     if (usePrefixFromTreeName)
                     {
@@ -199,7 +203,7 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
             {
                 TreeCollection trees = (TreeCollection)parameterValues["Trees"];
                 int treeIndex = (int)(Math.Round((double)parameterValues["Tree index:"]));
-                otherTree = trees[treeIndex - 1];
+                otherTrees = new List<TreeNode>() { trees[treeIndex - 1] };
 
                 if (usePrefixFromTreeName)
                 {
@@ -207,67 +211,168 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
                 }
             }
 
-            if (otherTree != null)
+            if (otherTrees != null)
             {
-                List<(string[], string[], TreeNode)> otherSplits = (from el in otherTree.GetChildrenRecursiveLazy()
-                                                                    let split = el.GetSplit()
-                                                                    select (
-                                                                    (from el1 in split.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(),
-                                                                    (from el2 in split.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(),
-                                                                    el
-                                                                    )).ToList();
-
-
-                foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                if (otherTrees.Count == 1)
                 {
-                    (List<TreeNode> side1, List<TreeNode> side2) currSplit = node.GetSplit();
+                    TreeNode otherTree = otherTrees[0];
+                    List<(string[], string[], TreeNode)> otherSplits = (from el in otherTree.GetChildrenRecursiveLazy()
+                                                                        let split = el.GetSplit()
+                                                                        select (
+                                                                        (from el1 in split.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(),
+                                                                        (from el2 in split.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(),
+                                                                        el
+                                                                        )).ToList();
 
-                    (string[], string[], double) split = ((from el1 in currSplit.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(), (from el2 in currSplit.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(), node.Length);
 
-                    bool isCompatible = true;
-                    bool isPresent = false;
-                    TreeNode correspondence = null;
-
-
-                    foreach ((string[], string[], TreeNode) otherSplit in otherSplits)
+                    foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
                     {
-                        if (AreSameSplit(split, otherSplit))
-                        {
-                            isPresent = true;
-                            correspondence = otherSplit.Item3;
-                        }
+                        (List<TreeNode> side1, List<TreeNode> side2) currSplit = node.GetSplit();
 
-                        if (!AreCompatible(split, otherSplit))
-                        {
-                            isCompatible = false;
-                        }
+                        (string[], string[], double) split = ((from el1 in currSplit.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(), (from el2 in currSplit.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(), node.Length);
 
-                        if (isPresent || !isCompatible)
-                        {
-                            break;
-                        }
-                    }
+                        bool isCompatible = true;
+                        bool isPresent = false;
+                        TreeNode correspondence = null;
 
-                    node.Attributes[prefix + "Present"] = isPresent ? "Yes" : "No";
-                    node.Attributes[prefix + "Compatible"] = isCompatible ? "Yes" : "No";
 
-                    if (storeAttributes && isPresent && correspondence != null)
-                    {
-                        foreach (KeyValuePair<string, object> attribute in correspondence.Attributes)
+                        foreach ((string[], string[], TreeNode) otherSplit in otherSplits)
                         {
-                            if (attribute.Value != null)
+                            if (AreSameSplit(split, otherSplit))
                             {
-                                if (attribute.Value is string sr && !string.IsNullOrEmpty(sr))
+                                isPresent = true;
+                                correspondence = otherSplit.Item3;
+                            }
+
+                            if (!AreCompatible(split, otherSplit))
+                            {
+                                isCompatible = false;
+                            }
+
+                            if (isPresent || !isCompatible)
+                            {
+                                break;
+                            }
+                        }
+
+                        node.Attributes[prefix + "Present"] = isPresent ? "Yes" : "No";
+                        node.Attributes[prefix + "Compatible"] = isCompatible ? "Yes" : "No";
+
+                        if (storeAttributes && isPresent && correspondence != null)
+                        {
+                            foreach (KeyValuePair<string, object> attribute in correspondence.Attributes)
+                            {
+                                if (attribute.Value != null)
                                 {
-                                    node.Attributes[prefix + attribute.Key] = attribute.Value;
-                                }
-                                else if (attribute.Value is double d && !double.IsNaN(d))
-                                {
-                                    node.Attributes[prefix + attribute.Key] = attribute.Value;
+                                    if (attribute.Value is string sr && !string.IsNullOrEmpty(sr))
+                                    {
+                                        node.Attributes[prefix + attribute.Key] = attribute.Value;
+                                    }
+                                    else if (attribute.Value is double d && !double.IsNaN(d))
+                                    {
+                                        node.Attributes[prefix + attribute.Key] = attribute.Value;
+                                    }
                                 }
                             }
                         }
                     }
+                }
+                else
+                {
+                    if (storeAttributes)
+                    {
+                        message = "The selected attachment contains multiple trees, their attributes will not be stored.";
+                    }
+
+                    List<TreeNode> nodes = tree.GetChildrenRecursive();
+
+                    int[] compatibles = new int[nodes.Count];
+                    int[] presents = new int[nodes.Count];
+                    object[] locks = new object[nodes.Count];
+
+                    for (int i = 0; i < locks.Length; i++)
+                    {
+                        locks[i] = new object();
+                    }
+
+                    object progressLock = new object();
+                    int progress = 0;
+                    int lastProgress = 0;
+
+                    progressAction(0);
+
+                    Parallel.ForEach(otherTrees, otherTree =>
+                    {
+                        List<(string[], string[], TreeNode)> otherSplits = (from el in otherTree.GetChildrenRecursiveLazy()
+                                                                            let split = el.GetSplit()
+                                                                            select (
+                                                                            (from el1 in split.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(),
+                                                                            (from el2 in split.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(),
+                                                                            el
+                                                                            )).ToList();
+
+
+                        for (int i = 0; i < nodes.Count; i++)
+                        {
+                            (List<TreeNode> side1, List<TreeNode> side2) currSplit = nodes[i].GetSplit();
+
+                            (string[], string[], double) split = ((from el1 in currSplit.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(), (from el2 in currSplit.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(), nodes[i].Length);
+
+                            bool isCompatible = true;
+                            bool isPresent = false;
+
+                            foreach ((string[], string[], TreeNode) otherSplit in otherSplits)
+                            {
+                                if (AreSameSplit(split, otherSplit))
+                                {
+                                    isPresent = true;
+                                }
+
+                                if (!AreCompatible(split, otherSplit))
+                                {
+                                    isCompatible = false;
+                                }
+
+                                if (isPresent || !isCompatible)
+                                {
+                                    break;
+                                }
+                            }
+
+                            if (isPresent || isCompatible)
+                            {
+                                lock (locks[i])
+                                {
+                                    presents[i] += (isPresent ? 1 : 0);
+                                    compatibles[i] += (isCompatible ? 1 : 0);
+                                }
+                            }
+                        }
+
+                        lock (progressLock)
+                        {
+                            lock (progressLock)
+                            {
+                                progress++;
+                                double currProgress = (double)progress / otherTrees.Count;
+
+                                if ((int)Math.Round(currProgress * 100) > lastProgress)
+                                {
+                                    lastProgress = (int)Math.Round(currProgress * 100);
+                                    progressAction(currProgress);
+                                }
+                            }
+                        }
+                    });
+
+                    /* Breakpoint */
+                    for (int i = 0; i < nodes.Count; i++)
+                    {
+                        nodes[i].Attributes[prefix + "Present"] = (double)presents[i] / otherTrees.Count;
+                        nodes[i].Attributes[prefix + "Compatible"] = (double)compatibles[i] / otherTrees.Count;
+                    }
+
+                    progressAction(1);
                 }
             }
 
@@ -408,3 +513,4 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
         }
     }
 }
+

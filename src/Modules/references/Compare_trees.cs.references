@@ -8,3 +8,5 @@ System.Linq.dll
 VectSharp.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
+System.Threading.Tasks.Parallel.dll
+System.Collections.Concurrent.dll
