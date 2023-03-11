@@ -123,6 +123,11 @@ namespace TreeViewer.Stats
             double h2 = 2 * iqr / Math.Pow(values.Count, 1.0 / 3.0);
             int binCount = Math.Max(1, (int)Math.Ceiling((maxValue - minValue) / h2));
 
+            if (h2 == 0)
+            {
+                binCount = 1;
+            }
+
             int[] bins = new int[binCount];
 
             if (binCount > 1)
