@@ -978,7 +978,6 @@ namespace TreeViewer
                         NativeMenuItem homeItem = new NativeMenuItem("Home");
                         homeItem.Command = new SimpleCommand((win) => true, (win) => { this.RibbonBar.SelectedIndex = 0; this.RibbonFilePage.SelectedIndex = 0; }, this);
                         homeItem.CommandParameter = this;
-                        homeItem.Gesture = new KeyGesture(Key.H, Modules.ControlModifier | KeyModifiers.Shift);
                         subMenu.Menu.Items.Add(homeItem);
 
                         NativeMenuItem autosavesItem = new NativeMenuItem("Autosaves") { Menu = new NativeMenu() };
@@ -992,7 +991,6 @@ namespace TreeViewer
                             ((RibbonFilePageContentTabbedWithButtons)page.PageContent).SelectedIndex = 0;
                         }, this);
                         autosavedTrees.CommandParameter = this;
-                        autosavedTrees.Gesture = new KeyGesture(Key.A, Modules.ControlModifier | KeyModifiers.Shift);
                         autosavesItem.Menu.Items.Add(autosavedTrees);
 
                         NativeMenuItem autosavedCode = new NativeMenuItem("Autosaved code");
@@ -1026,11 +1024,6 @@ namespace TreeViewer
 
                             clickAction = a => performAction(0, a);
 
-                            if (menuItems[i].Item2[j].Item2[k].ShortcutKeys[0].Item1 != Key.None)
-                            {
-                                item.Gesture = new KeyGesture(menuItems[i].Item2[j].Item2[k].ShortcutKeys[0].Item1, Modules.GetModifier(menuItems[i].Item2[j].Item2[k].ShortcutKeys[0].Item2));
-                            }
-
                             Func<MainWindow, List<bool>> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
                             item.Command = new SimpleCommand((win) => isEnabled((MainWindow)win)[0], async (win) => { await clickAction((MainWindow)win); }, this, menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled);
 
@@ -1052,11 +1045,6 @@ namespace TreeViewer
                                     Func<int, MainWindow, Task> performAction = menuItems[i].Item2[j].Item2[k].PerformAction;
 
                                     clickAction = a => performAction(lIndex - 1, a);
-
-                                    if (menuItems[i].Item2[j].Item2[k].ShortcutKeys[l].Item1 != Key.None)
-                                    {
-                                        subItem.Gesture = new KeyGesture(menuItems[i].Item2[j].Item2[k].ShortcutKeys[l].Item1, Modules.GetModifier(menuItems[i].Item2[j].Item2[k].ShortcutKeys[l].Item2));
-                                    }
 
                                     Func<MainWindow, List<bool>> isEnabled = menuItems[i].Item2[j].Item2[k].IsEnabled;
                                     subItem.Command = new SimpleCommand((win) => isEnabled((MainWindow)win)[lIndex], async (win) => { await clickAction((MainWindow)win); }, this, menuItems[i].Item2[j].Item2[k].PropertiesAffectingEnabled);
@@ -1083,15 +1071,6 @@ namespace TreeViewer
                     exitItem.Command = new SimpleCommand((win) => true, (win) => { this.Close(); }, this);
                     exitItem.CommandParameter = this;
 
-                    if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
-                    {
-                        exitItem.Gesture = new KeyGesture(Key.W, KeyModifiers.Meta);
-                    }
-                    else
-                    {
-                        exitItem.Gesture = new KeyGesture(Key.F4, KeyModifiers.Alt);
-                    }
-
                     subMenu.Menu.Items.Add(exitItem);
                 }
 
@@ -1109,7 +1088,6 @@ namespace TreeViewer
                         await win2.ShowDialog2((MainWindow)win);
                     }, this);
                     aboutItem.CommandParameter = this;
-                    aboutItem.Gesture = new KeyGesture(Key.H, Modules.ControlModifier);
 
                     subMenu.Menu.Items.Add(aboutItem);
                 }
@@ -1129,7 +1107,6 @@ namespace TreeViewer
                         this.RibbonFilePage.SelectedIndex = ind;
                     }, this);
                     preferencesItem.CommandParameter = this;
-                    preferencesItem.Gesture = new KeyGesture(Key.R, Modules.ControlModifier);
 
                     subMenu.Menu.Items.Add(preferencesItem);
 
@@ -1140,7 +1117,6 @@ namespace TreeViewer
                         await win2.ShowDialog2((MainWindow)win);
                     }, this);
                     managerItem.CommandParameter = this;
-                    managerItem.Gesture = new KeyGesture(Key.M, Modules.ControlModifier);
 
                     subMenu.Menu.Items.Add(managerItem);
 
@@ -1164,7 +1140,6 @@ namespace TreeViewer
                         }
                     }, this);
                     creatorItem.CommandParameter = this;
-                    creatorItem.Gesture = new KeyGesture(Key.M, Modules.ControlModifier | KeyModifiers.Shift);
 
                     subMenu.Menu.Items.Add(creatorItem);
                 }
@@ -3419,6 +3394,11 @@ namespace TreeViewer
                 {
                     e.Handled = true;
                     this.FindControl<TextBox>("CommandBox").Focus();
+                }
+                else if (Modules.IsMac && e.Key == Key.W && e.KeyModifiers == KeyModifiers.Meta)
+                {
+                    e.Handled = true;
+                    this.Close();
                 }
             }
         }
