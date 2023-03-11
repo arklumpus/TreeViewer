@@ -61,7 +61,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <ColumnDefinition Width="1*"/>
     </Grid.ColumnDefinitions>
 
-    <Canvas Grid.Column="0" Background="#0072b2"/>
+    <Canvas Grid.Column="0" Background="#0072b2" Name="BackgroundCanvas"/>
     <Canvas Grid.Column="1" Background="#F3F3F3"/>
 
     <Grid Grid.Column="1" Name="ClientArea" Focusable="True">

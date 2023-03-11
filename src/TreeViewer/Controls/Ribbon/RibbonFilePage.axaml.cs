@@ -259,6 +259,11 @@ namespace TreeViewer
         {
             AvaloniaXamlLoader.Load(this);
 
+            if (Modules.IsMac)
+            {
+                this.FindControl<Canvas>("BackgroundCanvas").Background = new SolidColorBrush(Color.FromRgb(48, 112, 173));
+            }
+
             this.FindControl<Canvas>("BackArrowContainer").Children.Add(new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.BackArrow")) { Width = 21, Height = 21 });
 
             BuildPlatform();

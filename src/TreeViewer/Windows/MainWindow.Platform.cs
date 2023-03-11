@@ -17,6 +17,7 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -259,6 +260,11 @@ namespace TreeViewer
                 this.FindControl<Grid>("RibbonTabContainer").Margin = new Thickness(0);
                 this.FindControl<Canvas>("RibbonBarBackground").Margin = new Thickness(0);
                 this.FindControl<Border>("WindowBorder").BorderThickness = new Thickness(0);
+            }
+
+            if (Modules.IsMac)
+            {
+                this.FindControl<Grid>("TitleBarBG").Background = new SolidColorBrush(Color.FromRgb(48, 112, 173));
             }
 
             if (GlobalSettings.Settings.InterfaceStyle == GlobalSettings.InterfaceStyles.WindowsStyle)
