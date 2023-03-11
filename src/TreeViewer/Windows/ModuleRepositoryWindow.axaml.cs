@@ -47,6 +47,25 @@ namespace TreeViewer
             this.Mode = mode;
             this.managerWindowParent = parent;
             this.InitializeComponent();
+
+            if (Modules.IsMac && this.WindowStartupLocation == WindowStartupLocation.Manual && GlobalSettings.Settings.MainWindows.Count > 0)
+            {
+                this.Opened += (s, e) =>
+                {
+                    int maxX = this.Screens.Primary.Bounds.Width - this.PointToScreen(new Avalonia.Point(this.Bounds.Width, this.Bounds.Height)).X + this.PointToScreen(new Avalonia.Point()).X;
+                    int maxY = this.Screens.Primary.Bounds.Height - this.PointToScreen(new Avalonia.Point(this.Bounds.Width, this.Bounds.Height)).Y + this.PointToScreen(new Avalonia.Point()).Y;
+
+                    if (maxX > 10 && maxY > 10)
+                    {
+                        Random rnd = new Random();
+
+                        int newX = rnd.Next(10, maxX - 100);
+                        int newY = rnd.Next(10, maxY - 100);
+
+                        this.Position = new PixelPoint(newX, newY);
+                    }
+                };
+            }
         }
 
         private enum NotificationType
@@ -60,6 +79,25 @@ namespace TreeViewer
         public ModuleRepositoryWindow()
         {
             this.InitializeComponent();
+
+            if (Modules.IsMac && this.WindowStartupLocation == WindowStartupLocation.Manual && GlobalSettings.Settings.MainWindows.Count > 0)
+            {
+                this.Opened += (s, e) =>
+                {
+                    int maxX = this.Screens.Primary.Bounds.Width - this.PointToScreen(new Avalonia.Point(this.Bounds.Width, this.Bounds.Height)).X + this.PointToScreen(new Avalonia.Point()).X;
+                    int maxY = this.Screens.Primary.Bounds.Height - this.PointToScreen(new Avalonia.Point(this.Bounds.Width, this.Bounds.Height)).Y + this.PointToScreen(new Avalonia.Point()).Y;
+
+                    if (maxX > 10 && maxY > 10)
+                    {
+                        Random rnd = new Random();
+
+                        int newX = rnd.Next(10, maxX - 100);
+                        int newY = rnd.Next(10, maxY - 100);
+
+                        this.Position = new PixelPoint(newX, newY);
+                    }
+                };
+            }
         }
 
         private readonly string[] headers = new string[] { "File type", "Load file", "Transformer", "Further transformation", "Coordinates", "Plot action", "Selection action", "Action", "Menu action" };

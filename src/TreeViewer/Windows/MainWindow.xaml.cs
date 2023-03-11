@@ -689,7 +689,7 @@ namespace TreeViewer
             AvaloniaXamlLoader.Load(this);
             Modules.SetIcon(this);
 
-            if (Modules.IsMac && this.WindowStartupLocation == WindowStartupLocation.Manual)
+            if (Modules.IsMac && this.WindowStartupLocation == WindowStartupLocation.Manual && GlobalSettings.Settings.MainWindows.Count > 0)
             {
                 this.Opened += (s, e) =>
                 {
