@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
         xmlns:paz="clr-namespace:Avalonia.Controls.PanAndZoom;assembly=Avalonia.Controls.PanAndZoom"
         xmlns:mdc="clr-namespace:VectSharp.MarkdownCanvas;assembly=VectSharp.MarkdownCanvas"
-        mc:Ignorable="d" Width="1000" Height="700"
+        mc:Ignorable="d" Width="1000" Height="600"
         x:Class="TreeViewer.TreeStatsWindow"
         Title="Tree statistics">
   <Window.Styles>
