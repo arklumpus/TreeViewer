@@ -125,11 +125,11 @@ namespace TreeViewer
 
     public static class Modules
     {
-        public static Avalonia.Input.KeyModifiers ControlModifier => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX) ? Avalonia.Input.KeyModifiers.Meta : Avalonia.Input.KeyModifiers.Control;
+        public static Avalonia.Input.KeyModifiers ControlModifier => IsMac ? Avalonia.Input.KeyModifiers.Meta : Avalonia.Input.KeyModifiers.Control;
 
         public static Avalonia.Input.KeyModifiers GetModifier(Avalonia.Input.KeyModifiers modifier)
         {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+            if (IsMac)
             {
                 if (modifier.HasFlag(Avalonia.Input.KeyModifiers.Control))
                 {
@@ -237,7 +237,7 @@ namespace TreeViewer
         {
             if (!Directory.Exists(ModulePath))
             {
-                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) || System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+                if (!Modules.IsWindows)
                 {
                     string path = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local", "share");
                     Directory.CreateDirectory(path);
@@ -323,30 +323,12 @@ namespace TreeViewer
         public static VectSharp.FontFamily UIVectSharpFontFamilyBold = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-Bold.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans");
         public static VectSharp.FontFamily UIVectSharpFontFamilyBoldItalic = new VectSharp.ResourceFontFamily(Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Fonts.OpenSans-BoldItalic.ttf"), "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans");
 
-        public static bool IsMac
-        {
-            get
-            {
-                return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX);
-            }
-        }
+        public static readonly bool IsMac = System.OperatingSystem.IsMacOS();
 
-        public static bool IsWindows
-        {
-            get
-            {
-                return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
-            }
-        }
+        public static readonly bool IsWindows = System.OperatingSystem.IsWindows();
 
 
-        public static bool IsLinux
-        {
-            get
-            {
-                return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
-            }
-        }
+        public static readonly bool IsLinux = System.OperatingSystem.IsLinux();
 
         public static void SetIcon(Avalonia.Controls.Window window)
         {

@@ -603,7 +603,7 @@ namespace TreeViewer
 
             System.Diagnostics.ProcessStartInfo psi;
 
-            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+            if (!Modules.IsMac)
             {
                 psi = new System.Diagnostics.ProcessStartInfo(executablePath);
             }

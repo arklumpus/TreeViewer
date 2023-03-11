@@ -43,9 +43,11 @@ namespace TreeViewer
 
         private bool IsAdmin()
         {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (Modules.IsWindows)
             {
+#pragma warning disable CA1416 // Platform validation
                 return new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+#pragma warning restore CA1416 // Platform validation
             }
             else
             {
@@ -59,7 +61,7 @@ namespace TreeViewer
 
             this.FindControl<Grid>("HeaderGrid").Children.Add(new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.FileTypeIcons.tre")) { Width = 32, Height = 32 });
 
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (Modules.IsWindows)
             {
                 if (IsAdmin())
                 {

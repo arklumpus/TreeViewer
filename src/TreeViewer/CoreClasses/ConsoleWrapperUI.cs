@@ -45,7 +45,7 @@ namespace TreeViewer
             if (!IsConsoleEnabled)
             {
                 // Apparently, only needed on Windows
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (Modules.IsWindows)
                 {
                     [DllImport("kernel32.dll", SetLastError = true)]
                     static extern bool AttachConsole(int dwProcessId);

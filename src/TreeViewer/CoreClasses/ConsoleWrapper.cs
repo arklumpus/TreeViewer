@@ -371,9 +371,11 @@ namespace TreeViewer
             {
                 int shift = 0;
 
-                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) && ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight >= 0)
+                if (Modules.IsWindows && ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight >= 0)
                 {
-                        Console.MoveBufferArea(0, ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight, ConsoleWrapper.BufferWidth, ConsoleWrapper.WindowHeight, 0, 0);
+#pragma warning disable CA1416 // Platform validation
+                    Console.MoveBufferArea(0, ConsoleWrapper.CursorTop - ConsoleWrapper.WindowHeight, ConsoleWrapper.BufferWidth, ConsoleWrapper.WindowHeight, 0, 0);
+#pragma warning restore CA1416 // Platform validation
                 }
                 else
                 {
@@ -389,9 +391,11 @@ namespace TreeViewer
 
                     while (bottom > 2 * ConsoleWrapper.WindowHeight)
                     {
-                        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) && bottom - heightToClear / 2 >= 0)
+                        if (Modules.IsWindows && bottom - heightToClear / 2 >= 0)
                         {
+#pragma warning disable CA1416 // Platform validation
                             Console.MoveBufferArea(0, bottom - heightToClear / 2, ConsoleWrapper.BufferWidth, heightToClear / 2, 0, ConsoleWrapper.WindowHeight);
+#pragma warning restore CA1416 // Platform validation
                         }
 
                         heightToClear /= 2;
@@ -412,9 +416,11 @@ namespace TreeViewer
                     }
                 }
 
-                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                if (Modules.IsWindows)
                 {
+#pragma warning disable CA1416 // Platform validation
                     Console.WindowTop = 0;
+#pragma warning restore CA1416 // Platform validation
                 }
 
                 ConsoleWrapper.SetCursorPosition(ConsoleWrapper.CursorLeft, ConsoleWrapper.WindowHeight - 1 + shift);

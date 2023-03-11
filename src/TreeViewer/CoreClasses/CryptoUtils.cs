@@ -50,7 +50,7 @@ namespace TreeViewer
                 {
                     ConsoleWrapperUI.WriteLine("An error occurred during initialisation!\n" + ex.Message);
 
-                    if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
+                    if (Modules.IsLinux)
                     {
                         ConsoleWrapperUI.WriteLine("\nPlease try running the following command (NOT as root) and restart the program:\n\n\t\tmkdir $HOME/.local/share\n\n" + ex.Message);
                     }

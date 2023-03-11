@@ -28,14 +28,14 @@ namespace TreeViewer
 
         public static void AssociateExtensions(IEnumerable<(string, string)> extensions)
         {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (Modules.IsWindows)
             {
                 foreach ((string extension, string formatDescription) in extensions)
                 {
                     AssociateExtensionWindows(extension, formatDescription);
                 }
             }
-            else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
+            else if (Modules.IsLinux)
             {
                 AssociateExtensionsLinux(extensions);
             }
@@ -127,8 +127,9 @@ namespace TreeViewer
 
         private static void AssociateExtensionWindows(string extension, string formatDescription)
         {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (Modules.IsWindows)
             {
+#pragma warning disable CA1416 // Platform validation
                 string iconPath = Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), "Icons");
                 string iconFile;
 
@@ -167,6 +168,7 @@ namespace TreeViewer
                 shellKey.SetValue(null, "Open", RegistryValueKind.String);
 
                 shellKey.CreateSubKey("Open").CreateSubKey("command").SetValue(null, "\"" + System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName + "\" \"%1\"", RegistryValueKind.String);
+#pragma warning restore CA1416 // Platform validation
             }
         }
     }
@@ -175,7 +177,7 @@ namespace TreeViewer
     {
         public static void Elevate(List<string> argsForElevator, List<string> argsForReboot)
         {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (Modules.IsWindows)
             {
                 string executablePath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
 
