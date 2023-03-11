@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TreeViewer
 {
@@ -396,8 +397,27 @@ namespace TreeViewer
                         else
                         {
                             progressWin.Close();
-                            MainWindow win2 = new MainWindow(LoadedTrees, ModuleSuggestions, currentFile);
-                            win2.Show();
+
+                            if (Modules.IsMac && parent.WindowState == WindowState.FullScreen)
+                            {
+                                parent.WindowState = WindowState.Normal;
+
+                                _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                                {
+                                    parent.PlatformImpl.GetType().InvokeMember("SetTitleBarColor", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.InvokeMethod, null, parent.PlatformImpl, new object[] { Avalonia.Media.Color.FromRgb(0, 114, 178) });
+
+                                    // Make sure that the pesky full screen animation has finished.
+                                    await Task.Delay(750);
+
+                                    MainWindow win2 = new MainWindow(LoadedTrees, ModuleSuggestions, currentFile);
+                                    win2.Show();
+                                }, Avalonia.Threading.DispatcherPriority.MinValue);
+                            }
+                            else
+                            {
+                                MainWindow win2 = new MainWindow(LoadedTrees, ModuleSuggestions, currentFile);
+                                win2.Show();
+                            }
                         }
                     }
                     else

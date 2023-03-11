@@ -396,9 +396,29 @@ namespace TreeViewer
                         else
                         {
                             progressWin.Close();
-                            MainWindow win = new MainWindow(coll, moduleSuggestions, deleteAfter ? "" : fileName, nameOverride);
-                            win.Show();
-                            tbr = win;
+
+                            if (Modules.IsMac && this.WindowState == WindowState.FullScreen)
+                            {
+                                this.WindowState = WindowState.Normal;
+
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                                {
+                                    this.PlatformImpl.GetType().InvokeMember("SetTitleBarColor", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.InvokeMethod, null, this.PlatformImpl, new object[] { Avalonia.Media.Color.FromRgb(0, 114, 178) });
+
+                                    // Make sure that the pesky full screen animation has finished.
+                                    await Task.Delay(750);
+
+                                    MainWindow win = new MainWindow(coll, moduleSuggestions, deleteAfter ? "" : fileName, nameOverride);
+                                    win.Show();
+                                    tbr = win;
+                                }, Avalonia.Threading.DispatcherPriority.MinValue);
+                            }
+                            else
+                            {
+                                MainWindow win = new MainWindow(coll, moduleSuggestions, deleteAfter ? "" : fileName, nameOverride);
+                                win.Show();
+                                tbr = win;
+                            }
                         }
                     }
                     else

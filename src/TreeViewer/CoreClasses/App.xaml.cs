@@ -21,6 +21,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace TreeViewer
 {
@@ -46,8 +47,26 @@ namespace TreeViewer
                 Header = "New window...",
                 Command = new SimpleCommand(win => true, a =>
                 {
-                    MainWindow window = new MainWindow();
-                    window.Show();
+                    if (Modules.IsMac && GlobalSettings.Settings.MainWindows.Count == 1 && GlobalSettings.Settings.MainWindows[0].WindowState == WindowState.FullScreen)
+                    {
+                        GlobalSettings.Settings.MainWindows[0].WindowState = WindowState.Normal;
+
+                        _ = Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                        {
+                            GlobalSettings.Settings.MainWindows[0].PlatformImpl.GetType().InvokeMember("SetTitleBarColor", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.InvokeMethod, null, GlobalSettings.Settings.MainWindows[0].PlatformImpl, new object[] { Avalonia.Media.Color.FromRgb(0, 114, 178) });
+
+                            // Make sure that the pesky full screen animation has finished.
+                            await Task.Delay(750);
+
+                            MainWindow window = new MainWindow();
+                            window.Show();
+                        }, Avalonia.Threading.DispatcherPriority.MinValue);
+                    }
+                    else
+                    {
+                        MainWindow window = new MainWindow();
+                        window.Show();
+                    }
                 },
                 null)
             });
