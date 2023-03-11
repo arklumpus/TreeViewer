@@ -66,6 +66,18 @@
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
 			<array>
+				<string>io.github.arklumpus.TreeViewer.trees</string>
+			</array>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>tree.icns</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
 				<string>io.github.arklumpus.TreeViewer.nwk</string>
 			</array>
 			<key>LSHandlerRank</key>
@@ -195,6 +207,25 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>tree</string>
+				</array>
+			</dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Newick file</string>
+			<key>UTTypeIconFile</key>
+			<string>tree.icns</string>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>io.github.arklumpus.TreeViewer.trees</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>trees</string>
 				</array>
 			</dict>
 			<key>UTTypeConformsTo</key>
