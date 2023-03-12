@@ -71,6 +71,7 @@ namespace TreeViewer
         public bool ClusterAccordingToRawDistances { get; set; } = false;
         public bool PairwiseTreeComparisons { get; set; } = true;
         public static GlobalSettings Settings { get; }
+        public bool AllowGoogleFonts { get; set; } = false;
 
         [JsonIgnore]
         public HashSet<string> CurrentlyDismissedMessages { get; } = new HashSet<string>();
@@ -248,6 +249,16 @@ namespace TreeViewer
                     else
                     {
                         GlobalSettings.Settings.RibbonStyle = (GlobalSettings.RibbonStyles)Enum.Parse(typeof(GlobalSettings.RibbonStyles), settingValue);
+                    }
+                    break;
+                case "AllowGoogleFonts":
+                    if (string.IsNullOrEmpty(settingValue))
+                    {
+                        GlobalSettings.Settings.AllowGoogleFonts = false;
+                    }
+                    else
+                    {
+                        GlobalSettings.Settings.AllowGoogleFonts = Convert.ToBoolean(settingValue);
                     }
                     break;
                 default:

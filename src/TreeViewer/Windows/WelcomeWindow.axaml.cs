@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
@@ -32,8 +33,6 @@ namespace TreeViewer
         {
             InitializeComponent();
         }
-
-        private static readonly string[] RecommendedModules = new string[] { "32914d41-b182-461e-b7c6-5f0263cc1ccd", "68e25ec6-5911-4741-8547-317597e1b792", "e56b8297-4417-4494-9369-cbe9e5d25397", "95b61284-b870-48b9-b51c-3276f7d89df1", "a99eb0c6-a69d-4785-961a-a0c247e9704d", "92aac276-3af7-4506-a263-7220e0df5797", "1f3e0b88-c42d-417c-ba14-ba228be086a7", "8de06406-68e4-4bd8-97eb-2185a0dd1127", "afb64d72-971d-4780-8dbb-a7d9248da30b" };
 
         private void InitializeComponent()
         {
@@ -63,6 +62,28 @@ namespace TreeViewer
             }
             catch { }
 
+            this.FindControl<TextBlock>("GitHubPrivacyLink").PointerPressed += (s, e) =>
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement",
+                    UseShellExecute = true
+                });
+            };
+
+            this.FindControl<TextBlock>("GoogleFontsPrivacyLink").PointerPressed += (s, e) =>
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "https://policies.google.com/privacy",
+                    UseShellExecute = true
+                });
+            };
+
+            this.FindControl<CheckBox>("ConsentBox").PropertyChanged += ConsentBoxPropertyChanged;
+            this.FindControl<CheckBox>("GoogleFontsBox").PropertyChanged += ConsentBoxPropertyChanged;
+            this.FindControl<CheckBox>("GoogleFontsConsentBox").PropertyChanged += ConsentBoxPropertyChanged;
+
             this.FindControl<Button>("CancelButton").Click += (s, e) =>
             {
                 this.Close();
@@ -70,6 +91,32 @@ namespace TreeViewer
 
             this.FindControl<Button>("OKButton").Click += async (s, e) =>
             {
+                switch (this.FindControl<ComboBox>("UpdatesBox").SelectedIndex)
+                {
+                    case 0:
+                        GlobalSettings.Settings.UpdateCheckMode = GlobalSettings.UpdateCheckModes.ProgramAndAllModules;
+                        break;
+                    case 1:
+                        GlobalSettings.Settings.UpdateCheckMode = GlobalSettings.UpdateCheckModes.ProgramAndInstalledModules;
+                        break;
+                    case 2:
+                        GlobalSettings.Settings.UpdateCheckMode = GlobalSettings.UpdateCheckModes.ProgramOnly;
+                        break;
+                    case 3:
+                        GlobalSettings.Settings.UpdateCheckMode = GlobalSettings.UpdateCheckModes.DontCheck;
+                        break;
+                }
+
+                if (this.FindControl<CheckBox>("GoogleFontsBox").IsChecked == true && this.FindControl<CheckBox>("GoogleFontsConsentBox").IsChecked == true)
+                {
+                    GlobalSettings.Settings.AllowGoogleFonts= true;
+                }
+                else
+                {
+                    GlobalSettings.Settings.AllowGoogleFonts = false;
+                }
+                GlobalSettings.SaveSettings();
+
                 if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
                 {
                     ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Accessing module database..." };
@@ -111,7 +158,7 @@ namespace TreeViewer
                         {
                             ModuleHeader header = moduleHeaders[i];
 
-                            if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true || RecommendedModules.Contains(header.Id))
+                            if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
                             {
 
                                 Uri moduleFile = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), header.Id + "/" + header.Id + ".v" + header.Version.ToString() + ".json.zip");
@@ -188,6 +235,25 @@ namespace TreeViewer
                     }
                 }
             };
+        }
+
+
+        private void ConsentBoxPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == CheckBox.IsCheckedProperty)
+            {
+                this.FindControl<Button>("OKButton").IsEnabled = this.FindControl<CheckBox>("ConsentBox").IsChecked == true && (this.FindControl<CheckBox>("GoogleFontsBox").IsChecked == false || this.FindControl<CheckBox>("GoogleFontsConsentBox").IsChecked == true);
+
+                if (this.FindControl<CheckBox>("GoogleFontsBox").IsChecked == true)
+                {
+                    this.FindControl<CheckBox>("GoogleFontsConsentBox").IsEnabled = true;
+                }
+                else
+                {
+                    this.FindControl<CheckBox>("GoogleFontsConsentBox").IsEnabled = false;
+                    this.FindControl<CheckBox>("GoogleFontsConsentBox").IsChecked = false;
+                }
+            }
         }
     }
 }

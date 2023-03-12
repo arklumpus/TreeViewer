@@ -20,61 +20,115 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="TreeViewer.WelcomeWindow" SizeToContent="WidthAndHeight" CanResize="False"
+        mc:Ignorable="d" Width="800" Height="600"
+        x:Class="TreeViewer.WelcomeWindow" SizeToContent="Width" CanResize="False"
         FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="13"
         Title="Welcome">
-  <local:ChildWindow.Content>
-    <Grid Margin="10" Width="800">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="250" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
-      <Image Source="resm:TreeViewer.Assets.Banner.png?assembly=TreeViewer"></Image>
-      <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontSize="40" FontWeight="Bold" Foreground="#0072b2">Welcome to TreeViewer!</TextBlock>
-      <TextBlock Grid.Row="2" TextWrapping="Wrap" >
-        TreeViewer is based on a "modular" structure: small modules perform individual actions, such as computing the coordinates of the nodes in the tree, or drawing the tree branches. Together, these actions constitute the complete plot.
-      </TextBlock>
-      <TextBlock Grid.Row="3" TextWrapping="Wrap" Margin="0,10,0,0">
-        We can install these modules now, or you can install them individually later, using the "Module manager" window.
-      </TextBlock>
-      <TextBlock Grid.Row="4" TextWrapping="Wrap" Margin="0,10,0,0">
-        Please make sure that you have a working Internet connection and choose one of the following options:
-      </TextBlock>
-      <StackPanel Grid.Row="5" Margin="40,10,0,0">
-        <StackPanel Orientation="Horizontal">
-          <RadioButton GroupName="ModuleChoice" Name="NoModulesRadio" FontSize="13">Do not install any module</RadioButton>
-          <local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
-            <ToolTip.Tip>
-              Does not install any module. The program will not work properly until the required modules are installed. These can be installed using the "Module manager" window.
-            </ToolTip.Tip>
-          </local:HelpButton>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-          <RadioButton IsChecked="True" GroupName="ModuleChoice" Name="AllModulesRadio" FontSize="13">Install all available modules (recommended)</RadioButton>
-          <local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
-            <ToolTip.Tip>
-              Installs all the available modules. This ensures that all the features of the program can be used fully. Modules can be later uninstalled using the "Module manager" window.
-            </ToolTip.Tip>
-          </local:HelpButton>
-        </StackPanel>
-      </StackPanel>
-      <Grid Grid.Row="6" Margin="0,10,0,0">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="1*"/>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="1*"/>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <Button Grid.Column="1" Width="100" HorizontalContentAlignment="Center" Name="OKButton" FontSize="13" Classes="PlainButton">OK</Button>
-        <Button Grid.Column="3" Width="100" HorizontalContentAlignment="Center" Name="CancelButton" FontSize="13" Classes="PlainButton">Cancel</Button>
-      </Grid>
-    </Grid>
-  </local:ChildWindow.Content>
+	<local:ChildWindow.Content>
+		<Grid Margin="10" Width="800">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="240"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="1*"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<Image Source="resm:TreeViewer.Assets.Banner.png?assembly=TreeViewer"></Image>
+			<TextBlock Grid.Row="1" HorizontalAlignment="Center" FontSize="40" FontWeight="Bold" Foreground="#0072b2">Welcome to TreeViewer!</TextBlock>
+			<ScrollViewer Grid.Row="2" AllowAutoHide="False" Margin="0,0,10,10">
+				<StackPanel>
+					<TextBlock TextWrapping="Wrap" >
+						TreeViewer is based on a "modular" structure: small modules perform individual actions, such as computing the coordinates of the nodes in the tree, or drawing the tree branches. Together, these actions constitute the complete plot.
+					</TextBlock>
+					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+						We can install these modules now, or you can install them individually later, using the "Module manager" window.
+					</TextBlock>
+					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+						Please make sure that you have a working Internet connection and choose one of the following options:
+					</TextBlock>
+					<StackPanel Margin="40,10,0,0">
+						<StackPanel Orientation="Horizontal">
+							<RadioButton GroupName="ModuleChoice" Name="NoModulesRadio" FontSize="13">Do not install any module</RadioButton>
+							<local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
+								<ToolTip.Tip>
+									Does not install any module. The program will not work properly until the required modules are installed. These can be installed using the "Module manager" window.
+								</ToolTip.Tip>
+							</local:HelpButton>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal">
+							<RadioButton IsChecked="True" GroupName="ModuleChoice" Name="AllModulesRadio" FontSize="13">Install all available modules (recommended)</RadioButton>
+							<local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">
+								<ToolTip.Tip>
+									Installs all the available modules. This ensures that all the features of the program can be used fully. Modules can be later uninstalled using the "Module manager" window.
+								</ToolTip.Tip>
+							</local:HelpButton>
+						</StackPanel>
+					</StackPanel>
+					<TextBlock  FontSize="18" Foreground="#0072b2" Margin="0,10,0,0">Updates</TextBlock>
+					<Canvas Background="#0072b2" Height="1" Margin="0,0,0,0" HorizontalAlignment="Stretch"/>
+					<TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,10,0,0">
+						Would you like TreeViewer to automatically check for updates? You can change this setting at any time in the program's preferences.
+					</TextBlock>
+					<ComboBox Margin="40,10,0,0" SelectedIndex="0" FontSize="13" Name="UpdatesBox">
+						<ComboBox.Items>
+							<ComboBoxItem>Check for updates for TreeViewer and all modules (recommended)</ComboBoxItem>
+							<ComboBoxItem>Check for updates for TreeViewer and installed modules</ComboBoxItem>
+							<ComboBoxItem>Check for updates for TreeViewer only</ComboBoxItem>
+							<ComboBoxItem>Do not check for updates</ComboBoxItem>
+						</ComboBox.Items>
+					</ComboBox>
+					<TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,10,0,0">
+						TreeViewer will only check for updates when it is opened and at most once a day.
+					</TextBlock>
+					<TextBlock  FontSize="18" Foreground="#0072b2" Margin="0,10,0,0">Privacy and personal data</TextBlock>
+					<Canvas Background="#0072b2" Height="1" Margin="0,0,0,0" HorizontalAlignment="Stretch"/>
+					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+						Installing modules and checking for updates requires TreeViewer to connect to GitHub. To make this possible, personal information, such as your IP address, must be transmitted to GitHub. You must consent to this in order to use TreeViewer.
+					</TextBlock>
+					<StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+						<TextBlock>
+							This information will be treated according to GitHub's
+						</TextBlock>
+						<TextBlock Foreground="#0072b2" Margin="4,0,0,0" TextDecorations="Underline" Cursor="Hand" Name="GitHubPrivacyLink">privacy policy</TextBlock>
+						<TextBlock>.</TextBlock>
+					</StackPanel>
+					<CheckBox Grid.Row="8" FontSize="13" Margin="40,5,0,0" Name="ConsentBox" IsChecked="False">
+						<TextBlock TextWrapping="Wrap">
+							I consent to personal information being transferred to GitHub in the extent necessary for TreeViewer to install modules and check for updates.
+						</TextBlock>
+					</CheckBox>
+					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+						TreeViewer can use fonts from Google Fonts to customise plots. To make this possible, personal information, such as your IP address, must be transmitted to Google Fonts. You must consent to this, or disable Google Fonts.
+					</TextBlock>
+					<StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+						<TextBlock>
+							This information will be treated according to Google Font's
+						</TextBlock>
+						<TextBlock Foreground="#0072b2" Margin="4,0,0,0" TextDecorations="Underline" Cursor="Hand" Name="GoogleFontsPrivacyLink">privacy policy</TextBlock>
+						<TextBlock>.</TextBlock>
+					</StackPanel>
+					<CheckBox Grid.Row="8" FontSize="13" Margin="40,5,0,0" IsChecked="True" Name="GoogleFontsBox">
+						<TextBlock TextWrapping="Wrap">
+							Allow the use of fonts from Google Fonts (recommended).
+						</TextBlock>
+					</CheckBox>
+					<CheckBox Grid.Row="8" FontSize="13" Margin="40,5,0,0" Name="GoogleFontsConsentBox" IsChecked="False">
+						<TextBlock TextWrapping="Wrap">
+							I consent to personal information being transferred to Google Fonts in the extent necessary for TreeViewer to download font files.
+						</TextBlock>
+					</CheckBox>
+				</StackPanel>
+			</ScrollViewer>
+			<Grid Margin="0,10,0,0" Grid.Row="3">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="1*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="1*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="1*"/>
+				</Grid.ColumnDefinitions>
+				<Button Grid.Column="1" Width="100" HorizontalContentAlignment="Center" Name="OKButton" FontSize="13" Classes="PlainButton" IsEnabled="False">OK</Button>
+				<Button Grid.Column="3" Width="100" HorizontalContentAlignment="Center" Name="CancelButton" FontSize="13" Classes="PlainButton">Cancel</Button>
+			</Grid>
+		</Grid>
+	</local:ChildWindow.Content>
 </local:ChildWindow>

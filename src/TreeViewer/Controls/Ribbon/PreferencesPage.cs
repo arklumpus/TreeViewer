@@ -348,6 +348,45 @@ namespace TreeViewer
             }
 
             currRow++;
+            pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
+
+            {
+                StackPanel pnl = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal };
+
+                CheckBox checkBox = new CheckBox() { Margin = new Thickness(0, 0, 0, 10), Content = "Allow fonts from Google Fonts", IsChecked = GlobalSettings.Settings.AllowGoogleFonts, FontSize = 14 };
+                pnl.Children.Add(checkBox);
+                StackPanel pnl2 = new StackPanel() { Orientation = Avalonia.Layout.Orientation.Horizontal, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, Margin = new Thickness(0, 0, 0, 12) };
+                pnl.Children.Add(pnl2);
+                pnl2.Children.Add(new TextBlock() { Text = "(", Margin = new Thickness(4, 0, 0, 0) });
+                TextBlock privacy = new TextBlock() { Text = "privacy policy", Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 114, 178)), TextDecorations = Avalonia.Media.TextDecorations.Underline, Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand) };
+                pnl2.Children.Add(privacy);
+                pnl2.Children.Add(new TextBlock() { Text = ")" });
+
+                privacy.PointerPressed += (s, e) =>
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                    {
+                        FileName = "https://policies.google.com/privacy",
+                        UseShellExecute = true
+                    });
+                };
+
+                Grid.SetColumnSpan(pnl, 2);
+                Grid.SetRow(pnl, currRow);
+                pageContent.Children.Add(pnl);
+
+                applyChanges.Add(() =>
+                {
+                    bool hasChanged = GlobalSettings.Settings.AllowGoogleFonts != (checkBox.IsChecked == true);
+
+                    GlobalSettings.Settings.AllowGoogleFonts = checkBox.IsChecked == true;
+                    return hasChanged;
+                });
+            }
+
+
+
+            currRow++;
 
             pageContent.RowDefinitions.Add(new RowDefinition(0, GridUnitType.Auto));
             {

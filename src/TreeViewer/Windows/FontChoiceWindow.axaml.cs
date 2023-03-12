@@ -355,6 +355,11 @@ namespace TreeViewer
                 }
             };
 
+            if (!GlobalSettings.Settings.AllowGoogleFonts)
+            {
+                this.FindControl<ListBox>("WebFontsListBox").IsEnabled = false;
+            }
+
             UpdatePreview();
         }
 
@@ -639,27 +644,34 @@ namespace TreeViewer
 
         public static WebFontFamily Create(FontChoiceWindow.WebFont webFont, string style)
         {
-            string url = webFont.Styles[style];
-
-            string fileName = System.IO.Path.GetFileName(url);
-
-            string targetFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WebFonts", fileName);
-
-            if (!System.IO.File.Exists(targetFile))
+            if (GlobalSettings.Settings.AllowGoogleFonts)
             {
-                if (!System.IO.Directory.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WebFonts")))
+                string url = webFont.Styles[style];
+
+                string fileName = System.IO.Path.GetFileName(url);
+
+                string targetFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WebFonts", fileName);
+
+                if (!System.IO.File.Exists(targetFile))
                 {
-                    System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WebFonts"));
+                    if (!System.IO.Directory.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WebFonts")))
+                    {
+                        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WebFonts"));
+                    }
+
+                    Modules.HttpClient.DownloadFile(url, targetFile);
                 }
 
-                Modules.HttpClient.DownloadFile(url, targetFile);
+                FontFamily baseFamily = FontFamily.ResolveFontFamily(targetFile);
+
+                Modules.FontLibrary.Add(baseFamily);
+
+                return new WebFontFamily(baseFamily.TrueTypeFile, webFont.Name, style);
             }
-
-            FontFamily baseFamily = FontFamily.ResolveFontFamily(targetFile);
-            
-            Modules.FontLibrary.Add(baseFamily);
-
-            return new WebFontFamily(baseFamily.TrueTypeFile, webFont.Name, style);
+            else
+            {
+                return new WebFontFamily(ResolveFontFamily(StandardFontFamilies.Helvetica).TrueTypeFile, webFont.Name, style);
+            }
         }
     }
 
