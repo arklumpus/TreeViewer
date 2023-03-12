@@ -35,10 +35,10 @@ namespace TreeViewer
 
         public SideTabHeader()
         {
-            InitializeComponent(new List<Control>());
+            InitializeComponent(new List<(Control, string)>());
         }
 
-        public SideTabHeader(List<Control> buttons)
+        public SideTabHeader(List<(Control, string)> buttons)
         {
             InitializeComponent(buttons);
         }
@@ -72,14 +72,14 @@ namespace TreeViewer
 
         public List<Border> ButtonBorders { get; } = new List<Border>();
 
-        private void InitializeComponent(List<Control> buttons)
+        private void InitializeComponent(List<(Control, string)> buttons)
         {
             AvaloniaXamlLoader.Load(this);
 
             for (int i = 0; i < buttons.Count; i++)
             {
                 Border buttonBorder = new Border() { Width = 40, Height = 40, Padding = new Thickness(4) };
-                buttonBorder.Child = new Viewbox() { Width = 32, Height = 32, Child = buttons[i] }; ;
+                buttonBorder.Child = new Viewbox() { Width = 32, Height = 32, Child = buttons[i].Item1 }; ;
                 buttonBorder.Classes.Add("ButtonBorder");
 
                 ButtonBorders.Add(buttonBorder);
@@ -102,6 +102,8 @@ namespace TreeViewer
                         this.SelectedIndex = index;
                     }
                 };
+
+                AvaloniaBugFixes.SetToolTip(buttonBorder, buttons[i].Item2);
 
                 this.FindControl<StackPanel>("ButtonStackPanel").Children.Add(buttonBorder);
             }

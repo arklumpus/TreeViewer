@@ -1134,10 +1134,10 @@ namespace TreeViewer
             this.RibbonSelectionActionPanel = selectionActionTab;
             this.FindControl<Grid>("RibbonTabContainer").Children.Add(selectionActionTab);
 
-            SideTabHeader selectionHeader = new SideTabHeader(new List<Control>()
+            SideTabHeader selectionHeader = new SideTabHeader(new List<(Control, string)>()
             {
-                new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.SelectionInfo")),
-                new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Attributes")),
+                (new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.SelectionInfo")), "Selection information"),
+                (new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Attributes")), "Attributes"),
             });
 
             this.FindControl<Grid>("SelectionTabHeaderContainer").Children.Add(selectionHeader);
@@ -1417,12 +1417,12 @@ namespace TreeViewer
 
             this.FindControl<Grid>("RibbonTabContainer").Children.Add(modulesTab);
 
-            SideTabHeader modulesHeader = new SideTabHeader(new List<Control>()
+            SideTabHeader modulesHeader = new SideTabHeader(new List<(Control, string)>()
             {
-                new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Transformer")),
-                new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.FurtherTransformations")),
-                new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Coordinates")),
-                new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.PlotActions"))
+                (new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Transformer")), "Transformer module"),
+                (new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.FurtherTransformations")), "Further transformations"),
+                (new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.Coordinates")), "Coordinates module" ),
+                (new DPIAwareBox(Icons.GetIcon32("TreeViewer.Assets.PlotActions")), "Plot actions")
             });
 
             this.FindControl<Grid>("ModuleTabHeaderContainer").Children.Add(modulesHeader);
