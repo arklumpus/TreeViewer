@@ -11,7 +11,7 @@ xcopy ..\..\Release\Win-x64 SourceDir\ /s /y /h
 
 del SourceDir\*.pdb
 
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\Roslyn\csi.exe" GenerateFileGuids.csx
+csi GenerateFileGuids.csx
 
 candle TreeViewer.wxs -ext WixUtilExtension
 
