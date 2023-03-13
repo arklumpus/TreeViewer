@@ -309,13 +309,12 @@ namespace TreeViewer.Stats
 
                 if (!PairWise)
                 {
-                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesGlobal((IReadOnlyList<TreeNode>)currentTrees, (p, x) => progressAction(p, x * 0.5));
+                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesGlobal((IReadOnlyList<TreeNode>)currentTrees, (p, x) => progressAction(p, x / 3));
                 }
                 else
                 {
-                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesPairwise((IReadOnlyList<TreeNode>)trees, (p, x) => progressAction(p, x * 0.5));
+                    (robinsonFouldsDistances, weightedRobinsonFouldsDistances, edgeLengthDistances) = GetRobinsonFouldsDistancesPairwise((IReadOnlyList<TreeNode>)trees, (p, x) => progressAction(p, x / 3));
                 }
-                
 
                 maxDistance = robinsonFouldsDistances.Max();
                 maxWeightedDistance = weightedRobinsonFouldsDistances.Max();
@@ -326,15 +325,16 @@ namespace TreeViewer.Stats
                 if (!sameTopology)
                 {
                     {
+                        progressAction("Performing MDS", 1.0 / 3);
                         (double[,] distMat, double[,] points) = PerformMDS(currentTrees.Count, robinsonFouldsDistances);
 
                         if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
-                            unweightedRFClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (unweighted)", x / 4 + 0.5));
+                            unweightedRFClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (unweighted)", x / 3 + 1.0 / 3));
                         }
                         else
                         {
-                            unweightedRFClustering = PointClustering.GetClustering(points, x => progressAction("Computing K-medoids (unweighted)", x / 4 + 0.5));
+                            unweightedRFClustering = PointClustering.GetClustering(points, x => progressAction("Computing K-medoids (unweighted)", x / 3 + 1.0 / 3));
                         }
 
                         treeSpacePlotGuid = Guid.NewGuid().ToString();
@@ -382,15 +382,17 @@ namespace TreeViewer.Stats
 
                     if (haveLengths)
                     {
+                        progressAction("Performing MDS", 2.0 / 3);
+
                         (double[,] distMat, double[,] points) = PerformMDS(currentTrees.Count, weightedRobinsonFouldsDistances);
 
                         if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                         {
-                            weightedRFClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (weighted)", x / 4 + 0.75));
+                            weightedRFClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (weighted)", x / 3 + 2.0 / 3));
                         }
                         else
                         {
-                            weightedRFClustering = PointClustering.GetClustering(points, x => progressAction("Computing K-medoids (weighted)", x / 4 + 0.75));
+                            weightedRFClustering = PointClustering.GetClustering(points, x => progressAction("Computing K-medoids (weighted)", x / 3 + 2.0 / 3));
                         }
 
                         weightedTreeSpacePlotGuid = Guid.NewGuid().ToString();
@@ -541,15 +543,17 @@ namespace TreeViewer.Stats
                 {
                     maxEdgeLengthDistance = edgeLengthDistances.Max();
 
+                    progressAction("Performing MDS", 1.0 / 3);
+
                     (double[,] distMat, double[,] points) = PerformMDS(currentTrees.Count, edgeLengthDistances);
 
                     if (GlobalSettings.Settings.ClusterAccordingToRawDistances)
                     {
-                        edgeLengthClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (edge-length distances)", x / 4 + 0.5));
+                        edgeLengthClustering = PointClustering.GetClustering(distMat, points, x => progressAction("Computing K-medoids (edge-length distances)", x / 3 * 2 + 1.0 / 3));
                     }
                     else
                     {
-                        edgeLengthClustering = PointClustering.GetClustering(points, x => progressAction("Computing K-medoids (edge-length distances)", x / 4 + 0.5));
+                        edgeLengthClustering = PointClustering.GetClustering(points, x => progressAction("Computing K-medoids (edge-length distances)", x / 3 * 2 + 1.0 / 3));
                     }
 
                     edgeLengthTreeSpacePlotGuid = Guid.NewGuid().ToString();

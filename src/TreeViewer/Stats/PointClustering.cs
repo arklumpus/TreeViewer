@@ -204,7 +204,7 @@ namespace TreeViewer.Stats
                         {
                             sum += distances[getIndex(Math.Min(i, j), Math.Max(i, j), points.Length)];
                         }
-                        
+
                     }
 
                     lock (minLock)
@@ -477,37 +477,54 @@ namespace TreeViewer.Stats
 
             progress(0);
 
-            for (int i = 0; i < maxClusterCount; i++)
             {
+                int i = 0;
+                (allCentroids[i], allEllipsoids[i], allCentroidAssignments[i], allScores[i], allVariances[i], double errorI) = KMedoidsClustering(newPoints, i + 1);
+                allVariances[i] = 0;
+                je1 = errorI;
+
+                progress((double)(i + 1) / maxClusterCount);
+            }
+
+            {
+                int i = 1;
                 (allCentroids[i], allEllipsoids[i], allCentroidAssignments[i], allScores[i], allVariances[i], double errorI) = KMedoidsClustering(newPoints, i + 1);
 
-                if (i == 0)
+                je2 = errorI;
+
+                double alpha = 3.090232;
+                double d = 2;
+
+                double critValue = 1 - 2 / (Math.PI * d) - alpha * Math.Sqrt(2 * (1 - 8 / (Math.PI * Math.PI * d)) / (pointCount * d));
+
+                double pValue = (1 - 2 / (Math.PI * d) - je2 / je1) / Math.Sqrt(2 * (1 - 8 / (Math.PI * Math.PI * d)) / (pointCount * d));
+
+                pValue = 1 - MathNet.Numerics.Distributions.Normal.CDF(0, 1, pValue);
+                this.MultipleClustersPValue = pValue;
+
+                if (je2 / je1 >= critValue)
                 {
-                    allVariances[i] = 0;
-                    je1 = errorI;
-                }
-                else if (i == 1)
-                {
-                    je2 = errorI;
-
-                    double alpha = 3.090232;
-                    double d = 2;
-
-                    double critValue = 1 - 2 / (Math.PI * d) - alpha * Math.Sqrt(2 * (1 - 8 / (Math.PI * Math.PI * d)) / (pointCount * d));
-
-                    double pValue = (1 - 2 / (Math.PI * d) - je2 / je1) / Math.Sqrt(2 * (1 - 8 / (Math.PI * Math.PI * d)) / (pointCount * d));
-
-                    pValue = 1 - MathNet.Numerics.Distributions.Normal.CDF(0, 1, pValue);
-                    this.MultipleClustersPValue = pValue;
-
-                    if (je2 / je1 >= critValue)
-                    {
-                        onlyOneCluster = true;
-                        break;
-                    }
+                    onlyOneCluster = true;
                 }
 
                 progress((double)(i + 1) / maxClusterCount);
+            }
+
+            int progressCount = 2;
+            object progressLock = new object();
+
+            if (!onlyOneCluster)
+            {
+                Parallel.For(2, maxClusterCount, i =>
+                {
+                    (allCentroids[i], allEllipsoids[i], allCentroidAssignments[i], allScores[i], allVariances[i], double errorI) = KMedoidsClustering(newPoints, i + 1);
+
+                    lock (progressLock)
+                    {
+                        progressCount++;
+                        progress((double)progressCount / maxClusterCount);
+                    }
+                });
             }
 
             progress(1);
@@ -571,7 +588,10 @@ namespace TreeViewer.Stats
 
             progress(0);
 
-            for (int i = 0; i < maxClusterCount; i++)
+            int progressCount = 0;
+            object progressLock = new object();
+
+            Parallel.For(0, maxClusterCount, i =>
             {
                 (allCentroids[i], allEllipsoids[i], allCentroidAssignments[i], allScores[i], allVariances[i], double errorI) = KMedoidsClustering(distanceMatrix, newPoints, i + 1);
 
@@ -580,8 +600,12 @@ namespace TreeViewer.Stats
                     allVariances[i] = 0;
                 }
 
-                progress((double)(i + 1) / maxClusterCount);
-            }
+                lock (progressLock)
+                {
+                    progressCount++;
+                    progress((double)progressCount / maxClusterCount);
+                }
+            });
 
             progress(1);
 

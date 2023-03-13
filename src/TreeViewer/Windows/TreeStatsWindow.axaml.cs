@@ -1380,7 +1380,7 @@ namespace TreeViewer
 
                         if (parentWindow.Trees.Count > 2)
                         {
-                            win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 4, LabelText = "Computing tree splits" };
+                            win = new ProgressWindow() { IsIndeterminate = false, ProgressText = "Creating tree report...", Steps = 3, LabelText = "Computing Robinson-Foulds distances" };
                         }
                         else
                         {
@@ -1389,7 +1389,17 @@ namespace TreeViewer
 
                         _ = win.ShowDialog2(this);
 
-                        await Task.Run(() => CreateLoadedTreesReport(parentWindow, win));
+                        System.Threading.SemaphoreSlim semaphore = new System.Threading.SemaphoreSlim(0, 1);
+                        
+                        System.Threading.Thread thr = new System.Threading.Thread(() =>
+                        {
+                            CreateLoadedTreesReport(parentWindow, win);
+                            semaphore.Release();
+                        });
+
+                        thr.Start();
+
+                        await semaphore.WaitAsync();
 
                         win.Close();
                     }, Avalonia.Threading.DispatcherPriority.MinValue);
