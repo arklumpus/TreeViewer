@@ -31,10 +31,15 @@ namespace TreeViewer
     {
         public WelcomeWindow()
         {
-            InitializeComponent();
+            InitializeComponent(false, null);
         }
 
-        private void InitializeComponent()
+        public WelcomeWindow(bool consentOnly, string[] filesToOpen)
+        {
+            InitializeComponent(consentOnly, filesToOpen);
+        }
+
+        private void InitializeComponent(bool consentOnly, string[] filesToOpen)
         {
             AvaloniaXamlLoader.Load(this);
 
@@ -61,6 +66,14 @@ namespace TreeViewer
                 }
             }
             catch { }
+
+            if (consentOnly)
+            {
+                this.FindControl<TextBlock>("Preamble1").IsVisible = false;
+                this.FindControl<TextBlock>("Preamble2").IsVisible = false;
+                this.FindControl<TextBlock>("Preamble3").IsVisible = false;
+                this.FindControl<StackPanel>("Preamble4").IsVisible = false;
+            }
 
             this.FindControl<TextBlock>("GitHubPrivacyLink").PointerPressed += (s, e) =>
             {
@@ -109,130 +122,146 @@ namespace TreeViewer
 
                 if (this.FindControl<CheckBox>("GoogleFontsBox").IsChecked == true && this.FindControl<CheckBox>("GoogleFontsConsentBox").IsChecked == true)
                 {
-                    GlobalSettings.Settings.AllowGoogleFonts= true;
+                    GlobalSettings.Settings.AllowGoogleFonts = true;
                 }
                 else
                 {
                     GlobalSettings.Settings.AllowGoogleFonts = false;
                 }
+
+                if (this.FindControl<CheckBox>("ConsentBox").IsChecked == true)
+                {
+                    GlobalSettings.Settings.PrivacyConsent = true;
+                }
+
                 GlobalSettings.SaveSettings();
 
-                if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
+                if (!consentOnly)
                 {
-                    ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Accessing module database..." };
-                    _ = progressWindow.ShowDialog2(this);
-
-                    try
+                    if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
                     {
-                        Uri moduleHeaderInfo = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), "modules.json.gz");
+                        ProgressWindow progressWindow = new ProgressWindow() { ProgressText = "Accessing module database..." };
+                        _ = progressWindow.ShowDialog2(this);
 
-                        List<ModuleHeader> moduleHeaders;
-
-                        Directory.CreateDirectory(Modules.ModulePath);
-                        Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "assets"));
-                        Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "libraries"));
-                        File.WriteAllText(Modules.ModuleListPath, "[]");
-                        await Modules.LoadInstalledModules(true, null);
-
+                        try
                         {
-                            string tempFile = Path.GetTempFileName();
-                            await Modules.HttpClient.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
+                            Uri moduleHeaderInfo = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), "modules.json.gz");
 
-                            using (FileStream fs = new FileStream(tempFile, FileMode.Open))
+                            List<ModuleHeader> moduleHeaders;
+
+                            Directory.CreateDirectory(Modules.ModulePath);
+                            Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "assets"));
+                            Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "libraries"));
+                            File.WriteAllText(Modules.ModuleListPath, "[]");
+                            await Modules.LoadInstalledModules(true, null);
+
                             {
-                                using (GZipStream decompressionStream = new GZipStream(fs, CompressionMode.Decompress))
+                                string tempFile = Path.GetTempFileName();
+                                await Modules.HttpClient.DownloadFileTaskAsync(moduleHeaderInfo, tempFile);
+
+                                using (FileStream fs = new FileStream(tempFile, FileMode.Open))
                                 {
-                                    moduleHeaders = await System.Text.Json.JsonSerializer.DeserializeAsync<List<ModuleHeader>>(decompressionStream, Modules.DefaultSerializationOptions);
+                                    using (GZipStream decompressionStream = new GZipStream(fs, CompressionMode.Decompress))
+                                    {
+                                        moduleHeaders = await System.Text.Json.JsonSerializer.DeserializeAsync<List<ModuleHeader>>(decompressionStream, Modules.DefaultSerializationOptions);
+                                    }
                                 }
+
+                                File.Delete(tempFile);
                             }
 
-                            File.Delete(tempFile);
-                        }
-
-                        progressWindow.IsIndeterminate = false;
-                        progressWindow.ProgressText = "Downloading and installing modules...";
-                        progressWindow.Progress = 0;
+                            progressWindow.IsIndeterminate = false;
+                            progressWindow.ProgressText = "Downloading and installing modules...";
+                            progressWindow.Progress = 0;
 
 
-                        for (int i = 0; i < moduleHeaders.Count; i++)
-                        {
-                            ModuleHeader header = moduleHeaders[i];
-
-                            if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
+                            for (int i = 0; i < moduleHeaders.Count; i++)
                             {
+                                ModuleHeader header = moduleHeaders[i];
 
-                                Uri moduleFile = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), header.Id + "/" + header.Id + ".v" + header.Version.ToString() + ".json.zip");
-
+                                if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
                                 {
-                                    string tempFile = Path.GetTempFileName();
-                                    await Modules.HttpClient.DownloadFileTaskAsync(moduleFile, tempFile);
 
-                                    try
-                                    {
-                                        ModuleMetadata.Install(tempFile, false, true);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        MessageBox message = new MessageBox("Attention", "An error occurred while installing module " + header.Name + "!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
-                                        await message.ShowDialog2(this);
-                                    }
+                                    Uri moduleFile = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), header.Id + "/" + header.Id + ".v" + header.Version.ToString() + ".json.zip");
 
-                                    File.Delete(tempFile);
+                                    {
+                                        string tempFile = Path.GetTempFileName();
+                                        await Modules.HttpClient.DownloadFileTaskAsync(moduleFile, tempFile);
+
+                                        try
+                                        {
+                                            ModuleMetadata.Install(tempFile, false, true);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            MessageBox message = new MessageBox("Attention", "An error occurred while installing module " + header.Name + "!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
+                                            await message.ShowDialog2(this);
+                                        }
+
+                                        File.Delete(tempFile);
+                                    }
                                 }
+
+                                progressWindow.Progress = (double)(i + 1) / moduleHeaders.Count;
                             }
 
-                            progressWindow.Progress = (double)(i + 1) / moduleHeaders.Count;
+                            progressWindow.Close();
+
+
+                            if (!Modules.IsMac && Modules.FileTypeModules.Count > 0)
+                            {
+                                FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
+                                fileAssociationWindow.Show();
+                            }
+                            else
+                            {
+                                MainWindow mainWindow = new MainWindow();
+                                mainWindow.Show();
+                            }
+
+                            this.Close();
                         }
-
-                        progressWindow.Close();
-
-
-                        if (!Modules.IsMac && Modules.FileTypeModules.Count > 0)
+                        catch (Exception ex)
                         {
-                            FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
-                            fileAssociationWindow.Show();
-                        }
-                        else
-                        {
-                            MainWindow mainWindow = new MainWindow();
-                            mainWindow.Show();
-                        }
+                            progressWindow.Close();
 
-                        this.Close();
+                            MessageBox message = new MessageBox("Attention", "An error occurred while accessing the module database!!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
+                            await message.ShowDialog2(this);
+                        }
                     }
-                    catch (Exception ex)
+                    else if (this.FindControl<RadioButton>("NoModulesRadio").IsChecked == true)
                     {
-                        progressWindow.Close();
-
-                        MessageBox message = new MessageBox("Attention", "An error occurred while accessing the module database!!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
+                        MessageBox message = new MessageBox("Attention", "Please make sure to install the required modules using the Module manager window before using the program!\nYou can open again this window by starting TreeViewer with the \"--welcome\" command-line option.\nAre you sure you want to proceed with this route?", MessageBox.MessageBoxButtonTypes.YesNo);
                         await message.ShowDialog2(this);
+                        if (message.Result == MessageBox.Results.Yes)
+                        {
+                            Directory.CreateDirectory(Modules.ModulePath);
+                            Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "assets"));
+                            Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "libraries"));
+                            File.WriteAllText(Modules.ModuleListPath, "[]");
+                            await Modules.LoadInstalledModules(true, null);
+
+                            if (!Modules.IsMac && Modules.FileTypeModules.Count > 0)
+                            {
+                                FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
+                                fileAssociationWindow.Show();
+                            }
+                            else
+                            {
+                                MainWindow mainWindow = new MainWindow();
+                                mainWindow.Show();
+                            }
+
+                            this.Close();
+                        }
                     }
                 }
-                else if (this.FindControl<RadioButton>("NoModulesRadio").IsChecked == true)
+                else
                 {
-                    MessageBox message = new MessageBox("Attention", "Please make sure to install the required modules using the Module manager window before using the program!\nYou can open again this window by starting TreeViewer with the \"--welcome\" command-line option.\nAre you sure you want to proceed with this route?", MessageBox.MessageBoxButtonTypes.YesNo);
-                    await message.ShowDialog2(this);
-                    if (message.Result == MessageBox.Results.Yes)
-                    {
-                        Directory.CreateDirectory(Modules.ModulePath);
-                        Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "assets"));
-                        Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "libraries"));
-                        File.WriteAllText(Modules.ModuleListPath, "[]");
-                        await Modules.LoadInstalledModules(true, null);
+                    SplashScreen splashScreen = new SplashScreen(filesToOpen);
+                    splashScreen.Show();
 
-                        if (!Modules.IsMac && Modules.FileTypeModules.Count > 0)
-                        {
-                            FileAssociationWindow fileAssociationWindow = new FileAssociationWindow(new string[] { "False" });
-                            fileAssociationWindow.Show();
-                        }
-                        else
-                        {
-                            MainWindow mainWindow = new MainWindow();
-                            mainWindow.Show();
-                        }
-
-                        this.Close();
-                    }
+                    this.Close();
                 }
             };
         }

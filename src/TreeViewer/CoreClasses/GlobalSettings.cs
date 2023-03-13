@@ -72,6 +72,7 @@ namespace TreeViewer
         public bool PairwiseTreeComparisons { get; set; } = true;
         public static GlobalSettings Settings { get; }
         public bool AllowGoogleFonts { get; set; } = false;
+        public bool PrivacyConsent { get; set; } = false;
 
         [JsonIgnore]
         public HashSet<string> CurrentlyDismissedMessages { get; } = new HashSet<string>();

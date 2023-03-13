@@ -36,16 +36,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 			<TextBlock Grid.Row="1" HorizontalAlignment="Center" FontSize="40" FontWeight="Bold" Foreground="#0072b2">Welcome to TreeViewer!</TextBlock>
 			<ScrollViewer Grid.Row="2" AllowAutoHide="False" Margin="0,0,10,10">
 				<StackPanel>
-					<TextBlock TextWrapping="Wrap" >
+					<TextBlock TextWrapping="Wrap" Name="Preamble1">
 						TreeViewer is based on a "modular" structure: small modules perform individual actions, such as computing the coordinates of the nodes in the tree, or drawing the tree branches. Together, these actions constitute the complete plot.
 					</TextBlock>
-					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Name="Preamble2">
 						We can install these modules now, or you can install them individually later, using the "Module manager" window.
 					</TextBlock>
-					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+					<TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Name="Preamble3">
 						Please make sure that you have a working Internet connection and choose one of the following options:
 					</TextBlock>
-					<StackPanel Margin="40,10,0,0">
+					<StackPanel Margin="40,10,0,0" Name="Preamble4">
 						<StackPanel Orientation="Horizontal">
 							<RadioButton GroupName="ModuleChoice" Name="NoModulesRadio" FontSize="13">Do not install any module</RadioButton>
 							<local:HelpButton IsActive="False" Margin="10,0,0,0" VerticalAlignment="Center">

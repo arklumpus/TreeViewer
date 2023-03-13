@@ -82,10 +82,18 @@ namespace TreeViewer
                     MacOSFileOpener.Initialise();
                 }
 
-                if (!File.Exists(Modules.ModuleListPath) || !Directory.Exists(Modules.ModulePath) || System.Convert.ToBoolean(desktop.Args[0]))
+                if (!File.Exists(Modules.ModuleListPath) || !Directory.Exists(Modules.ModulePath) || System.Convert.ToBoolean(desktop.Args[0]) || !GlobalSettings.Settings.PrivacyConsent)
                 {
-                    WelcomeWindow welcome = new WelcomeWindow();
-                    desktop.MainWindow = welcome;
+                    if (!File.Exists(Modules.ModuleListPath) || !Directory.Exists(Modules.ModulePath) || System.Convert.ToBoolean(desktop.Args[0]))
+                    {
+                        WelcomeWindow welcome = new WelcomeWindow(false, new string[0]);
+                        desktop.MainWindow = welcome;
+                    }
+                    else if (!GlobalSettings.Settings.PrivacyConsent)
+                    {
+                        WelcomeWindow welcome = new WelcomeWindow(true, desktop.Args.Skip(3).ToArray());
+                        desktop.MainWindow = welcome;
+                    }
                 }
                 else if (System.Convert.ToBoolean(desktop.Args[1]))
                 {
