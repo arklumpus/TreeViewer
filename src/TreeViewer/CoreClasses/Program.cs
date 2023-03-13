@@ -54,7 +54,6 @@ namespace TreeViewer
             bool installReferences = false;
             bool deleteFiles = false;
             bool deleteModules = false;
-            bool isCommandLine = false;
 
             List<string> filesToOpen = new List<string>();
             List<string> modulesToInstall = new List<string>();
@@ -346,11 +345,6 @@ namespace TreeViewer
 
                 List<string> newArgs = new List<string>();
 
-                if (isCommandLine)
-                {
-                    newArgs.Add("-c");
-                }
-
                 if (deleteFiles)
                 {
                     newArgs.Add("-d");
@@ -422,11 +416,6 @@ namespace TreeViewer
                     ConsoleWrapperUI.WriteLine();
 
                     List<string> newArgs = new List<string>();
-
-                    if (isCommandLine)
-                    {
-                        newArgs.Add("-c");
-                    }
 
                     if (deleteFiles)
                     {
@@ -547,11 +536,6 @@ namespace TreeViewer
                     ConsoleWrapperUI.WriteLine();
 
                     List<string> newArgs = new List<string>();
-
-                    if (isCommandLine)
-                    {
-                        newArgs.Add("-c");
-                    }
 
                     if (deleteFiles)
                     {
