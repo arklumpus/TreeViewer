@@ -24,6 +24,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TreeViewer
 {
@@ -170,18 +172,17 @@ namespace TreeViewer
                                 File.Delete(tempFile);
                             }
 
+                            SemaphoreSlim semaphore = new SemaphoreSlim(0, 1);
+
                             progressWindow.IsIndeterminate = false;
                             progressWindow.ProgressText = "Downloading and installing modules...";
                             progressWindow.Progress = 0;
 
-
-                            for (int i = 0; i < moduleHeaders.Count; i++)
+                            Thread thr = new Thread(async () =>
                             {
-                                ModuleHeader header = moduleHeaders[i];
-
-                                if (this.FindControl<RadioButton>("AllModulesRadio").IsChecked == true)
+                                for (int i = 0; i < moduleHeaders.Count; i++)
                                 {
-
+                                    ModuleHeader header = moduleHeaders[i];
                                     Uri moduleFile = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), header.Id + "/" + header.Id + ".v" + header.Version.ToString() + ".json.zip");
 
                                     {
@@ -194,16 +195,25 @@ namespace TreeViewer
                                         }
                                         catch (Exception ex)
                                         {
-                                            MessageBox message = new MessageBox("Attention", "An error occurred while installing module " + header.Name + "!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
-                                            await message.ShowDialog2(this);
+                                            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                                            {
+                                                MessageBox message = new MessageBox("Attention", "An error occurred while installing module " + header.Name + "!\n" + ex.Message, MessageBox.MessageBoxButtonTypes.OK);
+                                                await message.ShowDialog2(this);
+                                            });
                                         }
 
                                         File.Delete(tempFile);
                                     }
+
+                                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { progressWindow.Progress = (double)(i + 1) / moduleHeaders.Count; });
                                 }
 
-                                progressWindow.Progress = (double)(i + 1) / moduleHeaders.Count;
-                            }
+                                semaphore.Release();
+                            });
+
+                            thr.Start();
+
+                            await semaphore.WaitAsync();
 
                             progressWindow.Close();
 
