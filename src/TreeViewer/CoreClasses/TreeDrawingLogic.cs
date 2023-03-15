@@ -427,6 +427,7 @@ namespace TreeViewer
                         AttributeList = new List<string>(allAttributes);
                         AttributeList.Sort();
 
+                        StopAllUpdates = true;
 
                         List<ComboBox> selectorsToRemove = new List<ComboBox>();
 
@@ -450,6 +451,8 @@ namespace TreeViewer
                         {
                             AttributeSelectors.Remove(box);
                         }
+
+                        StopAllUpdates = false;
 
                         semaphore.Release();
                     });
@@ -1122,7 +1125,7 @@ namespace TreeViewer
             if (!StopAllUpdates)
             {
                 await PlotLayerUpdateLock.WaitAsync();
-                
+
                 try
                 {
                     this.RefreshAllButton.IsEnabled = false;
