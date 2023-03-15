@@ -27,7 +27,7 @@ namespace SetUpAgeDistributions
         public const string Name = "Set up age distributions (attachment)";
         public const string HelpText = "Computes node age distributions from trees contained in an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "5d721496-f2fa-48de-ad0d-90ef5d8086aa";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -85,13 +85,53 @@ namespace SetUpAgeDistributions
             {
                 ( "StateData", "InstanceStateData:" ),
 
+                ( "Data source", "Group:5" ),
+
                 /// <param name="Attachment:">
-                /// This parameter specifies the attachment from which the age distributions will be read. This should be a tree file in NEXUS, Newick, Newick-with-attributes, NCBI ASN.1 or Binary format.
+                /// This parameter specifies the attachment from which the age distributions will be read, either as a tree file, or as a table.
                 /// </param>
                 ( "Attachment:", "Attachment:" ),
+
+                /// <param name="Format:">
+                /// This parameter specifies whether the attachment contains a list of trees (e.g., posterior samples) that should be used to
+                /// determine the age distributions, or a table containing the age estimates for the nodes (e.g., the output file from a MCMCTree analysis).
+                /// 
+                /// If the file contains a list of trees, it should be a tree file in NEXUS, Newick, Newick-with-attributes, NCBI ASN.1 or Binary format.
+                /// 
+                /// If the file contains a table, this should be a tab-separated table containing a header row with parameter names, followed
+                /// by data rows. The parameter names will determine the nodes to which the age estimates will be applied. Following the syntax
+                /// of MCMCTree output files, parameter names for age estimates should be in the form `t_nX`, where `X` is a number identifying the node
+                /// corresponding to each column. Columns with headers that do not follow this convention (e.g. `Gen`, `lnL`, ...) will be ignored.
+                /// </param>
+                ( "Format:", "ComboBox:0[\"List of trees\",\"Table\"]" ),
+
+                /// <param name="Node indices:">
+                /// If the attachment contains a table, this parameter determines how the node indices that correspond to column headers are determined.
+                /// 
+                /// If the selected value is `Infer automatically`, the node indices are determined automatically based on the tree topology. Note that
+                /// if you have altered the tree topology using another _Further transformation_ module (e.g., by sorting or pruning nodes), the node
+                /// indices will change, while the other options are more robust to topology changes.
+                /// 
+                /// If the selected value is `Use attribute`, the node indices are determined using the value of the specified attribute.
+                /// 
+                /// If the selected value is `Load from MCMCTree output file`, an attachment containing the MCMCTree output file (`out.txt`) should be
+                /// provided, and the module will use the tree contained in there to determine the node indices.
+                /// </param>
+                ( "Node indices:", "ComboBox:0[\"Infer automatically\",\"Use attribute\",\"Load from MCMCTree output file\"]"),
+
+                /// <param name="Index attribute:">
+                /// This parameter determines the attribute used to determine node indices.
+                /// </param>
+                ( "Index attribute:", "AttributeSelector:Name" ),
+                
+                /// <param name="MCMCTree output file:">
+                /// This parameter specifies the attachment containing the MCMCTree output file (`out.txt`) that should be used to determine the
+                /// node indices.
+                /// </param>
+                ( "MCMCTree output file:", "Attachment:" ),
                 
                 /// <param name="Age type:">
-                /// This parameter determines the kind of age that is computed.
+                /// This parameter determines the kind of age that is computed if the attachment contains a list of trees.
                 /// 
                 /// If the value is `Since root`, the age of each node corresponds to the distance $d$ (as in, the
                 /// sum of branch lengths) from the node to the root of the tree; in this case, the root node would
@@ -102,6 +142,8 @@ namespace SetUpAgeDistributions
                 /// tips of the tree are contemporaneous, they will have an age of `0`.
                 /// </param>
                 ( "Age type:", "ComboBox:0[\"Until tips\", \"Since root\"]"),
+
+                ( "Summary statistics", "Group:3" ),
                 
                 /// <param name="Compute mean">
                 /// If this check box is checked, in addition to the age distribution, the mean age for each node.
@@ -124,6 +166,19 @@ namespace SetUpAgeDistributions
                 /// This parameter determines the threshold for the credible interval.
                 /// </param>
                 ( "Threshold:", "Slider:0.89[\"0\",\"1\",\"0.00\"]"),
+
+                ( "Scaling", "Group:2" ),
+
+                /// <param name="Scaling factor:">
+                /// This parameter is used to scale the age distributions (and the tree, if the [Apply scaling to transformed tree](#apply-scaling-to-transformed-tree)
+                /// check box is checked).
+                /// </param>
+                ( "Scaling factor:", "NumericUpDown:1[\"0\",\"Infinity\",\"1\",\"0.####\"]" ),
+                
+                /// <param name="Apply scaling to transformed tree">
+                /// If this check box is checked, the [scaling factor](#scaling-factor) is applied to the transformed tree, as well as to the age distributions.
+                /// </param>
+                ( "Apply scaling to transformed tree", "CheckBox:true" ),
                 
                 /// <param name="Apply">
                 /// This button applies the changes to the other parameter values and signals that the tree needs to be redrawn.
@@ -143,6 +198,37 @@ namespace SetUpAgeDistributions
             else
             {
                 controlStatus.Add("Threshold:", ControlStatus.Hidden);
+            }
+
+            if ((int)currentParameterValues["Format:"] == 0)
+            {
+                controlStatus["Node indices:"] = ControlStatus.Hidden;
+                controlStatus["Index attribute:"] = ControlStatus.Hidden;
+                controlStatus["MCMCTree output file:"] = ControlStatus.Hidden;
+
+                controlStatus["Age type:"] = ControlStatus.Enabled;
+            }
+            else if ((int)currentParameterValues["Format:"] == 1)
+            {
+                controlStatus["Node indices:"] = ControlStatus.Enabled;
+
+                switch ((int)currentParameterValues["Node indices:"])
+                {
+                    case 0:
+                        controlStatus["Index attribute:"] = ControlStatus.Hidden;
+                        controlStatus["MCMCTree output file:"] = ControlStatus.Hidden;
+                        break;
+                    case 1:
+                        controlStatus["Index attribute:"] = ControlStatus.Enabled;
+                        controlStatus["MCMCTree output file:"] = ControlStatus.Hidden;
+                        break;
+                    case 2:
+                        controlStatus["Index attribute:"] = ControlStatus.Hidden;
+                        controlStatus["MCMCTree output file:"] = ControlStatus.Enabled;
+                        break;
+                }
+
+                controlStatus["Age type:"] = ControlStatus.Hidden;
             }
 
             parametersToChange = new Dictionary<string, object>()
@@ -174,6 +260,9 @@ namespace SetUpAgeDistributions
 
             Attachment attachment = (Attachment)parameterValues["Attachment:"];
 
+            int format = (int)parameterValues["Format:"];
+            int nodeIndexType = (int)parameterValues["Node indices:"];
+
             if (attachment != null)
             {
                 List<TreeNode> nodes = tree.GetChildrenRecursive();
@@ -186,29 +275,179 @@ namespace SetUpAgeDistributions
 
                 attachment.Stream.Seek(attachment.StreamStart, System.IO.SeekOrigin.Begin);
 
-                foreach (TreeNode sampledTree in ReadTree.Read(attachment.Stream, progressAction))
+                if (format == 0)
                 {
-                    double treeHeight = -1;
-
-                    if (!fromLeft)
+                    foreach (TreeNode sampledTree in ReadTree.Read(attachment.Stream, progressAction))
                     {
-                        treeHeight = sampledTree.LongestDownstreamLength();
+                        double treeHeight = -1;
+
+                        if (!fromLeft)
+                        {
+                            treeHeight = sampledTree.LongestDownstreamLength();
+                        }
+
+                        foreach (TreeNode node in sampledTree.GetChildrenRecursiveLazy())
+                        {
+                            TreeNode LCA = tree.GetLastCommonAncestor(node.GetLeafNames());
+
+                            if (Compare(LCA.GetLeafNames(), node.GetLeafNames()))
+                            {
+                                double age = node.UpstreamLength();
+
+                                if (!fromLeft)
+                                {
+                                    age = treeHeight - age;
+                                }
+
+                                ageSamples[LCA.Id].Add(age);
+                            }
+                        }
+                    }
+                }
+                else if (format == 1)
+                {
+                    Dictionary<int, string> nodeIndices = new Dictionary<int, string>();
+
+                    if (nodeIndexType == 0)
+                    {
+                        int nodeIndex = tree.GetLeaves().Count + 1;
+
+                        for (int i = 0; i < nodes.Count; i++)
+                        {
+                            if (nodes[i].Children.Count > 0)
+                            {
+                                nodeIndices[nodeIndex] = nodes[i].Id;
+                                nodeIndex++;
+                            }
+                        }
+                    }
+                    else if (nodeIndexType == 1)
+                    {
+                        string attributeName = (string)parameterValues["Index attribute:"];
+
+                        foreach (TreeNode node in nodes)
+                        {
+                            if (node.Attributes.TryGetValue(attributeName, out object indexObject))
+                            {
+                                if (indexObject is int i)
+                                {
+                                    nodeIndices[i] = node.Id;
+                                }
+                                else if (indexObject is double d)
+                                {
+                                    nodeIndices[(int)d] = node.Id;
+                                }
+                                else if (indexObject is string sr && int.TryParse(sr, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int k))
+                                {
+                                    nodeIndices[k] = node.Id;
+                                }
+                            }
+                        }
+                    }
+                    else if (nodeIndexType == 2)
+                    {
+                        Attachment mcmcTreeAttachment = (Attachment)parameterValues["MCMCTree output file:"];
+
+                        if (mcmcTreeAttachment != null)
+                        {
+                            mcmcTreeAttachment.Stream.Seek(mcmcTreeAttachment.StreamStart, SeekOrigin.Begin);
+
+                            using (StreamReader sr = new StreamReader(mcmcTreeAttachment.Stream, leaveOpen: true))
+                            {
+                                string line = sr.ReadLine();
+
+                                if (line.StartsWith("MCMCTREE"))
+                                {
+                                    while (line != null && !line.StartsWith("Species tree"))
+                                    {
+                                        if (mcmcTreeAttachment.Stream.Position - mcmcTreeAttachment.StreamStart < mcmcTreeAttachment.StreamLength)
+                                        {
+                                            line = sr.ReadLine();
+                                        }
+                                        else
+                                        {
+                                            line = null;
+                                        }
+                                    }
+
+                                    if (line != null && line.StartsWith("Species tree"))
+                                    {
+                                        line = sr.ReadLine();
+
+                                        TreeNode speciesTree = NWKA.ParseTree(line);
+
+                                        foreach (TreeNode node in speciesTree.GetLeaves())
+                                        {
+                                            int index = int.Parse(node.Name.Substring(0, node.Name.IndexOf("_")), System.Globalization.CultureInfo.InvariantCulture);
+                                            node.Name = node.Name.Substring(node.Name.IndexOf("_") + 1);
+
+                                            string id = tree.GetNodeFromName(node.Name)?.Id;
+
+                                            if (id != null)
+                                            {
+                                                nodeIndices[index] = id;
+                                            }
+                                        }
+
+                                        foreach (TreeNode node in speciesTree.GetChildrenRecursiveLazy())
+                                        {
+                                            if (!double.IsNaN(node.Support))
+                                            {
+                                                int index = (int)node.Support;
+
+                                                string id = tree.GetLastCommonAncestor(node.GetLeafNames())?.Id;
+
+                                                if (id != null)
+                                                {
+                                                    nodeIndices[index] = id;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    throw new ArgumentException("The selected attachment does not seem to be an MCMCTree output file! Please make sure you have provided the `out.txt` file.");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            throw new NullReferenceException("No MCMCTree output file specified!");
+                        }
                     }
 
-                    foreach (TreeNode node in sampledTree.GetChildrenRecursiveLazy())
+                    using (StreamReader sr = new StreamReader(attachment.Stream, leaveOpen: true))
                     {
-                        TreeNode LCA = tree.GetLastCommonAncestor(node.GetLeafNames());
+                        string headerLine = sr.ReadLine();
+                        string[] headers = (from el in headerLine.Split('\t')
+                                            let isNode = el.StartsWith("t_n")
+                                            let index = isNode ? int.Parse(el.Replace("t_n", ""), System.Globalization.CultureInfo.InvariantCulture) : -1
+                                            let isPresent = isNode && nodeIndices.ContainsKey(index)
+                                            select isPresent ? nodeIndices[index] : null).ToArray();
 
-                        if (Compare(LCA.GetLeafNames(), node.GetLeafNames()))
+                        string line = sr.ReadLine();
+
+                        while (line != null)
                         {
-                            double age = node.UpstreamLength();
+                            string[] splitLine = line.Split('\t');
 
-                            if (!fromLeft)
+                            for (int i = 0; i < headers.Length; i++)
                             {
-                                age = treeHeight - age;
+                                if (!string.IsNullOrEmpty(headers[i]))
+                                {
+                                    ageSamples[headers[i]].Add(double.Parse(splitLine[i], System.Globalization.CultureInfo.InvariantCulture));
+                                }
                             }
 
-                            ageSamples[LCA.Id].Add(age);
+                            if (attachment.Stream.Position - attachment.StreamStart <= attachment.StreamLength)
+                            {
+                                line = sr.ReadLine();
+                            }
+                            else
+                            {
+                                line = null;
+                            }
                         }
                     }
                 }
@@ -234,6 +473,28 @@ namespace SetUpAgeDistributions
                                 double[] eti = BayesStats.EqualTailedInterval(ageSamples[nodes[i].Id], threshold);
                                 nodes[i].Attributes[threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
                             }
+                        }
+                    }
+                }
+
+                double scalingFactor = (double)parameterValues["Scaling factor:"];
+                bool applyScalingToTree = (bool)parameterValues["Apply scaling to transformed tree"];
+
+                if (scalingFactor != 1)
+                {
+                    foreach (KeyValuePair<string, List<double>> kvp in ageSamples)
+                    {
+                        for (int i = 0; i < kvp.Value.Count; i++)
+                        {
+                            kvp.Value[i] *= scalingFactor;
+                        }
+                    }
+
+                    if (applyScalingToTree)
+                    {
+                        foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                        {
+                            node.Length *= scalingFactor;
                         }
                     }
                 }
@@ -405,4 +666,3 @@ namespace SetUpAgeDistributions
         }
     }
 }
-
