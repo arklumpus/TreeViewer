@@ -336,6 +336,10 @@ namespace TreeViewer
             {
                 window.Icon = new Avalonia.Controls.WindowIcon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.WindowIcon_macOS.png"));
             }
+            else if (Modules.IsWindows)
+            {
+                window.Icon = new Avalonia.Controls.WindowIcon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.Program.ico"));
+            }
             else
             {
                 window.Icon = new Avalonia.Controls.WindowIcon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("TreeViewer.Assets.WindowIcon.png"));
