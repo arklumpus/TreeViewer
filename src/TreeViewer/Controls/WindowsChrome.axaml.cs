@@ -188,7 +188,7 @@ namespace TreeViewer
                 }
                 else
                 {
-                    return 0.0;
+                    return new GridLength(0.0, GridUnitType.Pixel);
                 }
             }
             else
@@ -199,14 +199,14 @@ namespace TreeViewer
                 }
                 else
                 {
-                    return 46.0;
+                    return new GridLength(46.0, GridUnitType.Pixel);
                 }
             }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is double size && size == 0)
+            if ((value is double size && size == 0) || (value is GridLength gl && gl.Value == 0))
             {
                 return false;
             }
