@@ -42,6 +42,7 @@ namespace TreeViewer
 
         public static void EnableConsole()
         {
+#if !DEBUG
             if (!IsConsoleEnabled)
             {
                 // Apparently, only needed on Windows
@@ -84,24 +85,37 @@ namespace TreeViewer
 
                 IsConsoleEnabled = true;
             }
+#endif
         }
 
         public static void WriteLine()
         {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine("");
+#else
             EnableConsole();
             Console.WriteLine();
+#endif
         }
 
         public static void WriteLine(string value)
         {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine(value);
+#else
             EnableConsole();
             Console.WriteLine(value);
+#endif
         }
 
         public static void WriteLine(string format, params object[] arg)
         {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine(format, arg);
+#else
             EnableConsole();
             Console.WriteLine(format, arg);
+#endif
         }
     }
 }
