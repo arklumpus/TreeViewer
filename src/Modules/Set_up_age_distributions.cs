@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -43,7 +44,7 @@ namespace SetUpAgeDistributions
         public const string Name = "Set up age distributions";
         public const string HelpText = "Computes node age distributions.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "a1ccf05a-cf3c-4ca4-83be-af56f501c2a6";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -137,6 +138,12 @@ namespace SetUpAgeDistributions
                 /// </param>
                 ( "Threshold:", "Slider:0.89[\"0\",\"1\",\"0.00\"]"),
                 
+                /// <param name="Name:">
+                /// This parameter specifies a name that can be used to identify the age distributions in cases where multiple age distributions have been computed
+                /// for the same tree.
+                /// </param>
+                ( "Name:", "TextBox:AgeDistributions" ),
+                
                 /// <param name="Apply">
                 /// This button applies the changes to the other parameter values and signals that the tree needs to be redrawn.
                 /// </param>
@@ -181,6 +188,7 @@ namespace SetUpAgeDistributions
             double threshold = (double)parameterValues["Threshold:"];
             int ciType = (int)parameterValues["Credible interval:"];
             bool computeMean = (bool)parameterValues["Compute mean"];
+            string name = (string)parameterValues["Name:"];
 
             TreeCollection treeCollection = (TreeCollection)parameterValues["Trees"];
             InstanceStateData stateData = (InstanceStateData)parameterValues["StateData"];
@@ -263,7 +271,22 @@ namespace SetUpAgeDistributions
 
             stateData.Tags["a1ccf05a-cf3c-4ca4-83be-af56f501c2a6"] = ageSamples;
             tree.Attributes["a1ccf05a-cf3c-4ca4-83be-af56f501c2a6"] = "Age distributions";
+
+            Dictionary<string, (string, object)> distributionCollection;
+
+            if (stateData.Tags.TryGetValue("4e5d3934-44e6-4fe3-b11c-bd78e5b577d0", out object distribCollect))
+            {
+                distributionCollection = distribCollect as Dictionary<string, (string, object)>;
+            }
+            else
+            {
+                distributionCollection = new Dictionary<string, (string, object)>();
+                stateData.Tags["4e5d3934-44e6-4fe3-b11c-bd78e5b577d0"] = distributionCollection;
+            }
+
+            distributionCollection[(string)parameterValues[Modules.ModuleIDKey]] = (name, ageSamples);
         }
     }
 }
+
 

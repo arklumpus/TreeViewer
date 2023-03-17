@@ -52,7 +52,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
         public const string Name = "Age distributions timeline";
         public const string HelpText = "Plots age distributions on a timeline.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.1.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "b93f8a2b-8731-4658-92f5-bb80af7292a8";
@@ -108,6 +108,20 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             return new List<(string, string)>()
             {
                 ( "InstanceStateData", "InstanceStateData:" ),
+
+                ( "Age distribution", "Group:2"),
+
+                /// <param name="Age distribution:">
+                /// This parameter determines whether the age distribution that is shown is the default one (i.e., the last one that has been
+                /// set up), or whether a name should be entered to specify another age distribution.
+                /// </param>
+                ( "Age distribution:", "ComboBox:0[\"Default\",\"Custom\"]"),
+
+                /// <param name="Distribution name:">
+                /// If the value for the [Age distribution](#age-distribution) parameter is `Custom`, this text box can be used to enter the name
+                /// of the age distribution to draw (as defined within the parameters of the _Set up age distributions_ module).
+                /// </param>
+                ( "Distribution name:", "TextBox:" ),
                 
                 /// <param name="Plot type:">
                 /// This parameter determines the kind of plot used to draw the age distributions. If the value is `Histogram`, histograms
@@ -143,7 +157,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                 /// </param>
                 ( "Plot position:", "ComboBox:1[\"Top\",\"Bottom\",\"Both\"]" ),
 
-                ("Distribution colour", "Group: 3"),
+                ("Fill colour", "Group: 3"),
                 
                 /// <param name="Auto colour by node" display="Auto colour by node (distributions)">
                 /// If this check box is checked, the colour of each age distribution is determined algorithmically in a pseudo-random
@@ -165,6 +179,46 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                 /// default value is used. The default attribute used to determine the colour is `Color`.
                 /// </param>
                 ("Colour:", "ColourByNode:[" + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToColour[0]) + ",\"Color\",\"String\",\"0\",\"0\",\"0\",\"255\",\"true\"]"),
+
+                ( "Stroke style", "Group:6" ),
+                
+                /// <param name="Auto stroke colour by node">
+                /// If this check box is checked, the colour of each age distribution is determined algorithmically in a pseudo-random
+                /// way designed to achieve an aestethically pleasing distribution of colours, while being reproducible
+                /// if the same tree is rendered multiple times.
+                /// </param>
+                ( "Auto stroke colour by node", "CheckBox:true"),
+                
+                /// <param name="Line opacity:">
+                /// This parameter determines the opacity of the colour used if the [Auto stroke colour by node](#auto-stroke-colour-by-node)
+                /// option is enabled.
+                /// </param>
+                ( "Line opacity:", "Slider:0.5[\"0\",\"1\",\"{0:P0}\"]" ),
+                
+                /// <param name="Line colour:">
+                /// This parameter determines the colour used to stroke each age distribution (if the [Auto stroke colour by node](#auto-stroke-colour-by-node)
+                /// option is disabled). The colour can be determined based on the value of an attribute of the nodes in the tree.
+                /// For nodes that do not possess the specified attribute (or that have the attribute with an invalid value), a
+                /// default value is used. The default attribute used to determine the colour is `Color`.
+                /// </param>
+                ( "Line colour:", "ColourByNode:[" + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToColour[0]) + ",\"Color\",\"String\",\"0\",\"0\",\"0\",\"255\",\"true\"]" ),
+                
+                 /// <param name="Line weight:">
+                /// The thickness of the outline for the branch distributions. This can be determined based on the value of an attribute of the nodes in the tree. For nodes that
+                /// do not possess the specified attribute (or that have the attribute with an invalid value), a default value is used. The default attribute
+                /// used to determine the thickness of the branches is `Thickness`.
+                /// </param>
+                ( "Line weight:", "NumericUpDownByNode:0[\"0\",\"Infinity\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToDouble[1]) + ",\"Thickness\",\"Number\",\"true\"]" ),
+                
+                /// <param name="Line cap:">
+                /// The line cap to use when drawing the distributions.
+                /// </param>
+                ( "Line cap:", "ComboBox:1[\"Butt\",\"Round\",\"Square\"]" ),
+                
+                /// <param name="Line dash:">
+                /// The line dash to use when drawing the distributions.
+                /// </param>
+                ( "Line dash:", "Dash:[0,0,0]"),
 
                 ("Labels", "Group: 7"),
 
@@ -253,6 +307,40 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                 controlStatus.Add("Colour: ", ControlStatus.Enabled);
             }
 
+            if ((bool)currentParameterValues["Auto stroke colour by node"])
+            {
+                controlStatus.Add("Line opacity:", ControlStatus.Enabled);
+                controlStatus.Add("Line colour:", ControlStatus.Hidden);
+            }
+            else
+            {
+                controlStatus.Add("Line opacity:", ControlStatus.Hidden);
+                controlStatus.Add("Line colour:", ControlStatus.Enabled);
+            }
+
+            if ((int)currentParameterValues["Age distribution:"] == 0)
+            {
+                controlStatus.Add("Distribution name:", ControlStatus.Hidden);
+            }
+            else
+            {
+                controlStatus.Add("Distribution name:", ControlStatus.Enabled);
+            }
+
+            if ((int)currentParameterValues["Age distribution:"] == 1 && (int)previousParameterValues["Age distribution:"] == 0 && string.IsNullOrEmpty((string)currentParameterValues["Distribution name:"]))
+            {
+                try
+                {
+                    InstanceStateData stateData = (InstanceStateData)currentParameterValues["InstanceStateData"];
+
+                    if (stateData.Tags.TryGetValue("4e5d3934-44e6-4fe3-b11c-bd78e5b577d0", out object distribCollect) && distribCollect is Dictionary<string, (string, object)> distributionCollection && distributionCollection.Count > 0)
+                    {
+                        parametersToChange.Add("Distribution name:", distributionCollection.Where(x => checkIfFurtherTransformationModuleExists(x.Key, stateData)).Last().Value.Item1);
+                    }
+                }
+                catch { }
+            }
+
             if ((string)previousParameterValues["Attribute:"] != (string)currentParameterValues["Attribute:"])
             {
                 string attributeName = (string)currentParameterValues["Attribute:"];
@@ -280,7 +368,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
             {
                 string attrType = (string)currentParameterValues["Attribute type:"];
-                
+
                 if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
                 {
                     if (attrType == "String")
@@ -297,12 +385,17 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             return true;
         }
 
+        public const string InvalidDistributionGuid = "527e3721-11cf-4e8c-aeec-18c93c7d8d7c";
+
         public static Point[] PlotAction(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates, Graphics graphics)
         {
             bool autoColourByNode = (bool)parameterValues["Auto colour by node"];
             bool autoLabelColourByNode = (bool)parameterValues["Auto colour by node "];
             double opacity = (double)parameterValues["Opacity:"];
             double labelOpacity = (double)parameterValues["Opacity: "];
+
+            bool defaultDistribution = (int)parameterValues["Age distribution:"] == 0;
+            string distributionName = (string)parameterValues["Distribution name:"];
 
             InstanceStateData stateData = (InstanceStateData)parameterValues["InstanceStateData"];
 
@@ -329,6 +422,20 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             string attribute = (string)parameterValues["Attribute:"];
             Func<object, string> formatter = ((FormatterOptions)parameterValues["Attribute format..."]).Formatter;
 
+            bool autoStroke = (bool)parameterValues["Auto stroke colour by node"];
+            double strokeOpacity = (double)parameterValues["Line opacity:"];
+
+            ColourFormatterOptions Stroke = (ColourFormatterOptions)parameterValues["Line colour:"];
+            Colour defaultStroke = Stroke.DefaultColour;
+            Func<object, Colour?> strokeFormatter = Stroke.Formatter;
+
+            NumberFormatterOptions WeightFO = (NumberFormatterOptions)parameterValues["Line weight:"];
+            double defaultWeight = WeightFO.DefaultValue;
+            Func<object, double?> weightFormatter = WeightFO.Formatter;
+
+            LineCaps cap = (LineCaps)(int)parameterValues["Line cap:"];
+            LineJoins join = (LineJoins)(2 - (int)parameterValues["Line cap:"]);
+            LineDash dash = (LineDash)parameterValues["Line dash:"];
 
             Point scalePoint;
 
@@ -341,8 +448,6 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             {
                 throw new Exception("The node ages have not been correctly set up!\nPlease use the \"Set up age distributions\" module.");
             }
-
-            Dictionary<string, List<double>> ageDistributions = (Dictionary<string, List<double>>)stateData.Tags["a1ccf05a-cf3c-4ca4-83be-af56f501c2a6"];
 
             double minX = double.MaxValue;
             double maxX = double.MinValue;
@@ -490,16 +595,78 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             topAxis = new Point[] { sumPoint(topAxis[0], new Point(-perpScaleNorm.X * (margin + maxHeight), -perpScaleNorm.Y * (margin + maxHeight))), sumPoint(topAxis[1], new Point(-perpScaleNorm.X * (margin + maxHeight), -perpScaleNorm.Y * (margin + maxHeight))) };
             bottomAxis = new Point[] { sumPoint(bottomAxis[0], new Point(perpScaleNorm.X * (margin + maxHeight), perpScaleNorm.Y * (margin + maxHeight))), sumPoint(bottomAxis[1], new Point(perpScaleNorm.X * (margin + maxHeight), perpScaleNorm.Y * (margin + maxHeight))) };
 
+
+            Dictionary<string, List<double>> ageDistributionsBySamples = null;
+            HashSet<string> availableNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (defaultDistribution)
+            {
+                if (stateData.Tags.TryGetValue("4e5d3934-44e6-4fe3-b11c-bd78e5b577d0", out object distribCollect) && distribCollect is Dictionary<string, (string, object)> distributionCollection && distributionCollection.Count > 0)
+                {
+                    foreach (KeyValuePair<string, (string, object)> kvp in distributionCollection)
+                    {
+                        if (checkIfFurtherTransformationModuleExists(kvp.Key, stateData))
+                        {
+                            if (kvp.Value.Item2 is Dictionary<string, List<double>> list)
+                            {
+                                ageDistributionsBySamples = list;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ageDistributionsBySamples = (Dictionary<string, List<double>>)stateData.Tags["a1ccf05a-cf3c-4ca4-83be-af56f501c2a6"];
+                }
+            }
+            else
+            {
+                if (stateData.Tags.TryGetValue("4e5d3934-44e6-4fe3-b11c-bd78e5b577d0", out object distribCollect) && distribCollect is Dictionary<string, (string, object)> distributionCollection && distributionCollection.Count > 0)
+                {
+                    foreach (KeyValuePair<string, (string, object)> kvp in distributionCollection)
+                    {
+                        if (checkIfFurtherTransformationModuleExists(kvp.Key, stateData))
+                        {
+                            availableNames.Add(kvp.Value.Item1);
+
+                            if (kvp.Value.Item1.Equals(distributionName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (kvp.Value.Item2 is Dictionary<string, List<double>> list)
+                                {
+                                    ageDistributionsBySamples = list;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (ageDistributionsBySamples == null)
+            {
+                if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+                {
+                    setWarning(availableNames.Aggregate("Invalid distribution specified! The available distribution names are:", (a, b) => a + "\n\n • `" + b + "`"), InvalidDistributionGuid);
+                }
+
+                return new Point[] { coordinates[Modules.RootNodeId], coordinates[Modules.RootNodeId] };
+            }
+            else if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+            {
+                setWarning("", InvalidDistributionGuid);
+            }
+
             if (plotPosition == 0 || plotPosition == 2)
             {
-                RunNodePlot(nodes, ageDistributions, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, topAxis, sumPoint, perpScaleNorm,
-               lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, -1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength());
+                RunNodePlot(nodes, ageDistributionsBySamples, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, topAxis, sumPoint, perpScaleNorm,
+                lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, -1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength(),
+                defaultStroke, autoStroke, Stroke, strokeFormatter, defaultWeight, WeightFO, weightFormatter, strokeOpacity, cap, join, dash);
             }
 
             if (plotPosition == 1 || plotPosition == 2)
             {
-                RunNodePlot(nodes, ageDistributions, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, bottomAxis, sumPoint, perpScaleNorm,
-                lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, 1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength());
+                RunNodePlot(nodes, ageDistributionsBySamples, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, bottomAxis, sumPoint, perpScaleNorm,
+                lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, 1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength(),
+                defaultStroke, autoStroke, Stroke, strokeFormatter, defaultWeight, WeightFO, weightFormatter, strokeOpacity, cap, join, dash);
             }
 
 
@@ -509,7 +676,8 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
         private static void RunNodePlot(List<TreeNode> nodes, Dictionary<string, List<double>> ageDistributions, Colour defaultFill, bool autoColourByNode, double opacity, ColourFormatterOptions customColour, Func<object, Colour?> fillFormatter,
         int plotType, Func<List<double>, (int[], double[])> histogram, Func<List<double>, (int[], double[], double[])> histogramWithBinMeans, Dictionary<string, Point> coordinates, Point scaleNorm, Point[] bottomAxis, Func<Point, Point, Point> sumPoint,
         Point perpScaleNorm, double lineMargin, double maxHeight, Point scalePoint, Action<Point> updateMaxMin, Point perpScale, Graphics graphics, int labelPosition, ColourFormatterOptions labelColour, Colour defaultLabelColour, bool autoLabelColourByNode,
-        Func<object, Colour?> labelFormatter, Point labelMargin, Font labelFont, double labelOpacity, double plotDirection, string attribute, Func<object, string> formatter, Func<Point, double, Point> rotatePoint, double totalTreeLength)
+        Func<object, Colour?> labelFormatter, Point labelMargin, Font labelFont, double labelOpacity, double plotDirection, string attribute, Func<object, string> formatter, Func<Point, double, Point> rotatePoint, double totalTreeLength, Colour defaultStroke,
+        bool autoStroke, ColourFormatterOptions Stroke, Func<object, Colour?> strokeFormatter, double defaultWeight, NumberFormatterOptions WeightFO, Func<object, double?> weightFormatter, double strokeOpacity, LineCaps cap, LineJoins join, LineDash dash)
         {
             int shownDistribCount = 0;
 
@@ -530,7 +698,29 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                         colour = fillFormatter(fillAttributeObject) ?? defaultFill;
                     }
 
-                    if (colour.A > 0)
+                    Colour strokeColour = defaultStroke;
+
+                    if (!autoStroke)
+                    {
+                        if (nodes[i].Attributes.TryGetValue(Stroke.AttributeName, out object strokeAttributeObject) && strokeAttributeObject != null)
+                        {
+                            strokeColour = strokeFormatter(strokeAttributeObject) ?? defaultStroke;
+                        }
+                    }
+                    else
+                    {
+                        strokeColour = Modules.DefaultColours[Math.Abs(string.Join(",", nodes[i].GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(strokeOpacity);
+                    }
+
+                    double weight = defaultWeight;
+
+                    if (nodes[i].Attributes.TryGetValue(WeightFO.AttributeName, out object weightAttributeObject) && weightAttributeObject != null)
+                    {
+                        weight = weightFormatter(weightAttributeObject) ?? defaultWeight;
+                    }
+
+
+                    if (colour.A > 0 || (strokeColour.A > 0 && weight > 0))
                     {
                         object globalHist = null;
                         double[] range = null;
@@ -587,7 +777,15 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                                     histPth.MoveTo(sumPoint(binStart, vertDist)).LineTo(sumPoint(binStart, new Point(-vertDist.X, -vertDist.Y))).LineTo(sumPoint(binEnd, new Point(-vertDist.X, -vertDist.Y))).LineTo(sumPoint(binEnd, vertDist)).Close();
                                 }
 
-                                graphics.FillPath(histPth, colour, tag: nodes[i].Id);
+                                if (colour.A > 0)
+                                {
+                                    graphics.FillPath(histPth, colour, tag: nodes[i].Id);
+                                }
+
+                                if (strokeColour.A > 0 && weight > 0)
+                                {
+                                    graphics.StrokePath(histPth, strokeColour, weight, cap, join, dash, tag: nodes[i].Id);
+                                }
                             }
                         }
                         else if (plotType == 1)
@@ -633,7 +831,15 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
                             histPth.Close();
 
-                            graphics.FillPath(histPth, colour, tag: nodes[i].Id);
+                            if (colour.A > 0)
+                            {
+                                graphics.FillPath(histPth, colour, tag: nodes[i].Id);
+                            }
+
+                            if (strokeColour.A > 0 && weight > 0)
+                            {
+                                graphics.StrokePath(histPth, strokeColour, weight, cap, join, dash, tag: nodes[i].Id);
+                            }
                         }
 
 
@@ -708,6 +914,21 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                     }
                 }
             }
+        }
+
+        private static bool checkIfFurtherTransformationModuleExists(string id, InstanceStateData stateData)
+        {
+            List<FurtherTransformationModule> furtherTransformationModules = stateData.FurtherTransformationModules();
+
+            for (int i = 0; i < furtherTransformationModules.Count; i++)
+            {
+                if (stateData.GetFurtherTransformationModulesParamters(i).TryGetValue(Modules.ModuleIDKey, out object key) && key is string str && str.Equals(id))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

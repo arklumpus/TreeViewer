@@ -44,11 +44,11 @@ namespace SetUpAgeDistributions
         public const string Name = "Set up age distributions (attachment)";
         public const string HelpText = "Computes node age distributions from trees contained in an attachment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.2.0");
         public const string Id = "5d721496-f2fa-48de-ad0d-90ef5d8086aa";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
-        public static bool Repeatable { get; } = false;
+        public static bool Repeatable { get; } = true;
 
         private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAC/SURBVDhPnZHBEoIwDESDXwZXL/5L7wx2vPdfvHDFP9NsTJwYaEHfDBMK3aW7dOQ4j/crj+m9ojzfLlg3Oek0TAwmNWwSDSK7JhIhHL3GZqSOxU+9/4ufDPgEX6WDwxEgTinFfVlKRLYtdwXZvXgopWDvgPXeX5DigviBFzajQdYJqmLAz3vM2rEFL+YLAsmPCPwO5eeqQUWM+0U7EFod+GObeEWzRMvsvrjw5XtqG1hRiojZDNE+HOnAWImJiF5HAlwXqgmmugAAAABJRU5ErkJggg==";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAElSURBVEhLtZRBEoIwDEVBz+I5hK0b116DvQMd95zDrQvdwrj2Bh4G82vqQGkhYeTNZNK0w0+bhqZJhMP5VpEryczjcsR4EVv2A3riINvtT+n7eW05VrFh7+PEHSUnVTNKMCG0KMmgRF5pQqjLZS9ZIBzjTvaaaoKUxDser0Lskv/G+iVibxEmUv14oz95JklUvCgK/ztT13UVfCoiFy8Rz0m0pTijcUNmYpds2DvE4phjn2M+eALQK5VKvA+td9EEcwjEbZkWJZCKkxl1Al+8FwPbOTSHJrHj77QQiOFjMuwwFI+6T/xUQIxcaOcutkl8NG+RX3Nf3NYcC4sIHR9AHGtkwXqrXlPe6Q+O7c5jF6pJgOM3LolEHKjalMvgWhLMtGKSfAACabeWbAz4GwAAAABJRU5ErkJggg==";
@@ -196,6 +196,12 @@ namespace SetUpAgeDistributions
                 /// If this check box is checked, the [scaling factor](#scaling-factor) is applied to the transformed tree, as well as to the age distributions.
                 /// </param>
                 ( "Apply scaling to transformed tree", "CheckBox:true" ),
+
+                /// <param name="Name:">
+                /// This parameter specifies a name that can be used to identify the age distributions in cases where multiple age distributions have been computed
+                /// for the same tree.
+                /// </param>
+                ( "Name:", "TextBox:" ),
                 
                 /// <param name="Apply">
                 /// This button applies the changes to the other parameter values and signals that the tree needs to be redrawn.
@@ -253,6 +259,11 @@ namespace SetUpAgeDistributions
                 { "Apply", false }
             };
 
+            if (string.IsNullOrEmpty((string)currentParameterValues["Name:"]) && (Attachment)currentParameterValues["Attachment:"] != (Attachment)previousParameterValues["Attachment:"])
+            {
+                parametersToChange["Name:"] = ((Attachment)currentParameterValues["Attachment:"]).Name;
+            }
+
             return (bool)currentParameterValues["Apply"];
         }
 
@@ -272,6 +283,7 @@ namespace SetUpAgeDistributions
             double threshold = (double)parameterValues["Threshold:"];
             int ciType = (int)parameterValues["Credible interval:"];
             bool computeMean = (bool)parameterValues["Compute mean"];
+            string name = (string)parameterValues["Name:"];
 
             InstanceStateData stateData = (InstanceStateData)parameterValues["StateData"];
 
@@ -518,6 +530,21 @@ namespace SetUpAgeDistributions
 
                 stateData.Tags["a1ccf05a-cf3c-4ca4-83be-af56f501c2a6"] = ageSamples;
                 tree.Attributes["a1ccf05a-cf3c-4ca4-83be-af56f501c2a6"] = "Age distributions";
+
+                Dictionary<string, (string, object)> distributionCollection;
+
+                if (stateData.Tags.TryGetValue("4e5d3934-44e6-4fe3-b11c-bd78e5b577d0", out object distribCollect))
+                {
+                    distributionCollection = distribCollect as Dictionary<string, (string, object)>;
+                }
+                else
+                {
+                    distributionCollection = new Dictionary<string, (string, object)>();
+                    stateData.Tags["4e5d3934-44e6-4fe3-b11c-bd78e5b577d0"] = distributionCollection;
+                }
+
+                distributionCollection[(string)parameterValues[Modules.ModuleIDKey]] = (name, ageSamples);
+
             }
         }
     }
@@ -683,3 +710,4 @@ namespace SetUpAgeDistributions
         }
     }
 }
+
