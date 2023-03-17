@@ -96,6 +96,42 @@ namespace Labels
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
+            int defaultBranchReference = 0;
+
+            if (InstanceStateData.IsUIAvailable)
+            {
+                MainWindow activeWindow = null;
+
+                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
+                {
+                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
+                    {
+                        activeWindow = GlobalSettings.Settings.MainWindows[i];
+                        break;
+                    }
+                }
+
+                if (activeWindow != null)
+                {
+                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+                    {
+                        // Rectangular coordinates
+                        defaultBranchReference = 0;
+                    }
+                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+                    {
+                        // Circular coordinates
+                        defaultBranchReference = 2;
+                    }
+                    else
+                    {
+                        // Radial coordinates
+                        defaultBranchReference = 1;
+                    }
+                }
+            }
+
+
             return new List<(string, string)>()
             {
                 /// <param name="Show on:">
@@ -172,7 +208,7 @@ namespace Labels
                 /// <param name="Branch reference:">
                 /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
                 /// </param>
-                ( "Branch reference:", "ComboBox:0[\"Rectangular\",\"Radial\",\"Circular\"]" ),
+                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
 
                 ( "Appearance", "Group:4"),
 
@@ -331,7 +367,7 @@ namespace Labels
             if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
             {
                 string attrType = (string)currentParameterValues["Attribute type:"];
-                
+
                 if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
                 {
                     if (attrType == "String")
@@ -1056,7 +1092,7 @@ namespace Labels
             {
                 // Circular coordinates
 
-                 if ((int)parameterValues["Branch reference:"] != 2)
+                if ((int)parameterValues["Branch reference:"] != 2)
                 {
                     message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Circular`.";
 
@@ -1067,7 +1103,7 @@ namespace Labels
             {
                 // Radial coordinates
 
-                 if ((int)parameterValues["Branch reference:"] != 1)
+                if ((int)parameterValues["Branch reference:"] != 1)
                 {
                     message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Radial`.";
 

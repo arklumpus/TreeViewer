@@ -2239,9 +2239,9 @@ namespace a36a54db04e2447868b84ad4e188c3285
 
             if (rooted)
             {
-                plottingActionModules.Add(new string[] { "7c767b07-71be-48b2-8753-b27f3e973570", MainWindow.SerializeParameters(new Dictionary<string, object>() { { "Line weight:", formatterOptions }, { "Colour:", branchColour } }) });
-                plottingActionModules.Add(new string[] { "7c767b07-71be-48b2-8753-b27f3e973570", MainWindow.SerializeParameters(new Dictionary<string, object>()) });
-                plottingActionModules.Add(new string[] { "ac496677-2650-4d92-8646-0812918bab03", MainWindow.SerializeParameters(new Dictionary<string, object>()) });
+                plottingActionModules.Add(new string[] { "7c767b07-71be-48b2-8753-b27f3e973570", MainWindow.SerializeParameters(new Dictionary<string, object>() { { "Line weight:", formatterOptions }, { "Colour:", branchColour }, { "Shape:", 0.0 } }) });
+                plottingActionModules.Add(new string[] { "7c767b07-71be-48b2-8753-b27f3e973570", MainWindow.SerializeParameters(new Dictionary<string, object>() { { "Shape:", 0.0 } } ) });
+                plottingActionModules.Add(new string[] { "ac496677-2650-4d92-8646-0812918bab03", MainWindow.SerializeParameters(new Dictionary<string, object>() { { "Branch reference:", 0 } }) });
                 plottingActionModules.Add(new string[] { "ac496677-2650-4d92-8646-0812918bab03", MainWindow.SerializeParameters(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new VectSharp.Point(0, -5) }, { "Font:", new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } }) });
             }
             else

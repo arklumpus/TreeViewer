@@ -47,7 +47,7 @@ namespace BranchExtensions
         public const string Name = "Branch extensions";
         public const string HelpText = "Extends terminal branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "fb385719-b376-49b0-8e99-aab7cf641966";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -99,6 +99,41 @@ namespace BranchExtensions
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
+			int defaultBranchReference = 0;
+
+            if (InstanceStateData.IsUIAvailable)
+            {
+                MainWindow activeWindow = null;
+
+                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
+                {
+                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
+                    {
+                        activeWindow = GlobalSettings.Settings.MainWindows[i];
+                        break;
+                    }
+                }
+
+                if (activeWindow != null)
+                {
+                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+                    {
+                        // Rectangular coordinates
+                        defaultBranchReference = 0;
+                    }
+                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+                    {
+                        // Circular coordinates
+                        defaultBranchReference = 2;
+                    }
+                    else
+                    {
+                        // Radial coordinates
+                        defaultBranchReference = 1;
+                    }
+                }
+            }
+			
             return new List<(string, string)>()
             {
                 ( "Position", "Group:5"),
@@ -113,7 +148,7 @@ namespace BranchExtensions
                 /// If the [Orientation reference](#orientation-reference) is `Branch`, this parameter determines the algorithm that is
                 /// used to compute the branch direction. Ideally, this should correspond to the Coordinates module that has been used.
                 /// </param>
-                ( "Branch reference:", "ComboBox:0[\"Rectangular\",\"Radial\",\"Circular\"]" ),
+                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
                 
                 /// <param name="Start:">
                 /// The offset of the start point of the branch extension, with respect to the terminal node from which the branch

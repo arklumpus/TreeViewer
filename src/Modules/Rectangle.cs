@@ -29,7 +29,7 @@ namespace a34e1a6277b6a4c0f80d9795eea245e1e
         public const string Name = "Rectangle";
         public const string HelpText = "Draws a rectangle on the plot.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "34e1a627-7b6a-4c0f-80d9-795eea245e1e";
@@ -90,6 +90,41 @@ namespace a34e1a6277b6a4c0f80d9795eea245e1e
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
+			int defaultBranchReference = 0;
+
+            if (InstanceStateData.IsUIAvailable)
+            {
+                MainWindow activeWindow = null;
+
+                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
+                {
+                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
+                    {
+                        activeWindow = GlobalSettings.Settings.MainWindows[i];
+                        break;
+                    }
+                }
+
+                if (activeWindow != null)
+                {
+                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+                    {
+                        // Rectangular coordinates
+                        defaultBranchReference = 0;
+                    }
+                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+                    {
+                        // Circular coordinates
+                        defaultBranchReference = 2;
+                    }
+                    else
+                    {
+                        // Radial coordinates
+                        defaultBranchReference = 1;
+                    }
+                }
+            }
+			
             List<string> leafNames = tree.GetLeafNames();
 
             return new List<(string, string)>()
@@ -143,7 +178,7 @@ namespace a34e1a6277b6a4c0f80d9795eea245e1e
                 /// <param name="Branch reference:">
                 /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
                 /// </param>
-                ("Branch reference:", "ComboBox:0[\"Rectangular\",\"Radial\",\"Circular\"]"),
+                ("Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]"),
                 
                 /// <param name="Position:">
                 /// This parameter determines how shifted from the anchor point the rectangle is. The `X` coordinate corresponds to the line determined by the [Orientation reference](#orientation-reference);

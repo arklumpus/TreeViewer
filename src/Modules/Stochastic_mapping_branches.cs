@@ -118,42 +118,43 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
             return pag;
         }
 
-        // This method should return a list of tuples representing the global parameters required by this module. The
-        // first item of each tuple is the name of the parameter, the second element is the parameter type. These will
-        // be presented to the user in the "Preferences" window. See the TreeViewer manual for details of the possible
-        // parameter values and options. Note that this method is only called once, when the module is loaded.
-        public static List<(string, string)> GetGlobalSettings()
-        {
-            // TODO: return the list of required parameters.
-            // E.g.:
-            //      return new List<(string, string)>()
-            //      {
-            //          ("Default colour:", "Colour:[0,162,232,255]"),
-            //      };
-
-            return new List<(string, string)>()
-            {
-
-            };
-        }
-
-        // This method should return a list of tuples representing the parameters required by this module. The first
-        // item of each tuple is the name of the parameter, the second element is the parameter type. These will be
-        // presented to the user in the interface. See the TreeViewer manual for details of the possible parameter
-        // values and options. Note that this method is called once every time the module is added to the plot.
-        //
-        // tree: the final transformed tree that is being plotted.
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-            // TODO: return the list of required parameters.
-            // E.g.:
-            //      return new List<(string, string)>()
-            //      {
-            //          ("Size", "Group:2"),
-            //          ("Width:", "NumericUpDown:100[\"0\",\"Infinity\"]"),
-            //          ("Height:", "NumericUpDown:100[\"0\",\"Infinity\"]"),
-            //      };
+			int defaultBranchReference = 0;
 
+            if (InstanceStateData.IsUIAvailable)
+            {
+                MainWindow activeWindow = null;
+
+                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
+                {
+                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
+                    {
+                        activeWindow = GlobalSettings.Settings.MainWindows[i];
+                        break;
+                    }
+                }
+
+                if (activeWindow != null)
+                {
+                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+                    {
+                        // Rectangular coordinates
+                        defaultBranchReference = 0;
+                    }
+                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+                    {
+                        // Circular coordinates
+                        defaultBranchReference = 2;
+                    }
+                    else
+                    {
+                        // Radial coordinates
+                        defaultBranchReference = 1;
+                    }
+                }
+            }
+			
             return new List<(string, string)>()
             {
                 ( "Window", "Window:" ),
@@ -206,7 +207,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
                 /// <param name="Shape:">
                 /// This parameter determines the shape of the branches.
                 /// </param>
-                ("Shape:", "ComboBox:0[\"Rectangular\",\"Radial\",\"Circular\"]"),
+                ("Shape:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]"),
 
                 /// <param name="Branch thickness:">
                 /// This parameter determines the thickness of the branches.

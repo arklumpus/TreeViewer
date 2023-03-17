@@ -95,6 +95,41 @@ namespace Branches
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
+			int defaultBranchReference = 0;
+
+            if (InstanceStateData.IsUIAvailable)
+            {
+                MainWindow activeWindow = null;
+
+                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
+                {
+                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
+                    {
+                        activeWindow = GlobalSettings.Settings.MainWindows[i];
+                        break;
+                    }
+                }
+
+                if (activeWindow != null)
+                {
+                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+                    {
+                        // Rectangular coordinates
+                        defaultBranchReference = 0;
+                    }
+                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+                    {
+                        // Circular coordinates
+                        defaultBranchReference = 2;
+                    }
+                    else
+                    {
+                        // Radial coordinates
+                        defaultBranchReference = 1;
+                    }
+                }
+            }
+			
             return new List<(string, string)>()
             {
                 /// <param name="Root branch">
@@ -112,7 +147,7 @@ namespace Branches
                 /// Intermediate values interpolate between these styles. Use the [Fixed shapes](#fixed-shapes) buttons to quickly
                 /// switch between the three styles.
                 /// </param>
-                ( "Shape:", "Slider:0[\"0\",\"2\"]" ),
+                ( "Shape:", "Slider:" + defaultBranchReference.ToString() + "[\"0\",\"2\"]" ),
                 
                 /// <param name="FixedShapes" display="Fixed shapes">
                 /// These buttons set the value of the [Shape](#shape) parameter to the predefined values corresponding to the

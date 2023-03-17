@@ -7,3 +7,11 @@ VectSharp.dll
 VectSharp.MuPDFUtils.dll
 MuPDFCore.dll
 PhyloTree.TreeNode.dll
+Avalonia.Controls.dll
+Avalonia.Input.dll
+Avalonia.Interactivity.dll
+Avalonia.Layout.dll
+Avalonia.Visuals.dll
+Avalonia.Styling.dll
+Avalonia.Animation.dll
+Avalonia.Base.dll
