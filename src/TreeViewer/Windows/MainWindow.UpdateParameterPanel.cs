@@ -1383,8 +1383,8 @@ namespace TreeViewer
 
                             slid.Resources.Add("SliderHorizontalThumbWidth", 5);
                             slid.Resources.Add("SliderHorizontalThumbHeight", 20);
-                            slid.Resources.Add("SliderPreContentMargin", 0.0);
-                            slid.Resources.Add("SliderPostContentMargin", 0.0);
+                            slid.Resources.Add("SliderPreContentMargin", new GridLength(0, GridUnitType.Pixel));
+                            slid.Resources.Add("SliderPostContentMargin", new GridLength(0, GridUnitType.Pixel));
 
                             container.Children.Add(slid);
 
