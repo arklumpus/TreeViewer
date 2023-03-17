@@ -1,16 +1,24 @@
 #!/bin/sh
 
-printf "\nWelcome to the TreeViewer setup!\n\n"
-
 #Check that we are running as root
 if [ $(id -u) -gt 0 ]; then
+    printf "\nWelcome to the TreeViewer setup!\n\n"
     printf "This script needs to be run as root!\n\n"
     exit 1
 fi
 
-printf "This script will copy the program files, add TreeViewer to the desktop\nmenu, and (optionally) symlink the TreeViewer executables so that they\ncan be recalled from anywhere.\n\n"
+more Licence.txt
 
-printf "\n"
+confirm="a"
+
+while [ "$confirm" != "Y" ] && [ "$confirm" != "y" ] && [ "$confirm" != "N" ] && [ "$confirm" != "n" ]; do
+    read -p "Do you agree to the licensing terms? [Y/n] " confirm
+done
+
+if [ "$confirm" != "Y" ] && [ "$confirm" != "y" ]; then
+    printf "\nTreeViewer setup aborted.\n\n"
+	exit 0
+fi
 
 prefix="/usr/lib"
 
