@@ -138,12 +138,25 @@ namespace SetUpAgeDistributions
                 /// </param>
                 ( "Threshold:", "Slider:0.89[\"0\",\"1\",\"0.00\"]"),
                 
+				( "Scaling", "Group:2" ),
+
+                /// <param name="Scaling factor:">
+                /// This parameter is used to scale the age distributions (and the tree, if the [Apply scaling to transformed tree](#apply-scaling-to-transformed-tree)
+                /// check box is checked).
+                /// </param>
+                ( "Scaling factor:", "NumericUpDown:1[\"0\",\"Infinity\",\"1\",\"0.####\"]" ),
+                
+                /// <param name="Apply scaling to transformed tree">
+                /// If this check box is checked, the [scaling factor](#scaling-factor) is applied to the transformed tree, as well as to the age distributions.
+                /// </param>
+                ( "Apply scaling to transformed tree", "CheckBox:true" ),
+				
                 /// <param name="Name:">
                 /// This parameter specifies a name that can be used to identify the age distributions in cases where multiple age distributions have been computed
                 /// for the same tree.
                 /// </param>
                 ( "Name:", "TextBox:AgeDistributions" ),
-                
+				
                 /// <param name="Apply">
                 /// This button applies the changes to the other parameter values and signals that the tree needs to be redrawn.
                 /// </param>
@@ -243,6 +256,28 @@ namespace SetUpAgeDistributions
                       progressAction((double)sampleIndex / treeCollection.Count);
                   }
               });
+			  
+			double scalingFactor = (double)parameterValues["Scaling factor:"];
+			bool applyScalingToTree = (bool)parameterValues["Apply scaling to transformed tree"];
+
+			if (scalingFactor != 1)
+			{
+				foreach (KeyValuePair<string, List<double>> kvp in ageSamples)
+				{
+					for (int i = 0; i < kvp.Value.Count; i++)
+					{
+						kvp.Value[i] *= scalingFactor;
+					}
+				}
+
+				if (applyScalingToTree)
+				{
+					foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+					{
+						node.Length *= scalingFactor;
+					}
+				}
+			}
 
             if (ciType > 0 || computeMean)
             {
