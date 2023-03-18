@@ -28,8 +28,10 @@ namespace ad064aea66b434bd38ceae72b4feb1142
     /// This module cycles through all the branches in the tree and multiplies their length by the specified
     /// [scaling factor](#scaling-factor).
     /// 
-    /// Note that this may yield unexpected results if age distributions or stochastic map data has been loaded,
-    /// because that data is not affected by this module (hence, it will retain the original scale).
+    /// Note that this may yield unexpected results if age distributions have been loaded, because that data
+	/// is not affected by this module (hence, it will retain the original scale).
+	/// 
+	/// Modules that set up age distribution data should have a setting to scale the age distribution data.
     /// </summary>
 
     public static class MyModule
