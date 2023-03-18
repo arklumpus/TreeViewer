@@ -31,7 +31,7 @@ namespace ad064aea66b434bd38ceae72b4feb1142
     /// Note that this may yield unexpected results if age distributions or stochastic map data has been loaded,
     /// because that data is not affected by this module (hence, it will retain the original scale).
     /// </summary>
-    
+
     public static class MyModule
     {
         public const string Name = "Scale tree";
@@ -98,7 +98,7 @@ namespace ad064aea66b434bd38ceae72b4feb1142
                 /// <param name="Scaling factor:">
                 /// This parameter determines the value by which all branch lengths in the tree will be multiplied.
                 /// </param>
-                ( "Scaling factor:", "NumericUpDown:1[\"0\",\"Infinity\"]"),
+                ( "Scaling factor:", "NumericUpDown:1[\"0\",\"Infinity\",\"1\",\"0.####\"]" ),
                 
                 /// <param name="Apply">
                 /// This button applies the changes to the other parameter values and signals that the tree needs to be redrawn.
@@ -117,9 +117,16 @@ namespace ad064aea66b434bd38ceae72b4feb1142
 
         public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
         {
+            string message = "";
+
             double scalingFactor = (double)parameterValues["Scaling factor:"];
 
-            if (scalingFactor != 1)
+            if (scalingFactor == 0)
+            {
+                message = "Refusing to scale the tree with a scaling factor of 0!";
+            }
+
+            if (scalingFactor != 1 && scalingFactor > 0)
             {
                 foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
                 {
@@ -130,12 +137,17 @@ namespace ad064aea66b434bd38ceae72b4feb1142
 
                 if (stateData.Tags.ContainsKey("a1ccf05a-cf3c-4ca4-83be-af56f501c2a6") && tree.Attributes.ContainsKey("a1ccf05a-cf3c-4ca4-83be-af56f501c2a6"))
                 {
-                    // TODO: complain because there are age distributions
+                    message = "The tree contains age distribution data. Please note that this module will only scale the tree!";
                 }
 
                 if (stateData.Tags.ContainsKey("32858c9d-0247-497f-aeee-03f7bfe24158") && tree.Attributes.ContainsKey("32858c9d-0247-497f-aeee-03f7bfe24158"))
                 {
-                    // TODO: complain because there is stochastic mapping data
+                    // The tree contains stochastic mapping data, but these are stored in relative terms, thus they shouldn't be affected.
+                }
+
+                if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+                {
+                    setWarning(message, Id);
                 }
             }
         }
