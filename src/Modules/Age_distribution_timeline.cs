@@ -597,6 +597,9 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
 
             Dictionary<string, List<double>> ageDistributionsBySamples = null;
+            Dictionary<string, (double[], double[])> ageDistributionFunctions = null;
+
+
             HashSet<string> availableNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             if (defaultDistribution)
@@ -610,6 +613,12 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                             if (kvp.Value.Item2 is Dictionary<string, List<double>> list)
                             {
                                 ageDistributionsBySamples = list;
+                                ageDistributionFunctions = null;
+                            }
+                            else if (kvp.Value.Item2 is Dictionary<string, (double[], double[])> list2)
+                            {
+                                ageDistributionsBySamples = null;
+                                ageDistributionFunctions = list2;
                             }
                         }
                     }
@@ -635,13 +644,17 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                                 {
                                     ageDistributionsBySamples = list;
                                 }
+                                else if (kvp.Value.Item2 is Dictionary<string, (double[], double[])> list2)
+                                {
+                                    ageDistributionFunctions = list2;
+                                }
                             }
                         }
                     }
                 }
             }
 
-            if (ageDistributionsBySamples == null)
+            if (ageDistributionsBySamples == null && ageDistributionFunctions == null)
             {
                 if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
                 {
@@ -657,14 +670,14 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
             if (plotPosition == 0 || plotPosition == 2)
             {
-                RunNodePlot(nodes, ageDistributionsBySamples, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, topAxis, sumPoint, perpScaleNorm,
+                RunNodePlot(nodes, ageDistributionsBySamples, ageDistributionFunctions, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, topAxis, sumPoint, perpScaleNorm,
                 lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, -1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength(),
                 defaultStroke, autoStroke, Stroke, strokeFormatter, defaultWeight, WeightFO, weightFormatter, strokeOpacity, cap, join, dash);
             }
 
             if (plotPosition == 1 || plotPosition == 2)
             {
-                RunNodePlot(nodes, ageDistributionsBySamples, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, bottomAxis, sumPoint, perpScaleNorm,
+                RunNodePlot(nodes, ageDistributionsBySamples, ageDistributionFunctions, defaultFill, autoColourByNode, opacity, customColour, fillFormatter, plotType, histogram, histogramWithBinMeans, coordinates, scaleNorm, bottomAxis, sumPoint, perpScaleNorm,
                 lineMargin, maxHeight, scalePoint, updateMaxMin, perpScale, graphics, labelPosition, labelColour, defaultLabelColour, autoLabelColourByNode, labelFormatter, labelMargin, labelFont, labelOpacity, 1, attribute, formatter, rotatePoint, tree.LongestDownstreamLength(),
                 defaultStroke, autoStroke, Stroke, strokeFormatter, defaultWeight, WeightFO, weightFormatter, strokeOpacity, cap, join, dash);
             }
@@ -673,7 +686,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
             return new Point[] { new Point(minX, minY), new Point(maxX, maxY) };
         }
 
-        private static void RunNodePlot(List<TreeNode> nodes, Dictionary<string, List<double>> ageDistributions, Colour defaultFill, bool autoColourByNode, double opacity, ColourFormatterOptions customColour, Func<object, Colour?> fillFormatter,
+        private static void RunNodePlot(List<TreeNode> nodes, Dictionary<string, List<double>> ageDistributionsBySamples, Dictionary<string, (double[], double[])> ageDistributionFunctions, Colour defaultFill, bool autoColourByNode, double opacity, ColourFormatterOptions customColour, Func<object, Colour?> fillFormatter,
         int plotType, Func<List<double>, (int[], double[])> histogram, Func<List<double>, (int[], double[], double[])> histogramWithBinMeans, Dictionary<string, Point> coordinates, Point scaleNorm, Point[] bottomAxis, Func<Point, Point, Point> sumPoint,
         Point perpScaleNorm, double lineMargin, double maxHeight, Point scalePoint, Action<Point> updateMaxMin, Point perpScale, Graphics graphics, int labelPosition, ColourFormatterOptions labelColour, Colour defaultLabelColour, bool autoLabelColourByNode,
         Func<object, Colour?> labelFormatter, Point labelMargin, Font labelFont, double labelOpacity, double plotDirection, string attribute, Func<object, string> formatter, Func<Point, double, Point> rotatePoint, double totalTreeLength, Colour defaultStroke,
@@ -683,9 +696,27 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
             for (int i = 0; i < nodes.Count; i++)
             {
-                List<double> distrib = ageDistributions[nodes[i].Id];
+                object distributionObject = null;
+                int cnt = 0;
 
-                if (distrib.Count > 0)
+                if (ageDistributionsBySamples != null)
+                {
+                    if (ageDistributionsBySamples.TryGetValue(nodes[i].Id, out List<double> ageDistribution))
+                    {
+                        distributionObject = ageDistribution;
+                        cnt = ageDistribution.Count;
+                    }
+                }
+                else
+                {
+                    if (ageDistributionFunctions.TryGetValue(nodes[i].Id, out (double[], double[]) ageDistribution))
+                    {
+                        distributionObject = ageDistribution;
+                        cnt = 1;
+                    }
+                }
+
+                if (cnt > 0)
                 {
                     Colour colour = defaultFill;
 
@@ -722,60 +753,120 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
                     if (colour.A > 0 || (strokeColour.A > 0 && weight > 0))
                     {
-                        object globalHist = null;
-                        double[] range = null;
+                        Point leftPoint = new Point();
+                        Point rightPoint = new Point();
+                        bool plotted = true;
 
-                        if (plotType == 0)
+                        if (distributionObject is List<double> distrib)
                         {
-                            (int[], double[]) hist = histogram(distrib);
-                            range = hist.Item2;
-                            globalHist = hist;
-                        }
-                        else if (plotType == 1)
-                        {
-                            (int[], double[], double[]) hist = histogramWithBinMeans(distrib);
-                            range = hist.Item2;
-                            globalHist = hist;
-                        }
+                            object globalHist = null;
+                            double[] range = null;
 
-                        double age = totalTreeLength - nodes[i].UpstreamLength();
-                        double deltaLeft = age - range[1];
-                        double deltaRight = range[0] - age;
-
-                        Point coord = coordinates[nodes[i].Id];
-                        double dotprod = scaleNorm.X * (coord.X - bottomAxis[0].X) + scaleNorm.Y * (coord.Y - bottomAxis[0].Y);
-                        coord = sumPoint(bottomAxis[0], new Point(dotprod * scaleNorm.X, dotprod * scaleNorm.Y));
-                        coord = sumPoint(coord, new Point(perpScaleNorm.X * (lineMargin + maxHeight) * shownDistribCount, perpScaleNorm.Y * (lineMargin + maxHeight * 2) * shownDistribCount * plotDirection));
-
-                        Point rightPoint = sumPoint(new Point(-scalePoint.X * deltaRight, -scalePoint.Y * deltaRight), coord);
-                        Point leftPoint = sumPoint(new Point(scalePoint.X * deltaLeft, scalePoint.Y * deltaLeft), coord);
-
-                        updateMaxMin(sumPoint(leftPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
-                        updateMaxMin(sumPoint(leftPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
-                        updateMaxMin(sumPoint(rightPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
-                        updateMaxMin(sumPoint(rightPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
-
-                        if (plotType == 0)
-                        {
-                            (int[], double[]) hist = ((int[], double[]))globalHist;
-
-                            int[] bins = hist.Item1;
-
-                            double maxBin = bins.Max();
-
-                            GraphicsPath histPth = new GraphicsPath();
-
-                            if (leftPoint.X != rightPoint.X || leftPoint.Y != rightPoint.Y)
+                            if (plotType == 0)
                             {
+                                (int[], double[]) hist = histogram(distrib);
+                                range = hist.Item2;
+                                globalHist = hist;
+                            }
+                            else if (plotType == 1)
+                            {
+                                (int[], double[], double[]) hist = histogramWithBinMeans(distrib);
+                                range = hist.Item2;
+                                globalHist = hist;
+                            }
+
+                            double age = totalTreeLength - nodes[i].UpstreamLength();
+                            double deltaLeft = age - range[1];
+                            double deltaRight = range[0] - age;
+
+                            Point coord = coordinates[nodes[i].Id];
+                            double dotprod = scaleNorm.X * (coord.X - bottomAxis[0].X) + scaleNorm.Y * (coord.Y - bottomAxis[0].Y);
+                            coord = sumPoint(bottomAxis[0], new Point(dotprod * scaleNorm.X, dotprod * scaleNorm.Y));
+                            coord = sumPoint(coord, new Point(perpScaleNorm.X * (lineMargin + maxHeight) * shownDistribCount, perpScaleNorm.Y * (lineMargin + maxHeight * 2) * shownDistribCount * plotDirection));
+
+                            rightPoint = sumPoint(new Point(-scalePoint.X * deltaRight, -scalePoint.Y * deltaRight), coord);
+                            leftPoint = sumPoint(new Point(scalePoint.X * deltaLeft, scalePoint.Y * deltaLeft), coord);
+
+                            updateMaxMin(sumPoint(leftPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
+                            updateMaxMin(sumPoint(leftPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
+                            updateMaxMin(sumPoint(rightPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
+                            updateMaxMin(sumPoint(rightPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
+
+                            if (plotType == 0)
+                            {
+                                (int[], double[]) hist = ((int[], double[]))globalHist;
+
+                                int[] bins = hist.Item1;
+
+                                double maxBin = bins.Max();
+
+                                GraphicsPath histPth = new GraphicsPath();
+
+                                if (leftPoint.X != rightPoint.X || leftPoint.Y != rightPoint.Y)
+                                {
+
+                                    for (int j = 0; j < bins.Length; j++)
+                                    {
+                                        Point vertDist = new Point(perpScale.X * bins[bins.Length - j - 1] / maxBin * maxHeight, perpScale.Y * bins[bins.Length - j - 1] / maxBin * maxHeight);
+                                        Point binStart = sumPoint(leftPoint, new Point(scalePoint.X * range[2] * j, scalePoint.Y * range[2] * j));
+                                        Point binEnd = sumPoint(leftPoint, new Point(scalePoint.X * Math.Min(range[2] * (j + 1), range[1] - range[0]), scalePoint.Y * Math.Min(range[2] * (j + 1), range[1] - range[0])));
+
+                                        histPth.MoveTo(sumPoint(binStart, vertDist)).LineTo(sumPoint(binStart, new Point(-vertDist.X, -vertDist.Y))).LineTo(sumPoint(binEnd, new Point(-vertDist.X, -vertDist.Y))).LineTo(sumPoint(binEnd, vertDist)).Close();
+                                    }
+
+                                    if (colour.A > 0)
+                                    {
+                                        graphics.FillPath(histPth, colour, tag: nodes[i].Id);
+                                    }
+
+                                    if (strokeColour.A > 0 && weight > 0)
+                                    {
+                                        graphics.StrokePath(histPth, strokeColour, weight, cap, join, dash, tag: nodes[i].Id);
+                                    }
+                                }
+                            }
+                            else if (plotType == 1)
+                            {
+                                (int[], double[], double[]) hist = ((int[], double[], double[]))globalHist;
+
+                                int[] bins = hist.Item1;
+                                double[] binMeans = hist.Item3;
+
+                                double maxBin = bins.Max();
+
+                                List<Point> pointsUp = new List<Point>();
+
+                                GraphicsPath histPth = new GraphicsPath();
+
+                                pointsUp.Add(sumPoint(leftPoint, new Point(perpScale.X / maxBin * maxHeight, perpScale.Y / maxBin * maxHeight)));
 
                                 for (int j = 0; j < bins.Length; j++)
                                 {
                                     Point vertDist = new Point(perpScale.X * bins[bins.Length - j - 1] / maxBin * maxHeight, perpScale.Y * bins[bins.Length - j - 1] / maxBin * maxHeight);
-                                    Point binStart = sumPoint(leftPoint, new Point(scalePoint.X * range[2] * j, scalePoint.Y * range[2] * j));
-                                    Point binEnd = sumPoint(leftPoint, new Point(scalePoint.X * Math.Min(range[2] * (j + 1), range[1] - range[0]), scalePoint.Y * Math.Min(range[2] * (j + 1), range[1] - range[0])));
 
-                                    histPth.MoveTo(sumPoint(binStart, vertDist)).LineTo(sumPoint(binStart, new Point(-vertDist.X, -vertDist.Y))).LineTo(sumPoint(binEnd, new Point(-vertDist.X, -vertDist.Y))).LineTo(sumPoint(binEnd, vertDist)).Close();
+                                    Point horiz = sumPoint(leftPoint, new Point(scalePoint.X * Math.Min(binMeans[j] - range[0], range[1] - range[0]), scalePoint.Y * Math.Min(binMeans[j] - range[0], range[1] - range[0])));
+
+                                    pointsUp.Add(sumPoint(horiz, vertDist));
                                 }
+
+                                histPth.AddSmoothSpline(pointsUp.ToArray());
+
+                                List<Point> pointsDown = new List<Point>();
+
+                                for (int j = bins.Length - 1; j >= 0; j--)
+                                {
+                                    Point vertDist = new Point(-perpScale.X * bins[bins.Length - j - 1] / maxBin * maxHeight, -perpScale.Y * bins[bins.Length - j - 1] / maxBin * maxHeight);
+                                    Point horiz = sumPoint(leftPoint, new Point(scalePoint.X * Math.Min(binMeans[j] - range[0], range[1] - range[0]), scalePoint.Y * Math.Min(binMeans[j] - range[0], range[1] - range[0])));
+
+                                    pointsDown.Add(sumPoint(horiz, vertDist));
+                                }
+
+                                pointsDown.Add(sumPoint(leftPoint, new Point(perpScale.X / maxBin * maxHeight, perpScale.Y / maxBin * maxHeight)));
+
+                                histPth.AddSmoothSpline(pointsDown.ToArray());
+
+
+                                histPth.Close();
 
                                 if (colour.A > 0)
                                 {
@@ -787,63 +878,91 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                                     graphics.StrokePath(histPth, strokeColour, weight, cap, join, dash, tag: nodes[i].Id);
                                 }
                             }
-                        }
-                        else if (plotType == 1)
-                        {
-                            (int[], double[], double[]) hist = ((int[], double[], double[]))globalHist;
 
-                            int[] bins = hist.Item1;
-                            double[] binMeans = hist.Item3;
+                            plotted = true;
+                        }
+                        else if (distributionObject is (double[] sampledPoints, double[] sampledValues))
+                        {
+                            double[] bins = sampledValues;
+                            double[] binMeans = sampledPoints;
+                            double[] range = new double[] { sampledPoints.Min(), sampledPoints.Max() };
 
                             double maxBin = bins.Max();
 
-                            List<Point> pointsUp = new List<Point>();
+                            double age = totalTreeLength - nodes[i].UpstreamLength();
+                            double deltaLeft = age - range[1];
+                            double deltaRight = range[0] - age;
 
-                            GraphicsPath histPth = new GraphicsPath();
-
-                            pointsUp.Add(sumPoint(leftPoint, new Point(perpScale.X / maxBin * maxHeight, perpScale.Y / maxBin * maxHeight)));
-
-                            for (int j = 0; j < bins.Length; j++)
+                            if (!double.IsNaN(age) && !double.IsNaN(deltaLeft) && !double.IsNaN(deltaRight))
                             {
-                                Point vertDist = new Point(perpScale.X * bins[bins.Length - j - 1] / maxBin * maxHeight, perpScale.Y * bins[bins.Length - j - 1] / maxBin * maxHeight);
+                                Point coord = coordinates[nodes[i].Id];
+                                double dotprod = scaleNorm.X * (coord.X - bottomAxis[0].X) + scaleNorm.Y * (coord.Y - bottomAxis[0].Y);
+                                coord = sumPoint(bottomAxis[0], new Point(dotprod * scaleNorm.X, dotprod * scaleNorm.Y));
+                                coord = sumPoint(coord, new Point(perpScaleNorm.X * (lineMargin + maxHeight) * shownDistribCount, perpScaleNorm.Y * (lineMargin + maxHeight * 2) * shownDistribCount * plotDirection));
 
-                                Point horiz = sumPoint(leftPoint, new Point(scalePoint.X * Math.Min(binMeans[j] - range[0], range[1] - range[0]), scalePoint.Y * Math.Min(binMeans[j] - range[0], range[1] - range[0])));
+                                rightPoint = sumPoint(new Point(-scalePoint.X * deltaRight, -scalePoint.Y * deltaRight), coord);
+                                leftPoint = sumPoint(new Point(scalePoint.X * deltaLeft, scalePoint.Y * deltaLeft), coord);
 
-                                pointsUp.Add(sumPoint(horiz, vertDist));
+                                updateMaxMin(leftPoint);
+                                updateMaxMin(rightPoint);
+                                updateMaxMin(sumPoint(leftPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
+                                updateMaxMin(sumPoint(leftPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
+                                updateMaxMin(sumPoint(rightPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
+                                updateMaxMin(sumPoint(rightPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
+
+                                List<Point> pointsUp = new List<Point>();
+
+                                GraphicsPath histPth = new GraphicsPath();
+
+                                for (int j = 0; j < bins.Length; j++)
+                                {
+                                    Point vertDist = new Point(perpScale.X * bins[j] / maxBin * maxHeight, perpScale.Y * bins[j] / maxBin * maxHeight);
+
+                                    Point horiz = sumPoint(rightPoint, new Point(-scalePoint.X * Math.Min(binMeans[j] - range[0], range[1] - range[0]), -scalePoint.Y * Math.Min(binMeans[j] - range[0], range[1] - range[0])));
+
+                                    pointsUp.Add(sumPoint(horiz, vertDist));
+                                }
+
+                                for (int j = 0; j < pointsUp.Count; j++)
+                                {
+                                    histPth.LineTo(pointsUp[j]);
+                                }
+
+                                List<Point> pointsDown = new List<Point>();
+
+                                for (int j = bins.Length - 1; j >= 0; j--)
+                                {
+                                    Point vertDist = new Point(-perpScale.X * bins[j] / maxBin * maxHeight, -perpScale.Y * bins[j] / maxBin * maxHeight);
+                                    Point horiz = sumPoint(rightPoint, new Point(-scalePoint.X * Math.Min(binMeans[j] - range[0], range[1] - range[0]), -scalePoint.Y * Math.Min(binMeans[j] - range[0], range[1] - range[0])));
+
+                                    pointsDown.Add(sumPoint(horiz, vertDist));
+                                }
+
+                                for (int j = 0; j < pointsDown.Count; j++)
+                                {
+                                    histPth.LineTo(pointsDown[j]);
+                                }
+
+
+                                histPth.Close();
+
+
+                                if (colour.A > 0)
+                                {
+                                    graphics.FillPath(histPth, colour, tag: nodes[i].Id);
+                                }
+
+                                if (strokeColour.A > 0 && weight > 0)
+                                {
+                                    graphics.StrokePath(histPth, strokeColour, weight, cap, join, dash, tag: nodes[i].Id);
+                                }
                             }
 
-                            histPth.AddSmoothSpline(pointsUp.ToArray());
-
-                            List<Point> pointsDown = new List<Point>();
-
-                            for (int j = bins.Length - 1; j >= 0; j--)
-                            {
-                                Point vertDist = new Point(-perpScale.X * bins[bins.Length - j - 1] / maxBin * maxHeight, -perpScale.Y * bins[bins.Length - j - 1] / maxBin * maxHeight);
-                                Point horiz = sumPoint(leftPoint, new Point(scalePoint.X * Math.Min(binMeans[j] - range[0], range[1] - range[0]), scalePoint.Y * Math.Min(binMeans[j] - range[0], range[1] - range[0])));
-
-                                pointsDown.Add(sumPoint(horiz, vertDist));
-                            }
-
-                            pointsDown.Add(sumPoint(leftPoint, new Point(perpScale.X / maxBin * maxHeight, perpScale.Y / maxBin * maxHeight)));
-
-                            histPth.AddSmoothSpline(pointsDown.ToArray());
-
-
-                            histPth.Close();
-
-                            if (colour.A > 0)
-                            {
-                                graphics.FillPath(histPth, colour, tag: nodes[i].Id);
-                            }
-
-                            if (strokeColour.A > 0 && weight > 0)
-                            {
-                                graphics.StrokePath(histPth, strokeColour, weight, cap, join, dash, tag: nodes[i].Id);
-                            }
+                            plotted = true;
                         }
 
 
-                        if (labelPosition > 0)
+                        if (labelPosition > 0 && plotted)
                         {
                             string labelText = "";
 
@@ -910,7 +1029,10 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
                             }
                         }
 
-                        shownDistribCount++;
+                        if (plotted)
+                        {
+                            shownDistribCount++;
+                        }
                     }
                 }
             }
