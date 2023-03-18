@@ -10,6 +10,76 @@ using System.Linq;
 
 namespace a15c955cebd4c4a968cd3b48d37aafc4c
 {
+    /// <summary>
+    /// This module parses age distributions that have been annotated on the tree as attributes. For example, prior calibrations for node ages
+    /// in some programs (e.g., `MCMCtree`) are stored as `Name`s on the tree.
+    /// 
+    /// The age distribution annotations generally consist of a distribution name, followed by the distribution's parameters in parentheses;
+    /// for example, `Gamma(3,10)` represents a gamma distribution with $\alpha$ = 3 and $\beta$ = 10.
+    /// </summary>
+    /// <description>
+    /// <![CDATA[
+    /// ## Further information
+    /// 
+    /// The module currently supports the following distributions:
+    /// 
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | Syntax                                                | Distribution                                                                                                                                         |
+    /// +=======================================================+======================================================================================================================================================+
+    /// | * `>x`                                                | Lower bound (as defined by [PAML](http://abacus.gene.ucl.ac.uk/software/pamlDOC.pdf)).                                                               |
+    /// | * `L(x)`                                              |                                                                                                                                                      |
+    /// | * `L(x,p)`                                            | Parameter `x` represents the lower bound value. Parameters `p` (default 0.1) and `c`                                                                 |
+    /// | * `L(x,p,c)`                                          | (default 1) control the shape of the distribution. Parameter `t` (default 0.025) is                                                                  |
+    /// | * `L(x,p,c,t)`                                        | the weight of the left tail (i.e., the probability of values lower than the specified bound).                                                        |
+    /// |                                                       |                                                                                                                                                      |
+    /// |                                                       | This is normally a soft bound, but you can set a low value (or `0`) for `t` to make it hard.                                                         |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `<x`                                                | Upper bound (as defined by [PAML](http://abacus.gene.ucl.ac.uk/software/pamlDOC.pdf)).                                                               |
+    /// | * `U(x)`                                              |                                                                                                                                                      |
+    /// | * `U(x,t)`                                            | Parameter `x` represents the upper bound value. Parameter `t` (default 0.025) is                                                                     |
+    /// |                                                       | the weight of the right tail (i.e., the probability of values higher than the specified bound).                                                      |
+    /// |                                                       |                                                                                                                                                      |
+    /// |                                                       | This is normally a soft bound, but you can set a low value (or `0`) for `t` to make it hard.                                                         |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `>a<b`                                              | Lower and upper bound (as defined by [PAML](http://abacus.gene.ucl.ac.uk/software/pamlDOC.pdf)).                                                     |
+    /// | * `B(a,b)`                                            |                                                                                                                                                      |
+    /// | * `B(a,b,l)`                                          | Parameters `a` and `b` represent the lower and upper bound values, respectively. Parameter `l`                                                       |
+    /// | * `B(a,b,l,r)`                                        | (default 0.025) is the weight of the left tail, and parameter `r` (default 0.025) is the weight                                                      |
+    /// |                                                       | of the right tail.                                                                                                                                   |
+    /// |                                                       |                                                                                                                                                      |
+    /// |                                                       | This is normally a soft bound, but you can set a low value (or `0`) for `l` and `r` to make it hard                                                  |
+    /// |                                                       | on either side or on both sides.                                                                                                                     |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `SN(l,s,p)`                                         | Skew normal distribution (as defined by [PAML](http://abacus.gene.ucl.ac.uk/software/pamlDOC.pdf)).                                                  |
+    /// |                                                       |                                                                                                                                                      |
+    /// |                                                       | Parameter `l` is the location of the skew normal, `s` is the scale, and `p` is the shape.                                                            |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `ST(l,s,p,d)`                                       | Skew _t_ distribution (as defined by [PAML](http://abacus.gene.ucl.ac.uk/software/pamlDOC.pdf)).                                                     |
+    /// |                                                       |                                                                                                                                                      |
+    /// |                                                       | Parameter `l` is the location of the skew normal, `s` is the scale, `p` is the shape, and `d` is the                                                 |
+    /// |                                                       | degrees of freedom.                                                                                                                                  |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `S2N(f,l1,s1,p1,l2,s2,p2)`                          | Mixture of two skew normal distributions (as defined by [PAML](http://abacus.gene.ucl.ac.uk/software/pamlDOC.pdf)).                                  |
+    /// |                                                       | Parameter `f` is the weight for the first distribution (the weight for the second distribution is $1-f$). The                                        |
+    /// |                                                       | other parameters are the location, scale and shape for each of the two normal distributions.                                                         |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `G(a,b)`                                            | Gamma distribution with $\alpha$ = `a` and $\beta$ = `b`.                                                                                            |
+    /// | * `Gamma(a,b)`                                        |                                                                                                                                                      |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `Normal(u,s)`                                       | Normal distribution, where `u` is the mean and `s` is the standard deviation.                                                                        |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * `Exponential(l)`                                    | Exponential distribution with $\lambda$ = `l`.                                                                                                       |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// | * _Other_                                             | Other distributions defined in the [`MathNet.Numerics.Distributions`](https://numerics.mathdotnet.com/api/MathNet.Numerics.Distributions/)           |
+    /// |                                                       | namespace should work. Only distributions that implement the `IContinuousDistribution` interface are supported, but some                             |
+    /// |                                                       | of them will not be drawn because the heuristic to find the range of the distribution to plot fails - please open an                                 |
+    /// |                                                       | issue on the [TreeViewer GitHub repository](https://github.com/arklumpus/TreeViewer/issues) if you would like a distribution in particular to work.  |
+    /// |                                                       |                                                                                                                                                      |
+    /// |                                                       | The syntax is the name of the distribution (as defined in `MathNet.Numerics.Distributions`), followed by the parameter(s) in parentheses             |
+    /// |                                                       | (e.g., `Rayleigh(0.1)`). Names are case-insensitive.                                                                                                 |
+    /// +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+    /// ]]>
+    /// </description>          
     public static class MyModule
     {
         public const string Name = "Parse age distributions";
