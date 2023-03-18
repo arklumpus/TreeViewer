@@ -834,8 +834,14 @@ namespace NodeAgeDistributions
                                         Point rightPoint = sumPoint(new Point(-scalePoint.X * deltaRight, -scalePoint.Y * deltaRight), coordinates[nodes[i].Id]);
                                         Point leftPoint = sumPoint(new Point(scalePoint.X * deltaLeft, scalePoint.Y * deltaLeft), coordinates[nodes[i].Id]);
 
+										Point perpScaleNorm = normalizePoint(perpScale);
+
                                         updateMaxMin(leftPoint);
                                         updateMaxMin(rightPoint);
+										updateMaxMin(sumPoint(leftPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
+										updateMaxMin(sumPoint(leftPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
+										updateMaxMin(sumPoint(rightPoint, new Point(-perpScaleNorm.X * maxHeight, -perpScaleNorm.Y * maxHeight)));
+										updateMaxMin(sumPoint(rightPoint, new Point(perpScaleNorm.X * maxHeight, perpScaleNorm.Y * maxHeight)));
 
                                         List<Point> pointsUp = new List<Point>();
 
