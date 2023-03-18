@@ -480,6 +480,28 @@ namespace SetUpAgeDistributions
                         }
                     }
                 }
+				
+				double scalingFactor = (double)parameterValues["Scaling factor:"];
+                bool applyScalingToTree = (bool)parameterValues["Apply scaling to transformed tree"];
+
+                if (scalingFactor != 1)
+                {
+                    foreach (KeyValuePair<string, List<double>> kvp in ageSamples)
+                    {
+                        for (int i = 0; i < kvp.Value.Count; i++)
+                        {
+                            kvp.Value[i] *= scalingFactor;
+                        }
+                    }
+
+                    if (applyScalingToTree)
+                    {
+                        foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                        {
+                            node.Length *= scalingFactor;
+                        }
+                    }
+                }
 
                 if (ciType > 0 || computeMean)
                 {
@@ -502,28 +524,6 @@ namespace SetUpAgeDistributions
                                 double[] eti = BayesStats.EqualTailedInterval(ageSamples[nodes[i].Id], threshold);
                                 nodes[i].Attributes[threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
                             }
-                        }
-                    }
-                }
-
-                double scalingFactor = (double)parameterValues["Scaling factor:"];
-                bool applyScalingToTree = (bool)parameterValues["Apply scaling to transformed tree"];
-
-                if (scalingFactor != 1)
-                {
-                    foreach (KeyValuePair<string, List<double>> kvp in ageSamples)
-                    {
-                        for (int i = 0; i < kvp.Value.Count; i++)
-                        {
-                            kvp.Value[i] *= scalingFactor;
-                        }
-                    }
-
-                    if (applyScalingToTree)
-                    {
-                        foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
-                        {
-                            node.Length *= scalingFactor;
                         }
                     }
                 }
