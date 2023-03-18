@@ -28,7 +28,7 @@ from anywhere.
 ║                                                                              ║
 ║ The full licence document for TreeViewer, including privacy information, is  ║
 ║ available from                                                               ║
-║ <https://github.com/arklumpus/TreeViewer/blob/main/License.rtf>.             ║
+║ <https://github.com/arklumpus/TreeViewer/blob/main/Licence.rtf>.             ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

@@ -77,6 +77,7 @@ hdiutil create -volname "TreeViewer" -fs HFS+ -size 350m "TreeViewer.rw.dmg"
 device=$(hdiutil attach -readwrite -noverify -noautoopen "TreeViewer.rw.dmg" | grep -e "^/dev/" | head -n1 | cut -f 1)
 
 cp -a Release/Mac-arm64/TreeViewer.app /Volumes/TreeViewer/TreeViewer.app
+cp Licence.rtf /Volumes/TreeViewer/
 
 mkdir /Volumes/TreeViewer/.background/
 
