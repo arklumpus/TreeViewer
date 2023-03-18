@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 
 namespace TreeViewer
 {
-    internal static class ConsoleWrapperUI
+    public static class ConsoleWrapperUI
     {
         public static bool IsConsoleEnabled { get; private set; } = false;
 
