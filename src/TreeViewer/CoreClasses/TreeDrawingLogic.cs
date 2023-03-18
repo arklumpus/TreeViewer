@@ -274,7 +274,15 @@ namespace TreeViewer
 
         object FurtherTransformationLock = new object();
 
-        private async Task UpdateOnlyFurtherTransformations(int minIndex, ProgressWindow progressWindow, Action<double> externalProgressAction = null)
+        public async Task WaitUntilFurtherTransformationUpdatesAreDone()
+        {
+            await Task.Run(() =>
+            {
+                lock (FurtherTransformationLock) { }
+            });
+        }
+
+        public async Task UpdateOnlyFurtherTransformations(int minIndex, ProgressWindow progressWindow, Action<double> externalProgressAction = null)
         {
             if (!StopAllUpdates)
             {

@@ -744,12 +744,20 @@ namespace abb4eb8d419254f088881c8dd6531e5c4
 
                 if (copyFurtherTransformations)
                 {
+                    ProgressWindow window = new ProgressWindow() { ProgressText = "Applying further transformations...", IsIndeterminate = false };
+                    window.Steps = parentWindow.FurtherTransformations.Count;
+                    _ = window.ShowDialog2(targetWindow);
+
                     for (int i = 0; i < parentWindow.FurtherTransformations.Count; i++)
                     {
                         Action<Dictionary<string, object>> updater = targetWindow.AddFurtherTransformation(parentWindow.FurtherTransformations[i]);
                         updater(furtherTransformationParametersClones[i]);
-                        await targetWindow.UpdateFurtherTransformations(targetWindow.FurtherTransformations.Count - 1);
+
+                        await Task.Run(async () => await targetWindow.UpdateOnlyFurtherTransformations(targetWindow.FurtherTransformations.Count - 1, null, x => { }));
+                        await targetWindow.WaitUntilFurtherTransformationUpdatesAreDone();
                     }
+
+                    window.Close();
                 }
 
                 if (copyCoordinates)
