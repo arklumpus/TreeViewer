@@ -734,7 +734,10 @@ namespace TreeViewer
                                                             this.StateData.Attachments[attachment.Name] = attachment;
                                                             att.Dispose();
                                                             await UpdateOnlyTransformedTree();
+                                                            StopAllUpdates = true;
                                                             RefreshAttachmentSelectors(attachment.Name);
+                                                            StopAllUpdates = false;
+                                                            await UpdateFurtherTransformations(0);
                                                         }
                                                         else
                                                         {
