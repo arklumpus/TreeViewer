@@ -15,7 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
 using System;
 using System.Collections.Generic;
 using PhyloTree;
@@ -35,12 +34,12 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
     /// For each branch in the current tree, the model will determine whether the split induced by the branch is present or compatible
     /// with the other tree(s). The results of these comparisons (`Yes` or `No`) are stored in the attributes `prefix_Present` and
     /// `prefix_Compatible` for each node (where `prefix_` is the value of the [Prefix](#prefix) attribute). If multiple trees have been
-	/// selected, the value of these attributes will be a number ranging from 0 to 1, showing in what proportion of the trees the split
-	/// is present or compatible.
+    /// selected, the value of these attributes will be a number ranging from 0 to 1, showing in what proportion of the trees the split
+    /// is present or compatible.
     /// 
     /// If the [Store attributes on equivalent splits](#store-attributes-on-equivalent-splits) check box is checked (and only one tree is selected
-	/// for comparison), for each split that is present in both trees, all the attributes from the other tree are copied on the current tree too,
-	/// with the specified [Prefix](#prefix).
+    /// for comparison), for each split that is present in both trees, all the attributes from the other tree are copied on the current tree too,
+    /// with the specified [Prefix](#prefix).
     /// </summary>
     public static class MyModule
     {
@@ -196,6 +195,13 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
             string prefix = (string)parameterValues["Prefix:"];
             bool storeAttributes = (bool)parameterValues["Store attributes on equivalent splits"];
 
+            List<string> leavesInTree = tree.GetLeafNames();
+
+            if (tree.IsRooted())
+            {
+                leavesInTree.Add("@Root");
+            }
+
             IReadOnlyList<TreeNode> otherTrees = null;
 
             if (treeSource == 1)
@@ -241,34 +247,32 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
                                                                         el
                                                                         )).ToList();
 
+                    List<string> leavesInOtherTree = otherTree.GetLeafNames();
+
+                    List<(string[], string[], TreeNode)> otherSplitsPruned = (from el in otherSplits select (el.Item1.Intersect(leavesInTree).ToArray(), el.Item2.Intersect(leavesInTree).ToArray(), el.Item3)).ToList();
 
                     foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
                     {
                         (List<TreeNode> side1, List<TreeNode> side2) currSplit = node.GetSplit();
 
                         (string[], string[], double) split = ((from el1 in currSplit.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(), (from el2 in currSplit.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(), node.Length);
+                        (string[], string[], double) splitPruned = (split.Item1.Intersect(leavesInOtherTree).ToArray(), split.Item2.Intersect(leavesInOtherTree).ToArray(), split.Item3);
 
                         bool isCompatible = true;
                         bool isPresent = false;
                         TreeNode correspondence = null;
 
-
-                        foreach ((string[], string[], TreeNode) otherSplit in otherSplits)
+                        for (int i = 0; i < otherSplits.Count; i++)
                         {
-                            if (AreSameSplit(split, otherSplit))
+                            if (AreSameSplit(split, otherSplits[i]))
                             {
                                 isPresent = true;
-                                correspondence = otherSplit.Item3;
+                                correspondence = otherSplits[i].Item3;
                             }
 
-                            if (!AreCompatible(split, otherSplit))
+                            if (!AreCompatible(splitPruned, otherSplitsPruned[i]))
                             {
                                 isCompatible = false;
-                            }
-
-                            if (isPresent || !isCompatible)
-                            {
-                                break;
                             }
                         }
 
@@ -318,6 +322,7 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
 
                     progressAction(0);
 
+
                     Parallel.ForEach(otherTrees, otherTree =>
                     {
                         List<(string[], string[], TreeNode)> otherSplits = (from el in otherTree.GetChildrenRecursiveLazy()
@@ -328,31 +333,31 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
                                                                             el
                                                                             )).ToList();
 
+                        List<string> leavesInOtherTree = otherTree.GetLeafNames();
+
+                        List<(string[], string[], TreeNode)> otherSplitsPruned = (from el in otherSplits select (el.Item1.Intersect(leavesInTree).ToArray(), el.Item2.Intersect(leavesInTree).ToArray(), el.Item3)).ToList();
+
 
                         for (int i = 0; i < nodes.Count; i++)
                         {
                             (List<TreeNode> side1, List<TreeNode> side2) currSplit = nodes[i].GetSplit();
 
                             (string[], string[], double) split = ((from el1 in currSplit.side1 where el1 == null || !string.IsNullOrEmpty(el1.Name) select el1 == null ? "@Root" : el1.Name).ToArray(), (from el2 in currSplit.side2 where el2 == null || !string.IsNullOrEmpty(el2.Name) select el2 == null ? "@Root" : el2.Name).ToArray(), nodes[i].Length);
+                            (string[], string[], double) splitPruned = (split.Item1.Intersect(leavesInOtherTree).ToArray(), split.Item2.Intersect(leavesInOtherTree).ToArray(), split.Item3);
 
                             bool isCompatible = true;
                             bool isPresent = false;
 
-                            foreach ((string[], string[], TreeNode) otherSplit in otherSplits)
+                            for (int j = 0; j < otherSplits.Count; j++)
                             {
-                                if (AreSameSplit(split, otherSplit))
+                                if (AreSameSplit(split, otherSplits[j]))
                                 {
                                     isPresent = true;
                                 }
 
-                                if (!AreCompatible(split, otherSplit))
+                                if (!AreCompatible(splitPruned, otherSplitsPruned[j]))
                                 {
                                     isCompatible = false;
-                                }
-
-                                if (isPresent || !isCompatible)
-                                {
-                                    break;
                                 }
                             }
 
@@ -382,7 +387,6 @@ namespace a36ca9f8c25b24b2baa16308227788e5d
                         }
                     });
 
-                    /* Breakpoint */
                     for (int i = 0; i < nodes.Count; i++)
                     {
                         nodes[i].Attributes[prefix + "Present"] = (double)presents[i] / otherTrees.Count;
