@@ -444,7 +444,14 @@ namespace TreeViewer.Stats
             }
             else
             {
-                markdownSourceBuilder.AppendLine(" The tree is **fully bifurcating**.");
+                if (tree.Children.Count == 2)
+                {
+                    markdownSourceBuilder.AppendLine(" The tree is **fully bifurcating**.");
+                }
+                else
+                {
+                    markdownSourceBuilder.AppendLine(" The tree is **fully bifurcating** (except for the root node, which has " + tree.Children.Count.ToString() + " children).");
+                }
             }
 
             markdownSourceBuilder.AppendLine();
