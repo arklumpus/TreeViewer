@@ -87,46 +87,6 @@ namespace TreeViewer.Stats
             return (rfDistances, wRFDistances, ELDistances);
         }
 
-
-        private static (double[,] distMat, double[,] points) PerformMDS(int treeCount, int[] distances)
-        {
-            Matrix<double> dSq = Matrix<double>.Build.Dense(treeCount, treeCount);
-            double[,] distMat = new double[treeCount, treeCount];
-
-            Matrix<double> centeringMatrix = Matrix<double>.Build.Dense(treeCount, treeCount, -1.0 / treeCount);
-
-            for (int j = 0; j < treeCount; j++)
-            {
-                for (int i = 0; i < j; i++)
-                {
-                    double val = distances[GetIndex(j, i)];
-
-                    dSq[i, j] = val * val;
-                    dSq[j, i] = val * val;
-                    distMat[i, j] = val;
-                    distMat[j, i] = val;
-                }
-
-                centeringMatrix[j, j] = 1 - 1.0 / treeCount;
-            }
-
-            Matrix<double> b = -0.5 * centeringMatrix * dSq * centeringMatrix;
-
-            Evd<double> eigen = b.Evd();
-
-            int[] sortedEigen = (from el in Enumerable.Range(0, treeCount) orderby eigen.EigenValues[el].Real descending select el).Take(2).ToArray();
-
-            Matrix<double> eM = Matrix<double>.Build.DenseOfColumnVectors(eigen.EigenVectors.Column(sortedEigen[0]), eigen.EigenVectors.Column(sortedEigen[1]));
-
-            Matrix<double> lamdbaMSqrt = Matrix<double>.Build.DiagonalOfDiagonalArray(new double[] { Math.Sqrt(eigen.EigenValues[sortedEigen[0]].Real), Math.Sqrt(eigen.EigenValues[sortedEigen[1]].Real) });
-
-            Matrix<double> X = eM * lamdbaMSqrt;
-
-            double[,] points = X.ToArray();
-
-            return (distMat, points);
-        }
-
         private static (double[,] distMat, double[,] points) PerformMDS(int treeCount, double[,] distances)
         {
             Matrix<double> dSq = Matrix<double>.Build.Dense(treeCount, treeCount);
@@ -165,27 +125,6 @@ namespace TreeViewer.Stats
 
             return (distMat, points);
         }
-
-
-
-        private static int GetIndex(int x, int y)
-        {
-            if (x > y)
-            {
-                return GetIndex(y, x);
-            }
-
-            return y * (y + 1) / 2 + x;
-        }
-
-        private static (int x, int y) GetIndices(int index)
-        {
-            int y = (int)Math.Ceiling((Math.Sqrt(9 + 8 * index) - 3) / 2);
-            int x = index - y * (y + 1) / 2;
-
-            return (x, y);
-        }
-
 
         public static (Markdig.Syntax.MarkdownDocument report, string reportSource) CreateReport(IList<TreeNode> trees, Action<string, double> progressAction, Dictionary<string, GetPlot> Plots, Dictionary<string, Func<(string header, IEnumerable<double[]>)>> Data, Avalonia.Controls.Window window)
         {
