@@ -206,7 +206,16 @@ namespace Consensus_tree
 
                     if (skip == 0 && every == 1 && until == trees.Count)
                     {
-                        return trees.GetConsensus(trees[0].Children.Count < 3 && trees[1].Children.Count < 3, clocklike, (double)parameterValues["Threshold:"], (int)parameterValues["Branch lengths:"] == 1, x => progressAction(x / trees.Count));
+                        TreeNode consensus = ((IReadOnlyList<TreeNode>)trees).GetConsensus(trees[0].Children.Count < 3 && trees[1].Children.Count < 3, clocklike, (double)parameterValues["Threshold:"], (int)parameterValues["Branch lengths:"] == 1, progressAction, true);
+
+                        if (consensus != null)
+                        {
+                            return consensus;
+                        }
+                        else
+                        {
+                            throw new Exception("An error occurred while computing the consensus tree! If you have highly discordant trees, the threshold may be too high.");
+                        }
                     }
                     else
                     {
