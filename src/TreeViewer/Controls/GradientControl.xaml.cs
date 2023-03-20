@@ -19,6 +19,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,6 +123,18 @@ namespace TreeViewer
         public static Gradient DeserializeJson(string serialized)
         {
             return new Gradient((from el in System.Text.Json.JsonSerializer.Deserialize<string[]>(serialized, Modules.DefaultSerializationOptions) select GradientStop.DeserializeJson(el)).ToList());
+        }
+
+        public static Gradient ToGradient(VectSharp.GradientStops gradientStops)
+        {
+            List<GradientStop> stops = new List<GradientStop>(); 
+
+            for (int i = 0; i < gradientStops.Count; i++)
+            {
+                stops.Add(new GradientStop(gradientStops[i].Offset, gradientStops[i].Colour));
+            }
+
+            return new Gradient(stops);
         }
     }
 

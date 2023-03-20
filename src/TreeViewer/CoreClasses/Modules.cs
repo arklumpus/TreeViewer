@@ -518,6 +518,15 @@ public static Colour? Format(object attribute)
                                                                new GradientStop(0.301, Colour.FromRgb(17, 119, 51)), new GradientStop(0.4, Colour.FromRgb(17, 119, 51)), new GradientStop(0.401, Colour.FromRgb(68, 170, 153)), new GradientStop(0.5, Colour.FromRgb(68, 170, 153)),
                                                                 new GradientStop(0.501, Colour.FromRgb(136, 204, 238)), new GradientStop(0.6, Colour.FromRgb(136, 204, 238)), new GradientStop(0.601, Colour.FromRgb(51, 34, 136)), new GradientStop(0.7, Colour.FromRgb(51, 34, 136)),
                                                                new GradientStop(0.701, Colour.FromRgb(170, 68, 153)), new GradientStop(0.8, Colour.FromRgb(170, 68, 153)), new GradientStop(0.801, Colour.FromRgb(136, 34, 85)), new GradientStop(0.9, Colour.FromRgb(136, 34, 85)), new GradientStop(0.901, Colour.FromRgb(204, 102, 119)), new GradientStop(1, Colour.FromRgb(204, 102, 119))}) },
+
+            { "Magma", Gradient.ToGradient(Gradients.Magma) },
+            { "Inferno", Gradient.ToGradient(Gradients.Inferno) },
+            { "Plasma", Gradient.ToGradient(Gradients.Plasma) },
+            { "Cividis", Gradient.ToGradient(Gradients.Cividis) },
+            { "Rocket", Gradient.ToGradient(Gradients.Rocket) },
+            { "Mako", Gradient.ToGradient(Gradients.Mako) },
+            { "Turbo", Gradient.ToGradient(Gradients.Turbo) },
+
         };
 
         public static string ModulePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TreeViewer", "modules");
