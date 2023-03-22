@@ -137,8 +137,8 @@ namespace SetUpAgeDistributions
                 /// This parameter determines the threshold for the credible interval.
                 /// </param>
                 ( "Threshold:", "Slider:0.89[\"0\",\"1\",\"0.00\"]"),
-                
-				( "Scaling", "Group:2" ),
+
+                ( "Scaling", "Group:2" ),
 
                 /// <param name="Scaling factor:">
                 /// This parameter is used to scale the age distributions (and the tree, if the [Apply scaling to transformed tree](#apply-scaling-to-transformed-tree)
@@ -150,13 +150,13 @@ namespace SetUpAgeDistributions
                 /// If this check box is checked, the [scaling factor](#scaling-factor) is applied to the transformed tree, as well as to the age distributions.
                 /// </param>
                 ( "Apply scaling to transformed tree", "CheckBox:true" ),
-				
+                
                 /// <param name="Name:">
                 /// This parameter specifies a name that can be used to identify the age distributions in cases where multiple age distributions have been computed
                 /// for the same tree.
                 /// </param>
                 ( "Name:", "TextBox:AgeDistributions" ),
-				
+                
                 /// <param name="Apply">
                 /// This button applies the changes to the other parameter values and signals that the tree needs to be redrawn.
                 /// </param>
@@ -256,28 +256,28 @@ namespace SetUpAgeDistributions
                       progressAction((double)sampleIndex / treeCollection.Count);
                   }
               });
-			  
-			double scalingFactor = (double)parameterValues["Scaling factor:"];
-			bool applyScalingToTree = (bool)parameterValues["Apply scaling to transformed tree"];
 
-			if (scalingFactor != 1)
-			{
-				foreach (KeyValuePair<string, List<double>> kvp in ageSamples)
-				{
-					for (int i = 0; i < kvp.Value.Count; i++)
-					{
-						kvp.Value[i] *= scalingFactor;
-					}
-				}
+            double scalingFactor = (double)parameterValues["Scaling factor:"];
+            bool applyScalingToTree = (bool)parameterValues["Apply scaling to transformed tree"];
 
-				if (applyScalingToTree)
-				{
-					foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
-					{
-						node.Length *= scalingFactor;
-					}
-				}
-			}
+            if (scalingFactor != 1)
+            {
+                foreach (KeyValuePair<string, List<double>> kvp in ageSamples)
+                {
+                    for (int i = 0; i < kvp.Value.Count; i++)
+                    {
+                        kvp.Value[i] *= scalingFactor;
+                    }
+                }
+
+                if (applyScalingToTree)
+                {
+                    foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                    {
+                        node.Length *= scalingFactor;
+                    }
+                }
+            }
 
             if (ciType > 0 || computeMean)
             {
@@ -288,17 +288,20 @@ namespace SetUpAgeDistributions
                         if (computeMean)
                         {
                             nodes[i].Attributes["Mean age"] = ageSamples[nodes[i].Id].Average();
+                            nodes[i].Attributes[name + " mean age"] = ageSamples[nodes[i].Id].Average();
                         }
 
                         if (ciType == 1)
                         {
                             double[] hdi = BayesStats.HighestDensityInterval(ageSamples[nodes[i].Id], threshold);
                             nodes[i].Attributes[threshold.ToString("0%") + "_HDI"] = "[ " + hdi[0].ToString() + ", " + hdi[1].ToString() + "]";
+                            nodes[i].Attributes[name + "_" + threshold.ToString("0%") + "_HDI"] = "[" + hdi[0].ToString() + ", " + hdi[1].ToString() + "]";
                         }
                         else if (ciType == 2)
                         {
                             double[] eti = BayesStats.EqualTailedInterval(ageSamples[nodes[i].Id], threshold);
                             nodes[i].Attributes[threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
+                            nodes[i].Attributes[name + "_" + threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
                         }
                     }
                 }

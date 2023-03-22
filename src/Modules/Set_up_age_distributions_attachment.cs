@@ -480,8 +480,8 @@ namespace SetUpAgeDistributions
                         }
                     }
                 }
-				
-				double scalingFactor = (double)parameterValues["Scaling factor:"];
+
+                double scalingFactor = (double)parameterValues["Scaling factor:"];
                 bool applyScalingToTree = (bool)parameterValues["Apply scaling to transformed tree"];
 
                 if (scalingFactor != 1)
@@ -512,17 +512,20 @@ namespace SetUpAgeDistributions
                             if (computeMean)
                             {
                                 nodes[i].Attributes["Mean age"] = ageSamples[nodes[i].Id].Average();
+                                nodes[i].Attributes[name + " mean age"] = ageSamples[nodes[i].Id].Average();
                             }
 
                             if (ciType == 1)
                             {
                                 double[] hdi = BayesStats.HighestDensityInterval(ageSamples[nodes[i].Id], threshold);
                                 nodes[i].Attributes[threshold.ToString("0%") + "_HDI"] = "[ " + hdi[0].ToString() + ", " + hdi[1].ToString() + "]";
+                                nodes[i].Attributes[name + "_" + threshold.ToString("0%") + "_HDI"] = "[ " + hdi[0].ToString() + ", " + hdi[1].ToString() + "]";
                             }
                             else if (ciType == 2)
                             {
                                 double[] eti = BayesStats.EqualTailedInterval(ageSamples[nodes[i].Id], threshold);
                                 nodes[i].Attributes[threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
+                                nodes[i].Attributes[name + "_" + threshold.ToString("0%") + "_ETI"] = "[ " + eti[0].ToString() + ", " + eti[1].ToString() + "]";
                             }
                         }
                     }
@@ -710,4 +713,3 @@ namespace SetUpAgeDistributions
         }
     }
 }
-
