@@ -75,8 +75,16 @@ namespace TreeViewer
                 }
                 else if (Modules.IsMac)
                 {
-                    remoteDownloadFile = "https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg";
-                    localDownloadFile = Path.Combine(Path.GetTempPath(), "TreeViewer-Mac-x64.pkg");
+                    if (System.Runtime.InteropServices.RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.Arm64)
+                    {
+                        remoteDownloadFile = "https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-arm64.pkg";
+                        localDownloadFile = Path.Combine(Path.GetTempPath(), "TreeViewer-Mac-arm64.pkg");
+                    }
+                    else
+                    {
+                        remoteDownloadFile = "https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg";
+                        localDownloadFile = Path.Combine(Path.GetTempPath(), "TreeViewer-Mac-x64.pkg");
+                    }
                 }
 
                 ProgressWindow win = new ProgressWindow() { IsIndeterminate = false, Progress = 0, ProgressText = "Downloading update...", LabelText = Path.GetFileName(remoteDownloadFile) };
