@@ -519,3 +519,4 @@ ru\Microsoft.CodeAnalysis.Scripting.resources.dll	4204cbf5-6bc8-4160-8ff3-a90076
 tr\Microsoft.CodeAnalysis.Scripting.resources.dll	35940646-9235-42e6-81e2-5def364a6a4a
 zh-Hans\Microsoft.CodeAnalysis.Scripting.resources.dll	39473cab-ceb8-41ac-ba44-efb4a8836b16
 zh-Hant\Microsoft.CodeAnalysis.Scripting.resources.dll	02048333-229e-4a77-bb55-05ac75c15c68
+Licence.rtf	2b3a4cd8-fc0a-4f02-a128-43b349b1b245
