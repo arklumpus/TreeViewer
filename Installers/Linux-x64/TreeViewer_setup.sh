@@ -7,7 +7,7 @@ if [ $(id -u) -gt 0 ]; then
     exit 1
 fi
 
-more Licence.txt
+more -e Licence.txt
 
 confirm="a"
 
