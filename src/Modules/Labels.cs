@@ -134,6 +134,26 @@ namespace Labels
 
             return new List<(string, string)>()
             {
+				( "Attribute", "Group:3" ),
+
+                /// <param name="Attribute:">
+                /// This parameter specifies the attribute used to determine the text of the labels. By default the `Name` of each node is drawn.
+                /// </param>
+                ( "Attribute:", "AttributeSelector:Name" ),
+
+                /// <param name="Attribute type:">
+                /// This parameter specifies the type of the attribute used to determine the text of the labels. By default this is `String`. If the type chosen here does not correspond to the actual type of the attribute
+                /// (e.g. `Number` is chosen for the `Name` attribute, or `String` is chosen for the `Length` attribute), no label is drawn. If the attribute has values with different types for different nodes, the label is only shown on nodes
+                /// whose attribute type corresponds to the one chosen here.
+                /// </param>
+                ( "Attribute type:", "AttributeType:String"),
+
+                /// <param name="Attribute format...">
+                /// This parameter determines how the value of the selected attribute is used to determine the text of the label. By default, if the [Attribute type](#attribute-type) is `String` the text of the label corresponds to the value of the attribute,
+                /// while if the [Attribute type](#attribute-type) is `Number` the text of the label corresponds to the number rounded to 2 significant digits.
+                /// </param>
+                ( "Attribute format...", "Formatter:[\"Attribute type:\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConverters[0]) + ",\"true\"]"),
+				
                 /// <param name="Show on:">
                 /// This parameter determines on which nodes the label is shown. If the value is `Leaves`, the label is only shown for terminal nodes (nodes with no child nodes).
                 /// If the value is `Internal nodes` the label is shown only for internal nodes (nodes which have at least one child). If the value is `All nodes`, labels are shown for both leaves and internal nodes.
@@ -303,26 +323,6 @@ namespace Labels
                 /// The line join to use at the corners of the border.
                 /// </param>
                 ( "Line join:", "ComboBox:1[\"Miter\",\"Round\",\"Bevel\"]" ),
-
-                ( "Attribute", "Group:3" ),
-
-                /// <param name="Attribute:">
-                /// This parameter specifies the attribute used to determine the text of the labels. By default the `Name` of each node is drawn.
-                /// </param>
-                ( "Attribute:", "AttributeSelector:Name" ),
-
-                /// <param name="Attribute type:">
-                /// This parameter specifies the type of the attribute used to determine the text of the labels. By default this is `String`. If the type chosen here does not correspond to the actual type of the attribute
-                /// (e.g. `Number` is chosen for the `Name` attribute, or `String` is chosen for the `Length` attribute), no label is drawn. If the attribute has values with different types for different nodes, the label is only shown on nodes
-                /// whose attribute type corresponds to the one chosen here.
-                /// </param>
-                ( "Attribute type:", "AttributeType:String"),
-
-                /// <param name="Attribute format...">
-                /// This parameter determines how the value of the selected attribute is used to determine the text of the label. By default, if the [Attribute type](#attribute-type) is `String` the text of the label corresponds to the value of the attribute,
-                /// while if the [Attribute type](#attribute-type) is `Number` the text of the label corresponds to the number rounded to 2 significant digits.
-                /// </param>
-                ( "Attribute format...", "Formatter:[\"Attribute type:\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConverters[0]) + ",\"true\"]"),
             };
         }
 
