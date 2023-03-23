@@ -90,14 +90,15 @@ tell application "Finder"
   set current view of container window to icon view
   set toolbar visible of container window to false
   set statusbar visible of container window to false
-  set the bounds of container window to {100, 100, 795, 660}
+  set the bounds of container window to {100, 100, 795, 790}
   set iconViewOptions to the icon view options of container window
   set arrangement of iconViewOptions to not arranged
   set background picture of iconViewOptions to file ".background:background.png"
   set icon size of iconViewOptions to 128
-  set position of item "TreeViewer.app" of container window to {140, 120}
+  set position of item "TreeViewer.app" of container window to {140, 260}
+  set position of item "Licence.rtf" of container window to {348, 80}
   make new alias file at container window to POSIX file "/Applications" with properties {name:"Applications"}
-  set position of item "Applications" of container window to {555, 120}
+  set position of item "Applications" of container window to {555, 260}
   close
   open
   update without registering applications
