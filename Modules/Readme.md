@@ -61,7 +61,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions timeline](b93f8a2b-8731-4658-92f5-bb80af7292a8)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Plots age distributions on a timeline.
 
@@ -158,7 +158,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Branch extensions](fb385719-b376-49b0-8e99-aab7cf641966)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Extends terminal branches.
 
@@ -413,7 +413,7 @@ If the input file is not in binary tree format, it will be converted to a tempor
 
 ### [Draw image](a26abc43-1b12-40c9-9e23-bd3de2718829)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Draws an image.
 
@@ -543,6 +543,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Linear transformation](50a98b43-6e92-4499-a81e-4f9609b47e7b)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Applies a linear transformation to a numeric attribute.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `50a98b43-6e92-4499-a81e-4f9609b47e7b`
+
+<br />
+
 ### [Memory loader](a22ff194-c486-4215-a4bf-7a006d6f88fa)
 
 _Version 1.0.2, by Giorgio Bianchini_
@@ -620,7 +632,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Node shapes](7434420a-1afd-46ee-aeea-75ed8a5eeada)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Draws shapes on nodes, tips or branches.
 
@@ -632,7 +644,7 @@ _Version 1.0.3, by Giorgio Bianchini_
 
 ### [Node states](0512b822-044d-4c13-b3bb-bca494c51daa)
 
-_Version 1.2.4, by Giorgio Bianchini_
+_Version 1.2.5, by Giorgio Bianchini_
 
 **Description**: Draws node states based on attributes.
 
@@ -666,6 +678,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Parse age distributions](15c955ce-bd4c-4a96-8cd3-b48d37aafc4c)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Parses node age distributions from node attributes.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `15c955ce-bd4c-4a96-8cd3-b48d37aafc4c`
+
+<br />
+
 ### [Parse node states](716b55a3-02d9-4007-a830-8326d407b24c)
 
 _Version 2.1.3, by Giorgio Bianchini_
@@ -692,7 +716,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Age distributions](5dbe1f3c-dbea-49b3-8f04-f319aefca534)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.2.0, by Giorgio Bianchini_
 
 **Description**: Plots node age distributions.
 
@@ -752,7 +776,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Prune node](ffc97742-4cf5-44ef-81aa-d5b51708a003)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.2.0, by Giorgio Bianchini_
 
 **Description**: Prunes nodes off the tree.
 
@@ -788,7 +812,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Rectangle](34e1a627-7b6a-4c0f-80d9-795eea245e1e)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Draws a rectangle on the plot.
 
@@ -897,7 +921,7 @@ Safe even when opening huge files.
 
 ### [Rooted tree style](e56b8297-4417-4494-9369-cbe9e5d25397)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as a rooted tree.
 
@@ -943,6 +967,18 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Scale tree](d064aea6-6b43-4bd3-8cea-e72b4feb1142)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Scales all branch lengths in the tree by the specified factor.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `d064aea6-6b43-4bd3-8cea-e72b4feb1142`
+
+<br />
+
 ### [Search](5f3a7147-f706-43dc-9f57-18ade0c7b15d)
 
 _Version 1.0.3, by Giorgio Bianchini_
@@ -969,7 +1005,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Set up age distributions](a1ccf05a-cf3c-4ca4-83be-af56f501c2a6)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Computes node age distributions.
 
@@ -981,7 +1017,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Set up age distributions (attachment)](5d721496-f2fa-48de-ad0d-90ef5d8086aa)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.2.0, by Giorgio Bianchini_
 
 **Description**: Computes node age distributions from trees contained in an attachment.
 
@@ -1041,7 +1077,7 @@ _Version 1.0.3, by Giorgio Bianchini_
 
 ### [Stochastic map](e760952f-56c1-4192-8dfb-b5d6ec2692d2)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Opens a file containing one or more trees in the format produced by the write.simmap function of phytools (Revell 2012).
 Safe even when opening huge files.
@@ -1049,6 +1085,18 @@ Safe even when opening huge files.
 **Module type**: FileType
 
 **Module ID**: `e760952f-56c1-4192-8dfb-b5d6ec2692d2`
+
+<br />
+
+### [Subsample tree](2b9a5563-4acf-49df-9cbc-46623975081e)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Removes taxa from the tree until only the requested number of taxa remain.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `2b9a5563-4acf-49df-9cbc-46623975081e`
 
 <br />
 
@@ -1078,7 +1126,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Text element](ebafe997-c220-425a-ae39-06e731de1a07)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Draws a text element on the plot.
 
