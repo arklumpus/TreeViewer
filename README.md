@@ -10,6 +10,6 @@
 
 Each TreeViewer module has a user manual, and these can be displayed in TreeViewer by opening the `Module Manager` window (from the `Edit` menu) or by clicking on the various question mark (`?`) icons that are shown throughout the program when appropriate.
 
-TreeViewer is written using .NET 5 and is available for Windows, macOS and Linux operating systems. It consists of the main GUI program and a command-line utility that can be used to plot trees that are too large to be previewed on-screen in real time. It is licensed under a GNU Affero GPLv3 license.
+TreeViewer is written using C# .NET 7 and is available for Windows, macOS and Linux operating systems. It consists of the main GUI program and a command-line utility that can be used to plot trees that are too large to be previewed on-screen in real time. It is licensed under a GNU Affero GPLv3 license.
 
 This branch contains the source code for the [TreeViewer website](https://treeviewer.org). You can access the main TreeViewer branch from [here](https://github.com/arklumpus/TreeViewer).
