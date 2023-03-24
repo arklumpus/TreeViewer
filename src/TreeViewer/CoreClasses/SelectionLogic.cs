@@ -476,24 +476,49 @@ namespace TreeViewer
 
         private void UpdateSelectionWidth(SKMultiLayerRenderCanvas parent)
         {
-            Avalonia.Controls.PanAndZoom.ZoomBorder zom = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer");
-            double zoom = zom.ZoomX;
-
-            foreach ((double, SKRenderAction) pth in FindPaths(parent, null))
+            if (!Modules.IsLinux)
             {
-                double orig = Math.Max(0, pth.Item1);
+                Avalonia.Controls.PanAndZoom.ZoomBorder zom = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer");
+                double zoom = zom.ZoomX;
 
-                if (pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.Stroke || pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.StrokeAndFill)
+                foreach ((double, SKRenderAction) pth in FindPaths(parent, null))
                 {
-                    float newStrokeWidth = (float)((orig * 5) * zoom >= 5 ? (orig * 5) : (5 / zoom));
+                    double orig = Math.Max(0, pth.Item1);
 
-                    if (newStrokeWidth != pth.Item2.Paint.StrokeWidth)
+                    if (pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.Stroke || pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.StrokeAndFill)
                     {
-                        pth.Item2.Paint.StrokeWidth = newStrokeWidth;
-                        pth.Item2.InvalidateHitTestPath();
+                        float newStrokeWidth = (float)((orig * 5) * zoom >= 5 ? (orig * 5) : (5 / zoom));
+
+                        if (newStrokeWidth != pth.Item2.Paint.StrokeWidth)
+                        {
+                            pth.Item2.Paint.StrokeWidth = newStrokeWidth;
+                            pth.Item2.InvalidateHitTestPath();
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                Avalonia.Controls.PanAndZoom.ZoomBorder zom = this.FindControl<Avalonia.Controls.PanAndZoom.ZoomBorder>("PlotContainer");
+                double zoom = zom.ZoomX;
+
+                foreach ((double, SKRenderAction) pth in FindPaths(parent, null))
+                {
+                    double orig = Math.Max(0, pth.Item1);
+
+                    if (pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.Stroke || pth.Item2.Paint.Style == SkiaSharp.SKPaintStyle.StrokeAndFill)
+                    {
+                        float newStrokeWidth = (float)((orig * 5) * zoom >= 5 ? (orig * 5) : (5 / zoom));
+
+                        if (newStrokeWidth != pth.Item2.Paint.StrokeWidth)
+                        {
+                            pth.Item2.Paint.StrokeWidth = newStrokeWidth;
+                            pth.Item2.Paint.StrokeJoin = SkiaSharp.SKStrokeJoin.Round;
+                            pth.Item2.InvalidateHitTestPath();
+                        }
                     }
                 }
-
             }
 
             parent.InvalidateDirty();
