@@ -10,7 +10,7 @@
 
 Each TreeViewer module has a user manual, and these can be displayed in TreeViewer by opening the `Module Manager` window (from the `Edit` menu) or by clicking on the various question mark (`?`) icons that are shown throughout the program when appropriate.
 
-TreeViewer is written using .NET 5 and is available for Windows, macOS and Linux operating systems. It consists of the main GUI program and a command-line utility that can be used to plot trees that are too large to be previewed on-screen in real time. It is licensed under a GNU Affero GPLv3 license.
+TreeViewer is written using C# .NET 7 and is available for Windows, macOS (Intel x64 and Apple Silicon ARM) and Linux operating systems. It consists of the main GUI program and a command-line utility that can be used to plot trees that are too large to be previewed on-screen in real time. It is licensed under a GNU Affero GPLv3 license.
 
 ## Installing TreeViewer
 
@@ -29,6 +29,8 @@ Of course, 3 and 4 are optional, and you can decide to skip these steps during t
 
 You can now run TreeViewer using the shortcut that has been created. Alternatively, you can invoke the program from the command line by typing `TreeViewer` in the command prompt (which you can open by pressing `Win+R` on your keyboard, typing `cmd` and pressing Enter). You can also run the command-line version by typing `TreeViewerCommandLine`.
 
+TreeViewer has been test on Windows 10 and Windows 11 on Intel x64 processors. It seems to work OK on Windows 11 for ARM running in an emulator, but this has not been tested extensively.
+
 ### macOS
 
 Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/releases/latest/download/TreeViewer-Mac-x64.pkg) and double-click it (starting from version 1.2.0, the TreeViewer installer and disk image are fully signed and notarized). If you get a message that the app cannot be opened because it was not downloaded from the App Store, right-click or ctrl-click on the file and choose "Open", then click on the "Open" button in the dialog that opens. The installer will open and guide you through the process. It will do three main things:
@@ -39,11 +41,11 @@ Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/rele
 
 Once the installer has finished, you can run TreeViewer by opening the App in your Applications folder. You can also run it from the command line by typing `TreeViewer` (or `TreeViewerCommandLine` for the command line version) in a terminal window.
 
-TreeViewer has been tested on macOS Catalina and Big Sur.
+TreeViewer has been tested on macOS Catalina (Intel x64), Big Sur (Intel x64), Monterey (Apple Silicon arm64), and Ventura (Apple Silicon arm64).
 
 ### Linux
 
-TreeViewer has been tested on Debian 11 (bullseye), Ubuntu 20.04.3 and 21.04, Linux Mint 20.2, openSUSE Leap 15.3, Fedora 34, and CentOS 7 and 8.
+TreeViewer has been tested on Debian 11 (bullseye), Ubuntu 22.04.1, Linux Mint 21.1, openSUSE Leap 15.4, Fedora 37, Arch Linux (March 2023), and CentOS 7. It may work on other distributions as well.
 
 Open a terminal window and download the installer using `wget` or `curl` (whichever you prefer/have available):
 
@@ -64,6 +66,8 @@ Depending on your system, you may have to replace `sudo` with `su -c`. You shoul
 2. Delete any downloaded modules from previous versions of TreeViewer.
 3. Create symlinks to the `TreeViewer` and `TreeViewerCommandLine` executables in `/usr/bin` (this step can be skipped).
 4. Add TreeViewer to the Desktop menu (this step can be skipped, but it is highly advised not to skip it, unless you are installing TreeViewer on a headless server without a desktop environment).
+
+Note for **CentOS** users: the `more` utility on CentOS 7, which is used by the installer to display the licence notice, does not support the `-e` option. This will result in the licence terms failing to be displayed; you can find the licence document in this repository. This does not otherwise affect the installation.
 
 You can now open TreeViewer using the icon that has been added to the desktop menu, or by typing `TreeViewer` (or `TreeViewerCommandLine` for the command-line version) in the command line.
 
@@ -88,12 +92,6 @@ After granting the file permission to load and compile the source code, you shou
 ## Troubleshooting and known issues
 
 * On some Linux distributions, the file icons sometimes don't show up for some file types. This appears to be dependent on the file manager used by each distro, so unfortunately there is not much that we can do. Strangely enough, even though the custom icon is not shown, double clicking the files should still work and open them in TreeViewer.
-
-* Tool tips are disabled on Linux due to a [bug in Avalonia](https://github.com/AvaloniaUI/Avalonia/issues/6677).
-
-* On macOS you may get two (or more) TreeViewer icons in the section of your dock that holds recently open applications. This is due to the way that macOS handles opening files, which is not fully supported by the Avalonia framework that TreeViewer uses for its UI (see [https://github.com/AvaloniaUI/Avalonia/discussions/5504](https://github.com/AvaloniaUI/Avalonia/discussions/5504)).
-
-* On macOS, if after double-clicking a tree file or dragging it on the TreeViewer icon on the dock you get a message about the file not being supported by the installed modules, it may be due to TreeViewer not having permission to open the file. See [here](src/TreeViewer/Assets/MacOSPermissionsInstructions.md) for instructions on how to grant TreeViewer these permissions.
 
 ## Manual installation
 
@@ -121,7 +119,7 @@ When you start TreeViewer for the first time from the icon in your `Applications
 You can also create symlinks to the TreeViewer executables in a folder that is included in your `PATH` (such as `/usr/local/bin`): open a terminal and type:
 
 ```bash
-ln -s /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewer /Applications/TreeViewer.app/Contents/Resources/TreeViewer.app/Contents/MacOs/TreeViewerCommandLine /usr/local/bin/
+ln -s /Applications/TreeViewer.app/Contents/MacOs/TreeViewer /Applications/TreeViewer.app/Contents/MacOs/TreeViewerCommandLine /usr/local/bin/
 ```
 
 This will allow you to run TreeViewer from the command line in any folder.
@@ -165,9 +163,9 @@ To be able to compile TreeViewer from source, you will need to install the [.NET
 
 You can use [Microsoft Visual Studio](https://visualstudio.microsoft.com/vs/) to compile the program. The following instructions will cover compiling TreeViewer from the command line, instead.
 
-To fully compile TreeViewer for Windows, macOS and Linux, you will need a computer with Windows 10 with the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) installed and a computer with a recent release of macOS.
+To fully compile TreeViewer for Windows, macOS and Linux, you will need a computer with Windows 10 or 11 with the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) installed and a computer with a recent release of macOS.
 
-First of all, you will need to download the TreeViewer source code: [TreeViewer-1.2.0.tar.gz](https://github.com/arklumpus/TreeViewer/archive/v1.2.0.tar.gz) and extract it somewhere on both the Windows machine and the macOS machine.
+First of all, you will need to download the TreeViewer source code: [TreeViewer-2.1.0.tar.gz](https://github.com/arklumpus/TreeViewer/archive/v2.1.0.tar.gz) and extract it somewhere on both the Windows machine and the macOS machine.
 
 Then, on the Windows machine, open a command-line window in the folder where you have extracted the source code, and type:
 
@@ -175,6 +173,7 @@ Then, on the Windows machine, open a command-line window in the folder where you
 BuildRelease Win-x64
 BuildRelease Linux-x64
 BuildRelease Mac-x64
+BuildRelease Mac-arm64
 
 BuildBinaries-Win-x64 "path/to/certificate.pfx" "certificate_password"
 bash -c ./BuildBinaries-Linux-x64.sh
@@ -182,14 +181,14 @@ bash -c ./BuildBinaries-Linux-x64.sh
 
 These commands will compile TreeViewer for all three platforms and create the installers for Windows and Linux, which will be placed in the `Binary` folder. To build the binaries for Windows, it is necessary to supply a code-signing certificate in PFX or P12 format, together with the associated password. Such a certificate can be obtained (for a fee) from a [certificate authority](https://docs.microsoft.com/en-us/windows-hardware/drivers/dashboard/get-a-code-signing-certificate) or can be a self-signed certificate.
 
-Now you need to copy the `Release/Mac-x64` folder to the corresponding folder on the macOS machine.
+Now you need to copy the `Release/Mac-x64` and `Release/Mac-arm64` folders to the corresponding folder on the macOS machine.
 
 To sign the app and the installer on macOS, you will need a "Developer ID Application" certificate and a "Developer ID Installer" certificate, as well as an Apple ID and an app-specific password (which can be generated from the Apple ID page).
 
 On the macOS machine, open a terminal in the folder where you have extracted the TreeViewer source code and type:
 
 ```bash
-./BuildBinaries-Mac-x64.sh "<Developer ID Application Identity>" "<Developer ID Installer Identity>" "<Apple ID>" "<app-specific password>"
+./BuildBinaries-Mac-x64.sh "<Developer ID Application Identity>" "<Developer ID Installer Identity>" "<Apple ID>" "<app-specific password>" "<developer team ID>"
 ```
 
 Where `<Developer ID Application Identity>` and `<Developer ID Installer Identity>` are the names of the certificates in your keychain (e.g. `"Developer ID Application: John Smith"`). This should create, sign and notarize the installers for macOS in the `Binary` folder.
