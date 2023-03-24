@@ -4,6 +4,8 @@
     <a href="https://treeviewer.org"><img src="Icons/Program/Banner.svg"></a>
 </p>
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7768344.svg)](https://doi.org/10.5281/zenodo.7768344)
+
 ## Introduction
 
 **TreeViewer** is a cross-platform program to draw phylogenetic trees. It is based on a "modular" approach, in which small _modules_ are used to perform individual actions (such as computing the coordinates of the nodes of the tree, or drawing the tree branches) that together contribute to the final plot.
@@ -11,6 +13,12 @@
 Each TreeViewer module has a user manual, and these can be displayed in TreeViewer by opening the `Module Manager` window (from the `Edit` menu) or by clicking on the various question mark (`?`) icons that are shown throughout the program when appropriate.
 
 TreeViewer is written using C# .NET 7 and is available for Windows, macOS (Intel x64 and Apple Silicon ARM) and Linux operating systems. It consists of the main GUI program and a command-line utility that can be used to plot trees that are too large to be previewed on-screen in real time. It is licensed under a GNU Affero GPLv3 license.
+
+## Citing TreeViewer
+
+If you use TreeViewer, please cite it as:
+
+> _Giorgio Bianchini, & Patricia Sánchez-Baracaldo_, 2023. **TreeViewer Version 2.1.0**. Zenodo. https://doi.org/10.5281/zenodo.7768344
 
 ## Installing TreeViewer
 
