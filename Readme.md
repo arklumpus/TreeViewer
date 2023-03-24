@@ -18,7 +18,7 @@ TreeViewer is written using C# .NET 7 and is available for Windows, macOS (Intel
 
 If you use TreeViewer, please cite it as:
 
-> _Giorgio Bianchini, & Patricia Sánchez-Baracaldo_, 2023. **TreeViewer Version 2.1.0**. Zenodo. https://doi.org/10.5281/zenodo.7768344
+> _Bianchini, G., & Sánchez-Baracaldo, P._ (2023). **TreeViewer - Cross-platform software to draw phylogenetic trees (Version 2.1.0)** [Computer software]. https://doi.org/10.5281/zenodo.7768344
 
 ## Installing TreeViewer
 
