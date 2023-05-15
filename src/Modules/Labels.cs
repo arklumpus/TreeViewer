@@ -1070,7 +1070,7 @@ namespace Labels
             }
         }
 
-        private const string WrongReferenceMessageId = "";
+        private const string WrongReferenceMessageId = "2d351c05-8c86-43d0-a6c0-3c28e26b23e7";
 
         private static void CheckCoordinates(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates)
         {
