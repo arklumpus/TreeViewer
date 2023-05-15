@@ -29,13 +29,18 @@ namespace aea7e246be93f4d0da67a88af05479b48
     /// <summary>
     /// This module reads an alignment file in FASTA format from an attachment and adds the alignment to the tree plot.
     /// Clicking on a sequence in the alignment selects the corresponding tip in the tree and vice versa.
+    /// 
+    /// The module can be used in two ways, depending on the value of the [Mode](#mode) parameter: if this is `Alignment block`,
+    /// the alignment is drawn as a single block that can be positioned on the tree plot; if this is `Sequences at nodes`, each
+    /// sequence is drawn individually at a position corresponding to the node it refers to. In this case, the sequences may not
+    /// appear "aligned" in the plot, unless the [Anchor type](#anchor-type) is set to `Origin`.
     /// </summary>
     public static class MyModule
     {
         public const string Name = "Plot alignment";
         public const string HelpText = "Adds the plot of an alignment to the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.1.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "ea7e246b-e93f-4d0d-a67a-88af05479b48";
@@ -88,6 +93,41 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
+            int defaultBranchReference = 0;
+
+            if (InstanceStateData.IsUIAvailable)
+            {
+                MainWindow activeWindow = null;
+
+                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
+                {
+                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
+                    {
+                        activeWindow = GlobalSettings.Settings.MainWindows[i];
+                        break;
+                    }
+                }
+
+                if (activeWindow != null)
+                {
+                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+                    {
+                        // Rectangular coordinates
+                        defaultBranchReference = 0;
+                    }
+                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+                    {
+                        // Circular coordinates
+                        defaultBranchReference = 2;
+                    }
+                    else
+                    {
+                        // Radial coordinates
+                        defaultBranchReference = 1;
+                    }
+                }
+            }
+
             List<string> leafNames = tree.GetLeafNames();
 
             return new List<(string, string)>()
@@ -112,13 +152,20 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 /// </param>
                 ("End:", "NumericUpDown:1[\"1\",\"Infinity\",\"1\",\"0\"]"),
 
-                ("Position","Group:4"),
+                ("Position","Group:7"),
+
+                /// <param name="Mode:">
+                /// This parameter determines whether the alignment is drawn as a single "block" positioned somewhere on
+                /// the tree plot, or as individual sequences positioned at the tips they refer to. In the second case, the
+                /// lines showing the % identity and the % of gaps are not shown.
+                /// </param>
+                ("Mode:", "ComboBox:0[\"Alignment block\",\"Sequences at nodes\"]"),
                 
                 /// <param name="Anchor:">
-                /// This parameter is used to select the anchor used to determine the position of the alignment plot. If
-                /// the selected value is `Node`, the specified node is used as an anchor. Otherwise, the selected point
-                /// on the tree plot is used. Note that these positions refer to the _tree_ plot and do not take into
-                /// account the presence of labels and other elements.
+                /// If the [Mode](#mode) is `Alignment block`, this parameter is used to select the anchor used to determine
+                /// the position of the alignment plot. If the selected value is `Node`, the specified node is used as an anchor.
+                /// Otherwise, the selected point on the tree plot is used. Note that these positions refer to the _tree_ plot and
+                /// do not take into account the presence of labels and other elements.
                 /// </param>
                 ("Anchor:","ComboBox:8[\"Node\",\"Top-left\",\"Top-center\",\"Top-right\",\"Middle-left\",\"Middle-center\",\"Middle-right\",\"Bottom-left\",\"Bottom-center\",\"Bottom-right\"]"),
                 
@@ -133,11 +180,59 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 /// </param>
                 ("Alignment:","ComboBox:1[\"Top-left\",\"Top-center\",\"Top-right\",\"Middle-left\",\"Middle-center\",\"Middle-right\",\"Bottom-left\",\"Bottom-center\",\"Bottom-right\"]"),
                 
+                /// <param name="Anchor type:">
+                /// If the [Mode](#mode) is `Sequences at nodes`, this parameter is used to determine how the position of each
+                /// sequence is computed. If the selected value is `Node`, each sequence is positioned at the node it corresponds to;
+                /// if the selected value is `Origin`, the position of each sequence depends on the current Coordinates module:
+                /// 
+                /// +------------------------------------+------------------------------------------------------------------------+
+                /// | Coordinates module                 | Origin                                                                 |
+                /// +====================================+========================================================================+
+                /// | Rectangular                        | A point corresponding to the projection of the node on a line          |
+                /// |                                    | perpedicular to the direction in which the tree expands and passing    |
+                /// |                                    | through the root node. Usually (i.e. if the tree is horizontal), this  |
+                /// |                                    | means a point with the same horizontal coordinate as the root node and |
+                /// |                                    | the same vertical coordinate as the current node.                      |
+                /// +------------------------------------+------------------------------------------------------------------------+
+                /// | Radial                             | The root node.                                                         |
+                /// |                                    |                                                                        |
+                /// |                                    |                                                                        |
+                /// +------------------------------------+------------------------------------------------------------------------+
+                /// | Circular                           | The root node.                                                         |
+                /// |                                    |                                                                        |
+                /// |                                    |                                                                        |
+                /// |                                    |                                                                        |
+                /// |                                    |                                                                        |
+                /// |                                    |                                                                        |
+                /// +------------------------------------+------------------------------------------------------------------------+
+                /// </param>
+                ("Anchor type:", "ComboBox:0[\"Node\",\"Origin\"]"),
+                
                 /// <param name="Position:">
-                /// This parameter determines how much the alignment plot is shifted with respect to the position determined
-                /// by the [Anchor](#anchor) and the [Alignment](#alignment).
+                /// If the [Mode](#mode) is `Alignment block`, this parameter determines how much the alignment plot is shifted with respect to the position determined
+                /// by the [Anchor](#anchor) and the [Alignment](#alignment). If the [Mode](#mode) is `Sequences at nodes`, instead, each sequence is
+                /// shifted by the specified amount with respect to the [Reference](#reference).
                 /// </param>
                 ("Position:","Point:[0,0]"),
+
+                ("Orientation", "Group:3"),
+
+                /// <param name="Orientation:">
+                /// This parameter determines the orientation of the sequence with respect to the [Reference](#reference), in degrees. If this is `0°`, the sequence is parallel to the reference (e.g. the branch), if it is `90°` it is perpendicular to the branch and so on.
+                /// </param>
+                ( "Orientation:", "Slider:0[\"0\",\"360\",\"0°\"]" ),
+                
+                /// <param name="Reference:">
+                /// This parameter (along with the [Orientation](#orientation)) determines the reference for the direction along which the sequence flows.
+                /// If this is `Horizontal`, the sequences are all drawn in the same direction, regardless of the orientation of the branch to which they refer.
+                /// If it is `Branch`, each sequence is drawn along the direction of the branch connecting the node to its parent, assuming that the branch is drawn in the style determined by the [Branch reference](#branch-reference).
+                /// </param>
+                ( "Reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
+
+                /// <param name="Branch reference:">
+                /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
+                /// </param>
+                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
 
                 ("Labels","Group:5"),
                 
@@ -284,34 +379,32 @@ namespace aea7e246be93f4d0da67a88af05479b48
             controlStatus = new Dictionary<string, ControlStatus>();
             parametersToChange = new Dictionary<string, object>() { { "ResidueStyleButtons", -1 } };
 
-            if ((int)currentParameterValues["Label position:"] == 0)
-            {
-                controlStatus["Label font:"] = ControlStatus.Hidden;
-                controlStatus["Attribute"] = ControlStatus.Hidden;
-                controlStatus["Label attribute:"] = ControlStatus.Hidden;
-                controlStatus["Attribute type:"] = ControlStatus.Hidden;
-                controlStatus["Attribute format..."] = ControlStatus.Hidden;
-                controlStatus["Identity label:"] = ControlStatus.Hidden;
-                controlStatus["Gaps label:"] = ControlStatus.Hidden;
-            }
-            else
-            {
-                controlStatus["Label font:"] = ControlStatus.Enabled;
-                controlStatus["Attribute"] = ControlStatus.Enabled;
-                controlStatus["Label attribute:"] = ControlStatus.Enabled;
-                controlStatus["Attribute type:"] = ControlStatus.Enabled;
-                controlStatus["Attribute format..."] = ControlStatus.Enabled;
-                controlStatus["Identity label:"] = ControlStatus.Enabled;
-                controlStatus["Gaps label:"] = ControlStatus.Enabled;
-            }
+
 
             if ((int)currentParameterValues["Colour mode:"] == 0)
             {
+                controlStatus["Auto colour by node"] = ControlStatus.Enabled;
+
+                if ((bool)currentParameterValues["Auto colour by node"])
+                {
+                    controlStatus["Opacity:"] = ControlStatus.Enabled;
+                    controlStatus["Colour:"] = ControlStatus.Hidden;
+                }
+                else
+                {
+                    controlStatus["Opacity:"] = ControlStatus.Hidden;
+                    controlStatus["Colour:"] = ControlStatus.Enabled;
+                }
+
                 controlStatus["Residue colours:"] = ControlStatus.Hidden;
                 controlStatus["ResidueStyleButtons"] = ControlStatus.Hidden;
             }
             else
             {
+                controlStatus["Auto colour by node"] = ControlStatus.Hidden;
+                controlStatus["Opacity:"] = ControlStatus.Hidden;
+                controlStatus["Colour:"] = ControlStatus.Hidden;
+
                 controlStatus["Residue colours:"] = ControlStatus.Enabled;
                 controlStatus["ResidueStyleButtons"] = ControlStatus.Enabled;
             }
@@ -336,15 +429,74 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 controlStatus["Letter colour:"] = ControlStatus.Hidden;
             }
 
-            if ((bool)currentParameterValues["Auto colour by node"])
+
+
+            if ((int)currentParameterValues["Mode:"] == 0)
             {
-                controlStatus["Opacity:"] = ControlStatus.Enabled;
-                controlStatus["Colour:"] = ControlStatus.Hidden;
+                controlStatus["Anchor:"] = ControlStatus.Enabled;
+                controlStatus["Node:"] = ControlStatus.Enabled;
+                controlStatus["Alignment:"] = ControlStatus.Enabled;
+
+                controlStatus["Anchor type:"] = ControlStatus.Hidden;
+                controlStatus["Orientation:"] = ControlStatus.Hidden;
+                controlStatus["Reference:"] = ControlStatus.Hidden;
+                controlStatus["Branch reference:"] = ControlStatus.Hidden;
+                controlStatus["Orientation"] = ControlStatus.Hidden;
+
+                controlStatus["Label position:"] = ControlStatus.Enabled;
+                controlStatus["Labels"] = ControlStatus.Enabled;
+                controlStatus["Margin:"] = ControlStatus.Enabled;
+                controlStatus["Identity colour:"] = ControlStatus.Enabled;
+                controlStatus["Gaps colour:"] = ControlStatus.Enabled;
+
+                if ((int)currentParameterValues["Label position:"] == 0)
+                {
+                    controlStatus["Label font:"] = ControlStatus.Hidden;
+                    controlStatus["Attribute"] = ControlStatus.Hidden;
+                    controlStatus["Label attribute:"] = ControlStatus.Hidden;
+                    controlStatus["Attribute type:"] = ControlStatus.Hidden;
+                    controlStatus["Attribute format..."] = ControlStatus.Hidden;
+                    controlStatus["Identity label:"] = ControlStatus.Hidden;
+                    controlStatus["Gaps label:"] = ControlStatus.Hidden;
+                }
+                else
+                {
+                    controlStatus["Label font:"] = ControlStatus.Enabled;
+                    controlStatus["Attribute"] = ControlStatus.Enabled;
+                    controlStatus["Label attribute:"] = ControlStatus.Enabled;
+                    controlStatus["Attribute type:"] = ControlStatus.Enabled;
+                    controlStatus["Attribute format..."] = ControlStatus.Enabled;
+                    controlStatus["Identity label:"] = ControlStatus.Enabled;
+                    controlStatus["Gaps label:"] = ControlStatus.Enabled;
+                }
+
             }
             else
             {
-                controlStatus["Opacity:"] = ControlStatus.Hidden;
-                controlStatus["Colour:"] = ControlStatus.Enabled;
+                controlStatus["Anchor:"] = ControlStatus.Hidden;
+                controlStatus["Node:"] = ControlStatus.Hidden;
+                controlStatus["Alignment:"] = ControlStatus.Hidden;
+
+                controlStatus["Anchor type:"] = ControlStatus.Enabled;
+                controlStatus["Orientation:"] = ControlStatus.Enabled;
+                controlStatus["Reference:"] = ControlStatus.Enabled;
+                controlStatus["Branch reference:"] = ControlStatus.Enabled;
+                controlStatus["Orientation"] = ControlStatus.Enabled;
+
+                controlStatus["Label position:"] = ControlStatus.Hidden;
+                controlStatus["Labels"] = ControlStatus.Hidden;
+                controlStatus["Margin:"] = ControlStatus.Hidden;
+                controlStatus["Identity colour:"] = ControlStatus.Hidden;
+                controlStatus["Gaps colour:"] = ControlStatus.Hidden;
+
+
+                controlStatus["Label font:"] = ControlStatus.Hidden;
+                controlStatus["Attribute"] = ControlStatus.Hidden;
+                controlStatus["Label attribute:"] = ControlStatus.Hidden;
+                controlStatus["Attribute type:"] = ControlStatus.Hidden;
+                controlStatus["Attribute format..."] = ControlStatus.Hidden;
+                controlStatus["Identity label:"] = ControlStatus.Hidden;
+                controlStatus["Gaps label:"] = ControlStatus.Hidden;
             }
 
 
@@ -375,7 +527,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
             if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
             {
                 string attrType = (string)currentParameterValues["Attribute type:"];
-                
+
                 if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
                 {
                     if (attrType == "String")
@@ -392,7 +544,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
             if ((int)currentParameterValues["ResidueStyleButtons"] == 0)
             {
                 object[] formatterParams = new object[] { DefaultNucleotideColourSource, false };
-                
+
                 ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultNucleotideColourSource, formatterParams);
 
                 formatterOptions.AttributeName = "(N/A)";
@@ -407,7 +559,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
             else if ((int)currentParameterValues["ResidueStyleButtons"] == 1)
             {
                 object[] formatterParams = new object[] { DefaultAminoAcidColourSource, false };
-                
+
                 ColourFormatterOptions formatterOptions = new ColourFormatterOptions(DefaultAminoAcidColourSource, formatterParams);
 
                 formatterOptions.AttributeName = "(N/A)";
@@ -430,11 +582,16 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 {
                     parametersToChange["Start:"] = 1.0;
                 }
-                
+
                 if (previousParameterValues["End:"] == currentParameterValues["End:"])
                 {
                     parametersToChange["End:"] = (double)maxLen;
                 }
+            }
+
+            if ((int)currentParameterValues["Mode:"] != (int)previousParameterValues["Mode:"] && ((Point)currentParameterValues["Position:"]).Equals((Point)previousParameterValues["Position:"]))
+            {
+                parametersToChange["Position:"] = new Point();
             }
 
             return true;
@@ -442,6 +599,8 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
         public static Point[] PlotAction(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates, Graphics graphics)
         {
+            CheckCoordinates(tree, parameterValues, coordinates);
+
             Attachment attachment = (Attachment)parameterValues["FASTA alignment:"];
             Font labelFont = (Font)parameterValues["Label font:"];
             string gapLabel = (string)parameterValues["Gaps label:"];
@@ -481,6 +640,8 @@ namespace aea7e246be93f4d0da67a88af05479b48
             bool drawLetters = (bool)parameterValues["Draw residue letters"];
             Font residueFont = (Font)parameterValues["Residue font:"];
             Colour residueLetterColour = (Colour)parameterValues["Letter colour:"];
+
+            int mode = (int)parameterValues["Mode:"];
 
             TreeNode anchorNode = (tree.GetLastCommonAncestor((string[])parameterValues["Node:"]) ?? tree);
 
@@ -569,378 +730,787 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 }
             }
 
+            double orientation = (double)parameterValues["Orientation:"] * Math.PI / 180;
+            int orientationReference = (int)parameterValues["Reference:"];
 
+            int branchReference = (int)parameterValues["Branch reference:"];
 
-            Graphics newGpr = new Graphics();
-
-            double maxLabelWidth = 0;
-            double maxY = 0;
-
-            foreach (TreeNode leaf in tree.GetLeaves())
+            if (orientationReference == 1)
             {
-                foreach (KeyValuePair<string, string> kvp in fastaAlignment)
+                orientationReference += branchReference;
+            }
+
+            int anchorKind = (int)parameterValues["Anchor type:"];
+            Point delta = (Point)parameterValues["Position:"];
+
+
+            if (mode == 0)
+            {
+                Graphics newGpr = new Graphics();
+
+                double maxLabelWidth = 0;
+                double maxY = 0;
+
+                foreach (TreeNode leaf in tree.GetLeaves())
                 {
-                    if (kvp.Key.Contains(leaf.Name))
+                    foreach (KeyValuePair<string, string> kvp in fastaAlignment)
                     {
-                        double height = defaultHeight;
-                        double margin = defaultMargin;
-
-                        if (leaf.Attributes.TryGetValue(heightFO.AttributeName, out object heightAttributeObject) && heightAttributeObject != null)
+                        if (kvp.Key.Contains(leaf.Name))
                         {
-                            height = heightFormatter(heightAttributeObject) ?? defaultHeight;
-                        }
+                            double height = defaultHeight;
+                            double margin = defaultMargin;
 
-                        if (leaf.Attributes.TryGetValue(marginFO.AttributeName, out object marginAttributeObject) && marginAttributeObject != null)
-                        {
-                            margin = marginFormatter(marginAttributeObject) ?? defaultMargin;
-                        }
-
-                        Colour sequenceColour = defaultColour;
-
-
-                        if (!autoColour)
-                        {
-                            if (leaf.Attributes.TryGetValue(colourFO.AttributeName, out object colourAttributeObject) && colourAttributeObject != null)
+                            if (leaf.Attributes.TryGetValue(heightFO.AttributeName, out object heightAttributeObject) && heightAttributeObject != null)
                             {
-                                sequenceColour = colourFormatter(colourAttributeObject) ?? defaultColour;
+                                height = heightFormatter(heightAttributeObject) ?? defaultHeight;
                             }
+
+                            if (leaf.Attributes.TryGetValue(marginFO.AttributeName, out object marginAttributeObject) && marginAttributeObject != null)
+                            {
+                                margin = marginFormatter(marginAttributeObject) ?? defaultMargin;
+                            }
+
+                            Colour sequenceColour = defaultColour;
+
+
+                            if (!autoColour)
+                            {
+                                if (leaf.Attributes.TryGetValue(colourFO.AttributeName, out object colourAttributeObject) && colourAttributeObject != null)
+                                {
+                                    sequenceColour = colourFormatter(colourAttributeObject) ?? defaultColour;
+                                }
+                            }
+                            else
+                            {
+                                sequenceColour = Modules.DefaultColours[Math.Abs(leaf.Name.GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                            }
+
+                            if (height > 0 && (sequenceColour.A > 0 || colourMode == 1))
+                            {
+                                string labelValue = "";
+
+                                if (leaf.Attributes.TryGetValue(labelAttributeName, out object attributeObject) && attributeObject != null)
+                                {
+                                    labelValue = labelFormatter(attributeObject);
+                                }
+
+
+                                if (!string.IsNullOrEmpty(labelValue))
+                                {
+                                    IEnumerable<FormattedText> formattedText;
+
+                                    if (labelFont.FontFamily.IsStandardFamily)
+                                    {
+                                        formattedText = FormattedText.Format(labelValue, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
+                                    }
+                                    else
+                                    {
+                                        formattedText = FormattedText.Format(labelValue, labelFont, labelFont, labelFont, labelFont);
+                                    }
+
+                                    double labelWidth = formattedText.Measure().Width;
+
+                                    maxLabelWidth = Math.Max(labelWidth, maxLabelWidth);
+
+                                    if (labelPosition == 1 || labelPosition == 3)
+                                    {
+                                        newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, height * 0.5, formattedText, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
+                                    }
+
+                                    if (labelPosition == 2 || labelPosition == 3)
+                                    {
+                                        newGpr.FillText(kvp.Value.Length * width + labelFont.FontSize * 0.625, height * 0.5, formattedText, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
+                                    }
+                                }
+
+
+                                if (colourMode == 0)
+                                {
+                                    List<int> sequence = new List<int>();
+                                    int currentPiece = 0;
+
+                                    bool inGap = false;
+
+                                    newGpr.Save();
+
+                                    int firstInGap = -1;
+
+                                    for (int i = 0; i < kvp.Value.Length; i++)
+                                    {
+                                        if (kvp.Value[i] == '-')
+                                        {
+                                            if (i == 0)
+                                            {
+                                                firstInGap = 0;
+                                            }
+
+                                            if (inGap)
+                                            {
+                                                currentPiece++;
+                                            }
+                                            else
+                                            {
+                                                if (currentPiece > 0)
+                                                {
+                                                    sequence.Add(currentPiece);
+                                                }
+                                                inGap = true;
+                                                currentPiece = 1;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (i == 0)
+                                            {
+                                                firstInGap = 1;
+                                            }
+
+                                            if (!inGap)
+                                            {
+                                                currentPiece++;
+                                            }
+                                            else
+                                            {
+                                                if (currentPiece > 0)
+                                                {
+                                                    sequence.Add(currentPiece);
+                                                }
+                                                inGap = false;
+                                                currentPiece = 1;
+                                            }
+                                        }
+                                    }
+
+                                    if (currentPiece > 0)
+                                    {
+                                        sequence.Add(currentPiece);
+                                    }
+
+                                    for (int i = 0; i < sequence.Count; i++)
+                                    {
+                                        if ((i + firstInGap) % 2 == 1)
+                                        {
+                                            newGpr.FillRectangle(0, 0, sequence[i] * width, height, sequenceColour, tag: leaf.Id);
+                                        }
+                                        newGpr.Translate(sequence[i] * width, 0);
+                                    }
+                                    newGpr.Restore();
+                                }
+                                else if (colourMode == 1)
+                                {
+                                    List<(int, Colour)> sequence = new List<(int, Colour)>();
+                                    int currentPiece = 0;
+                                    Colour currColour = defaultResidueColour;
+
+                                    newGpr.Save();
+
+                                    for (int i = 0; i < kvp.Value.Length; i++)
+                                    {
+                                        Colour colour = residueFormatter(kvp.Value[i].ToString()) ?? defaultResidueColour;
+
+                                        if (currColour == colour)
+                                        {
+                                            currentPiece++;
+                                        }
+                                        else
+                                        {
+                                            if (currentPiece > 0)
+                                            {
+                                                sequence.Add((currentPiece, currColour));
+                                            }
+
+                                            currentPiece = 1;
+                                            currColour = colour;
+                                        }
+                                    }
+
+                                    if (currentPiece > 0)
+                                    {
+                                        sequence.Add((currentPiece, currColour));
+                                    }
+
+                                    for (int i = 0; i < sequence.Count; i++)
+                                    {
+                                        newGpr.FillRectangle(-Math.Min(width * 0.2, 0.05), 0, sequence[i].Item1 * width + Math.Min(width * 0.4, 0.1), height, sequence[i].Item2, tag: leaf.Id);
+                                        newGpr.Translate(sequence[i].Item1 * width, 0);
+                                    }
+                                    newGpr.Restore();
+                                }
+
+                                if (drawLetters)
+                                {
+                                    newGpr.Save();
+                                    newGpr.Translate(width * 0.5, height * 0.5);
+                                    for (int i = 0; i < kvp.Value.Length; i++)
+                                    {
+                                        Size letterSize = residueFont.MeasureText(kvp.Value[i].ToString());
+
+                                        double scaleX = 1;
+                                        double scaleY = 1;
+
+                                        if (letterSize.Width > width)
+                                        {
+                                            scaleX = width / letterSize.Width;
+                                        }
+
+                                        if (letterSize.Height > height)
+                                        {
+                                            scaleY = height / letterSize.Height;
+                                        }
+
+                                        if (scaleX != 1 || scaleY != 1)
+                                        {
+                                            newGpr.Save();
+                                            newGpr.Scale(scaleX, scaleY);
+                                        }
+
+                                        newGpr.FillText(-letterSize.Width * 0.5, 0, kvp.Value[i].ToString(), residueFont, residueLetterColour, TextBaselines.Middle);
+
+                                        if (scaleX != 1 || scaleY != 1)
+                                        {
+                                            newGpr.Restore();
+                                        }
+
+                                        newGpr.Translate(width, 0);
+                                    }
+                                    newGpr.Restore();
+                                }
+
+
+
+                                newGpr.Translate(0, height + margin);
+                                maxY += height + margin;
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                int maxSequenceLength = (from el in fastaAlignment select el.Value.Length).Max();
+
+                if (identityColour.A > 0 && !string.IsNullOrEmpty(identityLabel))
+                {
+                    IEnumerable<FormattedText> formattedText;
+
+                    if (labelFont.FontFamily.IsStandardFamily)
+                    {
+                        formattedText = FormattedText.Format(identityLabel, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
+                    }
+                    else
+                    {
+                        formattedText = FormattedText.Format(identityLabel, labelFont, labelFont, labelFont, labelFont);
+                    }
+
+                    double labelWidth = formattedText.Measure().Width;
+                    maxLabelWidth = Math.Max(maxLabelWidth, labelWidth);
+
+                    if (labelPosition == 1 || labelPosition == 3)
+                    {
+                        newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, formattedText, identityColour, TextBaselines.Middle);
+                    }
+
+                    if (labelPosition == 2 || labelPosition == 3)
+                    {
+                        newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, formattedText, identityColour, TextBaselines.Middle);
+                    }
+
+                    GraphicsPath path = new GraphicsPath();
+                    path.MoveTo(0, defaultHeight);
+
+                    for (int i = 0; i < maxSequenceLength; i++)
+                    {
+                        double percIdentity = getPercIdentity(i, fastaAlignment);
+                        path.LineTo(i * width, defaultHeight - percIdentity * defaultHeight);
+                        path.LineTo(i * width + width, defaultHeight - percIdentity * defaultHeight);
+                    }
+
+                    path.LineTo(maxSequenceLength * width, defaultHeight);
+                    path.Close();
+                    newGpr.FillPath(path, identityColour);
+
+                    newGpr.Translate(0, defaultHeight + defaultMargin);
+                    maxY += defaultHeight + defaultMargin;
+                }
+
+                if (gapColour.A > 0 && !string.IsNullOrEmpty(gapLabel))
+                {
+                    IEnumerable<FormattedText> formattedText;
+
+                    if (labelFont.FontFamily.IsStandardFamily)
+                    {
+                        formattedText = FormattedText.Format(gapLabel, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
+                    }
+                    else
+                    {
+                        formattedText = FormattedText.Format(gapLabel, labelFont, labelFont, labelFont, labelFont);
+                    }
+
+                    double labelWidth = formattedText.Measure().Width;
+                    maxLabelWidth = Math.Max(maxLabelWidth, labelWidth);
+
+                    if (labelPosition == 1 || labelPosition == 3)
+                    {
+                        newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, formattedText, gapColour, TextBaselines.Middle);
+                    }
+
+                    if (labelPosition == 2 || labelPosition == 3)
+                    {
+                        newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, formattedText, gapColour, TextBaselines.Middle);
+                    }
+
+                    GraphicsPath path = new GraphicsPath();
+                    path.MoveTo(0, defaultHeight);
+
+                    for (int i = 0; i < maxSequenceLength; i++)
+                    {
+                        double percGaps = getPercGaps(i, fastaAlignment);
+                        path.LineTo(i * width, defaultHeight - percGaps * defaultHeight);
+                        path.LineTo(i * width + width, defaultHeight - percGaps * defaultHeight);
+                    }
+
+                    path.LineTo(maxSequenceLength * width, defaultHeight);
+                    path.Close();
+                    newGpr.FillPath(path, gapColour);
+                    maxY += defaultHeight;
+                }
+
+                double leftMargin = labelPosition == 1 || labelPosition == 3 ? (labelFont.FontSize * 0.625 + maxLabelWidth) : 0;
+                double rightMargin = labelPosition == 2 || labelPosition == 3 ? (labelFont.FontSize * 0.625 + maxLabelWidth) : 0;
+                double alnWidth = maxSequenceLength * width;
+
+                double totalWidth = alnWidth + leftMargin + rightMargin;
+
+                double plotPosX = 0;
+                double plotPosY = 0;
+
+                if (alignment == 0 || alignment == 1 || alignment == 2)
+                {
+                    plotPosY = 0;
+                }
+                else if (alignment == 3 || alignment == 4 || alignment == 5)
+                {
+                    plotPosY = -maxY * 0.5;
+                }
+                else if (alignment == 6 || alignment == 7 || alignment == 8)
+                {
+                    plotPosY = -maxY;
+                }
+
+                if (alignment == 0 || alignment == 3 || alignment == 6)
+                {
+                    plotPosX = leftMargin;
+                }
+                else if (alignment == 1 || alignment == 4 || alignment == 7)
+                {
+                    plotPosX = leftMargin - totalWidth * 0.5;
+                }
+                else if (alignment == 2 || alignment == 5 || alignment == 8)
+                {
+                    plotPosX = leftMargin - totalWidth;
+                }
+
+                graphics.DrawGraphics(position.X + anchorX + plotPosX, position.Y + anchorY + plotPosY, newGpr);
+
+                Point topLeft = new Point(position.X + anchorX + plotPosX - leftMargin, position.Y + anchorY + plotPosY);
+                Point bottomRight = new Point(topLeft.X + totalWidth, topLeft.Y + maxY);
+
+                return new Point[] { topLeft, bottomRight };
+            }
+            else
+            {
+                Point rootPoint = coordinates[Modules.RootNodeId];
+                coordinates.TryGetValue("92aac276-3af7-4506-a263-7220e0df5797", out Point circularCenter);
+
+                double minX = double.MaxValue;
+                double maxX = double.MinValue;
+                double minY = double.MaxValue;
+                double maxY = double.MinValue;
+
+                bool anyMaxMin = false;
+
+                void updateMaxMin(Point pt)
+                {
+                    anyMaxMin = true;
+                    minX = Math.Min(minX, pt.X);
+                    maxX = Math.Max(maxX, pt.X);
+                    minY = Math.Min(minY, pt.Y);
+                    maxY = Math.Max(maxY, pt.Y);
+                }
+
+                static Point rotatePoint(Point pt, double angle)
+                {
+                    return new Point(pt.X * Math.Cos(angle) - pt.Y * Math.Sin(angle), pt.X * Math.Sin(angle) + pt.Y * Math.Cos(angle));
+                }
+
+                static Point sumPoint(Point pt1, Point pt2)
+                {
+                    return new Point(pt1.X + pt2.X, pt1.Y + pt2.Y);
+                }
+
+                foreach (TreeNode node in tree.GetLeaves())
+                {
+                    Point point = coordinates[node.Id];
+
+                    Point anglePoint = point;
+
+                    if (orientationReference == 1 && node.Parent != null)
+                    {
+                        Point parentPoint = coordinates[node.Parent.Id];
+
+                        TreeNode parent = node.Parent;
+
+                        while (point.Y - parentPoint.Y == 0 && point.X - parentPoint.X == 0 && parent.Parent != null)
+                        {
+                            parent = parent.Parent;
+                            parentPoint = coordinates[parent.Id];
+                        }
+
+                        Point pA = coordinates[parent.Children[0].Id];
+                        Point pB = coordinates[parent.Children[^1].Id];
+
+                        double numerator = pA.Y + pB.Y - 2 * parentPoint.Y;
+                        double denominator = pA.X + pB.X - 2 * parentPoint.X;
+
+                        if (Math.Abs(numerator) > 1e-5 && Math.Abs(denominator) > 1e-5)
+                        {
+                            double m = numerator / denominator;
+
+                            double x = (m * (parentPoint.Y - point.Y + m * point.X) + parentPoint.X) / (m * m + 1);
+                            double y = parentPoint.Y - (x - parentPoint.X) / m;
+
+                            anglePoint = new Point(x, y);
+                        }
+                        else if (Math.Abs(numerator) > 1e-5)
+                        {
+                            anglePoint = new Point(point.X, parentPoint.Y);
+                        }
+                        else if (Math.Abs(denominator) > 1e-5)
+                        {
+                            anglePoint = new Point(parentPoint.X, point.Y);
                         }
                         else
                         {
-                            sequenceColour = Modules.DefaultColours[Math.Abs(leaf.Name.GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                            anglePoint = point;
                         }
-
-                        if (height > 0 && (sequenceColour.A > 0 || colourMode == 1))
-                        {
-                            string labelValue = "";
-
-                            if (leaf.Attributes.TryGetValue(labelAttributeName, out object attributeObject) && attributeObject != null)
-                            {
-                                labelValue = labelFormatter(attributeObject);
-                            }
-
-
-                            if (!string.IsNullOrEmpty(labelValue))
-                            {
-                                IEnumerable<FormattedText> formattedText;
-
-                                if (labelFont.FontFamily.IsStandardFamily)
-                                {
-                                    formattedText = FormattedText.Format(labelValue, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
-                                }
-                                else
-                                {
-                                    formattedText = FormattedText.Format(labelValue, labelFont, labelFont, labelFont, labelFont);
-                                }
-
-                                double labelWidth = formattedText.Measure().Width;
-
-                                maxLabelWidth = Math.Max(labelWidth, maxLabelWidth);
-
-                                if (labelPosition == 1 || labelPosition == 3)
-                                {
-                                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, height * 0.5, formattedText, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
-                                }
-
-                                if (labelPosition == 2 || labelPosition == 3)
-                                {
-                                    newGpr.FillText(kvp.Value.Length * width + labelFont.FontSize * 0.625, height * 0.5, formattedText, sequenceColour, TextBaselines.Middle, tag: leaf.Id);
-                                }
-                            }
-
-
-                            if (colourMode == 0)
-                            {
-                                List<int> sequence = new List<int>();
-                                int currentPiece = 0;
-
-                                bool inGap = false;
-
-                                newGpr.Save();
-
-                                int firstInGap = -1;
-
-                                for (int i = 0; i < kvp.Value.Length; i++)
-                                {
-                                    if (kvp.Value[i] == '-')
-                                    {
-                                        if (i == 0)
-                                        {
-                                            firstInGap = 0;
-                                        }
-
-                                        if (inGap)
-                                        {
-                                            currentPiece++;
-                                        }
-                                        else
-                                        {
-                                            if (currentPiece > 0)
-                                            {
-                                                sequence.Add(currentPiece);
-                                            }
-                                            inGap = true;
-                                            currentPiece = 1;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (i == 0)
-                                        {
-                                            firstInGap = 1;
-                                        }
-
-                                        if (!inGap)
-                                        {
-                                            currentPiece++;
-                                        }
-                                        else
-                                        {
-                                            if (currentPiece > 0)
-                                            {
-                                                sequence.Add(currentPiece);
-                                            }
-                                            inGap = false;
-                                            currentPiece = 1;
-                                        }
-                                    }
-                                }
-
-                                if (currentPiece > 0)
-                                {
-                                    sequence.Add(currentPiece);
-                                }
-
-                                for (int i = 0; i < sequence.Count; i++)
-                                {
-                                    if ((i + firstInGap) % 2 == 1)
-                                    {
-                                        newGpr.FillRectangle(0, 0, sequence[i] * width, height, sequenceColour, tag: leaf.Id);
-                                    }
-                                    newGpr.Translate(sequence[i] * width, 0);
-                                }
-                                newGpr.Restore();
-                            }
-                            else if (colourMode == 1)
-                            {
-                                List<(int, Colour)> sequence = new List<(int, Colour)>();
-                                int currentPiece = 0;
-                                Colour currColour = defaultResidueColour;
-
-                                newGpr.Save();
-
-                                for (int i = 0; i < kvp.Value.Length; i++)
-                                {
-                                    Colour colour = residueFormatter(kvp.Value[i].ToString()) ?? defaultResidueColour;
-
-                                    if (currColour == colour)
-                                    {
-                                        currentPiece++;
-                                    }
-                                    else
-                                    {
-                                        if (currentPiece > 0)
-                                        {
-                                            sequence.Add((currentPiece, currColour));
-                                        }
-
-                                        currentPiece = 1;
-                                        currColour = colour;
-                                    }
-                                }
-
-                                if (currentPiece > 0)
-                                {
-                                    sequence.Add((currentPiece, currColour));
-                                }
-
-                                for (int i = 0; i < sequence.Count; i++)
-                                {
-                                    newGpr.FillRectangle(-Math.Min(width * 0.2, 0.05), 0, sequence[i].Item1 * width + Math.Min(width * 0.4, 0.1), height, sequence[i].Item2, tag: leaf.Id);
-                                    newGpr.Translate(sequence[i].Item1 * width, 0);
-                                }
-                                newGpr.Restore();
-                            }
-
-                            if (drawLetters)
-                            {
-                                newGpr.Save();
-                                newGpr.Translate(width * 0.5, height * 0.5);
-                                for (int i = 0; i < kvp.Value.Length; i++)
-                                {
-                                    Size letterSize = residueFont.MeasureText(kvp.Value[i].ToString());
-
-                                    double scaleX = 1;
-                                    double scaleY = 1;
-
-                                    if (letterSize.Width > width)
-                                    {
-                                        scaleX = width / letterSize.Width;
-                                    }
-
-                                    if (letterSize.Height > height)
-                                    {
-                                        scaleY = height / letterSize.Height;
-                                    }
-
-                                    if (scaleX != 1 || scaleY != 1)
-                                    {
-                                        newGpr.Save();
-                                        newGpr.Scale(scaleX, scaleY);
-                                    }
-
-                                    newGpr.FillText(-letterSize.Width * 0.5, 0, kvp.Value[i].ToString(), residueFont, residueLetterColour, TextBaselines.Middle);
-
-                                    if (scaleX != 1 || scaleY != 1)
-                                    {
-                                        newGpr.Restore();
-                                    }
-
-                                    newGpr.Translate(width, 0);
-                                }
-                                newGpr.Restore();
-                            }
-
-
-
-                            newGpr.Translate(0, height + margin);
-                            maxY += height + margin;
-                        }
-
-                        break;
                     }
+
+                    double rotationAngle = 0;
+
+                    if (orientationReference > 0 && node.Parent != null)
+                    {
+                        if (orientationReference == 1)
+                        {
+                            double angle = Math.Atan2(point.Y - anglePoint.Y, point.X - anglePoint.X);
+                            rotationAngle += angle;
+                        }
+                        else if (orientationReference == 2)
+                        {
+                            Point parentPoint = coordinates[node.Parent.Id];
+
+                            TreeNode parent = node.Parent;
+
+                            while (point.Y - parentPoint.Y == 0 && point.X - parentPoint.X == 0 && parent.Parent != null)
+                            {
+                                parent = parent.Parent;
+                                parentPoint = coordinates[parent.Id];
+                            }
+
+                            double angle = Math.Atan2(point.Y - parentPoint.Y, point.X - parentPoint.X);
+                            rotationAngle += angle;
+                        }
+                        else if (orientationReference == 3)
+                        {
+                            Point pt = coordinates[node.Id];
+
+                            rotationAngle += Math.Atan2(pt.Y, pt.X);
+                        }
+                    }
+                    else if (orientationReference > 0 && node.Parent == null)
+                    {
+                        if (orientationReference != 3)
+                        {
+                            Point parentPoint = coordinates[Modules.RootNodeId];
+                            double angle = Math.Atan2(point.Y - parentPoint.Y, point.X - parentPoint.X);
+                            rotationAngle += angle;
+                        }
+                        else
+                        {
+                            Point pt = coordinates[node.Id];
+
+                            rotationAngle += Math.Atan2(pt.Y, pt.X);
+                        }
+                    }
+
+                    while (Math.Abs(rotationAngle) > Math.PI)
+                    {
+                        rotationAngle -= 2 * Math.PI * Math.Sign(rotationAngle);
+                    }
+
+                    if (anchorKind == 1)
+                    {
+                        double referenceAngle = rotationAngle;
+
+                        if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out Point coordinateReference))
+                        {
+                            referenceAngle = Math.Atan2(coordinateReference.Y, coordinateReference.X);
+                        }
+
+                        if (branchReference == 0)
+                        {
+                            point = coordinates[node.Id];
+
+                            Point branchVector = new Point(Math.Cos(referenceAngle), Math.Sin(referenceAngle));
+
+                            double d = (rootPoint.X - point.X) * branchVector.X + (rootPoint.Y - point.Y) * branchVector.Y;
+
+                            Point proj = new Point(point.X + d * branchVector.X, point.Y + d * branchVector.Y);
+
+                            point = proj;
+                        }
+                        else if (branchReference == 1)
+                        {
+                            point = coordinates[Modules.RootNodeId];
+                        }
+                        else if (branchReference == 2)
+                        {
+                            point = circularCenter;
+                        }
+                    }
+
+                    graphics.Save();
+
+                    graphics.Translate(point.X, point.Y);
+                    graphics.Rotate(rotationAngle);
+
+                    graphics.Translate(delta.X, delta.Y);
+                    graphics.Rotate(orientation);
+
+                    double totalAngle = rotationAngle + orientation;
+
+                    while (totalAngle > Math.PI)
+                    {
+                        totalAngle -= 2 * Math.PI;
+                    }
+
+                    while (totalAngle < -Math.PI)
+                    {
+                        totalAngle += 2 * Math.PI;
+                    }
+
+                    foreach (KeyValuePair<string, string> kvp in fastaAlignment)
+                    {
+                        if (kvp.Key.Contains(node.Name))
+                        {
+                            double height = defaultHeight;
+
+                            if (node.Attributes.TryGetValue(heightFO.AttributeName, out object heightAttributeObject) && heightAttributeObject != null)
+                            {
+                                height = heightFormatter(heightAttributeObject) ?? defaultHeight;
+                            }
+
+                            Colour sequenceColour = defaultColour;
+
+
+                            if (!autoColour)
+                            {
+                                if (node.Attributes.TryGetValue(colourFO.AttributeName, out object colourAttributeObject) && colourAttributeObject != null)
+                                {
+                                    sequenceColour = colourFormatter(colourAttributeObject) ?? defaultColour;
+                                }
+                            }
+                            else
+                            {
+                                sequenceColour = Modules.DefaultColours[Math.Abs(node.Name.GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                            }
+
+                            if (height > 0 && (sequenceColour.A > 0 || colourMode == 1))
+                            {
+                                if (colourMode == 0)
+                                {
+                                    List<int> sequence = new List<int>();
+                                    int currentPiece = 0;
+
+                                    bool inGap = false;
+
+                                    graphics.Save();
+
+                                    graphics.Translate(0, -height * 0.5);
+
+                                    int firstInGap = -1;
+
+                                    for (int i = 0; i < kvp.Value.Length; i++)
+                                    {
+                                        if (kvp.Value[i] == '-')
+                                        {
+                                            if (i == 0)
+                                            {
+                                                firstInGap = 0;
+                                            }
+
+                                            if (inGap)
+                                            {
+                                                currentPiece++;
+                                            }
+                                            else
+                                            {
+                                                if (currentPiece > 0)
+                                                {
+                                                    sequence.Add(currentPiece);
+                                                }
+                                                inGap = true;
+                                                currentPiece = 1;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (i == 0)
+                                            {
+                                                firstInGap = 1;
+                                            }
+
+                                            if (!inGap)
+                                            {
+                                                currentPiece++;
+                                            }
+                                            else
+                                            {
+                                                if (currentPiece > 0)
+                                                {
+                                                    sequence.Add(currentPiece);
+                                                }
+                                                inGap = false;
+                                                currentPiece = 1;
+                                            }
+                                        }
+                                    }
+
+                                    if (currentPiece > 0)
+                                    {
+                                        sequence.Add(currentPiece);
+                                    }
+
+                                    for (int i = 0; i < sequence.Count; i++)
+                                    {
+                                        if ((i + firstInGap) % 2 == 1)
+                                        {
+                                            graphics.FillRectangle(0, 0, sequence[i] * width, height, sequenceColour, tag: node.Id);
+                                        }
+                                        graphics.Translate(sequence[i] * width, 0);
+                                    }
+                                    graphics.Restore();
+
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, -height * 0.5), orientation)), rotationAngle)));
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(kvp.Value.Length * width, -height * 0.5), orientation)), rotationAngle)));
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(kvp.Value.Length * width, height * 0.5), orientation)), rotationAngle)));
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, height * 0.5), orientation)), rotationAngle)));
+                                }
+                                else if (colourMode == 1)
+                                {
+                                    List<(int, Colour)> sequence = new List<(int, Colour)>();
+                                    int currentPiece = 0;
+                                    Colour currColour = defaultResidueColour;
+
+                                    graphics.Save();
+
+                                    graphics.Translate(0, -height * 0.5);
+
+                                    for (int i = 0; i < kvp.Value.Length; i++)
+                                    {
+                                        Colour colour = residueFormatter(kvp.Value[i].ToString()) ?? defaultResidueColour;
+
+                                        if (currColour == colour)
+                                        {
+                                            currentPiece++;
+                                        }
+                                        else
+                                        {
+                                            if (currentPiece > 0)
+                                            {
+                                                sequence.Add((currentPiece, currColour));
+                                            }
+
+                                            currentPiece = 1;
+                                            currColour = colour;
+                                        }
+                                    }
+
+                                    if (currentPiece > 0)
+                                    {
+                                        sequence.Add((currentPiece, currColour));
+                                    }
+
+                                    for (int i = 0; i < sequence.Count; i++)
+                                    {
+                                        graphics.FillRectangle(-Math.Min(width * 0.2, 0.05), 0, sequence[i].Item1 * width + Math.Min(width * 0.4, 0.1), height, sequence[i].Item2, tag: node.Id);
+                                        graphics.Translate(sequence[i].Item1 * width, 0);
+                                    }
+                                    graphics.Restore();
+
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, -height * 0.5), orientation)), rotationAngle)));
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(kvp.Value.Length * width, -height * 0.5), orientation)), rotationAngle)));
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(kvp.Value.Length * width, height * 0.5), orientation)), rotationAngle)));
+                                    updateMaxMin(sumPoint(point, rotatePoint(sumPoint(delta, rotatePoint(new Point(0, height * 0.5), orientation)), rotationAngle)));
+                                }
+
+                                if (drawLetters)
+                                {
+                                    graphics.Save();
+                                    graphics.Translate(0, -height * 0.5);
+                                    graphics.Translate(width * 0.5, height * 0.5);
+                                    for (int i = 0; i < kvp.Value.Length; i++)
+                                    {
+                                        Size letterSize = residueFont.MeasureText(kvp.Value[i].ToString());
+
+                                        double scaleX = 1;
+                                        double scaleY = 1;
+
+                                        if (letterSize.Width > width)
+                                        {
+                                            scaleX = width / letterSize.Width;
+                                        }
+
+                                        if (letterSize.Height > height)
+                                        {
+                                            scaleY = height / letterSize.Height;
+                                        }
+
+                                        if (scaleX != 1 || scaleY != 1)
+                                        {
+                                            graphics.Save();
+                                            graphics.Scale(scaleX, scaleY);
+                                        }
+
+                                        graphics.FillText(-letterSize.Width * 0.5, 0, kvp.Value[i].ToString(), residueFont, residueLetterColour, TextBaselines.Middle);
+
+                                        if (scaleX != 1 || scaleY != 1)
+                                        {
+                                            graphics.Restore();
+                                        }
+
+                                        graphics.Translate(width, 0);
+                                    }
+                                    graphics.Restore();
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+
+                    graphics.Restore();
+
                 }
-            }
 
-            int maxSequenceLength = (from el in fastaAlignment select el.Value.Length).Max();
-
-            if (identityColour.A > 0 && !string.IsNullOrEmpty(identityLabel))
-            {
-                IEnumerable<FormattedText> formattedText;
-
-                if (labelFont.FontFamily.IsStandardFamily)
+                if (anyMaxMin)
                 {
-                    formattedText = FormattedText.Format(identityLabel, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
+                    return new Point[] { new Point(minX, minY), new Point(maxX, maxY) };
                 }
                 else
                 {
-                    formattedText = FormattedText.Format(identityLabel, labelFont, labelFont, labelFont, labelFont);
+                    return new Point[] { new Point(), new Point() };
                 }
-
-                double labelWidth = formattedText.Measure().Width;
-                maxLabelWidth = Math.Max(maxLabelWidth, labelWidth);
-
-                if (labelPosition == 1 || labelPosition == 3)
-                {
-                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, formattedText, identityColour, TextBaselines.Middle);
-                }
-
-                if (labelPosition == 2 || labelPosition == 3)
-                {
-                    newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, formattedText, identityColour, TextBaselines.Middle);
-                }
-
-                GraphicsPath path = new GraphicsPath();
-                path.MoveTo(0, defaultHeight);
-
-                for (int i = 0; i < maxSequenceLength; i++)
-                {
-                    double percIdentity = getPercIdentity(i, fastaAlignment);
-                    path.LineTo(i * width, defaultHeight - percIdentity * defaultHeight);
-                    path.LineTo(i * width + width, defaultHeight - percIdentity * defaultHeight);
-                }
-
-                path.LineTo(maxSequenceLength * width, defaultHeight);
-                path.Close();
-                newGpr.FillPath(path, identityColour);
-
-                newGpr.Translate(0, defaultHeight + defaultMargin);
-                maxY += defaultHeight + defaultMargin;
             }
-
-            if (gapColour.A > 0 && !string.IsNullOrEmpty(gapLabel))
-            {
-                IEnumerable<FormattedText> formattedText;
-
-                if (labelFont.FontFamily.IsStandardFamily)
-                {
-                    formattedText = FormattedText.Format(gapLabel, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, labelFont.FontFamily.FileName), labelFont.FontSize);
-                }
-                else
-                {
-                    formattedText = FormattedText.Format(gapLabel, labelFont, labelFont, labelFont, labelFont);
-                }
-
-                double labelWidth = formattedText.Measure().Width;
-                maxLabelWidth = Math.Max(maxLabelWidth, labelWidth);
-
-                if (labelPosition == 1 || labelPosition == 3)
-                {
-                    newGpr.FillText(-labelFont.FontSize * 0.625 - labelWidth, defaultHeight * 0.5, formattedText, gapColour, TextBaselines.Middle);
-                }
-
-                if (labelPosition == 2 || labelPosition == 3)
-                {
-                    newGpr.FillText(maxSequenceLength * width + labelFont.FontSize * 0.625, defaultHeight * 0.5, formattedText, gapColour, TextBaselines.Middle);
-                }
-
-                GraphicsPath path = new GraphicsPath();
-                path.MoveTo(0, defaultHeight);
-
-                for (int i = 0; i < maxSequenceLength; i++)
-                {
-                    double percGaps = getPercGaps(i, fastaAlignment);
-                    path.LineTo(i * width, defaultHeight - percGaps * defaultHeight);
-                    path.LineTo(i * width + width, defaultHeight - percGaps * defaultHeight);
-                }
-
-                path.LineTo(maxSequenceLength * width, defaultHeight);
-                path.Close();
-                newGpr.FillPath(path, gapColour);
-                maxY += defaultHeight;
-            }
-
-            double leftMargin = labelPosition == 1 || labelPosition == 3 ? (labelFont.FontSize * 0.625 + maxLabelWidth) : 0;
-            double rightMargin = labelPosition == 2 || labelPosition == 3 ? (labelFont.FontSize * 0.625 + maxLabelWidth) : 0;
-            double alnWidth = maxSequenceLength * width;
-
-            double totalWidth = alnWidth + leftMargin + rightMargin;
-
-            double plotPosX = 0;
-            double plotPosY = 0;
-
-            if (alignment == 0 || alignment == 1 || alignment == 2)
-            {
-                plotPosY = 0;
-            }
-            else if (alignment == 3 || alignment == 4 || alignment == 5)
-            {
-                plotPosY = -maxY * 0.5;
-            }
-            else if (alignment == 6 || alignment == 7 || alignment == 8)
-            {
-                plotPosY = -maxY;
-            }
-
-            if (alignment == 0 || alignment == 3 || alignment == 6)
-            {
-                plotPosX = leftMargin;
-            }
-            else if (alignment == 1 || alignment == 4 || alignment == 7)
-            {
-                plotPosX = leftMargin - totalWidth * 0.5;
-            }
-            else if (alignment == 2 || alignment == 5 || alignment == 8)
-            {
-                plotPosX = leftMargin - totalWidth;
-            }
-
-            graphics.DrawGraphics(position.X + anchorX + plotPosX, position.Y + anchorY + plotPosY, newGpr);
-
-            Point topLeft = new Point(position.X + anchorX + plotPosX - leftMargin, position.Y + anchorY + plotPosY);
-            Point bottomRight = new Point(topLeft.X + totalWidth, topLeft.Y + maxY);
-
-            return new Point[] { topLeft, bottomRight };
         }
 
         private static double getPercIdentity(int position, Dictionary<string, string> alignment)
@@ -1007,6 +1577,53 @@ namespace aea7e246be93f4d0da67a88af05479b48
             }
 
             return tbr;
+        }
+
+        private const string WrongReferenceMessageId = "78e326ef-686d-46d0-96bb-5a9df487b927";
+
+        private static void CheckCoordinates(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates)
+        {
+            string message = "";
+            string messageId = Id;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+
+                if ((int)parameterValues["Branch reference:"] != 0)
+                {
+                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Rectangular`.";
+
+                    messageId = WrongReferenceMessageId;
+                }
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+
+                if ((int)parameterValues["Branch reference:"] != 2)
+                {
+                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Circular`.";
+
+                    messageId = WrongReferenceMessageId;
+                }
+            }
+            else
+            {
+                // Radial coordinates
+
+                if ((int)parameterValues["Branch reference:"] != 1)
+                {
+                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Radial`.";
+
+                    messageId = WrongReferenceMessageId;
+                }
+            }
+
+            if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+            {
+                setWarning(message, messageId);
+            }
         }
 
         private const string DefaultNucleotideColourSource = @"public static Colour? Format(object attribute)
