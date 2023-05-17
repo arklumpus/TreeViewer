@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -93,41 +94,6 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-            int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-
             List<string> leafNames = tree.GetLeafNames();
 
             return new List<(string, string)>()
@@ -188,17 +154,17 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 /// +------------------------------------+------------------------------------------------------------------------+
                 /// | Coordinates module                 | Origin                                                                 |
                 /// +====================================+========================================================================+
-                /// | Rectangular                        | A point corresponding to the projection of the node on a line          |
+                /// | _Rectangular_                      | A point corresponding to the projection of the node on a line          |
                 /// |                                    | perpedicular to the direction in which the tree expands and passing    |
                 /// |                                    | through the root node. Usually (i.e. if the tree is horizontal), this  |
                 /// |                                    | means a point with the same horizontal coordinate as the root node and |
                 /// |                                    | the same vertical coordinate as the current node.                      |
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Radial                             | The root node.                                                         |
+                /// | _Radial_                           | The root node.                                                         |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Circular                           | The root node.                                                         |
+                /// | _Circular_                         | The root node.                                                         |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
@@ -225,14 +191,9 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 /// <param name="Reference:">
                 /// This parameter (along with the [Orientation](#orientation)) determines the reference for the direction along which the sequence flows.
                 /// If this is `Horizontal`, the sequences are all drawn in the same direction, regardless of the orientation of the branch to which they refer.
-                /// If it is `Branch`, each sequence is drawn along the direction of the branch connecting the node to its parent, assuming that the branch is drawn in the style determined by the [Branch reference](#branch-reference).
+                /// If it is `Branch`, each sequence is drawn along the direction of the branch connecting the node to its parent.
                 /// </param>
                 ( "Reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
-
-                /// <param name="Branch reference:">
-                /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
-                /// </param>
-                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
 
                 ("Labels","Group:5"),
                 
@@ -440,7 +401,6 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 controlStatus["Anchor type:"] = ControlStatus.Hidden;
                 controlStatus["Orientation:"] = ControlStatus.Hidden;
                 controlStatus["Reference:"] = ControlStatus.Hidden;
-                controlStatus["Branch reference:"] = ControlStatus.Hidden;
                 controlStatus["Orientation"] = ControlStatus.Hidden;
 
                 controlStatus["Label position:"] = ControlStatus.Enabled;
@@ -480,7 +440,6 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 controlStatus["Anchor type:"] = ControlStatus.Enabled;
                 controlStatus["Orientation:"] = ControlStatus.Enabled;
                 controlStatus["Reference:"] = ControlStatus.Enabled;
-                controlStatus["Branch reference:"] = ControlStatus.Enabled;
                 controlStatus["Orientation"] = ControlStatus.Enabled;
 
                 controlStatus["Label position:"] = ControlStatus.Hidden;
@@ -599,8 +558,6 @@ namespace aea7e246be93f4d0da67a88af05479b48
 
         public static Point[] PlotAction(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates, Graphics graphics)
         {
-            CheckCoordinates(tree, parameterValues, coordinates);
-
             Attachment attachment = (Attachment)parameterValues["FASTA alignment:"];
             Font labelFont = (Font)parameterValues["Label font:"];
             string gapLabel = (string)parameterValues["Gaps label:"];
@@ -733,7 +690,24 @@ namespace aea7e246be93f4d0da67a88af05479b48
             double orientation = (double)parameterValues["Orientation:"] * Math.PI / 180;
             int orientationReference = (int)parameterValues["Reference:"];
 
-            int branchReference = (int)parameterValues["Branch reference:"];
+
+            int branchReference;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                branchReference = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                branchReference = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                branchReference = 1;
+            }
 
             if (orientationReference == 1)
             {
@@ -1579,53 +1553,6 @@ namespace aea7e246be93f4d0da67a88af05479b48
             return tbr;
         }
 
-        private const string WrongReferenceMessageId = "78e326ef-686d-46d0-96bb-5a9df487b927";
-
-        private static void CheckCoordinates(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates)
-        {
-            string message = "";
-            string messageId = Id;
-
-            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-            {
-                // Rectangular coordinates
-
-                if ((int)parameterValues["Branch reference:"] != 0)
-                {
-                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Rectangular`.";
-
-                    messageId = WrongReferenceMessageId;
-                }
-            }
-            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-            {
-                // Circular coordinates
-
-                if ((int)parameterValues["Branch reference:"] != 2)
-                {
-                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Circular`.";
-
-                    messageId = WrongReferenceMessageId;
-                }
-            }
-            else
-            {
-                // Radial coordinates
-
-                if ((int)parameterValues["Branch reference:"] != 1)
-                {
-                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Radial`.";
-
-                    messageId = WrongReferenceMessageId;
-                }
-            }
-
-            if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
-            {
-                setWarning(message, messageId);
-            }
-        }
-
         private const string DefaultNucleotideColourSource = @"public static Colour? Format(object attribute)
 {
     if (attribute is string state)
@@ -1713,4 +1640,5 @@ namespace aea7e246be93f4d0da67a88af05479b48
 }";
     }
 }
+
 

@@ -51,11 +51,11 @@ namespace Draw_image
         public const string Name = "Draw image";
         public const string HelpText = "Draws an image.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "a26abc43-1b12-40c9-9e23-bd3de2718829";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
-		
-		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAChSURBVDhPYywqKvrPQAkAGUAuAOllgppDEHx9eJDh9eFmMAaxYYBoA749OgRlobKJNgAXINoALjk7KAuVjWHA0n03oCxUwC1vzyBqWwvGIDYMoBgA0rzswC2chmAThxsA0wwC2AzBZTjcAJhmGEBWjM9wvIEIUxztpAEVgQBky/AaAAIwQ7Y2+UFFUAFBA0AAnyFEGQACOA2hNDNRmJ0ZGAB8BdOyhXKg3QAAAABJRU5ErkJggg==";
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAChSURBVDhPYywqKvrPQAkAGUAuAOllgppDEHx9eJDh9eFmMAaxYYBoA749OgRlobKJNgAXINoALjk7KAuVjWHA0n03oCxUwC1vzyBqWwvGIDYMoBgA0rzswC2chmAThxsA0wwC2AzBZTjcAJhmGEBWjM9wvIEIUxztpAEVgQBky/AaAAIwQ7Y2+UFFUAFBA0AAnyFEGQACOA2hNDNRmJ0ZGAB8BdOyhXKg3QAAAABJRU5ErkJggg==";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD6SURBVEhLtZYhDsIwFIYfCBIUIHAIBJILILgCnmvMY+AswAmwhATBBRCEIBA4BKBIZiB/6VvK1m7d2n7m9S2v/9dmYqtFUfShkEAQCmTXpceJ+Hml13FN9/1CVPSMF8H7dqD4cRFrVPSMnxvIcEbtvQganYFc/VB7L4Jmb5SEoqJn/Nyg3afWcErd8UxU9IwXQR5GwXJ7kis3tAKEr3ZnL5KMgMOBrSRv5k+ghjNFEt5jmkkEunDGFKDuMc0kAlM4kw7QHUgn0b5kE2qA6UBpSSkB4IDNfCKfZFHlpQXARsJUEgBbSWUBsJE4CUCRxFkAciWhP/qBf1uIvh3/VWmXLP3CAAAAAElFTkSuQmCC";
         private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEmSURBVFhH5Ze7DcIwEIYNJdS00LIEIDEAC7BFUtNAnTFgA1rEYwlEBy01tKDf8oFjHNt5HJHgk6IcJ/v+T8ZNGlEUPUSNNNW7Nl4nkCSJbHyLOI7lm/0EbueduB4W8kFtwiqAwPtlr34JWZsSrAJ6OGH2ar+ErAKt7lBVb8weq0C7N0oFokZPh/0vQGBnMJOPGQ5++w6E4BVYbo6q4sEpgPDV9sQqkSlA4aCIROh6q4AeTuSRoP0h6z8EbOFEyFB9f8j6lIArnHANte33SaQEfOGEbahL3iWReQl96ENd4USWRGEBQEOn477quLFJlBIANHQ9n6iOG/OkSguAvBI6lQiAohKVCYAiEpUKgLwSlQuAPBIsAiBUgk0AhEjU/mn271/HQjwBO4zOVKtbBG4AAAAASUVORK5CYII=";
 
@@ -103,41 +103,6 @@ namespace Draw_image
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-			int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-			
             List<string> leafNames = tree.GetLeafNames();
             return new List<(string, string)>()
             {
@@ -180,22 +145,22 @@ namespace Draw_image
                 /// <param name="Anchor:">
                 /// This parameter determines the anchor for the centre of the image. If the value is `Node`, the centre of the image is anchored to the corresponding node.
                 /// If the value is `Mid-branch`, the centre of the image is aligned with the midpoint of the branch connecting the node to its parent.
-                /// If the value is `Centre of leaves` or `Origin`, the alignment depends on the value of the [Branch reference](#branch-reference):
+                /// If the value is `Centre of leaves` or `Origin`, the alignment depends on the current Coordinates module:
                 /// 
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Branch reference                   | Centre of leaves                                                       | Origin                                                                 |
+                /// | Coordinates module                 | Centre of leaves                                                       | Origin                                                                 |
                 /// +====================================+========================================================================+========================================================================+
-                /// | Rectangular                        | The smallest rectangle containing all the leaves that descend from the | A point corresponding to the projection of the node on a line          |
+                /// | _Rectangular_                      | The smallest rectangle containing all the leaves that descend from the | A point corresponding to the projection of the node on a line          |
                 /// |                                    | current node is computed. The anchor corresponds to the centre of this | perpedicular to the direction in which the tree expands and passing    |
                 /// |                                    | rectangle.                                                             | through the root node. Usually (i.e. if the tree is horizontal), this  |
                 /// |                                    |                                                                        | means a point with the same horizontal coordinate as the root node and |
                 /// |                                    |                                                                        | the same vertical coordinate as the current node.                      |
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Radial                             | The smallest rectangle containing all the leaves that descend from the | The root node.                                                         |
+                /// | _Radial_                           | The smallest rectangle containing all the leaves that descend from the | The root node.                                                         |
                 /// |                                    | current node is computed. The anchor corresponds to the centre of this |                                                                        |
                 /// |                                    | rectangle.                                                             |                                                                        |
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Circular                           | The centre of leaves is computed using polar coordinates: the minimum  | The root node.                                                         |
+                /// | _Circular_                         | The centre of leaves is computed using polar coordinates: the minimum  | The root node.                                                         |
                 /// |                                    | and maximum distance of the leaves that descend from the current node  |                                                                        |
                 /// |                                    | are computed, as well as the minimum and maximum angle. The anchor has |                                                                        |
                 /// |                                    | a distance corresponding to the average of the minimum and maximum     |                                                                        |
@@ -212,11 +177,6 @@ namespace Draw_image
                 /// perpendicular to the branch.
                 /// </param>
                 ( "Orientation reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
-                
-                /// <param name="Branch reference:">
-                /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
-                /// </param>
-                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
                 
                 /// <param name="Position:">
                 /// This parameter determines how shifted from the anchor point the image is. The `X` coordinate corresponds to the line determined by the [Orientation reference](#orientation-reference);
@@ -358,7 +318,24 @@ namespace Draw_image
 
             int anchor = (int)parameterValues["Anchor:"];
             int reference = (int)parameterValues["Orientation reference:"];
-            int branchReference = (int)parameterValues["Branch reference:"];
+
+            int branchReference;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                branchReference = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                branchReference = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                branchReference = 1;
+            }
 
             Point delta = (Point)parameterValues["Position:"];
 

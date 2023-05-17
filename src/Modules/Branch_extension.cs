@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -47,7 +48,7 @@ namespace BranchExtensions
         public const string Name = "Branch extensions";
         public const string HelpText = "Extends terminal branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "fb385719-b376-49b0-8e99-aab7cf641966";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -99,41 +100,6 @@ namespace BranchExtensions
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-			int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-			
             return new List<(string, string)>()
             {
                 ( "Position", "Group:5"),
@@ -143,12 +109,6 @@ namespace BranchExtensions
                 /// is horizontal; if it is `Branch`, the extension follows the direction of the branch.
                 /// </param>
                 ( "Orientation reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
-                
-                /// <param name="Branch reference:">
-                /// If the [Orientation reference](#orientation-reference) is `Branch`, this parameter determines the algorithm that is
-                /// used to compute the branch direction. Ideally, this should correspond to the Coordinates module that has been used.
-                /// </param>
-                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
                 
                 /// <param name="Start:">
                 /// The offset of the start point of the branch extension, with respect to the terminal node from which the branch
@@ -160,9 +120,9 @@ namespace BranchExtensions
                 /// <param name="End anchor:">
                 /// The anchor for the end point of the branch extension. This determines the point from which the offset in [End](#end)
                 /// is computed. If the selected value is `Node`, the anchor corresponds to the node from which the branch extension
-                /// originates. If the value is `Origin`, this corresponds to the root node (if the [Branch reference](#branch-reference)
-                /// is `Radial` or `Circular`), or to the projection of the node along the direction of growth of the tree, onto a line that
-                /// is perpendicular to this direction and passes through the root node, if the branch reference is `Rectangular`.
+                /// originates. If the value is `Origin`, this corresponds to the root node (if the Coordinates module
+                /// is _Radial_ or _Circular_), or to the projection of the node along the direction of growth of the tree, onto a line that
+                /// is perpendicular to this direction and passes through the root node, if the Coordinates module is _Rectangular_.
                 /// </param>
                 ( "End anchor:", "ComboBox:0[\"Node\",\"Origin\"]" ),
                 
@@ -272,7 +232,25 @@ namespace BranchExtensions
             }
 
             int reference = (int)parameterValues["Orientation reference:"];
-            int branchReference = (int)parameterValues["Branch reference:"];
+
+            int branchReference;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                branchReference = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                branchReference = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                branchReference = 1;
+            }
+
             int endAnchor = (int)parameterValues["End anchor:"];
 
             Point deltaStart = (Point)parameterValues["Start:"];
@@ -586,3 +564,4 @@ namespace BranchExtensions
         }
     }
 }
+

@@ -30,7 +30,7 @@ namespace aebafe997c220425aae3906e731de1a07
         public const string Name = "Text element";
         public const string HelpText = "Draws a text element on the plot.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.1.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "ebafe997-c220-425a-ae39-06e731de1a07";
@@ -90,41 +90,6 @@ namespace aebafe997c220425aae3906e731de1a07
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-			int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-			
             List<string> leafNames = tree.GetLeafNames();
 
             return new List<(string, string)>()
@@ -147,22 +112,22 @@ namespace aebafe997c220425aae3906e731de1a07
                 /// <param name="Anchor:">
                 /// This parameter determines the anchor for the text. If the value is `Node`, the text is anchored to the corresponding node.
                 /// If the value is `Mid-branch`, the text is aligned with the midpoint of the branch connecting the node to its parent.
-                /// If the value is `Centre of leaves` or `Origin`, the alignment depends on the value of the [Branch reference](#branch-reference):
+                /// If the value is `Centre of leaves` or `Origin`, the alignment depends on the current Coordinates module:
                 /// 
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Branch reference                   | Centre of leaves                                                       | Origin                                                                 |
+                /// | Coordinates module                 | Centre of leaves                                                       | Origin                                                                 |
                 /// +====================================+========================================================================+========================================================================+
-                /// | Rectangular                        | The smallest rectangle containing all the leaves that descend from the | A point corresponding to the projection of the node on a line          |
+                /// | _Rectangular_                      | The smallest rectangle containing all the leaves that descend from the | A point corresponding to the projection of the node on a line          |
                 /// |                                    | current node is computed. The anchor corresponds to the centre of this | perpedicular to the direction in which the tree expands and passing    |
                 /// |                                    | rectangle.                                                             | through the root node. Usually (i.e. if the tree is horizontal), this  |
                 /// |                                    |                                                                        | means a point with the same horizontal coordinate as the root node and |
                 /// |                                    |                                                                        | the same vertical coordinate as the current node.                      |
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Radial                             | The smallest rectangle containing all the leaves that descend from the | The root node.                                                         |
+                /// | _Radial_                           | The smallest rectangle containing all the leaves that descend from the | The root node.                                                         |
                 /// |                                    | current node is computed. The anchor corresponds to the centre of this |                                                                        |
                 /// |                                    | rectangle.                                                             |                                                                        |
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Circular                           | The centre of leaves is computed using polar coordinates: the minimum  | The root node.                                                         |
+                /// | _Circular_                         | The centre of leaves is computed using polar coordinates: the minimum  | The root node.                                                         |
                 /// |                                    | and maximum distance of the leaves that descend from the current node  |                                                                        |
                 /// |                                    | are computed, as well as the minimum and maximum angle. The anchor has |                                                                        |
                 /// |                                    | a distance corresponding to the average of the minimum and maximum     |                                                                        |
@@ -179,12 +144,7 @@ namespace aebafe997c220425aae3906e731de1a07
                 /// perpendicular to the branch.
                 /// </param>
                 ( "Orientation reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
-                
-                /// <param name="Branch reference:">
-                /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
-                /// </param>
-                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
-                
+              
                 /// <param name="Position:">
                 /// This parameter determines how shifted from the anchor point the text is. The `X` coordinate corresponds to the line determined by the [Orientation reference](#orientation-reference);
                 /// the `Y` coordinate corresponds to the line perpendicular to this.
@@ -305,7 +265,24 @@ namespace aebafe997c220425aae3906e731de1a07
 
             int anchor = (int)parameterValues["Anchor:"];
             int reference = (int)parameterValues["Orientation reference:"];
-            int branchReference = (int)parameterValues["Branch reference:"];
+
+            int branchReference;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                branchReference = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                branchReference = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                branchReference = 1;
+            }
 
             Point delta = (Point)parameterValues["Position:"];
             Point margin = (Point)parameterValues["Margin:"];
@@ -607,7 +584,7 @@ namespace aebafe997c220425aae3906e731de1a07
 
             if (font.FontFamily.IsStandardFamily)
             {
-                formattedText = FormattedText.Format(text, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, font.FontFamily.FileName), font.FontSize, defaultBrush:  colour);
+                formattedText = FormattedText.Format(text, (FontFamily.StandardFontFamilies)Array.IndexOf(FontFamily.StandardFamilies, font.FontFamily.FileName), font.FontSize, defaultBrush: colour);
             }
             else
             {
