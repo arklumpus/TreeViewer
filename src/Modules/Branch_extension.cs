@@ -102,7 +102,7 @@ namespace BranchExtensions
         {
             return new List<(string, string)>()
             {
-                ( "Position", "Group:5"),
+                ( "Position", "Group:4"),
                 
                 /// <param name="Orientation reference:">
                 /// This parameter determines the direction of the branch extension. If the value is `Horizontal`, the branch extension

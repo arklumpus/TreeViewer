@@ -132,7 +132,7 @@ namespace Draw_image
                 /// </param>
                 ( "Scale factor:", "NumericUpDown:1[\"0.001\",\"Infinity\"]" ),
 
-                ( "Position", "Group:5"),
+                ( "Position", "Group:4"),
                 
                 /// <param name="Node:">
                 /// This parameter determines the node used as an anchor for positioning the image. If only a

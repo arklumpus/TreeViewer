@@ -99,7 +99,7 @@ namespace aebafe997c220425aae3906e731de1a07
                 /// </param>
                 ("Text:", "TextBox:Text"),
 
-                ( "Position", "Group:7"),
+                ( "Position", "Group:6"),
                 
                 /// <param name="Node:">
                 /// This parameter determines the node used as an anchor for positioning the text. If only a

@@ -94,7 +94,7 @@ namespace a34e1a6277b6a4c0f80d9795eea245e1e
 
             return new List<(string, string)>()
             {
-                ("Position", "Group:7"),
+                ("Position", "Group:6"),
                 
                 /// <param name="Node:">
                 /// This parameter determines the node used as an anchor for positioning the rectangle. If only a

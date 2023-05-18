@@ -118,7 +118,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 /// </param>
                 ("End:", "NumericUpDown:1[\"1\",\"Infinity\",\"1\",\"0\"]"),
 
-                ("Position","Group:7"),
+                ("Position","Group:6"),
 
                 /// <param name="Mode:">
                 /// This parameter determines whether the alignment is drawn as a single "block" positioned somewhere on
