@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -26,24 +27,15 @@ using System.Runtime.InteropServices;
 namespace Branches
 {
     /// <summary>
-    /// This module is used to draw the branches of the tree. It can draw branches for the different Coordinates modules, based
-    /// on the value of the [Shape](#shape) parameter.
+    /// This module is used to draw the branches of the tree. It can draw branches for the different Coordinates modules.
     /// </summary>
-    /// 
-    /// <description>
-    /// ## Further information
-    /// 
-    /// For optimal results, the value of the [Shape](#shape) parameter should correspond to the Coordinates module used. However,
-    /// if _Rectangular_ coordinates are being used, a Shape value between `0` and `1` can be used, toghether with the
-    /// [Rounding](#rounding) parameter, to produce interesting results.
-    /// </description>
 
     public static class MyModule
     {
         public const string Name = "Branches";
         public const string HelpText = "Plots tree branches as lines.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.2.0");
         public const string Id = "7c767b07-71be-48b2-8753-b27f3e973570";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -95,41 +87,6 @@ namespace Branches
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-			int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-			
             return new List<(string, string)>()
             {
                 /// <param name="Root branch">
@@ -138,37 +95,7 @@ namespace Branches
                 /// unrooted.
                 /// </param>
                 ( "Root branch", "CheckBox:true" ),
-
-                ( "Style", "Group:4" ),
-                
-                /// <param name="Shape:">
-                /// This parameter determines the shape of the branches. A value of `0` corresponds to branches computed assuming
-                /// _Rectangular_ coordinates; a value of `1` to _Radial_ coordinates and a value of `2` to _Circular_ coordinates.
-                /// Intermediate values interpolate between these styles. Use the [Fixed shapes](#fixed-shapes) buttons to quickly
-                /// switch between the three styles.
-                /// </param>
-                ( "Shape:", "Slider:" + defaultBranchReference.ToString() + "[\"0\",\"2\"]" ),
-                
-                /// <param name="FixedShapes" display="Fixed shapes">
-                /// These buttons set the value of the [Shape](#shape) parameter to the predefined values corresponding to the
-                /// three branch styles.
-                /// </param>
-                ( "FixedShapes", "Buttons:[\"Rectangular\",\"Radial\",\"Circular\"]" ),
-                
-                /// <param name="Auto elbow">
-                /// If the [Shape](#shape) is between `0` and `1`, the elbow corresponds to the point where the branch coming from the
-                /// parent node turns to head towards the child node. If this check box is checked, the position of the elbow is
-                /// computed automatically for each branch, based on the position of the parent node and the child node. Otherwise,
-                /// it is determined by the [Elbow position](#elbow-position) parameter.
-                /// </param>
-                ( "Auto elbow", "CheckBox:true" ),
-                
-                /// <param name="Elbow position:">
-                /// This parameter determines the position of the elbow if the [Auto elbow](#auto-elbow) option is disabled. A value
-                /// of `0` places the elbows closer to the parent nodes; a value of `1` places the elbows closer to the child nodes.
-                /// </param>
-                ( "Elbow position:", "Slider:0.5[\"0\",\"1\"]" ),
-                
+               
                 /// <param name="Rounding:">
                 /// This parameter determines the amount of rounding to apply to the angles of the branches. A value of `0` produces
                 /// sharp angles, while a value of `1` produces completely rounded angles.
@@ -221,35 +148,7 @@ namespace Branches
 
             };
 
-            double shape = (double)currentParameterValues["Shape:"];
-
-            parametersToChange = new Dictionary<string, object>() { { "FixedShapes", -1 } };
-
-            int fixShape = (int)currentParameterValues["FixedShapes"];
-
-            if (fixShape >= 0)
-            {
-                parametersToChange.Add("Shape:", (double)fixShape);
-                shape = fixShape;
-            }
-
-            if ((bool)currentParameterValues["Auto elbow"] || shape >= 1)
-            {
-                controlStatus.Add("Elbow position:", ControlStatus.Hidden);
-            }
-            else
-            {
-                controlStatus.Add("Elbow position:", ControlStatus.Enabled);
-            }
-
-            if (shape >= 1)
-            {
-                controlStatus.Add("Auto elbow", ControlStatus.Hidden);
-            }
-            else
-            {
-                controlStatus.Add("Auto elbow", ControlStatus.Enabled);
-            }
+            parametersToChange = new Dictionary<string, object>() { };
 
             if ((bool)currentParameterValues["Auto colour by node"])
             {
@@ -275,10 +174,27 @@ namespace Branches
             double minY = double.MaxValue;
             double maxY = double.MinValue;
 
-            double straightness = (double)parameterValues["Shape:"];
+            double straightness;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                straightness = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                straightness = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                straightness = 1;
+            }
+
             double circleness = straightness - 1;
-            bool autoElbow = (bool)parameterValues["Auto elbow"];
-            double elbow = (double)parameterValues["Elbow position:"];
+            bool autoElbow = true;
+            double elbow = 0.5;
             double smoothing = (double)parameterValues["Rounding:"];
 
             ColourFormatterOptions ColourFO = (ColourFormatterOptions)parameterValues["Colour:"];
@@ -562,9 +478,7 @@ namespace Branches
             return new Point[] { new Point(minX - defaultWeight * 2, minY - defaultWeight * 2), new Point(maxX + defaultWeight * 2, maxY + defaultWeight * 2) };
         }
 
-        private const string WrongShapeMessageId = "ed5b737d-e0b5-4c1b-a95f-8d1fa258476e";
         private const string RootBranchMessageId = "b05de536-158d-4159-8996-d3207e2c6802";
-        private const string WrongShapeAndRootBranchMessageId = "1303f833-15f7-49ac-9518-2538753d22ec";
 
         private static void CheckCoordinates(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates)
         {
@@ -575,25 +489,9 @@ namespace Branches
             {
                 // Rectangular coordinates
 
-                if ((double)parameterValues["Shape:"] != 0.0)
-                {
-                    message = "With the current Coordinates module, a value of `0.0` for the _Shape_ parameter is recommended.";
-
-                    messageId = WrongShapeMessageId;
-                }
-
                 if (tree.Children.Count > 2 && (bool)parameterValues["Root branch"])
                 {
-                    if (!string.IsNullOrEmpty(message))
-                    {
-                        message += "\n\n";
-                        messageId = WrongShapeAndRootBranchMessageId;
-                    }
-                    else
-                    {
-                        messageId = RootBranchMessageId;
-                    }
-
+                    messageId = RootBranchMessageId;
                     message += "The tree appears to be unrooted; thus, drawing the `Root branch` may be inappropriate.";
                 }
             }
@@ -601,43 +499,17 @@ namespace Branches
             {
                 // Circular coordinates
 
-                if ((double)parameterValues["Shape:"] != 2.0)
-                {
-                    message = "With the current Coordinates module, a value of `2.0` for the _Shape_ parameter is recommended.";
-
-                    messageId = WrongShapeMessageId;
-                }
-
                 if (tree.Children.Count > 2 && (bool)parameterValues["Root branch"])
                 {
-                    if (!string.IsNullOrEmpty(message))
-                    {
-                        message += "\n\n";
-                        messageId = WrongShapeAndRootBranchMessageId;
-                    }
-                    else
-                    {
-                        messageId = RootBranchMessageId;
-                    }
-
+                    messageId = RootBranchMessageId;
                     message += "The tree appears to be unrooted; thus, drawing the `Root branch` may be inappropriate.";
                 }
             }
+
             else
             {
                 // Radial coordinates
-
-                if ((double)parameterValues["Shape:"] != 1.0 && (bool)parameterValues["Root branch"])
-                {
-                    message = "With the current Coordinates module, a value of `1.0` for the _Shape_ parameter is recommended. It is also not recommended to draw the `Root branch`.";
-                    messageId = WrongShapeAndRootBranchMessageId;
-                }
-                else if ((double)parameterValues["Shape:"] != 1.0 && !(bool)parameterValues["Root branch"])
-                {
-                    message = "With the current Coordinates module, a value of `1.0` for the _Shape_ parameter is recommended.";
-                    messageId = WrongShapeMessageId;
-                }
-                else if ((double)parameterValues["Shape:"] == 1.0 && (bool)parameterValues["Root branch"])
+                if ((bool)parameterValues["Root branch"])
                 {
                     message = "With the current Coordinates module, it is not recommended to draw the `Root branch`.";
                     messageId = RootBranchMessageId;

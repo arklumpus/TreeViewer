@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -66,8 +67,7 @@ namespace NodeStates
     /// 
     /// * Set [Show on](#show-on) to `Tips`.
     /// * Set the [Anchor](#anchor) to `Origin`.
-    /// * Set the [Orientation reference](#orientation-reference) to `Branch` and the [Branch reference](#branch-reference) to
-    ///   `Rectangular`.
+    /// * Set the [Orientation reference](#orientation-reference) to `Branch`.
     /// * Set the [Position](#position) to a sufficient displacement on the `X` axis (e.g. `(1000, 0)`).
     /// * Set the [Type](#type) to `Rectangle`.
     /// 
@@ -80,8 +80,7 @@ namespace NodeStates
     /// 
     /// * Set [Show on](#show-on) to `Tips`.
     /// * Set the [Anchor](#anchor) to `Origin`.
-    /// * Set the [Orientation reference](#orientation-reference) to `Branch` and the [Branch reference](#branch-reference) to
-    ///   `Circular`.
+    /// * Set the [Orientation reference](#orientation-reference) to `Branch`.
     /// * Set the [Position](#position) to a displacement on the `X` axis that is slightly larger than the outer radius of the
     /// circular coordinates (e.g. `(1100, 0)` if the outer radius is `1000`).
     /// * Set the [Type](#type) to `Wedge`.
@@ -100,7 +99,7 @@ namespace NodeStates
         public const string Name = "Node states";
         public const string HelpText = "Draws node states based on attributes.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.5");
+        public static Version Version = new Version("1.3.0");
         public const string Id = "0512b822-044d-4c13-b3bb-bca494c51daa";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -152,41 +151,6 @@ namespace NodeStates
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-			int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-			
             return new List<(string, string)>()
             {
                 ( "Window", "Window:" ),
@@ -206,27 +170,27 @@ namespace NodeStates
                 /// </param>
                 ( "Exclude cartoon nodes", "CheckBox:true" ),
 
-                ( "Position", "Group:4"),
+                ( "Position", "Group:3"),
                 
                 /// <param name="Anchor:">
                 /// This parameter determines the anchor for the centre of the state shape. If the value is `Node`, the centre of the shape is anchored to the corresponding node.
                 /// If the value is `Mid-branch`, the centre of the shape is aligned with the midpoint of the branch connecting the node to its parent.
-                /// If the value is `Origin`, the alignment depends on the value of the [Branch reference](#branch-reference):
+                /// If the value is `Origin`, the alignment depends on the current Coordinates module:
                 /// 
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Branch reference                   | Origin                                                                 |
+                /// | Coordinates module                 | Origin                                                                 |
                 /// +====================================+========================================================================+
-                /// | Rectangular                        | A point corresponding to the projection of the node on a line          |
+                /// | _Rectangular_                      | A point corresponding to the projection of the node on a line          |
                 /// |                                    | perpedicular to the direction in which the tree expands and passing    |
                 /// |                                    | through the root node. Usually (i.e. if the tree is horizontal), this  |
                 /// |                                    | means a point with the same horizontal coordinate as the root node and |
                 /// |                                    | the same vertical coordinate as the current node.                      |
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Radial                             | The root node.                                                         |
+                /// | _Radial_                           | The root node.                                                         |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Circular                           | The root node.                                                         |
+                /// | _Circular_                         | The root node.                                                         |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
@@ -243,11 +207,6 @@ namespace NodeStates
                 /// perpendicular to the branch.
                 /// </param>
                 ( "Orientation reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
-                
-                /// <param name="Branch reference:">
-                /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
-                /// </param>
-                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
                 
                 /// <param name="Position:">
                 /// This parameter determines how shifted from the anchor point the shape is. The `X` coordinate corresponds to the line determined by the [Orientation reference](#orientation-reference);
@@ -271,7 +230,7 @@ namespace NodeStates
                 ( "Width:", "NumericUpDownByNode:8[\"0\",\"Infinity\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToDouble[1]) + ",\"StateWidth\",\"Number\",\"true\"]" ),
                 
                 /// <param name="Suggested width:" default="" value-header="">
-                /// If the [Branch reference](#branch-reference) is set as `Circular`, the [Type](#type) is set as `Wedge`, and the [Anchor](#anchor) is set
+                /// If the Coordinates module is set as `Circular`, the [Type](#type) is set as `Wedge`, and the [Anchor](#anchor) is set
                 /// as `Origin`, this read-only control shows the suggested width for the wedge, based on the number of taxa in the tree and the position.
                 /// </param>
                 ( "Suggested width:", "NumericUpDown:8[\"0\",\"Infinity\",\"1\",\"0\"]" ),
@@ -430,7 +389,7 @@ namespace NodeStates
         {
             parametersToChange = new Dictionary<string, object>() { { "Wizard edit state colours", false }, { "Wizard edit enabled characters", false } };
 
-            if ((int)currentParameterValues["Type:"] == 2 && (int)currentParameterValues["Anchor:"] == 2 && (int)currentParameterValues["Branch reference:"] == 2)
+            if ((int)currentParameterValues["Type:"] == 2 && (int)currentParameterValues["Anchor:"] == 2 && ((InstanceStateData)currentParameterValues["StateData"]).CoordinateModule().Id == "92aac276-3af7-4506-a263-7220e0df5797")
             {
                 controlStatus = new Dictionary<string, ControlStatus>()
                 {
@@ -539,7 +498,7 @@ namespace NodeStates
                         {
                             parametersToChange["State colours:"] = cfo;
                         }
-                        
+
                         if (currentParameterValues["Enabled characters:"] == previousParameterValues["Enabled characters:"])
                         {
                             parametersToChange["Enabled characters:"] = new CompiledCode(GetDefaultEnabledCharactersCode(splitStates));
@@ -560,7 +519,7 @@ namespace NodeStates
                         object[] formatterParams = new object[2] { code, false };
 
                         ColourFormatterOptions cfo = new ColourFormatterOptions(code, formatterParams) { AttributeName = "(N/A)", AttributeType = "String", DefaultColour = Colour.FromRgb(220, 220, 220) };
-                        
+
                         if (currentParameterValues["State colours:"] == previousParameterValues["State colours:"])
                         {
                             parametersToChange["State colours:"] = cfo;
@@ -872,11 +831,44 @@ namespace NodeStates
             bool excludeCartoonNodes = (bool)parameterValues["Exclude cartoon nodes"];
             int anchor = (int)parameterValues["Anchor:"];
             int reference = (int)parameterValues["Orientation reference:"];
-            int branchReference = (int)parameterValues["Branch reference:"];
+
+            int branchReference;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                branchReference = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                branchReference = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                branchReference = 1;
+            }
+
             Point delta = (Point)parameterValues["Position:"];
 
 
             int type = (int)parameterValues["Type:"];
+
+            if (type == 2 && (branchReference != 2 || anchor != 2))
+            {
+                if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+                {
+                    setWarning("Setting the `Type` to `Wedge` is only recommended when using _Circular_ coordinates and when the `Anchor` is set to `Origin`!", "");
+                }
+            }
+            else
+            {
+                if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+                {
+                    setWarning(null, null);
+                }
+            }
 
 
             NumberFormatterOptions Width = (NumberFormatterOptions)parameterValues["Width:"];
@@ -2182,3 +2174,4 @@ namespace NodeStates
         }
     }
 }
+

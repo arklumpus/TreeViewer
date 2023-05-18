@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -44,7 +45,7 @@ namespace Labels
         public const string Name = "Labels";
         public const string HelpText = "Draws labels on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.3.0");
+        public static Version Version = new Version("1.4.0");
         public const string Id = "ac496677-2650-4d92-8646-0812918bab03";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -96,45 +97,9 @@ namespace Labels
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-            int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-
-
             return new List<(string, string)>()
             {
-				( "Attribute", "Group:3" ),
+                ( "Attribute", "Group:3" ),
 
                 /// <param name="Attribute:">
                 /// This parameter specifies the attribute used to determine the text of the labels. By default the `Name` of each node is drawn.
@@ -153,7 +118,7 @@ namespace Labels
                 /// while if the [Attribute type](#attribute-type) is `Number` the text of the label corresponds to the number rounded to 2 significant digits.
                 /// </param>
                 ( "Attribute format...", "Formatter:[\"Attribute type:\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConverters[0]) + ",\"true\"]"),
-				
+                
                 /// <param name="Show on:">
                 /// This parameter determines on which nodes the label is shown. If the value is `Leaves`, the label is only shown for terminal nodes (nodes with no child nodes).
                 /// If the value is `Internal nodes` the label is shown only for internal nodes (nodes which have at least one child). If the value is `All nodes`, labels are shown for both leaves and internal nodes.
@@ -172,22 +137,22 @@ namespace Labels
                 /// <param name="Anchor:">
                 /// This parameter determines the anchor for the labels. If the value is `Node`, the mid-left of each label is anchored to the corresponding node.
                 /// If the value is `Mid-branch`, the mid-centre of the label is aligned with the midpoint of the branch connecting the node to its parent.
-                /// If the value is `Centre of leaves` or `Origin`, the alignment depends on the value of the [Branch reference](#branch-reference):
+                /// If the value is `Centre of leaves` or `Origin`, the alignment depends on the current Coordinates module:
                 /// 
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Branch reference                   | Centre of leaves                                                       | Origin                                                                 |
+                /// | Coordinates module                 | Centre of leaves                                                       | Origin                                                                 |
                 /// +====================================+========================================================================+========================================================================+
-                /// | Rectangular                        | The smallest rectangle containing all the leaves that descend from the | A point corresponding to the projection of the node on a line          |
+                /// | _Rectangular_                      | The smallest rectangle containing all the leaves that descend from the | A point corresponding to the projection of the node on a line          |
                 /// |                                    | current node is computed. The anchor corresponds to the centre of this | perpedicular to the direction in which the tree expands and passing    |
                 /// |                                    | rectangle.                                                             | through the root node. Usually (i.e. if the tree is horizontal), this  |
                 /// |                                    |                                                                        | means a point with the same horizontal coordinate as the root node and |
                 /// |                                    |                                                                        | the same vertical coordinate as the current node.                      |
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Radial                             | The smallest rectangle containing all the leaves that descend from the | The root node.                                                         |
+                /// | _Radial_                           | The smallest rectangle containing all the leaves that descend from the | The root node.                                                         |
                 /// |                                    | current node is computed. The anchor corresponds to the centre of this |                                                                        |
                 /// |                                    | rectangle.                                                             |                                                                        |
                 /// +------------------------------------+------------------------------------------------------------------------+------------------------------------------------------------------------+
-                /// | Circular                           | The centre of leaves is computed using polar coordinates: the minimum  | The root node.                                                         |
+                /// | _Circular_                         | The centre of leaves is computed using polar coordinates: the minimum  | The root node.                                                         |
                 /// |                                    | and maximum distance of the leaves that descend from the current node  |                                                                        |
                 /// |                                    | are computed, as well as the minimum and maximum angle. The anchor has |                                                                        |
                 /// |                                    | a distance corresponding to the average of the minimum and maximum     |                                                                        |
@@ -209,7 +174,7 @@ namespace Labels
                 /// </param>
                 ( "Alignment:", "ComboBox:0[\"Default\",\"Outwards\",\"Center\",\"Inwards\"]" ),
 
-                ( "Orientation", "Group:3"),
+                ( "Orientation", "Group:2"),
 
                 /// <param name="Orientation:">
                 /// This parameter determines the orientation of the label with respect to the [Reference](#reference), in degrees. If this is `0°`, the label is parallel to the reference (e.g. the branch), if it is `90°` it is perpendicular to the branch and so on.
@@ -221,14 +186,9 @@ namespace Labels
                 /// <param name="Reference:">
                 /// This parameter (along with the [Orientation](#orientation)) determines the reference for the direction along which the text of the label flows.
                 /// If this is `Horizontal`, the labels are all drawn in the same direction, regardless of the orientation of the branch to which they refer.
-                /// If it is `Branch`, each label is drawn along the direction of the branch connecting the node to its parent, assuming that the branch is drawn in the style determined by the [Branch reference](#branch-reference).
+                /// If it is `Branch`, each label is drawn along the direction of the branch connecting the node to its parent.
                 /// </param>
                 ( "Reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
-
-                /// <param name="Branch reference:">
-                /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
-                /// </param>
-                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
 
                 ( "Appearance", "Group:4"),
 
@@ -432,7 +392,6 @@ namespace Labels
 
         public static Point[] PlotAction(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates, Graphics graphics)
         {
-            CheckCoordinates(tree, parameterValues, coordinates);
             List<TreeNode> nodes = tree.GetChildrenRecursive();
 
             string attribute = (string)parameterValues["Attribute:"];
@@ -515,7 +474,23 @@ namespace Labels
             double orientation = (double)parameterValues["Orientation:"] * Math.PI / 180;
             int orientationReference = (int)parameterValues["Reference:"];
 
-            int branchReference = (int)parameterValues["Branch reference:"];
+            int branchReference;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                branchReference = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                branchReference = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                branchReference = 1;
+            }
 
             if (anchor == 2)
             {
@@ -1069,52 +1044,6 @@ namespace Labels
                 return new Point[] { new Point(), new Point() };
             }
         }
-
-        private const string WrongReferenceMessageId = "2d351c05-8c86-43d0-a6c0-3c28e26b23e7";
-
-        private static void CheckCoordinates(TreeNode tree, Dictionary<string, object> parameterValues, Dictionary<string, Point> coordinates)
-        {
-            string message = "";
-            string messageId = Id;
-
-            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-            {
-                // Rectangular coordinates
-
-                if ((int)parameterValues["Branch reference:"] != 0)
-                {
-                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Rectangular`.";
-
-                    messageId = WrongReferenceMessageId;
-                }
-            }
-            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-            {
-                // Circular coordinates
-
-                if ((int)parameterValues["Branch reference:"] != 2)
-                {
-                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Circular`.";
-
-                    messageId = WrongReferenceMessageId;
-                }
-            }
-            else
-            {
-                // Radial coordinates
-
-                if ((int)parameterValues["Branch reference:"] != 1)
-                {
-                    message = "With the current Coordinates module, it is recommended that the _Branch reference_ parameter be set to `Radial`.";
-
-                    messageId = WrongReferenceMessageId;
-                }
-            }
-
-            if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
-            {
-                setWarning(message, messageId);
-            }
-        }
     }
 }
+

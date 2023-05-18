@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -35,11 +36,11 @@ namespace NodeShapes
         public const string Name = "Node shapes";
         public const string HelpText = "Draws shapes on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.4");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "7434420a-1afd-46ee-aeea-75ed8a5eeada";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
-		
-		private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACGSURBVDhPY2QgEhQVFf2HMskDFBuACxDlBa/ajQ5Aaj8QO25r9j8AFoQCDAOQndrX18eIpBkGUAxhgtIoAKQRhKFcZM0ggM5HBTQLLFwGo4QB0L8NQKoeiBuB/gSx4QCnATAJaIDBFQENICqGmNACrBGNHgBAaixgTQekAIoNwJuUCQMGBgAjcDSOWwPSlAAAAABJRU5ErkJggg==";
+
+        private static string Icon16Base64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACGSURBVDhPY2QgEhQVFf2HMskDFBuACxDlBa/ajQ5Aaj8QO25r9j8AFoQCDAOQndrX18eIpBkGUAxhgtIoAKQRhKFcZM0ggM5HBTQLLFwGo4QB0L8NQKoeiBuB/gSx4QCnATAJaIDBFQENICqGmNACrBGNHgBAaixgTQekAIoNwJuUCQMGBgAjcDSOWwPSlAAAAABJRU5ErkJggg==";
         private static string Icon24Base64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADFSURBVEhL1ZPBDoIwDIaHT4ZXL77L7kaM970LF67wZtLCb6Kj3SqTKF+ylJFQ1vZb5Qrw3jcUrvNO5oC4lmTyYqiCBy9sRUor2DmnS9vwwlZEtUgzJIQwfUOJawo9PxPH7n4e8PxGagaqIVFypse7BakKJjueJ36FkonmUBX2e2VR0EKRppZDbH4P7D0TsLRQrICN4EFiiXaAG6JKFZ+CrYkt+ciOiN/MAG3J3tL/xuK4hc1nsP8fqH5/o/9MqoLsLc3j3AglaksB+/Q1rgAAAABJRU5ErkJggg==";
         private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD7SURBVFhH7ZVBDsIgEEVBz+I57NqNa6/B3tjGPedw68a18RoeRhk6XbRpO38Sqmh4CaG0CQy//I81iXHO1aE7tSOZFfcpgRdfhKDAixoPRZZQQMXXC/g/dsdrTY2HImvuk8ALkwuqzfZgn4/LPX6YQcwBxNfe+zhPKKB3+m/nvTg/cgghX4/JjvwKRIG4q26XUwx33yGpkL8NtcmmJbkC2oJLFIsu0KI9L7MKkI/JXtzQeG24h5hUgBcchlATfI0WAmHHJKPQoV3zsAcSrxryPYSf+gWT1zFdpXSlhseqfZN+8d9AG61aShSXAvINoo4lHUAgCqhuNx3GvAGdc1uapLqCiwAAAABJRU5ErkJggg==";
 
@@ -87,41 +88,6 @@ namespace NodeShapes
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-			int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-			
             return new List<(string, string)>()
             {
                 /// <param name="Show on:">
@@ -132,27 +98,27 @@ namespace NodeShapes
                 /// </param>
                 ( "Show on:", "ComboBox:0[\"Leaves\",\"Internal nodes\",\"All nodes\"]" ),
 
-                ( "Position", "Group:4"),
+                ( "Position", "Group:3"),
                 
                 /// <param name="Anchor:">
                 /// This parameter determines the anchor for the centre of the shape. If the value is `Node`, the centre of the shape is anchored to the corresponding node.
                 /// If the value is `Mid-branch`, the centre of the shape is aligned with the midpoint of the branch connecting the node to its parent.
-                /// If the value is `Origin`, the alignment depends on the value of the [Branch reference](#branch-reference):
+                /// If the value is `Origin`, the alignment depends on the current Coordinates module:
                 /// 
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Branch reference                   | Origin                                                                 |
+                /// | Coordinates module                 | Origin                                                                 |
                 /// +====================================+========================================================================+
-                /// | Rectangular                        | A point corresponding to the projection of the node on a line          |
+                /// | _Rectangular_                      | A point corresponding to the projection of the node on a line          |
                 /// |                                    | perpedicular to the direction in which the tree expands and passing    |
                 /// |                                    | through the root node. Usually (i.e. if the tree is horizontal), this  |
                 /// |                                    | means a point with the same horizontal coordinate as the root node and |
                 /// |                                    | the same vertical coordinate as the current node.                      |
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Radial                             | The root node.                                                         |
+                /// | _Radial_                           | The root node.                                                         |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
                 /// +------------------------------------+------------------------------------------------------------------------+
-                /// | Circular                           | The root node.                                                         |
+                /// | _Circular_                         | The root node.                                                         |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
                 /// |                                    |                                                                        |
@@ -169,12 +135,7 @@ namespace NodeShapes
                 /// perpendicular to the branch.
                 /// </param>
                 ( "Orientation reference:", "ComboBox:1[\"Horizontal\",\"Branch\"]" ),
-                
-                /// <param name="Branch reference:">
-                /// This parameter determines the algorithm used to compute branch orientations. For best results, the value of this parameter should correspond to the coordinates module actually used.
-                /// </param>
-                ( "Branch reference:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]" ),
-                
+                    
                 /// <param name="Position:">
                 /// This parameter determines how shifted from the anchor point the shape is. The `X` coordinate corresponds to the line determined by the [Orientation reference](#orientation-reference);
                 /// the `Y` coordinate corresponds to the line perpendicular to this.
@@ -356,7 +317,24 @@ namespace NodeShapes
             int showOn = (int)parameterValues["Show on:"];
             int anchor = (int)parameterValues["Anchor:"];
             int reference = (int)parameterValues["Orientation reference:"];
-            int branchReference = (int)parameterValues["Branch reference:"];
+            int branchReference;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                branchReference = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                branchReference = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                branchReference = 1;
+            }
+
 
             Point delta = (Point)parameterValues["Position:"];
 
@@ -665,3 +643,4 @@ namespace NodeShapes
         }
     }
 }
+

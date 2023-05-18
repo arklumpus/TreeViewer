@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -67,7 +68,7 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
         public const string Name = "Stochastic mapping branches";
         public const string HelpText = "Plots branches with data from a stochastic mapping analysis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.1.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "f7a20f2f-94b2-4331-8bbf-4e0087da6fba";
@@ -120,41 +121,6 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
-			int defaultBranchReference = 0;
-
-            if (InstanceStateData.IsUIAvailable)
-            {
-                MainWindow activeWindow = null;
-
-                for (int i = 0; i < GlobalSettings.Settings.MainWindows.Count; i++)
-                {
-                    if (GlobalSettings.Settings.MainWindows[i].IsActive)
-                    {
-                        activeWindow = GlobalSettings.Settings.MainWindows[i];
-                        break;
-                    }
-                }
-
-                if (activeWindow != null)
-                {
-                    if (activeWindow.Coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
-                    {
-                        // Rectangular coordinates
-                        defaultBranchReference = 0;
-                    }
-                    else if (activeWindow.Coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
-                    {
-                        // Circular coordinates
-                        defaultBranchReference = 2;
-                    }
-                    else
-                    {
-                        // Radial coordinates
-                        defaultBranchReference = 1;
-                    }
-                }
-            }
-			
             return new List<(string, string)>()
             {
                 ( "Window", "Window:" ),
@@ -202,13 +168,8 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
                 /// </param>
                 ("Position shift:", "Point:[0,0]"),
 
-                ( "Appearance", "Group:8" ),
+                ( "Appearance", "Group:7" ),
                 
-                /// <param name="Shape:">
-                /// This parameter determines the shape of the branches.
-                /// </param>
-                ("Shape:", "ComboBox:" + defaultBranchReference.ToString() + "[\"Rectangular\",\"Radial\",\"Circular\"]"),
-
                 /// <param name="Branch thickness:">
                 /// This parameter determines the thickness of the branches.
                 /// </param>
@@ -532,7 +493,23 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
             double exclusionThreshold = (double)parameterValues["Exclusion threshold:"];
             double dashUnit = (double)parameterValues["Dash unit:"];
 
-            int shape = (int)parameterValues["Shape:"];
+            int shape;
+
+            if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out _))
+            {
+                // Rectangular coordinates
+                shape = 0;
+            }
+            else if (coordinates.TryGetValue("d0ab64ba-3bcd-443f-9150-48f6e85e97f3", out _))
+            {
+                // Circular coordinates
+                shape = 2;
+            }
+            else
+            {
+                // Radial coordinates
+                shape = 1;
+            }
 
             InstanceStateData stateData = (InstanceStateData)parameterValues["StateData"];
 
@@ -1671,3 +1648,4 @@ namespace af7a20f2f94b243318bbf4e0087da6fba
         }
     }
 }
+
