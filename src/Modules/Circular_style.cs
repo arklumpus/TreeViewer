@@ -48,7 +48,7 @@ namespace CircularStyleAction
         public const string Name = "Circular tree style";
         public const string HelpText = "Sets the plot actions to display the tree as a circular tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.0.4");
         public const string Id = "1f3e0b88-c42d-417c-ba14-ba228be086a7";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -180,10 +180,10 @@ namespace CircularStyleAction
 						double innerRadius = double.IsNaN(stateData.TransformedTree.Length) ? defaultRadius * 0.1 : 0;
 
 						Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-						updater(new Dictionary<string, object>() { { "Shape:", 2.0 } });
+						updater(new Dictionary<string, object>() { });
 
 						updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-						updater(new Dictionary<string, object>() { { "Reference:", 1 }, { "Branch reference:", 2 } });
+						updater(new Dictionary<string, object>() { { "Reference:", 1 } });
 
 						CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "92aac276-3af7-4506-a263-7220e0df5797");
 
@@ -206,10 +206,10 @@ namespace CircularStyleAction
 					double innerRadius = double.IsNaN(stateData.TransformedTree.Length) ? defaultRadius * 0.1 : 0;
 
 					Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-					updater(new Dictionary<string, object>() { { "Shape:", 2.0 } });
+					updater(new Dictionary<string, object>() { });
 
 					updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-					updater(new Dictionary<string, object>() { { "Reference:", 1 }, { "Branch reference:", 2 } });
+					updater(new Dictionary<string, object>() { { "Reference:", 1 } });
 
 					CoordinateModule module = Modules.GetModule(Modules.CoordinateModules, "92aac276-3af7-4506-a263-7220e0df5797");
 

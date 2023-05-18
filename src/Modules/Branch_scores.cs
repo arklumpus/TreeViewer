@@ -66,7 +66,7 @@ namespace a10bbbbe1c6344582907311f067a54081
         public const string Name = "Branch score style";
         public const string HelpText = "Sets the plot actions to display node scores using the branch colours.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.2");
+        public static Version Version = new Version("1.1.3");
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public const string Id = "10bbbbe1-c634-4582-9073-11f067a54081";
@@ -778,7 +778,7 @@ public static Colour? Format(object attribute)
                 ColourFormatterOptions branchColour = new ColourFormatterOptions(colourFormatterSource, formatterParams) { AttributeName = attributeName, AttributeType = "Number", DefaultColour = currCol.WithAlpha(0) };
 
                 Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-                updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 }, { "Line weight:", branchWidth }, { "Colour:", branchColour } });
+                updater(new Dictionary<string, object>() { { "Root branch", false }, { "Line weight:", branchWidth }, { "Colour:", branchColour } });
             }
 
             {
@@ -805,7 +805,7 @@ public static Colour? Format(object attribute)
 
 
                 Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-                updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 }, { "Line weight:", branchWidth }, { "Colour:", branchColour } });
+                updater(new Dictionary<string, object>() { { "Root branch", false }, { "Line weight:", branchWidth }, { "Colour:", branchColour } });
             }
 
 

@@ -49,7 +49,7 @@ namespace UnrootedStyleAction
         public const string Name = "Unrooted tree style";
         public const string HelpText = "Sets the plot actions to display the tree as an unrooted tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.0.4");
         public const string Id = "a99eb0c6-a69d-4785-961a-a0c247e9704d";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -175,10 +175,10 @@ namespace UnrootedStyleAction
 							stateData.RemovePlottingModule(0);
 						}
 						Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-						updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 } });
+						updater(new Dictionary<string, object>() { { "Root branch", false } });
 
 						updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-						updater(new Dictionary<string, object>() { { "Reference:", 1 }, { "Branch reference:", 1 } });
+						updater(new Dictionary<string, object>() { { "Reference:", 1 } });
 
 						double defaultHeight = Math.Min(10000, stateData.TransformedTree.GetLeaves().Count * 14);
 
@@ -197,10 +197,10 @@ namespace UnrootedStyleAction
 						stateData.RemovePlottingModule(0);
 					}
 					Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-					updater(new Dictionary<string, object>() { { "Root branch", false }, { "Shape:", 1.0 } });
+					updater(new Dictionary<string, object>() { { "Root branch", false } });
 
 					updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-					updater(new Dictionary<string, object>() { { "Reference:", 1 }, { "Branch reference:", 1 } });
+					updater(new Dictionary<string, object>() { { "Reference:", 1 } });
 
 					double defaultHeight = Math.Min(10000, stateData.TransformedTree.GetLeaves().Count * 14);
 

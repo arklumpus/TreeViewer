@@ -41,7 +41,7 @@ namespace OpenSimmap
         public const string Name = "Stochastic map";
         public const string HelpText = "Opens a file containing one or more trees in the format produced by the write.simmap function of phytools (Revell 2012).\nSafe even when opening huge files.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.2");
+        public static Version Version = new Version("1.1.3");
         public const string Id = "e760952f-56c1-4192-8dfb-b5d6ec2692d2";
         public const ModuleTypes ModuleType = ModuleTypes.FileType;
 
@@ -114,16 +114,15 @@ namespace OpenSimmap
             {
                 moduleSuggestions.Add(("32858c9d-0247-497f-aeee-03f7bfe24158", new Dictionary<string, object>()));
 
-                moduleSuggestions.Add(("7c767b07-71be-48b2-8753-b27f3e973570", new Dictionary<string, object>() { { "Shape:", 0.0 } } ));
-                moduleSuggestions.Add(("f7a20f2f-94b2-4331-8bbf-4e0087da6fba", new Dictionary<string, object>() { { "Branch reference:", 0 } } ));
-                moduleSuggestions.Add(("ac496677-2650-4d92-8646-0812918bab03", new Dictionary<string, object>() { { "Position:", new VectSharp.Point(10, 0) }, { "Branch reference:", 0 } }));
+                moduleSuggestions.Add(("7c767b07-71be-48b2-8753-b27f3e973570", new Dictionary<string, object>() { } ));
+                moduleSuggestions.Add(("f7a20f2f-94b2-4331-8bbf-4e0087da6fba", new Dictionary<string, object>() { } ));
+                moduleSuggestions.Add(("ac496677-2650-4d92-8646-0812918bab03", new Dictionary<string, object>() { { "Position:", new VectSharp.Point(10, 0) } }));
 
                 NumberFormatterOptions widthFO = new NumberFormatterOptions(Modules.DefaultAttributeConvertersToDouble[1]) { AttributeName = "StateWidth", AttributeType = "Number", DefaultValue = 10.0, Parameters = new object[] { Modules.DefaultAttributeConvertersToDouble[1], 0, double.PositiveInfinity, true } };
                 NumberFormatterOptions heightFO = new NumberFormatterOptions(Modules.DefaultAttributeConvertersToDouble[1]) { AttributeName = "StateHeight", AttributeType = "Number", DefaultValue = 10.0, Parameters = new object[] { Modules.DefaultAttributeConvertersToDouble[1], 0, double.PositiveInfinity, true } };
 
                 moduleSuggestions.Add(("0512b822-044d-4c13-b3bb-bca494c51daa", new Dictionary<string, object>()
                 {
-					{ "Branch reference:", 0 },
                     { "Show on:",  2 },
                     { "Stroke thickness:", 1.0 },
                     { "Width:", widthFO },

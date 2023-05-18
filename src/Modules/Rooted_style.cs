@@ -50,7 +50,7 @@ namespace RootedStyleAction
         public const string Name = "Rooted tree style";
         public const string HelpText = "Sets the plot actions to display the tree as a rooted tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.0.4");
         public const string Id = "e56b8297-4417-4494-9369-cbe9e5d25397";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -176,13 +176,13 @@ namespace RootedStyleAction
 							stateData.RemovePlottingModule(0);
 						}
 						Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
-						updater(new Dictionary<string, object>() { { "Shape:", 0.0 } });
+						updater(new Dictionary<string, object>() { });
 
 						updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-						updater(new Dictionary<string, object>() { { "Branch reference:", 0 } });
+						updater(new Dictionary<string, object>() { });
 
 						updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-						updater(new Dictionary<string, object>() { { "Branch reference:", 0 }, { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
+						updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
 
 						double defaultHeight = stateData.TransformedTree.GetLeaves().Count * 14;
 
@@ -236,10 +236,10 @@ namespace RootedStyleAction
 					stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "7c767b07-71be-48b2-8753-b27f3e973570"));
 
 					Action<Dictionary<string, object>> updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-					updater(new Dictionary<string, object>() { { "Branch reference:", 0 } });
+					updater(new Dictionary<string, object>() { });
 
 					updater = stateData.AddPlottingModule(Modules.GetModule(Modules.PlottingModules, "ac496677-2650-4d92-8646-0812918bab03"));
-					updater(new Dictionary<string, object>() { { "Branch reference:", 0 }, { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
+					updater(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new Point(0, -5) }, { "Font:", new Font(FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } });
 
 					double defaultHeight = stateData.TransformedTree.GetLeaves().Count * 14;
 
