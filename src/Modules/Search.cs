@@ -27,6 +27,7 @@ using VectSharp.Canvas;
 using System.Runtime.InteropServices;
 using Avalonia.Media.Transformation;
 using System.Text.Json;
+using Avalonia.Styling;
 
 namespace Search
 {
@@ -48,7 +49,7 @@ namespace Search
         public const string Name = "Search";
         public const string HelpText = "Searches nodes in the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.0.4");
         public const string Id = "5f3a7147-f706-43dc-9f57-18ade0c7b15d";
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
@@ -217,6 +218,17 @@ namespace Search
             Grid.SetColumn(searchBox, 1);
             row1.Children.Add(searchBox);
             stateData.Tags["5f3a7147-f706-43dc-9f57-18ade0c7b15d"] = searchBox;
+
+            DPIAwareBox warningIcon = MainWindow.GetAlertIcon();
+            warningIcon.Width = 16;
+            warningIcon.Height = 16;
+            Grid.SetColumn(warningIcon, 1);
+            warningIcon.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right;
+            warningIcon.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
+            warningIcon.Margin = new Avalonia.Thickness(0, 0, 10, 0);
+            AvaloniaBugFixes.SetToolTip(warningIcon, "Invalid regex specified!");
+            warningIcon.IsVisible = false;
+            row1.Children.Add(warningIcon);
 
             {
                 TextBlock blk = new TextBlock() { Text = "Replace with:", Margin = new Avalonia.Thickness(5, 0, 5, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center, FontSize = 13 };
@@ -587,7 +599,29 @@ namespace Search
                 }
 
 
-                Regex reg = regex ? new Regex(needle, options) : null;
+                Regex reg = null;
+
+                if (regex)
+                {
+                    try
+                    {
+                        reg = new Regex(needle, options);
+                        regexBox.Styles.Clear();
+                        warningIcon.IsVisible = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        reg = null;
+                        regex = false;
+                        AvaloniaBugFixes.SetToolTip(warningIcon, "Invalid regex specified!\n" + ex.Message);
+                        warningIcon.IsVisible = true;
+                    }
+                }
+                else
+                {
+                    regexBox.Styles.Clear();
+                    warningIcon.IsVisible = false;
+                }
 
                 List<string> matchedIds = new List<string>();
                 List<TreeNode> matchedNodes = new List<TreeNode>();
@@ -736,7 +770,29 @@ namespace Search
                 }
 
 
-                Regex reg = regex ? new Regex(needle, options) : null;
+                Regex reg = null;
+
+                if (regex)
+                {
+                    try
+                    {
+                        reg = new Regex(needle, options);
+                        regexBox.Styles.Clear();
+                        warningIcon.IsVisible = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        reg = null;
+                        regex = false;
+                        AvaloniaBugFixes.SetToolTip(warningIcon, "Invalid regex specified!\n" + ex.Message);
+                        warningIcon.IsVisible = true;
+                    }
+                }
+                else
+                {
+                    regexBox.Styles.Clear();
+                    warningIcon.IsVisible = false;
+                }
 
                 SkiaSharp.SKColor selectionColor = window.SelectionSKColor;
                 List<string> matchedIds = new List<string>();
@@ -961,7 +1017,29 @@ namespace Search
                 }
 
 
-                Regex reg = regex ? new Regex(needle, options) : null;
+                Regex reg = null;
+
+                if (regex)
+                {
+                    try
+                    {
+                        reg = new Regex(needle, options);
+                        regexBox.Styles.Clear();
+                        warningIcon.IsVisible = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        reg = null;
+                        regex = false;
+                        AvaloniaBugFixes.SetToolTip(warningIcon, "Invalid regex specified!\n" + ex.Message);
+                        warningIcon.IsVisible = true;
+                    }
+                }
+                else
+                {
+                    regexBox.Styles.Clear();
+                    warningIcon.IsVisible = false;
+                }
 
                 List<string> matchedIds = new List<string>();
                 List<string> matchedNames = new List<string>();
