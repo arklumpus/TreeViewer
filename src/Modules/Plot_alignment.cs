@@ -1,4 +1,3 @@
-
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -41,7 +40,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
         public const string Name = "Plot alignment";
         public const string HelpText = "Adds the plot of an alignment to the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.1.1");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "ea7e246b-e93f-4d0d-a67a-88af05479b48";
@@ -535,16 +534,21 @@ namespace aea7e246be93f4d0da67a88af05479b48
             {
                 Attachment attachment = (Attachment)currentParameterValues["FASTA alignment:"];
 
-                int maxLen = (from el in ReadFasta(attachment) select el.Value.Length).Max();
+                Dictionary<string, string> fasta = ReadFasta(attachment);
 
-                if (previousParameterValues["Start:"] == currentParameterValues["Start:"])
+                if (fasta.Count > 0)
                 {
-                    parametersToChange["Start:"] = 1.0;
-                }
+                    int maxLen = (from el in fasta select el.Value.Length).Max();
 
-                if (previousParameterValues["End:"] == currentParameterValues["End:"])
-                {
-                    parametersToChange["End:"] = (double)maxLen;
+                    if (previousParameterValues["Start:"] == currentParameterValues["Start:"])
+                    {
+                        parametersToChange["Start:"] = 1.0;
+                    }
+
+                    if (previousParameterValues["End:"] == currentParameterValues["End:"])
+                    {
+                        parametersToChange["End:"] = (double)maxLen;
+                    }
                 }
             }
 
@@ -1640,5 +1644,3 @@ namespace aea7e246be93f4d0da67a88af05479b48
 }";
     }
 }
-
-
