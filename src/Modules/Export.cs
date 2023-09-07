@@ -31,6 +31,7 @@ using Avalonia.VisualTree;
 using VectSharp.PDF;
 using VectSharp.SVG;
 using VectSharp.Raster.ImageSharp;
+using VectSharp.Raster;
 using System.Runtime.InteropServices;
 
 namespace ExportPDF
@@ -44,7 +45,7 @@ namespace ExportPDF
         public const string Name = "Export";
         public const string HelpText = "Exports the tree plot as a PDF, SVG or PNG image.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.1.1");
         public const string Id = "d5d75840-4a71-4b81-bfc4-431736792abb";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -1157,7 +1158,7 @@ namespace ExportPDF
                 {
                     note.Text = "Note: converting all text into paths means that it will always look right, but it will not be selectable, searchable or editable. The output file will be rather large (use the \"Convert into paths using glyphs\" option to address this).";
                 }
-				else if (textOptionBox.SelectedIndex == 3)
+                else if (textOptionBox.SelectedIndex == 3)
                 {
                     note.Text = "Note: converting all text into paths means that it will always look right, but it will not be selectable, searchable or editable. Using glyphs means that the output file will not be too large, but some editors do not support embedded glyphs.";
                 }
@@ -1913,12 +1914,23 @@ namespace ExportPDF
 
                             double scale = widthPxNud.Value / pag.Width;
 
-                            SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
+                            SixLabors.ImageSharp.Image image;
 
+                            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                            {
+                                pag.SaveAsPNG(ms, scale);
+
+                                ms.Seek(0, System.IO.SeekOrigin.Begin);
+
+                                image = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>.Load(ms);
+                            }
+
+                            image.Metadata.ResolutionUnits = SixLabors.ImageSharp.Metadata.PixelResolutionUnit.PixelsPerInch;
                             image.Metadata.HorizontalResolution = resolutionNud.Value;
                             image.Metadata.VerticalResolution = resolutionNud.Value;
 
                             SixLabors.ImageSharp.ImageExtensions.SaveAsPng(image, result);
+
                         }
                         catch (Exception ex)
                         {
@@ -1988,8 +2000,18 @@ namespace ExportPDF
 
                             double scale = widthPxNud.Value / pag.Width;
 
-                            SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = pag.SaveAsImage(scale);
+                            SixLabors.ImageSharp.Image image;
 
+                            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                            {
+                                pag.SaveAsPNG(ms, scale);
+
+                                ms.Seek(0, System.IO.SeekOrigin.Begin);
+
+                                image = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>.Load(ms);
+                            }
+
+                            image.Metadata.ResolutionUnits = SixLabors.ImageSharp.Metadata.PixelResolutionUnit.PixelsPerInch;
                             image.Metadata.HorizontalResolution = resolutionNud.Value;
                             image.Metadata.VerticalResolution = resolutionNud.Value;
 
