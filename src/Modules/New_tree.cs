@@ -96,7 +96,7 @@ namespace a36a54db04e2447868b84ad4e188c3285
         public const string Name = "New tree";
         public const string HelpText = "Creates a new random tree or builds a tree from a sequence alignment.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.1");
+        public static Version Version = new Version("1.0.2");
         public const string Id = "36a54db0-4e24-4786-8b84-ad4e188c3285";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -962,6 +962,7 @@ namespace a36a54db04e2447868b84ad4e188c3285
                 TreeNode tree = null;
 
                 Func<Action<double>, TreeNode> generatorFunction = null;
+                bool isGTR = false;
 
                 int bootstrapReplicates = (int)bootstrapNud.Value;
 
@@ -988,6 +989,7 @@ namespace a36a54db04e2447868b84ad4e188c3285
 
                             case 3:
                                 evolutionModel = isProtein ? PhyloTree.TreeBuilding.EvolutionModel.BLOSUM62 : PhyloTree.TreeBuilding.EvolutionModel.GTR;
+                                isGTR = true;
                                 break;
                         }
 
@@ -1032,20 +1034,38 @@ namespace a36a54db04e2447868b84ad4e188c3285
 
                         await Task.Run(async () =>
                         {
-                            tree = generatorFunction(async x =>
+                            int errorMessage = 0;
+                            Exception error = null;
+
+                            try
                             {
-                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                                tree = generatorFunction(async x =>
                                 {
-                                    if (this.SelectedInputType == 0 && bootstrapReplicates == 0)
+                                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
                                     {
-                                        progWin.LabelText = x <= 0.5 ? "Building distance matrix..." : "Building tree...";
-                                    }
+                                        if (this.SelectedInputType == 0 && bootstrapReplicates == 0)
+                                        {
+                                            progWin.LabelText = x <= 0.5 ? "Building distance matrix..." : "Building tree...";
+                                        }
 
-                                    progWin.Progress = x;
+                                        progWin.Progress = x;
+                                    });
                                 });
-                            });
+                            }
+                            catch (Exception ex)
+                            {
+                                error = ex;
+                                if (ex.InnerException is MathNet.Numerics.NonConvergenceException && isGTR)
+                                {
+                                    errorMessage = 2;
+                                }
+                                else
+                                {
+                                    errorMessage = 1;
+                                }
+                            }
 
-                            if (constraint != null)
+                            if (constraint != null && tree != null)
                             {
                                 SetConstraint(tree, constraint);
                             }
@@ -1054,6 +1074,21 @@ namespace a36a54db04e2447868b84ad4e188c3285
                             {
                                 progWin.Close();
                             });
+
+                            if (errorMessage == 1)
+                            {
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                                {
+                                    await new MessageBox("Attention!", "An error occurred while creating the tree:\n" + error.InnerException?.Message ?? error.Message).ShowDialog2(this.FindAncestorOfType<Window>());
+                                });
+                            }
+                            else if (errorMessage == 2)
+                            {
+                                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+                                {
+                                    await new MessageBox("Attention!", "Eigenvalue decomposition failed when computing the distance matrix using the GTR model!\nThis probably means that the sequences are too divergent. Please try again using a different distance model (e.g., Kimura 1980)!\n" + error.InnerException?.Message ?? error.Message).ShowDialog2(this.FindAncestorOfType<Window>());
+                                });
+                            }
                         });
 
                         await task;
@@ -2240,7 +2275,7 @@ namespace a36a54db04e2447868b84ad4e188c3285
             if (rooted)
             {
                 plottingActionModules.Add(new string[] { "7c767b07-71be-48b2-8753-b27f3e973570", MainWindow.SerializeParameters(new Dictionary<string, object>() { { "Line weight:", formatterOptions }, { "Colour:", branchColour } }) });
-                plottingActionModules.Add(new string[] { "7c767b07-71be-48b2-8753-b27f3e973570", MainWindow.SerializeParameters(new Dictionary<string, object>() { } ) });
+                plottingActionModules.Add(new string[] { "7c767b07-71be-48b2-8753-b27f3e973570", MainWindow.SerializeParameters(new Dictionary<string, object>() { }) });
                 plottingActionModules.Add(new string[] { "ac496677-2650-4d92-8646-0812918bab03", MainWindow.SerializeParameters(new Dictionary<string, object>() { }) });
                 plottingActionModules.Add(new string[] { "ac496677-2650-4d92-8646-0812918bab03", MainWindow.SerializeParameters(new Dictionary<string, object>() { { "Show on:", 2 }, { "Anchor:", 1 }, { "Position:", new VectSharp.Point(0, -5) }, { "Font:", new VectSharp.Font(VectSharp.FontFamily.ResolveFontFamily("Helvetica"), 8) }, { "Attribute:", "Length" }, { "Attribute type:", "Number" }, { "Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } } } }) });
             }
@@ -2529,10 +2564,10 @@ namespace a36a54db04e2447868b84ad4e188c3285
                     for (int j = 0; j < i; j++)
                     {
                         System.Text.RegularExpressions.Match match = whitespace.Match(line, currIndex);
-                        
-						float value;
-						
-						if (match.Success)
+
+                        float value;
+
+                        if (match.Success)
                         {
                             value = float.Parse(line.Substring(currIndex, match.Index - currIndex));
                         }
@@ -2540,7 +2575,7 @@ namespace a36a54db04e2447868b84ad4e188c3285
                         {
                             value = float.Parse(line.Substring(currIndex));
                         }
-						
+
                         tbr[i][j] = value;
                         currIndex = match.Index + match.Length;
                     }
