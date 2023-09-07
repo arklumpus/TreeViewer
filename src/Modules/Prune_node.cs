@@ -34,7 +34,7 @@ namespace PruneNode
         public const string Name = "Prune node";
         public const string HelpText = "Prunes nodes off the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.0");
+        public static Version Version = new Version("1.3.0");
         public const string Id = "ffc97742-4cf5-44ef-81aa-d5b51708a003";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -92,6 +92,13 @@ namespace PruneNode
 
             return new List<(string, string)>()
             {
+                /// <param name="Action:">
+                /// This parameter determines whether node(s) that have been selected (either by directly specifying a
+                /// node, or through an attribute match) are pruned or if everything else is pruned. This is useful,
+                /// e.g., if you wish to keep just a small part of the tree while pruning everything else.
+                /// </param>
+                ( "Action:", "ComboBox:0[\"Prune selection\",\"Keep only selection\"]" ),
+                
                 /// <param name="Mode:">
                 /// This parameter determines whether a single node is pruned, or whether all nodes matching
                 /// a search criterion are pruned.
@@ -106,7 +113,7 @@ namespace PruneNode
                 /// </param>
                 ( "Node:", "Node:[\"" + leafNames[0] +"\",\"" + leafNames[^1] + "\"]" ),
 
-                ( "Attribute match", "Group:6" ),
+                ( "Attribute match", "Group:7" ),
                 
                 /// <param name="Attribute:">
                 /// This parameter determines the attribute that needs to match the search criterion. If the attribute name
@@ -145,6 +152,12 @@ namespace PruneNode
                 /// search for complicated strings.
                 /// </param>
                 ( "Regex", "CheckBox:false"),
+
+                /// <param name="Match leaves only">
+                /// If this check box is checked, only leaves (tips of the tree) are matched, and not internal nodes. Internal nodes will still
+                /// be pruned appropriately, if the [Leave one-child parent](#leave-one-child-parent) check box is unchecked.
+                /// </param>
+                ( "Match leaves only", "CheckBox:false" ),
                 
                 /// <param name="Position:">
                 /// This parameter determines the relative position along the branch leading to the [Node](#node) at
@@ -251,6 +264,7 @@ namespace PruneNode
                 controlStatus["Comparison type: "] = ControlStatus.Hidden;
                 controlStatus["Comparison type:"] = ControlStatus.Hidden;
                 controlStatus["Regex"] = ControlStatus.Hidden;
+                controlStatus["Match leaves only"] = ControlStatus.Hidden;
                 controlStatus["Node:"] = ControlStatus.Enabled;
             }
             else if ((int)currentParameterValues["Mode:"] == 1)
@@ -259,10 +273,11 @@ namespace PruneNode
                 controlStatus["Attribute:"] = ControlStatus.Enabled;
                 controlStatus["Attribute type:"] = ControlStatus.Enabled;
                 controlStatus["Value:"] = ControlStatus.Enabled;
+                controlStatus["Match leaves only"] = ControlStatus.Enabled;
                 controlStatus["Node:"] = ControlStatus.Hidden;
             }
 
-            return (bool)currentParameterValues["Apply"] || !((string[])previousParameterValues["Node:"]).SequenceEqual((string[])currentParameterValues["Node:"]);
+            return (bool)currentParameterValues["Apply"] || !((string[])previousParameterValues["Node:"]).SequenceEqual((string[])currentParameterValues["Node:"]) || (int)previousParameterValues["Action:"] != (int)currentParameterValues["Action:"];
         }
 
         public static void Transform(ref TreeNode tree, Dictionary<string, object> parameterValues, Action<double> progressAction)
@@ -277,13 +292,25 @@ namespace PruneNode
 
             string storeAttributeName = (string)parameterValues["Attribute name:"];
 
+            int action = (int)parameterValues["Action:"];
+            bool matchLeavesOnly = (bool)parameterValues["Match leaves only"];
+
             if (mode == 0)
             {
                 string[] nodeElements = (string[])parameterValues["Node:"];
 
                 TreeNode node = tree.GetLastCommonAncestor(nodeElements);
 
-                PruneNode(node, ref tree, position, leaveParent, keepNodeNames, storeAttributeName);
+                if (action == 0)
+                {
+                    PruneNode(node, ref tree, position, leaveParent, keepNodeNames, storeAttributeName, matchLeavesOnly, mode);
+                }
+                else
+                {
+                    node.Parent = null;
+                    node.Length = (1 - position) * node.Length;
+                    tree = node;
+                }
             }
             else if (mode == 1)
             {
@@ -330,65 +357,82 @@ namespace PruneNode
                 {
                     bool matched = false;
 
-                    if (nodes[i].Attributes.TryGetValue(attributeName, out object attributeValue))
+                    if (nodes[i].Children.Count == 0 || !matchLeavesOnly)
                     {
-                        if (attrType == "String" && attributeValue is string actualValue)
+                        if (nodes[i].Attributes.TryGetValue(attributeName, out object attributeValue))
                         {
-                            if (regex)
+                            if (attrType == "String" && attributeValue is string actualValue)
                             {
-                                if (reg.IsMatch(actualValue))
+                                if (regex)
                                 {
-                                    matched = true;
+                                    if (reg.IsMatch(actualValue))
+                                    {
+                                        matched = true;
+                                    }
+                                }
+                                else
+                                {
+                                    if (actualValue.Contains(attrValue, comparison))
+                                    {
+                                        matched = true;
+                                    }
                                 }
                             }
-                            else
+                            else if (attrType == "Number" && attributeValue is double actualNumber)
                             {
-                                if (actualValue.Contains(attrValue, comparison))
+                                switch (comparisonType)
                                 {
-                                    matched = true;
+                                    case 0:
+                                        if (actualNumber == numberNeedle)
+                                        {
+                                            matched = true;
+                                        }
+                                        break;
+                                    case 1:
+                                        if (actualNumber < numberNeedle)
+                                        {
+                                            matched = true;
+                                        }
+                                        break;
+                                    case 2:
+                                        if (actualNumber > numberNeedle)
+                                        {
+                                            matched = true;
+                                        }
+                                        break;
                                 }
                             }
                         }
-                        else if (attrType == "Number" && attributeValue is double actualNumber)
-                        {
-                            switch (comparisonType)
-                            {
-                                case 0:
-                                    if (actualNumber == numberNeedle)
-                                    {
-                                        matched = true;
-                                    }
-                                    break;
-                                case 1:
-                                    if (actualNumber < numberNeedle)
-                                    {
-                                        matched = true;
-                                    }
-                                    break;
-                                case 2:
-                                    if (actualNumber > numberNeedle)
-                                    {
-                                        matched = true;
-                                    }
-                                    break;
-                            }
-                        }
-                    }
 
-                    if (matched)
-                    {
-                        PruneNode(nodes[i], ref tree, position, leaveParent, keepNodeNames, storeAttributeName);
+                        if ((action == 0 && matched) || (action == 1 && !matched))
+                        {
+                            PruneNode(nodes[i], ref tree, position, leaveParent, keepNodeNames, storeAttributeName, matchLeavesOnly, mode);
+                        }
                     }
                 }
             }
 
         }
 
-        private static void PruneNode(TreeNode node, ref TreeNode tree, double position, bool leaveParent, bool keepNodeNames, string storeAttributeName)
+        private static void PruneNode(TreeNode node, ref TreeNode tree, double position, bool leaveParent, bool keepNodeNames, string storeAttributeName, bool matchLeavesOnly, int mode)
         {
             if (node == tree || (node.Parent == tree && tree.Children.Count < 3 && (from el in tree.Children where el != node select el).First().Children.Count == 0 && position == 0))
             {
-                throw new Exception("Cannot remove all nodes from the tree!");
+                if (matchLeavesOnly || mode == 0)
+                {
+                    if (node == tree)
+                    {
+                        throw new Exception("Cannot prune the root node!");
+                    }
+                    else
+                    {
+                        throw new Exception("Cannot remove all nodes from the tree!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Cannot remove all nodes from the tree!\nNote that the attribute match also matches internal nodes. If you only wish to prune some leaves, select the \"Match leaves only\" checkbox!");
+                }
             }
 
             string underlyingNodes = "";
@@ -442,21 +486,25 @@ namespace PruneNode
                         if (parent.Parent != null)
                         {
                             int index = parent.Parent.Children.IndexOf(parent);
-                            parent.Parent.Children[index] = otherChild;
-                            otherChild.Length += parent.Length;
-                            otherChild.Parent = parent.Parent;
 
-                            if (keepNodeNames)
+                            if (index >= 0)
                             {
-                                if (!string.IsNullOrEmpty(underlyingNodes))
+                                parent.Parent.Children[index] = otherChild;
+                                otherChild.Length += parent.Length;
+                                otherChild.Parent = parent.Parent;
+
+                                if (keepNodeNames)
                                 {
-                                    if (parent.Parent.Attributes.TryGetValue(storeAttributeName, out object storedNames) && storedNames is string storedString)
+                                    if (!string.IsNullOrEmpty(underlyingNodes))
                                     {
-                                        parent.Parent.Attributes[storeAttributeName] = storedString + "," + underlyingNodes;
-                                    }
-                                    else
-                                    {
-                                        parent.Parent.Attributes[storeAttributeName] = underlyingNodes;
+                                        if (parent.Parent.Attributes.TryGetValue(storeAttributeName, out object storedNames) && storedNames is string storedString)
+                                        {
+                                            parent.Parent.Attributes[storeAttributeName] = storedString + "," + underlyingNodes;
+                                        }
+                                        else
+                                        {
+                                            parent.Parent.Attributes[storeAttributeName] = underlyingNodes;
+                                        }
                                     }
                                 }
                             }
