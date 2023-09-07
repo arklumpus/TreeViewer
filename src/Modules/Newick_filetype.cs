@@ -40,7 +40,7 @@ namespace OpenNewick
         public const string Name = "Newick";
         public const string HelpText = "Opens a file containing one or more trees in the Newick (-with-attributes) format.\nSafe even when opening huge files.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const string Id = "79dfb9b2-ff10-4ed9-aa74-f7b3ae93c3d2";
         public const ModuleTypes ModuleType = ModuleTypes.FileType;
 
@@ -88,9 +88,13 @@ namespace OpenNewick
 
                     if (sb.Length > 0)
                     {
-                        yield return NWKA.ParseTree(sb.ToString());
-                        double progress = Math.Max(0, Math.Min(1, sr.BaseStream.Position / length));
-                        progressAction?.Invoke(progress);
+                        string treeText = sb.ToString();
+                        if (!string.IsNullOrWhiteSpace(treeText))
+                        {
+                            yield return NWKA.ParseTree(treeText);
+                            double progress = Math.Max(0, Math.Min(1, sr.BaseStream.Position / length));
+                            progressAction?.Invoke(progress);
+                        }
                     }
                 }
             }

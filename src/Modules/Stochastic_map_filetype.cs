@@ -41,7 +41,7 @@ namespace OpenSimmap
         public const string Name = "Stochastic map";
         public const string HelpText = "Opens a file containing one or more trees in the format produced by the write.simmap function of phytools (Revell 2012).\nSafe even when opening huge files.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.3");
+        public static Version Version = new Version("1.1.4");
         public const string Id = "e760952f-56c1-4192-8dfb-b5d6ec2692d2";
         public const ModuleTypes ModuleType = ModuleTypes.FileType;
 
@@ -114,8 +114,8 @@ namespace OpenSimmap
             {
                 moduleSuggestions.Add(("32858c9d-0247-497f-aeee-03f7bfe24158", new Dictionary<string, object>()));
 
-                moduleSuggestions.Add(("7c767b07-71be-48b2-8753-b27f3e973570", new Dictionary<string, object>() { } ));
-                moduleSuggestions.Add(("f7a20f2f-94b2-4331-8bbf-4e0087da6fba", new Dictionary<string, object>() { } ));
+                moduleSuggestions.Add(("7c767b07-71be-48b2-8753-b27f3e973570", new Dictionary<string, object>() { }));
+                moduleSuggestions.Add(("f7a20f2f-94b2-4331-8bbf-4e0087da6fba", new Dictionary<string, object>() { }));
                 moduleSuggestions.Add(("ac496677-2650-4d92-8646-0812918bab03", new Dictionary<string, object>() { { "Position:", new VectSharp.Point(10, 0) } }));
 
                 NumberFormatterOptions widthFO = new NumberFormatterOptions(Modules.DefaultAttributeConvertersToDouble[1]) { AttributeName = "StateWidth", AttributeType = "Number", DefaultValue = 10.0, Parameters = new object[] { Modules.DefaultAttributeConvertersToDouble[1], 0, double.PositiveInfinity, true } };
@@ -149,61 +149,66 @@ namespace OpenSimmap
 
                     if (sb.Length > 0)
                     {
-                        TreeNode tree = NWKA.ParseTree(sb.ToString());
+                        string treeText = sb.ToString();
 
-                        HashSet<string>[] characters = null;
-
-                        foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                        if (!string.IsNullOrWhiteSpace(treeText))
                         {
-                            string attributeToRemove = null;
+                            TreeNode tree = NWKA.ParseTree(treeText);
 
-                            foreach (KeyValuePair<string, object> attribute in node.Attributes)
+                            HashSet<string>[] characters = null;
+
+                            foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
                             {
-                                if (attribute.Key.StartsWith("Unknown") && attribute.Value is string attributeValue && attributeValue.StartsWith("{") && attributeValue.EndsWith("}"))
+                                string attributeToRemove = null;
+
+                                foreach (KeyValuePair<string, object> attribute in node.Attributes)
                                 {
-                                    SimmapBranchState[] states = SimmapBranchState.Parse(attributeValue).ToArray();
-
-                                    if (states.Length > 0)
+                                    if (attribute.Key.StartsWith("Unknown") && attribute.Value is string attributeValue && attributeValue.StartsWith("{") && attributeValue.EndsWith("}"))
                                     {
-                                        if (characters == null)
+                                        SimmapBranchState[] states = SimmapBranchState.Parse(attributeValue).ToArray();
+
+                                        if (states.Length > 0)
                                         {
-                                            characters = new HashSet<string>[states[0].States.Length];
-
-                                            for (int i = 0; i < characters.Length; i++)
+                                            if (characters == null)
                                             {
-                                                characters[i] = new HashSet<string>();
+                                                characters = new HashSet<string>[states[0].States.Length];
+
+                                                for (int i = 0; i < characters.Length; i++)
+                                                {
+                                                    characters[i] = new HashSet<string>();
+                                                }
                                             }
-                                        }
 
-                                        node.Attributes.Add("States", System.Text.Json.JsonSerializer.Serialize(states, Modules.DefaultSerializationOptions));
-                                        node.Length = (from el in states select el.Length).Sum();
+                                            node.Attributes.Add("States", System.Text.Json.JsonSerializer.Serialize(states, Modules.DefaultSerializationOptions));
+                                            node.Length = (from el in states select el.Length).Sum();
 
-                                        foreach (SimmapBranchState state in states)
-                                        {
-                                            for (int i = 0; i < state.States.Length; i++)
+                                            foreach (SimmapBranchState state in states)
                                             {
-                                                characters[i].Add(state.States[i]);
+                                                for (int i = 0; i < state.States.Length; i++)
+                                                {
+                                                    characters[i].Add(state.States[i]);
+                                                }
                                             }
+
+                                            attributeToRemove = attribute.Key;
+
+                                            break;
                                         }
-
-                                        attributeToRemove = attribute.Key;
-
-                                        break;
                                     }
+                                }
+
+                                if (!string.IsNullOrEmpty(attributeToRemove))
+                                {
+                                    node.Attributes.Remove(attributeToRemove);
                                 }
                             }
 
-                            if (!string.IsNullOrEmpty(attributeToRemove))
-                            {
-                                node.Attributes.Remove(attributeToRemove);
-                            }
+                            tree.Attributes.Add("Characters", System.Text.Json.JsonSerializer.Serialize(characters, Modules.DefaultSerializationOptions));
+
+                            yield return tree;
+                            double progress = Math.Max(0, Math.Min(1, sr.BaseStream.Position / length));
+                            progressAction?.Invoke(progress);
                         }
-
-                        tree.Attributes.Add("Characters", System.Text.Json.JsonSerializer.Serialize(characters, Modules.DefaultSerializationOptions));
-
-                        yield return tree;
-                        double progress = Math.Max(0, Math.Min(1, sr.BaseStream.Position / length));
-                        progressAction?.Invoke(progress);
                     }
                 }
             }
