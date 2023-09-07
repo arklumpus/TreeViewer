@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Mono.Options" Version="6.12.0.148" />
-    <PackageReference Include="TreeNode" Version="1.5.2" />
+    <PackageReference Include="TreeNode" Version="1.5.3" />
   </ItemGroup>
 
   <ItemGroup>
