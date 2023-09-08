@@ -26,6 +26,8 @@ using VectSharp;
 using Mono.Options;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.IO.Compression;
+using System.IO;
 
 namespace TreeViewer
 {
@@ -59,6 +61,9 @@ namespace TreeViewer
             List<string> modulesToInstall = new List<string>();
             List<string> modulesToUninstall = new List<string>();
 
+            bool installAllModules = false;
+            string installAllModulesPath = null;
+
             bool clean = false;
             bool cleanCache = false;
             bool fetchAssets = false;
@@ -80,6 +85,8 @@ namespace TreeViewer
             {
                 { "h|help", "Print this message and exit.", v => { showHelp = v != null; } },
                 { "rebuild-all-modules", "Recompile all installed modules from the stored source code.", v => { rebuildAllModules = v != null; } },
+                { "I|install-all=", "Uninstall all currently install modules, and install all the modules contained in the specified modules.tar.gz file. If no file is specified, the modules will be downloaded from the module repository.", v => { installAllModules = true;
+                    installAllModulesPath = v; } },
                 { "i|install=", "Install a module from a module.json.zip file and close the program (unless the -b/--boot option is also specified). This option can be specified multiple times.", v => { modulesToInstall.Add(v); } },
                 { "install-references", "When installing modules, also install the module's additional references, if available.",  v => { installReferences = v != null; } },
                 { "install-unsigned", "Allow installing modules without a signature or with an invalid signature.",  v => { installUnsigned = v != null; } },
@@ -225,6 +232,36 @@ namespace TreeViewer
             Parallel.For(0, 0, (i) => { });
 
             FontFamily.DefaultFontLibrary = new SimpleFontLibrary();
+
+
+            if (installAllModules)
+            {
+                InstallAllModules(installAllModulesPath, installUnsigned).GetAwaiter().GetResult();
+
+                if (reboot)
+                {
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("\tRebooting...");
+                    ConsoleWrapperUI.WriteLine();
+
+                    List<string> newArgs = new List<string>();
+
+                    if (deleteFiles)
+                    {
+                        newArgs.Add("-d");
+                    }
+
+                    newArgs.AddRange(filesToOpen);
+
+                    Reboot(newArgs.ToArray(), false);
+                    return 0;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+
 
             List<string> pipeClientArgument = new List<string>();
 
@@ -619,7 +656,11 @@ namespace TreeViewer
             psi.ArgumentList.Add("-w");
             psi.ArgumentList.Add("1100");
 
-            NamedPipes.StopServer();
+            try
+            {
+                NamedPipes.StopServer();
+            }
+            catch(NullReferenceException) { }
 
             System.Diagnostics.Process.Start(psi);
             System.Threading.Thread.Sleep(100);
@@ -704,6 +745,91 @@ namespace TreeViewer
             }
 
             return moduleFiles;
+        }
+
+        private static async Task InstallAllModules(string installAllModulesPath, bool ignoreInvalidSignature)
+        {
+            string tempPath = Path.GetTempFileName();
+            File.Delete(tempPath);
+            Directory.CreateDirectory(tempPath);
+
+            ConsoleWrapperUI.WriteLine();
+
+            if (installAllModulesPath == null)
+            {
+                ConsoleWrapperUI.WriteLine("Downloading modules from repository: " + GlobalSettings.Settings.ModuleRepositoryBaseUri + "...");
+
+                Uri modulesTGZ = new Uri(new Uri(GlobalSettings.Settings.ModuleRepositoryBaseUri), "modules.tar.gz");
+
+                installAllModulesPath = Path.Combine(tempPath, "modules.tar.gz");
+
+                await Modules.HttpClient.DownloadFileTaskAsync(modulesTGZ, installAllModulesPath);
+            }
+            else
+            {
+                ConsoleWrapperUI.WriteLine("Installing modules from " + installAllModulesPath + "...");
+            }
+
+            ConsoleWrapperUI.WriteLine();
+            ConsoleWrapperUI.WriteLine("Extracting modules...");
+            ConsoleWrapperUI.WriteLine();
+
+            using (GZipStream decompressionStream = new GZipStream(File.OpenRead(installAllModulesPath), CompressionMode.Decompress))
+            {
+                System.Formats.Tar.TarFile.ExtractToDirectory(decompressionStream, tempPath, false);
+            }
+
+            string moduleHeaderInfo = Path.Combine(tempPath, "Modules", "modules.json.gz");
+
+            List<ModuleHeader> moduleHeaders;
+
+            Directory.CreateDirectory(Modules.ModulePath);
+            Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "assets"));
+            Directory.CreateDirectory(Path.Combine(Modules.ModulePath, "libraries"));
+            File.WriteAllText(Modules.ModuleListPath, "[]");
+            await Modules.LoadInstalledModules(true, null);
+
+            using (FileStream fs = new FileStream(moduleHeaderInfo, FileMode.Open))
+            {
+                using (GZipStream decompressionStream = new GZipStream(fs, CompressionMode.Decompress))
+                {
+                    moduleHeaders = await System.Text.Json.JsonSerializer.DeserializeAsync<List<ModuleHeader>>(decompressionStream, Modules.DefaultSerializationOptions);
+                }
+            }
+
+            ConsoleWrapperUI.WriteLine("Installing modules... ");
+            ConsoleWrapperUI.WriteLine();
+            ConsoleWrapper.Write("0%");
+
+            for (int i = 0; i < moduleHeaders.Count; i++)
+            {
+                ModuleHeader header = moduleHeaders[i];
+                string moduleFile = Path.Combine(tempPath, "Modules", header.Id, header.Id + ".v" + header.Version.ToString() + ".json.zip");
+
+                try
+                {
+                    ModuleMetadata.Install(moduleFile, ignoreInvalidSignature, true);
+                }
+                catch (Exception ex)
+                {
+                    ConsoleWrapperUI.WriteLine();
+                    ConsoleWrapperUI.WriteLine("An error occurred while installing module " + header.Name + "!\n" + ex.Message);
+                    ConsoleWrapperUI.WriteLine();
+                }
+
+                ConsoleWrapper.CursorLeft = 0;
+                ConsoleWrapper.Write(((double)(i + 1) / moduleHeaders.Count).ToString("0%", System.Globalization.CultureInfo.InvariantCulture));
+            }
+
+            ConsoleWrapperUI.WriteLine();
+            ConsoleWrapperUI.WriteLine();
+            ConsoleWrapperUI.WriteLine("Deleting temporary files...");
+            ConsoleWrapperUI.WriteLine();
+
+            Directory.Delete(tempPath, true);
+
+            ConsoleWrapperUI.WriteLine("All done!");
+            ConsoleWrapperUI.WriteLine();
         }
     }
 }
