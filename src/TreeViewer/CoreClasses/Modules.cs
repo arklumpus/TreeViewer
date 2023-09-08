@@ -1553,14 +1553,25 @@ public static Colour? Format(object attribute)
 
         public static Func<object[], object> GetMethod(Type type, string methodName)
         {
-            return (object[] args) =>
+            MethodInfo methodInfo = null;
+
+            foreach (MethodInfo met in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public))
             {
-                return type.InvokeMember(methodName,
-                    BindingFlags.Default | BindingFlags.InvokeMethod,
-                    null,
-                    null,
-                    args);
-            };
+                if (met.Name == methodName)
+                {
+                    methodInfo = met;
+                    break;
+                }
+            }
+
+            if (methodInfo != null)
+            {
+                return (object[] args) => methodInfo.Invoke(null, args);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static object GetField(Type type, string fieldName)

@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using TreeViewer;
 
@@ -31,7 +32,42 @@ namespace TreeViewerCommandLine
             new ConsoleTextSpan("<path to script file>\n", 2, ConsoleColor.Blue),
             new ConsoleTextSpan("    Compiles and executes the C# code contained in the specified ", 4),
             new ConsoleTextSpan("input file", 4, ConsoleColor.Blue),
-            new ConsoleTextSpan(".", 4)
+            new ConsoleTextSpan(".\n", 4),
+            new ConsoleTextSpan("    The ", 4),
+            new ConsoleTextSpan("input file", 4, ConsoleColor.Blue),
+            new ConsoleTextSpan(" should contain valid C# source code, defining a class with a method having signature\n", 4),
+            new ConsoleTextSpan("      • ", 6),
+            new ConsoleTextSpan("static void Main()\n", 6, ConsoleColor.Yellow),
+            new ConsoleTextSpan("      or\n", 4),
+            new ConsoleTextSpan("      • ", 6),
+            new ConsoleTextSpan("static void Main(string[] args)\n", 6, ConsoleColor.Yellow),
+            new ConsoleTextSpan("    This method will be the entry point for the script. This is an example script file:\n\n", 4),
+            new ConsoleTextSpan("      ", 6),
+            new ConsoleTextSpan("using", 6, ConsoleColor.Blue),
+            new ConsoleTextSpan(" System;\n\n", 6),
+            new ConsoleTextSpan("      ", 6),
+            new ConsoleTextSpan("namespace", 6, ConsoleColor.Blue),
+            new ConsoleTextSpan(" ExampleNamespace\n", 6),
+            new ConsoleTextSpan("      {\n", 6),
+            new ConsoleTextSpan("          ", 10),
+            new ConsoleTextSpan("class", 10, ConsoleColor.Blue),
+            new ConsoleTextSpan(" ExampleClass\n", 10, ConsoleColor.Green),
+            new ConsoleTextSpan("          {\n", 10),
+            new ConsoleTextSpan("              ", 14),
+            new ConsoleTextSpan("public static void", 14, ConsoleColor.Blue),
+            new ConsoleTextSpan(" Main", 14, ConsoleColor.Yellow),
+            new ConsoleTextSpan("()\n", 14),
+            new ConsoleTextSpan("              {\n", 14),
+            new ConsoleTextSpan("                  ", 18),
+            new ConsoleTextSpan("Console", 18, ConsoleColor.Green),
+            new ConsoleTextSpan(".", 18),
+            new ConsoleTextSpan("WriteLine", 18,ConsoleColor.Yellow),
+            new ConsoleTextSpan("(", 18),
+            new ConsoleTextSpan("\"Hello world!\"", 18,ConsoleColor.Red),
+            new ConsoleTextSpan(");\n", 18),
+            new ConsoleTextSpan("              }\n", 14),
+            new ConsoleTextSpan("          }\n", 10),
+            new ConsoleTextSpan("      }\n", 6),
         };
 
         public override ConsoleTextSpan[] ShortHelpText => new ConsoleTextSpan[]
@@ -109,7 +145,7 @@ namespace TreeViewerCommandLine
                         {
                             mainMethod(new object[] { new string[] { } });
                         }
-                        catch (MissingMethodException)
+                        catch (TargetParameterCountException)
                         {
                             mainMethod(new object[0]);
                         }
