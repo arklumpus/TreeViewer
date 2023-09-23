@@ -485,7 +485,7 @@ public static Colour? Format(object attribute)
                 Formatter = await ColourFormatterOptions.Create(ConverterCodeBox, DebuggerServer);
 
                 Formatter.Parameters = GetParameters();
-                Formatter.AttributeName = this.FindControl<TextBox>("AttributeNameContainer").Text;
+                Formatter.AttributeName = this.FindControl<TextBox>("AttributeNameContainer").Text.Trim();
                 Formatter.AttributeType = this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex == 0 ? "String" : this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex == 1 ? "Number" : "";
                 Formatter.DefaultColour = this.FindControl<ColorButton>("DefaultColourButton").Color.ToVectSharp();
 

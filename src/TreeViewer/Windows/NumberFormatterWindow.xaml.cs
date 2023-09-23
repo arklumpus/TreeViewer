@@ -335,7 +335,7 @@ namespace TreeViewer
                 Formatter = await NumberFormatterOptions.Create(ConverterCodeBox, DebuggerServer);
 
                 Formatter.Parameters = GetParameters();
-                Formatter.AttributeName = this.FindControl<TextBox>("AttributeNameContainer").Text;
+                Formatter.AttributeName = this.FindControl<TextBox>("AttributeNameContainer").Text.Trim();
                 Formatter.AttributeType = this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex == 0 ? "String" : this.FindControl<ComboBox>("AttributeTypeContainer").SelectedIndex == 1 ? "Number" : "";
                 Formatter.DefaultValue = this.FindControl<NumericUpDown>("DefaultValueNud").Value;
 
