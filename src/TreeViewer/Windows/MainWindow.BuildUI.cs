@@ -23,8 +23,10 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Media.Transformation;
 using PhyloTree;
+using Spreadalonia;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -569,13 +571,14 @@ namespace TreeViewer
                    ("", null, null),
                    ("Add attachment from file", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.AddAttachment")) { Width = 16, Height = 16 }, null),
                    ("Open text editor", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.TextEditor")) { Width = 16, Height = 16 }, null),
+                   ("Open spreadsheet editor", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.SpreadsheetEditor")) { Width = 16, Height = 16 }, null),
                 }, true, 0, (Action<int>)(async ind =>
                 {
                     if (ind < 1)
                     {
                         AddAttachmentClicked(null, null);
                     }
-                    else
+                    else if (ind == 1)
                     {
                         TextEditorWindow editorWin = new TextEditorWindow();
 
@@ -584,6 +587,68 @@ namespace TreeViewer
                         if (editorWin.Result)
                         {
                             string attachmentText = editorWin.Text;
+
+                            bool validResult = false;
+
+                            string defaultName = "attachment";
+                            bool loadInMemory = true;
+                            bool cacheResults = true;
+
+                            while (!validResult)
+                            {
+                                AddAttachmentWindow win = new AddAttachmentWindow(defaultName, loadInMemory, cacheResults);
+                                await win.ShowDialog2(this);
+
+                                if (win.Result)
+                                {
+                                    if (!StateData.Attachments.ContainsKey(win.AttachmentName))
+                                    {
+                                        Stream ms = new MemoryStream();
+                                        StreamWriter writer = new StreamWriter(ms, leaveOpen: true);
+                                        writer.Write(attachmentText);
+                                        writer.Dispose();
+                                        ms.Seek(0, SeekOrigin.Begin);
+
+                                        validResult = true;
+
+                                        this.PushUndoFrame(UndoFrameLevel.Attachment, 0);
+
+                                        Attachment attachment = new Attachment(win.AttachmentName, win.CacheResults, win.LoadInMemory, ref ms);
+                                        this.StateData.Attachments.Add(attachment.Name, attachment);
+
+                                        BuildAttachmentList();
+
+                                        await UpdateTransformedTree();
+                                    }
+                                    else
+                                    {
+                                        validResult = false;
+                                        loadInMemory = win.LoadInMemory;
+                                        cacheResults = win.CacheResults;
+                                        defaultName = win.AttachmentName;
+
+                                        MessageBox box = new MessageBox("Attention", "There is another attachment with the same name!");
+
+                                        await box.ShowDialog2(this);
+                                    }
+
+                                }
+                                else
+                                {
+                                    validResult = true;
+                                }
+                            }
+                        }
+                    }
+                    else if (ind == 2)
+                    {
+                        SpreadsheetWindow editorWin = new SpreadsheetWindow(true, false, false);
+
+                        await editorWin.ShowDialog2(this);
+
+                        if (editorWin.Result)
+                        {
+                            string attachmentText = editorWin.Spreadsheet.SerializeData();
 
                             bool validResult = false;
 
@@ -651,6 +716,7 @@ namespace TreeViewer
                     attachments.Add((attachmentName, Icons.GetAttachmentIcon(1), null, new List<(string, Control, string)>()
                     {
                         ("Text editor", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.TextEditor")) { Width = 16, Height = 16 }, null),
+                        ("Spreadsheet editor", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.SpreadsheetEditor")) { Width = 16, Height = 16 }, null),
                         ("Export attachment", Icons.GetDownloadIcon(1), null),
                         ("Replace attachment", Icons.GetReplaceIcon(1), null),
                         ("Delete attachment", Icons.GetCrossIcon(1), null),
@@ -679,7 +745,44 @@ namespace TreeViewer
                                                     RefreshAttachmentSelectors(attachment.Name);
                                                 }
                                             }
-                                            else if (ind == 3)
+                                            else if (ind == 1)
+                                            {
+                                                Attachment att = this.StateData.Attachments[attachmentName];
+
+                                                SpreadsheetWindow win = new SpreadsheetWindow(true, false, false);
+                                                win.Load(win.Spreadsheet, att.GetText(), false);
+
+                                                int maxX = 0;
+
+                                                foreach (KeyValuePair<(int, int), string> kvp in win.Spreadsheet.Data)
+                                                {
+                                                    maxX = Math.Max(maxX, kvp.Key.Item1);
+                                                }
+
+                                                maxX = Math.Min(maxX, 50);
+                                                win.Spreadsheet.Selection = ImmutableList.Create(new SelectionRange(0, 0, maxX, win.Spreadsheet.MaxTableHeight));
+                                                win.Spreadsheet.AutoFitWidth();
+                                                win.Spreadsheet.Selection = ImmutableList.Create(new SelectionRange(0, 0));
+                                                win.Spreadsheet.ScrollTopLeft();
+
+                                                await win.ShowDialog2(this);
+
+                                                if (win.Result)
+                                                {
+                                                    Stream ms = new MemoryStream();
+                                                    StreamWriter writer = new StreamWriter(ms, leaveOpen: true);
+                                                    writer.Write(win.Spreadsheet.SerializeData());
+                                                    writer.Dispose();
+                                                    ms.Seek(0, SeekOrigin.Begin);
+
+                                                    Attachment attachment = new Attachment(att.Name, att.CacheResults, att.StoreInMemory, ref ms);
+                                                    this.StateData.Attachments[attachment.Name] = attachment;
+                                                    att.Dispose();
+                                                    await UpdateOnlyTransformedTree();
+                                                    RefreshAttachmentSelectors(attachment.Name);
+                                                }
+                                            }
+                                            else if (ind == 4)
                                             {
                                                 Attachment att = this.StateData.Attachments[attachmentName];
                                                 this.StateData.Attachments.Remove(attachmentName);
@@ -688,7 +791,7 @@ namespace TreeViewer
                                                 await UpdateTransformedTree();
                                                 UpdateAttachmentSelectors();
                                             }
-                                            else if (ind == 2)
+                                            else if (ind == 3)
                                             {
                                                 Attachment att = this.StateData.Attachments[attachmentName];
 
@@ -746,7 +849,7 @@ namespace TreeViewer
                                                     }
                                                 }
                                             }
-                                            else if (ind == 1)
+                                            else if (ind == 2)
                                             {
                                                 SaveFileDialog dialog = new SaveFileDialog() { Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string>() { "*" }, Name = "All files" } }, Title = "Export attachment" };
 

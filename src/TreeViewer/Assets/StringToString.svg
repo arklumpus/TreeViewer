@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 8.4666657 8.4666657"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="StringToString.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="22.627417"
+     inkscape:cx="14.937631"
+     inkscape:cy="11.313709"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="2.5"
+       markerHeight="2.89017352"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:4.29201px;line-height:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-decoration-color:#000000;text-anchor:middle;white-space:pre;fill:#727272;stroke-width:0.599654;stop-color:#000000;fill-opacity:1"
+       x="2.8637848"
+       y="3.0052476"
+       id="text236"><tspan
+         sodipodi:role="line"
+         id="tspan234"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI Bold';stroke-width:0.599654;fill:#727272;fill-opacity:1"
+         x="2.8637846"
+         y="3.0052476">AB</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:4.29201px;line-height:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-decoration-color:#000000;text-anchor:middle;white-space:pre;fill:#727272;stroke-width:0.599654;stop-color:#000000;fill-opacity:1"
+       x="5.7328157"
+       y="8.4666662"
+       id="text398"><tspan
+         sodipodi:role="line"
+         id="tspan396"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI Bold';stroke-width:0.599654;fill:#727272;fill-opacity:1"
+         x="5.7328157"
+         y="8.4666662">AB</tspan></text>
+    <path
+       style="fill:none;stroke:#4a7db1;stroke-width:0.52916667;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart);stop-color:#000000"
+       d="M 0.52916668,3.4395833 V 7.2047427 H 2.2246579"
+       id="path528" />
+  </g>
+</svg>

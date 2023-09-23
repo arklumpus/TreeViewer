@@ -1,0 +1,181 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2023  Giorgio Bianchini, University of Bristol
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+        mc:Ignorable="d" Width="750" Height="350"
+        x:Class="TreeViewer.SpreadsheetTransformTemplateDialog"
+        Title="Transform and paste"  FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" WindowStartupLocation="CenterOwner">
+	<local:ChildWindow.Content>
+		<Grid Margin="10">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="1*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Grid Name="HeaderGrid" Margin="0,0,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="1*"/>
+				</Grid.ColumnDefinitions>
+
+				<TextBlock Grid.Column="1" FontSize="16" Foreground="#0072b2" Text="Transform and paste" Margin="10, 0, 0, 0" VerticalAlignment="Center"/>
+			</Grid>
+			<Grid Grid.Row="1" Margin="0,5,0,0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="1*"/>
+					<ColumnDefinition Width="1*"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Grid.ColumnSpan="2" Margin="0,0,0,10">Select template:</TextBlock>
+
+				<Button Grid.Row="1" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="StringToStringButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="StringToStringIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Text to text" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform text strings into other text strings" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+				<Button Grid.Row="2" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="StringToNumberButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="StringToNumberIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Text to number" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform text strings into numbers" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+				<Button Grid.Column="1" Grid.Row="1" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="NumberToNumberButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="NumberToNumberIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Number to number" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform numbers into other numbers" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+				<Button Grid.Column="1" Grid.Row="2" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton"  Name="NumberToStringButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="NumberToStringIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Number to text" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform numbers into text strings" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+				<Canvas Grid.ColumnSpan="2" Grid.Row="3" Margin="0,5,0,5" Height="1" Background="#808080"></Canvas>
+
+				<Button Grid.Row="4" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="StringsToStringsButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="StringsToStringsIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Text list to text list" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform a list of text strings into other text strings" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+				<Button Grid.Row="5" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="StringsToNumbersButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="StringsToNumbersIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Text list to number list" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform a list of text strings into numbers" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+				<Button Grid.Column="1" Grid.Row="4" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="NumbersToNumbersButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="NumbersToNumbersIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Number list to number list" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform a list of numbers into other numbers" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+				<Button Grid.Column="1" Grid.Row="5" Background="Transparent" HorizontalAlignment="Stretch" Padding="5,0,5,0" RenderTransform="scale(1,1)" Margin="0,0,0,5" Classes="SideBarButton" Name="NumbersToStringsButton">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Canvas Width="32" Height="32" Name="NumbersToStringsIcon"></Canvas>
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="Number list to text list" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" FontSize="13" />
+							<TextBlock Text="Transform a list of numbers into text strings" Margin="5,0,0,0" FontSize="13" TextWrapping="Wrap" />
+						</StackPanel>
+					</Grid>
+				</Button>
+
+			</Grid>
+			<Grid Grid.Row="2">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="1*" />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="1*" />
+				</Grid.ColumnDefinitions>
+				<Button Grid.Column="1" Width="100" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton" Name="CancelButton">Cancel</Button>
+			</Grid>
+		</Grid>
+	</local:ChildWindow.Content>
+</local:ChildWindow>

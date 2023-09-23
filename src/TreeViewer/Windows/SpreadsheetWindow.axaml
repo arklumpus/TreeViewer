@@ -1,0 +1,133 @@
+<!--
+TreeViewer - Cross-platform software to draw phylogenetic trees
+Copyright (C) 2023  Giorgio Bianchini, University of Bristol
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<local:ChildWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:TreeViewer;assembly=TreeViewer"
+		xmlns:ss="clr-namespace:Spreadalonia;assembly=Spreadalonia"
+        mc:Ignorable="d" Width="900" Height="550"
+        x:Class="TreeViewer.SpreadsheetWindow"
+        Title="Spreadsheet" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15" WindowStartupLocation="CenterOwner">
+	<Window.Styles>
+		<Style Selector=".WindowsStyle Canvas.RibbonSeparator">
+			<Setter Property="Background" Value="#B1B1B1" />
+			<Setter Property="Margin" Value="0,0,0,0" />
+		</Style>
+
+		<Style Selector=".MacOSStyle Canvas.RibbonSeparator">
+			<Setter Property="Background" Value="#CECECE" />
+		</Style>
+	</Window.Styles>
+	<local:ChildWindow.Content>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="1*" />
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0" Name="RibbonBarContainer" ></Grid>
+			<Grid Grid.Row="1" Name="RibbonTabContainer" Height="100" Margin="1,0,1,0" ClipToBounds="True">
+				<local:RibbonTabContent HorizontalAlignment="Stretch" Height="100"></local:RibbonTabContent>
+			</Grid>
+			<Canvas Grid.Row="2" Height="1" Classes="RibbonSeparator"></Canvas>
+			<Grid Grid.Row="3" Margin="0,0,0,10" Name="MainGrid">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="1*" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<ss:Spreadsheet Name="spreadsheetControl" Margin="10" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="14" HeaderFontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" HeaderFontSize="14" HeaderBackground="#F3F3F3" DefaultRowHeight="25"></ss:Spreadsheet>
+				<Grid Grid.Row="1" Margin="0, 0, 0, 0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*" />
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="1*" />
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="1*" />
+					</Grid.ColumnDefinitions>
+					<Button Grid.Column="1" Width="100" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton" Name="OKButton">OK</Button>
+					<Button Grid.Column="3" Width="100" HorizontalContentAlignment="Center" FontSize="13" Classes="PlainButton" Name="CancelButton">Cancel</Button>
+				</Grid>
+			</Grid>
+
+			<Grid Grid.Row="0" Grid.RowSpan="4" Name="PopupLayer">
+				<Grid.Styles>
+					<Style Selector=".WindowsStyle TextBlock">
+						<Setter Property="Foreground" Value="#D0000000"/>
+					</Style>
+
+					<Style Selector=".WindowsStyle StackPanel.MenuItem">
+						<Setter Property="Background" Value="Transparent" />
+					</Style>
+
+					<Style Selector=".WindowsStyle StackPanel.MenuItem Viewbox">
+						<Setter Property="Margin" Value="5, 3, 5, 3" />
+					</Style>
+
+					<Style Selector=".WindowsStyle StackPanel.MenuItem:pointerover">
+						<Setter Property="Background" Value="#C5C5C5" />
+					</Style>
+
+					<Style Selector=".WindowsStyle Border.MenuBorder">
+						<Setter Property="CornerRadius" Value="0"/>
+						<Setter Property="Padding" Value="1"/>
+						<Setter Property="Background" Value="White" />
+						<Setter Property="BorderBrush" Value="#C6C6C6" />
+					</Style>
+
+					<Style Selector=".MacOSStyle TextBlock">
+						<Setter Property="Foreground" Value="Black"/>
+					</Style>
+
+					<Style Selector=".MacOSStyle StackPanel.MenuItem">
+						<Setter Property="Background" Value="Transparent" />
+					</Style>
+
+					<Style Selector=".MacOSStyle StackPanel.MenuItem Viewbox">
+						<Setter Property="Margin" Value="20, 3, 5, 3" />
+					</Style>
+
+					<Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover">
+						<Setter Property="Background" Value="#0072b2" />
+					</Style>
+
+					<Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover TextBlock">
+						<Setter Property="Foreground" Value="White" />
+					</Style>
+
+					<Style Selector=".MacOSStyle StackPanel.MenuItem:pointerover Path">
+						<Setter Property="Fill" Value="White" />
+					</Style>
+
+					<Style Selector=".MacOSStyle Border.MenuBorder">
+						<Setter Property="CornerRadius" Value="4"/>
+						<Setter Property="Padding" Value="0 4 0 4"/>
+						<Setter Property="Background" Value="#E9E9E9" />
+						<Setter Property="BorderBrush" Value="#C3C3C3" />
+					</Style>
+
+
+				</Grid.Styles>
+
+			</Grid>
+			<Canvas Grid.Row="0" Grid.RowSpan="4" Name="BusyOverlay" Background="Transparent" Cursor="Wait" IsVisible="False">
+			</Canvas>
+		</Grid>
+	</local:ChildWindow.Content>
+</local:ChildWindow>

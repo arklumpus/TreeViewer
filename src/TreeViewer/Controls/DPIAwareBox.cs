@@ -76,31 +76,35 @@ namespace TreeViewer
 
             if (scaling != lastScaling)
             {
-                if (cachedControls.TryGetValue(lastScaling, out Control lastControl))
-                {
-                    lastControl.IsVisible = false;
-                }
-
-                if (cachedControls.TryGetValue(scaling, out Control control))
-                {
-                    control.IsVisible = true;
-                }
-                else
-                {
-                    control = this.GetControlAtResolution(scaling);
-                    control.IsVisible = true;
-                    container.Children.Add(control);
-
-                    cachedControls[scaling] = control;
-                }
-
-
-                lastScaling = scaling;
-
-                Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { this.InvalidateVisual(); });
+                ShowControl(scaling);   
             }
 
             base.Render(context);
+        }
+
+        public void ShowControl(double scaling)
+        {
+            if (cachedControls.TryGetValue(lastScaling, out Control lastControl))
+            {
+                lastControl.IsVisible = false;
+            }
+
+            if (cachedControls.TryGetValue(scaling, out Control control))
+            {
+                control.IsVisible = true;
+            }
+            else
+            {
+                control = this.GetControlAtResolution(scaling);
+                control.IsVisible = true;
+                container.Children.Add(control);
+
+                cachedControls[scaling] = control;
+            }
+
+            Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { this.InvalidateVisual(); });
+
+            lastScaling = scaling;
         }
     }
 }

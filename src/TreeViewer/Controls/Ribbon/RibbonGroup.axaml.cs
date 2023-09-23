@@ -89,22 +89,58 @@ namespace TreeViewer
                 }
                 else
                 {
-                    SmallRibbonButton ribbonButton = new SmallRibbonButton(buttons[i].Item4) { ButtonText = buttons[i].Item1, Icon = buttons[i].Item2, ShortcutText = buttons[i].Item3 };
-                    ribbonButton.ButtonPressed += (s, e) => buttons[index].Item7(e.Index);
-                    Grid.SetRow(ribbonButton, currentSmallButtonGrid.Children.Count);
-                    currentSmallButtonGrid.Children.Add(ribbonButton);
-
-                    if (!string.IsNullOrEmpty(buttons[i].Item8))
+                    if (string.IsNullOrEmpty(buttons[i].Item1))
                     {
-                        AvaloniaBugFixes.SetToolTip(ribbonButton, buttons[i].Item8);
+                        currentSmallButtonGrid.Children.Add(new Control());
+
+                        if (currentSmallButtonGrid.Children.Count == 3)
+                        {
+                            this.FindControl<StackPanel>("ItemsContainer").Children.Add(currentSmallButtonGrid);
+                            currentSmallButtonGrid = GetSmallButtonGrid();
+                        }
                     }
-
-                    RibbonButtons.Add(ribbonButton);
-
-                    if (currentSmallButtonGrid.Children.Count == 3)
+                    else if (!buttons[i].Item1.StartsWith("@") || buttons[i].Item2 == null)
                     {
-                        this.FindControl<StackPanel>("ItemsContainer").Children.Add(currentSmallButtonGrid);
-                        currentSmallButtonGrid = GetSmallButtonGrid();
+                        SmallRibbonButton ribbonButton = new SmallRibbonButton(buttons[i].Item4) { ButtonText = buttons[i].Item1, Icon = buttons[i].Item2, ShortcutText = buttons[i].Item3 };
+                        ribbonButton.ButtonPressed += (s, e) => buttons[index].Item7(e.Index);
+                        Grid.SetRow(ribbonButton, currentSmallButtonGrid.Children.Count);
+                        currentSmallButtonGrid.Children.Add(ribbonButton);
+
+                        if (!string.IsNullOrEmpty(buttons[i].Item8))
+                        {
+                            AvaloniaBugFixes.SetToolTip(ribbonButton, buttons[i].Item8);
+                        }
+
+                        RibbonButtons.Add(ribbonButton);
+
+                        if (currentSmallButtonGrid.Children.Count == 3)
+                        {
+                            this.FindControl<StackPanel>("ItemsContainer").Children.Add(currentSmallButtonGrid);
+                            currentSmallButtonGrid = GetSmallButtonGrid();
+                        }
+                    }
+                    else
+                    {
+                        //SmallRibbonButton ribbonButton = new SmallRibbonButton(buttons[i].Item4) { ButtonText = buttons[i].Item1, Icon = buttons[i].Item2, ShortcutText = buttons[i].Item3 };
+                        //ribbonButton.ButtonPressed += (s, e) => buttons[index].Item7(e.Index);
+
+                        Control ribbonButton = buttons[i].Item2;
+
+                        Grid.SetRow(ribbonButton, currentSmallButtonGrid.Children.Count);
+                        currentSmallButtonGrid.Children.Add(ribbonButton);
+
+                        if (!string.IsNullOrEmpty(buttons[i].Item8))
+                        {
+                            AvaloniaBugFixes.SetToolTip(ribbonButton, buttons[i].Item8);
+                        }
+
+                        //RibbonButtons.Add(ribbonButton);
+
+                        if (currentSmallButtonGrid.Children.Count == 3)
+                        {
+                            this.FindControl<StackPanel>("ItemsContainer").Children.Add(currentSmallButtonGrid);
+                            currentSmallButtonGrid = GetSmallButtonGrid();
+                        }
                     }
                 }
             }
