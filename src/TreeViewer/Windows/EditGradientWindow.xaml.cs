@@ -54,11 +54,34 @@ namespace TreeViewer
             this.InitializeComponent();
         }
 
-        public EditGradientWindow(Gradient gradient)
+        private double MinValue = 0;
+        private double MaxValue = 1;
+        private double Increment = 0.01;
+
+        public EditGradientWindow(Gradient gradient, double min, double max)
         {
             this.InitializeComponent();
 
             Gradient = gradient;
+
+            if (max == min)
+            {
+                min = 0;
+                max = 1;
+            }
+
+            this.MinValue = min;
+            this.MaxValue = max;
+
+            if (Math.Max(MinValue, MaxValue) >= 10)
+            {
+                Increment = 0.1;
+            }
+
+            if (Math.Max(MinValue, MaxValue) >= 100)
+            {
+                Increment = 1;
+            }
 
             BuildGradientStopContainer();
         }
@@ -153,7 +176,7 @@ namespace TreeViewer
 
                         if ((string)grd.Tag == MovingTag)
                         {
-                            ((NumericUpDown)grd.Children[0]).Value = Math.Max(0, Math.Min(1, ((NumericUpDown)grd.Children[0]).Value + dx));
+                            ((NumericUpDown)grd.Children[0]).Value = this.MinValue + Math.Max(0, Math.Min(1, (((NumericUpDown)grd.Children[0]).Value - this.MinValue) / (this.MaxValue - this.MinValue) + dx)) * (this.MaxValue - this.MinValue);
                             break;
                         }
                     }
@@ -249,7 +272,7 @@ namespace TreeViewer
 
             controls.Sort((a, b) =>
             {
-                return ((NumericUpDown)a.Children[0]).Value.CompareTo(((NumericUpDown)b.Children[0]).Value);
+                return ((((NumericUpDown)a.Children[0]).Value - MinValue) / (MaxValue - MinValue)).CompareTo((((NumericUpDown)b.Children[0]).Value - MinValue) / (MaxValue - MinValue));
             });
 
             for (int i = 0; i < controls.Count; i++)
@@ -306,10 +329,10 @@ namespace TreeViewer
                 grd.ColumnDefinitions.Add(new ColumnDefinition(64, GridUnitType.Pixel));
                 grd.ColumnDefinitions.Add(new ColumnDefinition(24, GridUnitType.Pixel));
 
-                NumericUpDown nud = new NumericUpDown() { Minimum = 0, Maximum = 1, Margin = new Thickness(0, 2.5, 5, 2.5), FormatString = "0.###", Increment = 0.01, Value = this.Gradient.GradientStops[i].Position, FontSize = 13, Padding = new Thickness(5, 2, 5, 2) };
+                NumericUpDown nud = new NumericUpDown() { Minimum = Math.Min(MinValue, MaxValue), Maximum = Math.Max(MinValue, MaxValue), Margin = new Thickness(0, 2.5, 5, 2.5), FormatString = "0.###", Increment = this.Increment, Value = this.Gradient.GradientStops[i].Position * (MaxValue - MinValue) + MinValue, FontSize = 13, Padding = new Thickness(5, 2, 5, 2) };
                 nud.ValueChanged += (s, e) =>
                 {
-                    stop.Position = nud.Value;
+                    stop.Position = (nud.Value - MinValue) / (MaxValue - MinValue);
                     this.Gradient.SortGradient();
                     BuildGradient();
                     SortGradientStopControls();
@@ -383,10 +406,10 @@ namespace TreeViewer
             grd.ColumnDefinitions.Add(new ColumnDefinition(64, GridUnitType.Pixel));
             grd.ColumnDefinitions.Add(new ColumnDefinition(24, GridUnitType.Pixel));
 
-            NumericUpDown nud = new NumericUpDown() { Minimum = 0, Maximum = 1, Margin = new Thickness(0, 2.5, 5, 2.5), FormatString = "0.###", Increment = 0.01, Value = stop.Position, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            NumericUpDown nud = new NumericUpDown() { Minimum = Math.Min(this.MinValue, this.MaxValue), Maximum = Math.Max(this.MinValue, this.MaxValue), Margin = new Thickness(0, 2.5, 5, 2.5), FormatString = "0.###", Increment = this.Increment, Value = stop.Position * (this.MaxValue - this.MinValue) + this.MinValue, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
             nud.ValueChanged += (s, e) =>
             {
-                stop.Position = nud.Value;
+                stop.Position = (nud.Value - this.MinValue) / (this.MaxValue - this.MinValue);
                 this.Gradient.SortGradient();
                 BuildGradient();
                 SortGradientStopControls();

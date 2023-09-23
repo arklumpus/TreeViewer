@@ -249,7 +249,7 @@ namespace TreeViewer
 
             this.FindControl<Button>("GradientButton").Click += async (s, e) =>
             {
-                EditGradientWindow win = new EditGradientWindow(new Gradient(this.FindControl<GradientControl>("GradientButtonControl").Gradient.GradientStops));
+                EditGradientWindow win = new EditGradientWindow(new Gradient(this.FindControl<GradientControl>("GradientButtonControl").Gradient.GradientStops), this.FindControl<NumericUpDown>("NumberOptionsMinimumBox").Value, this.FindControl<NumericUpDown>("NumberOptionsMaximumBox").Value);
                 await win.ShowDialog2(this);
                 if (win.Result)
                 {
