@@ -19,8 +19,8 @@
     <EmbeddedResource Include="WindowIcon_macOS.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.18" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
+    <PackageReference Include="Avalonia" Version="0.10.21" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.21" />
     <PackageReference Include="CSharpEditor" Version="1.1.5" />
   </ItemGroup>
   <ItemGroup>
