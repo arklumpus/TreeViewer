@@ -1236,7 +1236,7 @@ namespace TreeViewer
                 else if (e.Property == Spreadsheet.ColumnSeparatorProperty)
                 {
                     programmaticChange = true;
-                    colSepBox.Text = Regex.Escape(spreadsheet.ColumnSeparator);
+                    colSepBox.Text = spreadsheet.ColumnSeparator.ToString();
                     programmaticChange = false;
                 }
             };
@@ -1466,11 +1466,17 @@ namespace TreeViewer
                     {
                         try
                         {
-                            spreadsheet.ColumnSeparator = Regex.Unescape(colSepBox.Text);
+                            spreadsheet.ColumnSeparator = new Regex(colSepBox.Text, RegexOptions.Compiled);
+                            colSepBox.BorderBrush = null;
                         }
                         catch
                         {
-                            spreadsheet.ColumnSeparator = colSepBox.Text;
+                            try
+                            {
+                                spreadsheet.ColumnSeparator = new Regex(Regex.Escape(colSepBox.Text), RegexOptions.Compiled);
+                                colSepBox.BorderBrush = null;
+                            }
+                            catch { colSepBox.BorderBrush = Brushes.Red; }
                         }
                     }
                 }
@@ -1482,11 +1488,17 @@ namespace TreeViewer
                 {
                     try
                     {
-                        spreadsheet.RowSeparator = Regex.Unescape(rowSepBox.Text);
+                        spreadsheet.RowSeparator = new Regex(rowSepBox.Text, RegexOptions.Compiled);
+                        rowSepBox.BorderBrush = null;
                     }
                     catch
                     {
-                        spreadsheet.RowSeparator = rowSepBox.Text;
+                        try
+                        {
+                            spreadsheet.RowSeparator = new Regex(Regex.Escape(rowSepBox.Text), RegexOptions.Compiled);
+                            rowSepBox.BorderBrush = null;
+                        }
+                        catch { rowSepBox.BorderBrush = Brushes.Red; }
                     }
                 }
             };
@@ -1749,7 +1761,7 @@ namespace TreeViewer
             return false;
         }
 
-        private static string Transpose(string text, string rowSeparator, string columnSeparator, string quoteSymbol)
+        private static string Transpose(string text, Regex rowSeparator, Regex columnSeparator, string quoteSymbol)
         {
             string[][] cells = Spreadsheet.SplitData(text, rowSeparator, columnSeparator, quoteSymbol, out int width);
 
@@ -1773,7 +1785,7 @@ namespace TreeViewer
                 {
                     string cell = outputMatrix[x, y];
 
-                    if (string.IsNullOrEmpty(cell) || (!cell.Contains(columnSeparator) && !cell.Contains(rowSeparator)))
+                    if (string.IsNullOrEmpty(cell) || (!columnSeparator.IsMatch(cell) && !rowSeparator.IsMatch(cell)))
                     {
                         tbr.Append(outputMatrix[x, y]);
                     }
@@ -2125,9 +2137,11 @@ namespace TreeViewer
             }
         }
 
-        private static string GetColumnSeparator(string text, string hintSeparator, string rowSeparator, string quote)
+        static Regex[] DefaultSeparators = new Regex[] { new Regex("\t", RegexOptions.Compiled), new Regex(",", RegexOptions.Compiled), new Regex(";", RegexOptions.Compiled), new Regex(" ", RegexOptions.Compiled), new Regex("[\t ]+", RegexOptions.Compiled), new Regex(":", RegexOptions.Compiled) };
+
+        private static Regex GetColumnSeparator(string text, Regex hintSeparator, Regex rowSeparator, string quote)
         {
-            string[] possibleSeparators = new string[] { hintSeparator, "\t", ",", ";", " ", ":" };
+            Regex[] possibleSeparators = new Regex[] { hintSeparator }.Concat(DefaultSeparators).ToArray();
 
             double minVariance = double.MaxValue;
             int maxCount = 0;
@@ -2139,7 +2153,7 @@ namespace TreeViewer
                 {
                     double variance = Spreadsheet.SplitData(text, rowSeparator, possibleSeparators[i], quote, out int width).Select(x => (double)x.Length).Variance();
 
-                    if (variance < minVariance || variance == minVariance && width > maxCount)
+                    if ((width > 1 || maxCount == 0) && (variance < minVariance || (variance == minVariance && width > maxCount)))
                     {
                         minVariance = variance;
                         maxCount = width;
@@ -2198,11 +2212,12 @@ namespace TreeViewer
 
         public void Load(Spreadsheet spreadsheet, string text, bool forceSeparator)
         {
-            string[] lines = text.Split(spreadsheet.RowSeparator);
+            string[] lines = spreadsheet.RowSeparator.Split(text);
 
             if (!forceSeparator)
             {
-                string columnSeparator = GetColumnSeparator(lines.Take(Math.Min(lines.Length, 50)).TakeWhile(x => !x.StartsWith("----------")).Aggregate((a, b) => a + spreadsheet.RowSeparator + b), spreadsheet.ColumnSeparator, spreadsheet.RowSeparator, spreadsheet.QuoteSymbol);
+                string rowSep = spreadsheet.GetRowSeparator();
+                Regex columnSeparator = GetColumnSeparator(lines.Take(Math.Min(lines.Length, 50)).TakeWhile(x => !x.StartsWith("----------")).Aggregate((a, b) => a + rowSep + b), spreadsheet.ColumnSeparator, spreadsheet.RowSeparator, spreadsheet.QuoteSymbol);
                 spreadsheet.ColumnSeparator = columnSeparator;
             }
 
@@ -2233,7 +2248,7 @@ namespace TreeViewer
 
                 for (int j = i; j < lines.Length; j++)
                 {
-                    if ("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans".Contains(spreadsheet.ColumnSeparator))
+                    if (spreadsheet.ColumnSeparator.IsMatch("resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans"))
                     {
                         lines[j] = lines[j].Replace(spreadsheet.ColumnSeparator + "Open Sans" + spreadsheet.ColumnSeparator, spreadsheet.ColumnSeparator + spreadsheet.QuoteSymbol + "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans".Replace(spreadsheet.QuoteSymbol, spreadsheet.QuoteSymbol + spreadsheet.QuoteSymbol) + spreadsheet.QuoteSymbol + spreadsheet.ColumnSeparator);
                     }
@@ -2242,7 +2257,7 @@ namespace TreeViewer
                         lines[j] = lines[j].Replace(spreadsheet.ColumnSeparator + "Open Sans" + spreadsheet.ColumnSeparator, spreadsheet.ColumnSeparator + "resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" + spreadsheet.ColumnSeparator);
                     }
 
-                    if ("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono".Contains(spreadsheet.ColumnSeparator))
+                    if (spreadsheet.ColumnSeparator.IsMatch("resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono"))
                     {
                         lines[j] = lines[j].Replace(spreadsheet.ColumnSeparator + "Roboto Mono" + spreadsheet.ColumnSeparator, spreadsheet.ColumnSeparator + spreadsheet.QuoteSymbol + "resm:TreeViewer.Fonts.?assembly=TreeViewer#Roboto Mono".Replace(spreadsheet.QuoteSymbol, spreadsheet.QuoteSymbol + spreadsheet.QuoteSymbol) + spreadsheet.QuoteSymbol + spreadsheet.ColumnSeparator);
                     }
@@ -2487,7 +2502,7 @@ namespace TreeViewer
                                 {
                                     string cell = matrix[x, y];
 
-                                    if (string.IsNullOrEmpty(cell) || (!cell.Contains(spreadsheet.ColumnSeparator) && !cell.Contains(spreadsheet.RowSeparator)))
+                                    if (string.IsNullOrEmpty(cell) || (!spreadsheet.ColumnSeparator.IsMatch(cell) && !spreadsheet.RowSeparator.IsMatch(cell)))
                                     {
                                         tbr.Append(matrix[x, y]);
                                     }

@@ -52,7 +52,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 					<RowDefinition Height="1*" />
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
-				<ss:Spreadsheet Name="spreadsheetControl" Margin="10" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="14" HeaderFontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" HeaderFontSize="14" HeaderBackground="#F3F3F3" DefaultRowHeight="25"></ss:Spreadsheet>
+				<ss:Spreadsheet Name="spreadsheetControl" Margin="10" FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="14" HeaderFontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" HeaderFontSize="14" HeaderBackground="#F3F3F3" DefaultRowHeight="25" DefaultCellMargin="7,3,7,3"></ss:Spreadsheet>
 				<Grid Grid.Row="1" Margin="0, 0, 0, 0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="1*" />
