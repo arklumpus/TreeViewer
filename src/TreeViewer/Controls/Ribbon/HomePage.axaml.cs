@@ -81,8 +81,9 @@ namespace TreeViewer
             ("Figures", "Include images in the plot"),
             ("Character_states", "Display character states"),
             ("Alignment", "Plot an alignment with the tree"),
-            ("BLAST_scores", "Highlight BLAST scores"),
             ("Clock", "Show posterior age distributions"),
+            ("AgeDistributions", "Plot multiple age distributions"),
+            ("BLAST_scores", "Highlight BLAST scores"),
             ("Support", "Highlight support values")
         };
 

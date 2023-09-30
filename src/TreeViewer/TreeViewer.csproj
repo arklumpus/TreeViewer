@@ -437,6 +437,8 @@
     <EmbeddedResource Include="Assets\Wrench-16.png" />
     <EmbeddedResource Include="Assets\Wrench-24.png" />
     <EmbeddedResource Include="Assets\Wrench-32.png" />
+    <EmbeddedResource Include="Examples\AgeDistributions.png" />
+    <EmbeddedResource Include="Examples\AgeDistributions.tbi" />
     <EmbeddedResource Include="Examples\Alignment.png" />
     <EmbeddedResource Include="Examples\Alignment.tbi" />
     <EmbeddedResource Include="Examples\BLAST_scores.png" />
@@ -865,6 +867,8 @@
     <None Remove="Assets\Wrench-16.png" />
     <None Remove="Assets\Wrench-24.png" />
     <None Remove="Assets\Wrench-32.png" />
+    <None Remove="Examples\AgeDistributions.png" />
+    <None Remove="Examples\AgeDistributions.tbi" />
     <None Remove="Examples\Alignment.png" />
     <None Remove="Examples\Alignment.tbi" />
     <None Remove="Examples\BLAST_scores.png" />
