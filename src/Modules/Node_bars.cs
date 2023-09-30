@@ -54,7 +54,7 @@ namespace NodeBars
         public const string Name = "Node bars";
         public const string HelpText = "Draws node bars.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.3");
+        public static Version Version = new Version("1.0.4");
         public const string Id = "319e8f63-d6c9-4dac-9419-0b621dcd5f23";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -352,18 +352,25 @@ namespace NodeBars
                                 Point leftPoint = sumPoint(new Point(-scalePoint.X * deltaRight, -scalePoint.Y * deltaRight), coordinates[nodes[i].Id]);
                                 Point rightPoint = sumPoint(new Point(scalePoint.X * deltaLeft, scalePoint.Y * deltaLeft), coordinates[nodes[i].Id]);
 
-                                updateMaxMin(leftPoint);
-                                updateMaxMin(rightPoint);
-
                                 GraphicsPath pth = new GraphicsPath();
 
                                 if (!whiskers)
                                 {
+									updateMaxMin(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), leftPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), rightPoint));
+									updateMaxMin(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), rightPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), leftPoint));
+									
                                     pth.MoveTo(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), leftPoint)).LineTo(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), rightPoint));
                                     pth.LineTo(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), rightPoint)).LineTo(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), leftPoint)).Close();
                                 }
                                 else
                                 {
+									updateMaxMin(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), leftPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, -perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), leftPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, -perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), rightPoint));
+									updateMaxMin(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), rightPoint));
+									
                                     pth.MoveTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), leftPoint)).LineTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), leftPoint));
                                     pth.LineTo(sumPoint(new Point(perpScale.X * thickness * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * thickness * 0.5 - parallScale.Y * whiskerThickness * 0.5), leftPoint)).LineTo(sumPoint(new Point(perpScale.X * thickness * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * thickness * 0.5 + parallScale.Y * whiskerThickness * 0.5), rightPoint));
                                     pth.LineTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), rightPoint)).LineTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), rightPoint));
@@ -416,9 +423,6 @@ namespace NodeBars
                                 Point leftPoint = sumPoint(rootPoint, new Point((r - scalePoint.X * deltaLeft) * Math.Cos(theta), (r - scalePoint.X * deltaLeft) * Math.Sin(theta)));
                                 Point rightPoint = sumPoint(rootPoint, new Point((r + scalePoint.X * deltaRight) * Math.Cos(theta), (r + scalePoint.X * deltaRight) * Math.Sin(theta)));
 
-                                updateMaxMin(leftPoint);
-                                updateMaxMin(rightPoint);
-
                                 Point perpScale = new Point(Math.Sin(theta), -Math.Cos(theta));
                                 Point parallScale = new Point(Math.Cos(theta), Math.Sin(theta));
 
@@ -426,11 +430,21 @@ namespace NodeBars
 
                                 if (!whiskers)
                                 {
+									updateMaxMin(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), leftPoint));
+									updateMaxMin(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), rightPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), rightPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), leftPoint));
+									
                                     pth.MoveTo(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), leftPoint)).LineTo(sumPoint(new Point(perpScale.X * thickness * 0.5, perpScale.Y * thickness * 0.5), rightPoint));
                                     pth.LineTo(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), rightPoint)).LineTo(sumPoint(new Point(-perpScale.X * thickness * 0.5, -perpScale.Y * thickness * 0.5), leftPoint)).Close();
                                 }
                                 else
                                 {
+									updateMaxMin(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), leftPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, -perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), leftPoint));
+									updateMaxMin(sumPoint(new Point(-perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, -perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), rightPoint));
+									updateMaxMin(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), rightPoint));
+									
                                     pth.MoveTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), leftPoint)).LineTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), leftPoint));
                                     pth.LineTo(sumPoint(new Point(perpScale.X * thickness * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * thickness * 0.5 - parallScale.Y * whiskerThickness * 0.5), leftPoint)).LineTo(sumPoint(new Point(perpScale.X * thickness * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * thickness * 0.5 + parallScale.Y * whiskerThickness * 0.5), rightPoint));
                                     pth.LineTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 + parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 + parallScale.Y * whiskerThickness * 0.5), rightPoint)).LineTo(sumPoint(new Point(perpScale.X * (thickness + whiskerSize) * 0.5 - parallScale.X * whiskerThickness * 0.5, perpScale.Y * (thickness + whiskerSize) * 0.5 - parallScale.Y * whiskerThickness * 0.5), rightPoint));
