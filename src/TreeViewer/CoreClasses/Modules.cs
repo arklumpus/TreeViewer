@@ -492,6 +492,29 @@ public static Colour? Format(object attribute)
 
         public static readonly Colour[] DefaultColours = { Colour.FromRgb(237, 28, 36), Colour.FromRgb(34, 177, 76), Colour.FromRgb(255, 127, 39), Colour.FromRgb(0, 162, 232), Colour.FromRgb(255, 242, 0), Colour.FromRgb(63, 72, 204), Colour.FromRgb(255, 201, 14), Colour.FromRgb(163, 73, 164), Colour.FromRgb(181, 230, 29) };
 
+        public static Colour AutoColour(TreeNode node)
+        {
+            List<string> descendantNames = node.GetNodeNames();
+
+            int hash1 = (5381 << 16) + 5381;
+            int hash2 = hash1;
+
+            foreach (string name in descendantNames)
+            {
+                int i;
+                for (i = 0; i < name.Length - 1; ++i)
+                {
+                    hash1 = unchecked((hash1 << 5) + hash1) ^ name[i];
+                    hash2 = unchecked((hash2 << 5) + hash2) ^ name[i + 1];
+                }
+                hash1 = unchecked((hash1 << 5) + hash1) ^ name[i];
+
+                hash1 = unchecked(hash1 + (hash2 * 1566083941));
+            }
+
+            return DefaultColours[Math.Abs(hash1) % DefaultColours.Length];
+        }
+
         public static readonly Dictionary<string, Gradient> DefaultGradients = new Dictionary<string, Gradient>()
         {
             { "TransparentToBlack", new Gradient(new List<GradientStop>() { new GradientStop(0, Colour.FromRgba(0, 0, 0, 0)), new GradientStop(1, Colour.FromRgb(0, 0, 0)) }) },

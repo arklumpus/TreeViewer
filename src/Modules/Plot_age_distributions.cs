@@ -37,7 +37,7 @@ namespace NodeAgeDistributions
         public const string Name = "Age distributions";
         public const string HelpText = "Plots node age distributions.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.0");
+        public static Version Version = new Version("1.2.1");
         public const string Id = "5dbe1f3c-dbea-49b3-8f04-f319aefca534";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -523,7 +523,7 @@ namespace NodeAgeDistributions
 
                         if (autoColourByNode)
                         {
-                            colour = Modules.DefaultColours[Math.Abs(string.Join(",", nodes[i].GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                            colour = Modules.AutoColour(nodes[i]).WithAlpha(opacity);
                         }
                         else if (nodes[i].Attributes.TryGetValue(customColour.AttributeName, out object fillAttributeObject) && fillAttributeObject != null)
                         {
@@ -541,7 +541,7 @@ namespace NodeAgeDistributions
                         }
                         else
                         {
-                            strokeColour = Modules.DefaultColours[Math.Abs(string.Join(",", nodes[i].GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(strokeOpacity);
+                            strokeColour = Modules.AutoColour(nodes[i]).WithAlpha(strokeOpacity);
                         }
 
                         double weight = defaultWeight;

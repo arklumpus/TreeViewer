@@ -54,7 +54,7 @@ namespace NodeBars
         public const string Name = "Node bars";
         public const string HelpText = "Draws node bars.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "319e8f63-d6c9-4dac-9419-0b621dcd5f23";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -336,7 +336,7 @@ namespace NodeBars
 
                                 if (autoColourByNode)
                                 {
-                                    colour = Modules.DefaultColours[Math.Abs(string.Join(",", nodes[i].GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                                    colour = Modules.AutoColour(nodes[i]).WithAlpha(opacity);
                                 }
                                 else if (nodes[i].Attributes.TryGetValue(customColour.AttributeName, out object fillAttributeObject) && fillAttributeObject != null)
                                 {
@@ -396,7 +396,7 @@ namespace NodeBars
 
                                 if (autoColourByNode)
                                 {
-                                    colour = Modules.DefaultColours[Math.Abs(string.Join(",", nodes[i].GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                                    colour = Modules.AutoColour(nodes[i]).WithAlpha(opacity);
                                 }
                                 else if (nodes[i].Attributes.TryGetValue(customColour.AttributeName, out object fillAttributeObject) && fillAttributeObject != null)
                                 {

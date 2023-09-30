@@ -45,7 +45,7 @@ namespace Labels
         public const string Name = "Labels";
         public const string HelpText = "Draws labels on nodes, tips or branches.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.4.0");
+        public static Version Version = new Version("1.4.1");
         public const string Id = "ac496677-2650-4d92-8646-0812918bab03";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -543,7 +543,7 @@ namespace Labels
                         }
                         else
                         {
-                            fillColour = Modules.DefaultColours[Math.Abs(string.Join(",", node.GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                            fillColour = Modules.AutoColour(node).WithAlpha(opacity);
                         }
 
                         Colour backgroundColour = defaultBackgroundColour;
@@ -557,7 +557,7 @@ namespace Labels
                         }
                         else
                         {
-                            backgroundColour = Modules.DefaultColours[Math.Abs(string.Join(",", node.GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(backgroundOpacity);
+                            backgroundColour = Modules.AutoColour(node).WithAlpha(backgroundOpacity);
                         }
 
                         Colour borderColour = defaultBorderColour;
@@ -571,7 +571,7 @@ namespace Labels
                         }
                         else
                         {
-                            borderColour = Modules.DefaultColours[Math.Abs(string.Join(",", node.GetLeafNames()).GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(borderOpacity);
+                            borderColour = Modules.AutoColour(node).WithAlpha(borderOpacity);
                         }
 
                         IEnumerable<FormattedText> formattedText;

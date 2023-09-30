@@ -40,7 +40,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
         public const string Name = "Plot alignment";
         public const string HelpText = "Adds the plot of an alignment to the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "ea7e246b-e93f-4d0d-a67a-88af05479b48";
@@ -760,7 +760,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
                             }
                             else
                             {
-                                sequenceColour = Modules.DefaultColours[Math.Abs(leaf.Name.GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                                sequenceColour = Modules.AutoColour(leaf).WithAlpha(opacity);
                             }
 
                             if (height > 0 && (sequenceColour.A > 0 || colourMode == 1))
@@ -1299,7 +1299,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
                             }
                             else
                             {
-                                sequenceColour = Modules.DefaultColours[Math.Abs(node.Name.GetHashCode()) % Modules.DefaultColours.Length].WithAlpha(opacity);
+                                sequenceColour = Modules.AutoColour(node).WithAlpha(opacity);
                             }
 
                             if (height > 0 && (sequenceColour.A > 0 || colourMode == 1))
