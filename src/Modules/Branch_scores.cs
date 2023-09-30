@@ -410,7 +410,7 @@ public static Colour? Format(object attribute)
 
                     gradientButton.Click += async (s, e) =>
                     {
-                        EditGradientWindow win = new EditGradientWindow(new Gradient(gradientControl.Gradient.GradientStops));
+                        EditGradientWindow win = new EditGradientWindow(new Gradient(gradientControl.Gradient.GradientStops), minNud.Value, maxNud.Value);
                         await win.ShowDialog2(parameterWindow);
                         if (win.Result)
                         {
