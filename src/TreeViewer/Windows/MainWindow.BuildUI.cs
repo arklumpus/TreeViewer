@@ -750,7 +750,9 @@ namespace TreeViewer
                                                 Attachment att = this.StateData.Attachments[attachmentName];
 
                                                 SpreadsheetWindow win = new SpreadsheetWindow(true, false, false);
-                                                win.Load(win.Spreadsheet, att.GetText(), false);
+                                                string text = att.GetText();
+                                                win.OriginalText = text;
+                                                win.Load(win.Spreadsheet, text, false);
 
                                                 int maxX = 0;
 

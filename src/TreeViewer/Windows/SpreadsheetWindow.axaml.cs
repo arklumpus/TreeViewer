@@ -2166,7 +2166,7 @@ namespace TreeViewer
             return possibleSeparators[Math.Max(0, bestIndex)];
         }
 
-        private string OriginalText = "";
+        public string OriginalText { get; set; } = "";
 
         private async Task Open(Spreadsheet spreadsheet)
         {
