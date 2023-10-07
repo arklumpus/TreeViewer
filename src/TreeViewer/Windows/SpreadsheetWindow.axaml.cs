@@ -151,9 +151,9 @@ namespace TreeViewer
             AvaloniaBugFixes.SetToolTip(columnWidthNud, "Column width");
             NumericUpDown rowHeightNud = new NumericUpDown() { Value = 25, Minimum = 10, Increment = 1, FormatString = "0" };
             AvaloniaBugFixes.SetToolTip(rowHeightNud, "Row height");
-            TextBox searchBox = new TextBox() { Padding = new Thickness(5, 1, 5, 1), Width = 100, FontSize = 12, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            TextBox searchBox = new TextBox() { Padding = new Thickness(5, 1, 5, 1), Width = 100, FontSize = 12, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = "" };
             AvaloniaBugFixes.SetToolTip(searchBox, "Search text");
-            TextBox replaceBox = new TextBox() { Padding = new Thickness(5, 1, 5, 1), Width = 100, FontSize = 12, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            TextBox replaceBox = new TextBox() { Padding = new Thickness(5, 1, 5, 1), Width = 100, FontSize = 12, VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center, Text = "" };
             AvaloniaBugFixes.SetToolTip(replaceBox, "Replacement text");
             CheckBox regexBox = new CheckBox() { Content = "Regex", FontSize = 12 };
             AvaloniaBugFixes.SetToolTip(regexBox, "Interpret the search text as a regular expression");
@@ -673,11 +673,6 @@ namespace TreeViewer
 
                     }), "Search text"),
 
-                    ("@", regexBox, null, new List<(string, Control, string)>(), false, 0, (Action<int>)(ind =>
-                    {
-
-                    }), "Interpret the search text as a regular expression"),
-
                     ("Search", new DPIAwareBox(Icons.GetIcon16("TreeViewer.Assets.Find")), null, new List<(string, Control, string)>()
                     {
                         ( "", null, null ),
@@ -691,7 +686,7 @@ namespace TreeViewer
                             {
                                 try
                                 {
-                                    Regex regex = new Regex(searchBox.Text, RegexOptions.IgnoreCase);
+                                    Regex regex = new Regex(searchBox.Text ?? "", RegexOptions.IgnoreCase);
 
                                     List<(int, int)> matches = new List<(int, int)>();
                                     int currMatch = -1;
@@ -737,7 +732,7 @@ namespace TreeViewer
                             }
                             else
                             {
-                                string searchText = searchBox.Text;
+                                string searchText = searchBox.Text ?? "";
 
                                 List<(int, int)> matches = new List<(int, int)>();
                                 int currMatch = -1;
@@ -783,7 +778,7 @@ namespace TreeViewer
                             {
                                 try
                                 {
-                                    Regex regex = new Regex(searchBox.Text, RegexOptions.IgnoreCase);
+                                    Regex regex = new Regex(searchBox.Text ?? "", RegexOptions.IgnoreCase);
 
                                     List<(int, int)> matches = new List<(int, int)>();
 
@@ -823,7 +818,7 @@ namespace TreeViewer
                             }
                             else
                             {
-                                string searchText = searchBox.Text;
+                                string searchText = searchBox.Text ?? "";
 
                                 List<(int, int)> matches = new List<(int, int)>();
 
@@ -861,6 +856,11 @@ namespace TreeViewer
 
                     }), "Locate matches to the search text."),
 
+                    ("@", regexBox, null, new List<(string, Control, string)>(), false, 0, (Action<int>)(ind =>
+                    {
+
+                    }), "Interpret the search text as a regular expression"),
+
                     ("@", replaceBox, null, new List<(string, Control, string)>(), false, 0, (Action<int>)(ind =>
                     {
 
@@ -879,7 +879,7 @@ namespace TreeViewer
                             {
                                 try
                                 {
-                                    Regex regex = new Regex(searchBox.Text, RegexOptions.IgnoreCase);
+                                    Regex regex = new Regex(searchBox.Text ?? "", RegexOptions.IgnoreCase);
 
                                     List<(int, int)> matches = new List<(int, int)>();
                                     int currMatch = -1;
@@ -913,7 +913,7 @@ namespace TreeViewer
 
                                     if (matches.Count > 0 && currMatch >= 0)
                                     {
-                                        string replacement = regex.Replace(spreadsheet.Data[matches[currMatch]], replaceBox.Text);
+                                        string replacement = regex.Replace(spreadsheet.Data[matches[currMatch]], replaceBox.Text ?? "");
                                         spreadsheet.SetData(new List<KeyValuePair<(int,int), string>>(){ new KeyValuePair<(int, int), string>(matches[currMatch], replacement) });
                                     }
                                     else if (matches.Count > 0)
@@ -930,7 +930,7 @@ namespace TreeViewer
                             }
                             else
                             {
-                                string searchText = searchBox.Text;
+                                string searchText = searchBox.Text ?? "";
 
                                 List<(int, int)> matches = new List<(int, int)>();
                                 int currMatch = -1;
@@ -964,7 +964,7 @@ namespace TreeViewer
 
                                 if (matches.Count > 0 && currMatch >= 0)
                                 {
-                                    string replacement = spreadsheet.Data[matches[currMatch]].Replace(searchText, replaceBox.Text, StringComparison.OrdinalIgnoreCase);
+                                    string replacement = spreadsheet.Data[matches[currMatch]].Replace(searchText, replaceBox.Text ?? "", StringComparison.OrdinalIgnoreCase);
                                     spreadsheet.SetData(new List<KeyValuePair<(int,int), string>>(){ new KeyValuePair<(int, int), string>(matches[currMatch], replacement) });
                                 }
                                 else if (matches.Count > 0)
@@ -981,7 +981,7 @@ namespace TreeViewer
                             {
                                 try
                                 {
-                                    Regex regex = new Regex(searchBox.Text, RegexOptions.IgnoreCase);
+                                    Regex regex = new Regex(searchBox.Text ?? "", RegexOptions.IgnoreCase);
 
                                     Dictionary<(int, int), string> replacements = new Dictionary<(int, int), string>();
 
@@ -992,7 +992,7 @@ namespace TreeViewer
                                         {
                                             if (regex.IsMatch(kvp.Value))
                                             {
-                                                replacements.Add(kvp.Key, regex.Replace(kvp.Value, replaceBox.Text));
+                                                replacements.Add(kvp.Key, regex.Replace(kvp.Value, replaceBox.Text ?? ""));
                                             }
                                         }
                                     }
@@ -1002,7 +1002,7 @@ namespace TreeViewer
                                         {
                                             if (Contains(spreadsheet.Selection, kvp.Key) && regex.IsMatch(kvp.Value))
                                             {
-                                                replacements.Add(kvp.Key, regex.Replace(kvp.Value, replaceBox.Text));
+                                                replacements.Add(kvp.Key, regex.Replace(kvp.Value, replaceBox.Text ?? ""));
                                             }
                                         }
                                     }
@@ -1022,7 +1022,7 @@ namespace TreeViewer
                             }
                             else
                             {
-                                string searchText = searchBox.Text;
+                                string searchText = searchBox.Text ?? "";
 
                                 Dictionary<(int, int), string> replacements = new Dictionary<(int, int), string>();
 
@@ -1033,7 +1033,7 @@ namespace TreeViewer
                                     {
                                         if (kvp.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase))
                                         {
-                                            replacements.Add(kvp.Key, kvp.Value.Replace(searchText, replaceBox.Text, StringComparison.OrdinalIgnoreCase));
+                                            replacements.Add(kvp.Key, kvp.Value.Replace(searchText, replaceBox.Text ?? "", StringComparison.OrdinalIgnoreCase));
                                         }
                                     }
                                 }
@@ -1043,7 +1043,7 @@ namespace TreeViewer
                                     {
                                         if (Contains(spreadsheet.Selection, kvp.Key) && kvp.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase))
                                         {
-                                            replacements.Add(kvp.Key, kvp.Value.Replace(searchText, replaceBox.Text, StringComparison.OrdinalIgnoreCase));
+                                            replacements.Add(kvp.Key, kvp.Value.Replace(searchText, replaceBox.Text ?? "", StringComparison.OrdinalIgnoreCase));
                                         }
                                     }
                                 }
@@ -1466,15 +1466,15 @@ namespace TreeViewer
                     {
                         try
                         {
-                            spreadsheet.ColumnSeparator = new Regex(colSepBox.Text, RegexOptions.Compiled);
-                            colSepBox.BorderBrush = null;
+                            spreadsheet.ColumnSeparator = new Regex(colSepBox.Text ?? "", RegexOptions.Compiled);
+                            colSepBox.BorderBrush = new SolidColorBrush(Color.FromRgb(100, 100, 100));
                         }
                         catch
                         {
                             try
                             {
-                                spreadsheet.ColumnSeparator = new Regex(Regex.Escape(colSepBox.Text), RegexOptions.Compiled);
-                                colSepBox.BorderBrush = null;
+                                spreadsheet.ColumnSeparator = new Regex(Regex.Escape(colSepBox.Text ?? ""), RegexOptions.Compiled);
+                                colSepBox.BorderBrush = new SolidColorBrush(Color.FromRgb(100, 100, 100));
                             }
                             catch { colSepBox.BorderBrush = Brushes.Red; }
                         }
@@ -1488,15 +1488,15 @@ namespace TreeViewer
                 {
                     try
                     {
-                        spreadsheet.RowSeparator = new Regex(rowSepBox.Text, RegexOptions.Compiled);
-                        rowSepBox.BorderBrush = null;
+                        spreadsheet.RowSeparator = new Regex(rowSepBox.Text ?? "", RegexOptions.Compiled);
+                        rowSepBox.BorderBrush = new SolidColorBrush(Color.FromRgb(100, 100, 100));
                     }
                     catch
                     {
                         try
                         {
-                            spreadsheet.RowSeparator = new Regex(Regex.Escape(rowSepBox.Text), RegexOptions.Compiled);
-                            rowSepBox.BorderBrush = null;
+                            spreadsheet.RowSeparator = new Regex(Regex.Escape(rowSepBox.Text ?? ""), RegexOptions.Compiled);
+                            rowSepBox.BorderBrush = new SolidColorBrush(Color.FromRgb(100, 100, 100));
                         }
                         catch { rowSepBox.BorderBrush = Brushes.Red; }
                     }
@@ -2137,7 +2137,7 @@ namespace TreeViewer
             }
         }
 
-        static Regex[] DefaultSeparators = new Regex[] { new Regex("\t", RegexOptions.Compiled), new Regex(",", RegexOptions.Compiled), new Regex(";", RegexOptions.Compiled), new Regex(" ", RegexOptions.Compiled), new Regex("[\t ]+", RegexOptions.Compiled), new Regex(":", RegexOptions.Compiled) };
+        static Regex[] DefaultSeparators = new Regex[] { new Regex("\\t", RegexOptions.Compiled), new Regex(",", RegexOptions.Compiled), new Regex(";", RegexOptions.Compiled), new Regex(" ", RegexOptions.Compiled), new Regex("[\\t ]+", RegexOptions.Compiled), new Regex(":", RegexOptions.Compiled) };
 
         private static Regex GetColumnSeparator(string text, Regex hintSeparator, Regex rowSeparator, string quote)
         {
@@ -2572,7 +2572,7 @@ namespace TreeViewer
                     {
                         Dictionary<(int, int), string> newData = new Dictionary<(int, int), string>();
 
-                        foreach (SelectionRange range in  spreadsheet.Selection)
+                        foreach (SelectionRange range in spreadsheet.Selection)
                         {
                             for (int y = range.Top; y <= range.Bottom; y++)
                             {
