@@ -33,6 +33,8 @@
   <ItemGroup>
     <None Remove="Assets\*" />
     <EmbeddedResource Include="Assets\*" />
+    <None Remove="Assets\*\*" />
+    <EmbeddedResource Include="Assets\*\*" />
     <None Remove="Examples\*" />
     <EmbeddedResource Include="Examples\*" />
     <None Remove="Fonts\*" />
