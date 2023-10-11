@@ -55,6 +55,9 @@ namespace CircularCoordinates
             double defaultRadius = tree.GetLeaves().Count * 20 / (2 * Math.PI);
             double innerRadius = double.IsNaN(tree.Length) ? defaultRadius * 0.1 : 0;
 
+            defaultRadius = Math.Max(defaultRadius, 200);
+            innerRadius = Math.Max(innerRadius, 20);
+
             System.Text.StringBuilder defaultSourceCode = new System.Text.StringBuilder();
 
             defaultSourceCode.AppendLine("using PhyloTree;");
