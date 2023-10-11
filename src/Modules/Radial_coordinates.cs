@@ -38,7 +38,7 @@ namespace Radial_coordinates
     /// This code is based on the algorithm used by [FigTree](http://tree.bio.ed.ac.uk/software/figtree/), which is available under
     /// a GPLv2 licence [here](https://github.com/rambaut/figtree/blob/9f0e0ae495bdeaa344f7eaecf3082af3b2588097/src/figtree/treeviewer/treelayouts/RadialTreeLayout.java).
     /// 
-    /// Here is an example of a tree drawn using radial coordinates (and with the appropriate shape for the _Branches_):
+    /// Here is an example of a tree drawn using radial coordinates:
     /// 
     /// <p align="center">
     /// <img height="800" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAgMCAzMDQgMzA0IiB2ZXJzaW9uPSIxLjEiIHN0eWxlPSJmb250LXN5bnRoZXNpczogbm9uZTsiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxwYXRoIGQ9Ik0gMCAwIEwgMzA0IDAgTCAzMDQgMzA0IEwgMCAzMDQgWiAiIHN0cm9rZT0ibm9uZSIgZmlsbD0iI0ZGRkZGRiIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDAsMCkiIC8+DQogIDxwYXRoIGQ9Ik0gMTM4LjIzMDYxNTgyNDA2NDE2IDE0MC40MDI5ODI1NjI5NzczNCBMIDEyOS4xOTMyNDY3ODE2ODIyMyAxNjQuMTg3NzU2NTgwNDg3MTMgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSIzNDE5MzkxOC1mZGYzLTQwMTItYTg5Ni02YTE1MGIzZmZlOTQiIC8+DQogIDxwYXRoIGQ9Ik0gMTI5LjE5MzI0Njc4MTY4MjIzIDE2NC4xODc3NTY1ODA0ODcxMyBMIDE5OC43Mjg2NTE1ODQ0NzI0NiAxODMuNTA4MTEwNDUyMzMxMTIgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSIyNDk4MGM5Yi00NDZiLTQ1YWEtOWM1OC1jN2IxNGY2MjAzZjMiIC8+DQogIDxwYXRoIGQ9Ik0gMTk4LjcyODY1MTU4NDQ3MjQ2IDE4My41MDgxMTA0NTIzMzExMiBMIDI3MC45NDIzNTAxNDU1NDIgMTkzLjI4ODcwMjcwODg5Mzc0ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iNzNhYWU3MzUtMDgzMy00MWNhLTg1NmYtNGJhNTgyMDkxMmVmIiAvPg0KICA8cGF0aCBkPSJNIDE5OC43Mjg2NTE1ODQ0NzI0NiAxODMuNTA4MTEwNDUyMzMxMTIgTCAyNjMuODczNTcwMTg3OTYxMSAyMTEuODkyNDk0NzA2NTUzNCAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9ImU3NzI0YTg1LWI0NzUtNDFlMy1iNmE2LTRhNjkyYWU5ZTg3NCIgLz4NCiAgPHBhdGggZD0iTSAxMjkuMTkzMjQ2NzgxNjgyMjMgMTY0LjE4Nzc1NjU4MDQ4NzEzIEwgMTEyLjAwMzE0OTM0NTgzOTQyIDE4NC40MjAyOTM4MjQ5NTI0ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iM2EwNjg2YzktMmQxYy00NzgzLWJiYWItMDQ5ZGE4YWI0Zjc0IiAvPg0KICA8cGF0aCBkPSJNIDExMi4wMDMxNDkzNDU4Mzk0MiAxODQuNDIwMjkzODI0OTUyNCBMIDEyOS43MDYwNzk0NDM4MjM2OCAyMTQuMTMwOTU1NTQ3NDIyNiAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjFkYThmNjA4LWIzOTktNGExNy1iYmViLTc4MWY3Mzc0OWU5NSIgLz4NCiAgPHBhdGggZD0iTSAxMjkuNzA2MDc5NDQzODIzNjggMjE0LjEzMDk1NTU0NzQyMjYgTCAxNTIuNjI2MjA5MzU4MjgwODIgMjQxLjEwNzY3MTg3MzM3NjM1ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iZTM2ZWFkMGQtZTU1ZS00ZTVkLWFjNWItNGQ4NGIyNWQ0NDYyIiAvPg0KICA8cGF0aCBkPSJNIDE1Mi42MjYyMDkzNTgyODA4MiAyNDEuMTA3NjcxODczMzc2MzUgTCAxODAuMTk5MTY5NDIzMTY2NyAyNjQuNjg2MTg2NTE2MjgwMTUgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSIzMzFiZGY0ZS02OWU4LTQ5YzUtYjgyNC02OTA0MDcxYWViM2QiIC8+DQogIDxwYXRoIGQ9Ik0gMTUyLjYyNjIwOTM1ODI4MDgyIDI0MS4xMDc2NzE4NzMzNzYzNSBMIDE3MC4zMjkxMzk0NTYyNjUwNyAyNzAuODE4MzMzNTk1ODQ2NSAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjE3Y2Y1N2I2LWEzYzMtNGFjZC05OTEwLWRkOGQyZWQyODJmZCIgLz4NCiAgPHBhdGggZD0iTSAxMjkuNzA2MDc5NDQzODIzNjggMjE0LjEzMDk1NTU0NzQyMjYgTCAxNDEuOTA2MTA3NDIyODc0MTMgMjgwICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iMWJhYWNjOTAtNWY2Zi00NWI0LWEzNTEtOThlNzJjNjY5ZjhiIiAvPg0KICA8cGF0aCBkPSJNIDExMi4wMDMxNDkzNDU4Mzk0MiAxODQuNDIwMjkzODI0OTUyNCBMIDg1Ljk0NTE4MTkwNDQ0Mzk0IDE5NS43NzQwNDc1MjY2NDEzICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iMTkyMjdjOGYtYjE4Ny00ODEyLTk1MWUtYmZmMDgwZjQyYzNjIiAvPg0KICA8cGF0aCBkPSJNIDg1Ljk0NTE4MTkwNDQ0Mzk0IDE5NS43NzQwNDc1MjY2NDEzIEwgNzIuNjY3OTg0MzMwOTU1NzMgMjE4LjA1NzA0MzgxODQ5Mzk4ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iNDQ4ZmNlNjEtMzJlOC00YWM0LWIyNDUtNjE1Zjk3NDg1NjU3IiAvPg0KICA8cGF0aCBkPSJNIDcyLjY2Nzk4NDMzMDk1NTczIDIxOC4wNTcwNDM4MTg0OTM5OCBMIDYzLjUxNzk2MzM0NjY2NzkyNiAyNjcuNDU4ODI3MTU3OTI3MDMgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSJhZTViNTQzMC03ODY4LTQzNmItOGM4OC05Njc4ZGMyNDYwMGYiIC8+DQogIDxwYXRoIGQ9Ik0gNzIuNjY3OTg0MzMwOTU1NzMgMjE4LjA1NzA0MzgxODQ5Mzk4IEwgNTUuNDc3ODg2ODk1MTEyOTIgMjM4LjI4OTU4MTA2Mjk1OTI2ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iNzM1NzBmZjktN2QwOC00OWEwLTljZmYtMGZiODUyMzU1MGUyIiAvPg0KICA8cGF0aCBkPSJNIDU1LjQ3Nzg4Njg5NTExMjkyIDIzOC4yODk1ODEwNjI5NTkyNiBMIDQyLjIwMDY4OTMyMTYyNDcgMjYwLjU3MjU3NzM1NDgxMTg3ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iOTJjOGUzNWYtYWYwNC00NTQyLTljMjEtZWQxYzM3ZGMxZGNmIiAvPg0KICA8cGF0aCBkPSJNIDU1LjQ3Nzg4Njg5NTExMjkyIDIzOC4yODk1ODEwNjI5NTkyNiBMIDM0Ljc5ODE2Njg0NjQ0ODQ4IDI1NS45NzM0NjcwNDUxMzcwOCAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9ImVlMjg2OGViLTI0NTgtNGI5MC05MjViLTJkNDA4NTJhZjAyMyIgLz4NCiAgPHBhdGggZD0iTSA4NS45NDUxODE5MDQ0NDM5NCAxOTUuNzc0MDQ3NTI2NjQxMyBMIDU2LjY5OTY0MTM0NTU0MzkgMTk1Ljc3NDA0NzUyNjY0MTMgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSJjNTk1YWNhZS03MzMyLTQ3NDYtOGYwNS1kNDk1YTEwNzA0ZTMiIC8+DQogIDxwYXRoIGQ9Ik0gNTYuNjk5NjQxMzQ1NTQzOSAxOTUuNzc0MDQ3NTI2NjQxMyBMIDI4Ljg4NTQ3OTQyNDQyNzggMjAzLjUwMjE4OTA3NTM3ODk0ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iZDA2M2FjNjQtYTU0My00ZjFlLThmZjItOGQ1ZDYwMmUwNWFhIiAvPg0KICA8cGF0aCBkPSJNIDI4Ljg4NTQ3OTQyNDQyNzggMjAzLjUwMjE4OTA3NTM3ODk0IEwgMi44Mjc1MTE5ODMwMzIzMiAyMTQuODU1OTQyNzc3MDY3ODQgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSJmZTM1NGE2Yi1jNDhhLTRlZDgtYjRmYi1hM2I4NWFlNjJkZjciIC8+DQogIDxwYXRoIGQ9Ik0gMjguODg1NDc5NDI0NDI3OCAyMDMuNTAyMTg5MDc1Mzc4OTQgTCAyLjU5NzUyNTc5OTY4Nzk3NjRFLTE0IDIwNy40MTQ0MjU5NzgwMDQgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSIwZDhhZmI5Mi02ZWQzLTQyY2EtYTA4Yy0xOWRlMGEzYTliOTMiIC8+DQogIDxwYXRoIGQ9Ik0gNTYuNjk5NjQxMzQ1NTQzOSAxOTUuNzc0MDQ3NTI2NjQxMyBMIDI4Ljg4NTQ3OTQyNDQyNzggMTg4LjA0NTkwNTk3NzkwMzcxICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iMDY5MTVkYjItNWE2Ni00MWE3LWFmMzctNThiODM2YWFlZDIyIiAvPg0KICA8cGF0aCBkPSJNIDI4Ljg4NTQ3OTQyNDQyNzggMTg4LjA0NTkwNTk3NzkwMzcxIEwgMCAxODQuMTMzNjY5MDc1Mjc4NjggIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSJiNGZjOTdiZC1kNjY2LTQ3M2EtYjc1Yi1iOGVmZWU2YjZjODQiIC8+DQogIDxwYXRoIGQ9Ik0gMjguODg1NDc5NDI0NDI3OCAxODguMDQ1OTA1OTc3OTAzNzEgTCAyLjgyNzUxMTk4MzAzMjMyIDE3Ni42OTIxNTIyNzYyMTQ4NCAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjQ5NmQ2YzUzLTRhNTctNDEwMC1hMWU5LTBiZmI4MWYzNmNkYiIgLz4NCiAgPHBhdGggZD0iTSAxMzguMjMwNjE1ODI0MDY0MTYgMTQwLjQwMjk4MjU2Mjk3NzM0IEwgMTQ3LjI2Nzk4NDg2NjQ0NjA2IDExNi42MTgyMDg1NDU0Njc1NCAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjNjNDcyYzYxLWRkOGQtNGI2YS1hZDA4LTAyMzFjYTUxZTQ1OSIgLz4NCiAgPHBhdGggZD0iTSAxNDcuMjY3OTg0ODY2NDQ2MDYgMTE2LjYxODIwODU0NTQ2NzU0IEwgMTA0LjI5Mjc0MTI3NjgzOSA2Ni4wMzY4NjU0MzQzMDQzMiAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjYyOGFhNmQzLTg5YjEtNGQ1My05ZDNkLTlmNmU0MGY0ZjU5NSIgLz4NCiAgPHBhdGggZD0iTSAxMDQuMjkyNzQxMjc2ODM5IDY2LjAzNjg2NTQzNDMwNDMyIEwgNTIuNTkzNDQxMTU1MTc3ODggMjEuODI3MTUwNDc4ODU5NjY4ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iZGNkMTEzNjEtOWMxYS00OGI3LTk1ZDItZWI2N2RhZmI1MjYyIiAvPg0KICA8cGF0aCBkPSJNIDEwNC4yOTI3NDEyNzY4MzkgNjYuMDM2ODY1NDM0MzA0MzIgTCA3MS4wOTk3NDczNDMxMTg0MiAxMC4zMjkzNzQ3MDQ2NzI3MTQgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSIzZjViMWIzNC0xMzJhLTRjYjMtOGY2NS0xYmY5MmJhMzRlNGUiIC8+DQogIDxwYXRoIGQ9Ik0gMTQ3LjI2Nzk4NDg2NjQ0NjA2IDExNi42MTgyMDg1NDU0Njc1NCBMIDE2NC40NTgwODIzMDIyODg4NiA5Ni4zODU2NzEzMDEwMDIyNSAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjUwZWM5NzQzLTBhYWMtNDI2Yy1hNDk0LWNkNmNmZTYzZDExYSIgLz4NCiAgPHBhdGggZD0iTSAxNjQuNDU4MDgyMzAyMjg4ODYgOTYuMzg1NjcxMzAxMDAyMjUgTCAxNzcuNzM1Mjc5ODc1Nzc3MDUgNzQuMTAyNjc1MDA5MTQ5NTkgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSI5OGU2Zjg2MS1jOWFiLTQ4NjctODBhMC0zOWMyZjUyYmYwNjMiIC8+DQogIDxwYXRoIGQ9Ik0gMTc3LjczNTI3OTg3NTc3NzA1IDc0LjEwMjY3NTAwOTE0OTU5IEwgMTY0LjAxMDI0ODM5OTM0NTMzIDAgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSI2ZjAzZjYyMS1mYmE5LTQ3MmItYTc4Yi1lZGNiYzQwNzM0ZjgiIC8+DQogIDxwYXRoIGQ9Ik0gMTc3LjczNTI3OTg3NTc3NzA1IDc0LjEwMjY3NTAwOTE0OTU5IEwgMTk0LjkyNTM3NzMxMTYxOTkgNTMuODcwMTM3NzY0Njg0MzEgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSJhMWM3ZGEwNy0zMzRkLTRkYjAtYjg4Yi0yYjZiZmNjNzI2NjciIC8+DQogIDxwYXRoIGQ9Ik0gMTk0LjkyNTM3NzMxMTYxOTkgNTMuODcwMTM3NzY0Njg0MzEgTCAyMDMuOTYyNzQ2MzU0MDAxNzggMzAuMDg1MzYzNzQ3MTc0NTE1ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iOTljNWRhZWMtNzk4NC00Y2UzLTkwMzAtN2M4Y2Q0Y2EwMmM5IiAvPg0KICA8cGF0aCBkPSJNIDIwMy45NjI3NDYzNTQwMDE3OCAzMC4wODUzNjM3NDcxNzQ1MTUgTCAyMDguNTM3NzU2ODQ2MTQ1NyA1LjM4NDQ3MjA3NzQ1Nzk2NyAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjNmZjk0YzQ2LTQyNzgtNDYwYy05ODI3LTAzMjVjMzZhMTBjNyIgLz4NCiAgPHBhdGggZD0iTSAyMDMuOTYyNzQ2MzU0MDAxNzggMzAuMDg1MzYzNzQ3MTc0NTE1IEwgMjE3LjIzOTk0MzkyNzQ5IDcuODAyMzY3NDU1MzIxODY3ICIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLDEsMTIsMTIpIiBpZD0iMDkyYjkwYmEtZWMwMS00YjE1LTg2MTUtMDk3NGJmNTRlY2ZkIiAvPg0KICA8cGF0aCBkPSJNIDE5NC45MjUzNzczMTE2MTk5IDUzLjg3MDEzNzc2NDY4NDMxIEwgMjE4LjU4NTUxNjYzMzQ1MTgyIDM5LjE3MDMzOTAwNzEyNzg2NSAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9ImE5MDY4MTIxLTI3MjEtNGFlNS1iMTQzLTQyMzUxOWNhZjMzYyIgLz4NCiAgPHBhdGggZD0iTSAyMTguNTg1NTE2NjMzNDUxODIgMzkuMTcwMzM5MDA3MTI3ODY1IEwgMjM5LjI2NTIzNjY4MjExNjI3IDIxLjQ4NjQ1MzAyNDk0OTk5NSAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjNhMjhhMTgyLTU5ZjEtNDFlNi04OTJjLTcxMmYxMzI1MzQ4NCIgLz4NCiAgPHBhdGggZD0iTSAyMTguNTg1NTE2NjMzNDUxODIgMzkuMTcwMzM5MDA3MTI3ODY1IEwgMjQ0LjY0MzQ4NDA3NDg0NzMgMjcuODE2NTg1MzA1NDM4OTYgIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsMSwxMiwxMikiIGlkPSJkYTNmNTZmOC0zYTM4LTRiZjQtYjEzYi1iODFjYzQ5NDM4ODgiIC8+DQogIDxwYXRoIGQ9Ik0gMTY0LjQ1ODA4MjMwMjI4ODg2IDk2LjM4NTY3MTMwMTAwMjI1IEwgMjgwIDgwLjczNjcyMzY5MDUwMiAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwxLDEyLDEyKSIgaWQ9IjczZTY2YTlmLTkzYzAtNDg5Yy04M2FmLTI1MTM1NjM0NTliMyIgLz4NCjwvc3ZnPg==" />
@@ -52,13 +52,34 @@ namespace Radial_coordinates
         public const string Name = "Radial";
         public const string HelpText = "Computes the coordinates for a radial tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.1.2");
         public const string Id = "95b61284-b870-48b9-b51c-3276f7d89df1";
         public const ModuleTypes ModuleType = ModuleTypes.Coordinate;
 
         public static List<(string, string)> GetParameters(TreeNode tree)
         {
             double defaultHeight = Math.Min(10000, tree.GetLeaves().Count * 14);
+
+            System.Text.StringBuilder defaultSourceCode = new System.Text.StringBuilder();
+
+            defaultSourceCode.AppendLine("using PhyloTree;");
+            defaultSourceCode.AppendLine("using System.Collections.Generic;");
+            defaultSourceCode.AppendLine("using TreeViewer;");
+            defaultSourceCode.AppendLine("using VectSharp;");
+            defaultSourceCode.AppendLine();
+            defaultSourceCode.AppendLine("namespace a" + Guid.NewGuid().ToString("N"));
+            defaultSourceCode.AppendLine("{");
+            defaultSourceCode.AppendLine("\t//Do not change class name");
+            defaultSourceCode.AppendLine("\tpublic static class CustomCoordinates");
+            defaultSourceCode.AppendLine("\t{");
+            defaultSourceCode.AppendLine("\t\t//Do not change method signature");
+            defaultSourceCode.AppendLine("\t\tpublic static void GetCoordinates(TreeNode tree, ref Dictionary<string, Point> coordinates)");
+            defaultSourceCode.AppendLine("\t\t{");
+            defaultSourceCode.AppendLine("\t\t\t//TODO: change the coordinate values contained in the coordinates dictionary");
+            defaultSourceCode.AppendLine("\t\t}");
+            defaultSourceCode.AppendLine("\t}");
+            defaultSourceCode.AppendLine("}");
+
 
             return new List<(string, string)>()
             {
@@ -93,6 +114,42 @@ namespace Radial_coordinates
                 /// This parameter determines the angular size of the tree.
                 /// </param>
                 ( "Sweep angle:", "Slider:360[\"1\",\"360\",\"0°\"]" ),
+
+                ( "Coordinate shift", "Group:5"),
+                
+                /// <param name="Coordinate shift:">
+                /// This parameter determines the kind of coordinate shift that is applied. If the value is `None`, no coordinate
+                /// shift is applied. If the value is `Relative`, the coordinates for each point are shifted by the amount specified
+                /// by the selected [X](#x-attribute) and [Y](#y-attribute) attributes, relative to their default position. If the value is
+                /// `Absolute`, the coordinates are set to the value specified by the selected [X](#x-attribute) and [Y](#y-attribute)
+                /// attributes, regardless of their default position.
+                /// </param>
+                ( "Coordinate shift:", "ComboBox:0[\"None\",\"Relative\",\"Absolute\"]" ),
+
+                /// <param name="X shift">
+                /// If this check box is checked, the X coordinates of the tree nodes are shifted. Otherwise, they are left as is.
+                /// </param>
+                ( "X shift", "CheckBox:false"),
+                
+                /// <param name="X attribute:">
+                /// This parameter determines the attribute used to shift the X coordinate of the points.
+                /// </param>
+                ( "X attribute:", "AttributeSelector:Length"),
+
+                /// <param name="Y shift">
+                /// If this check box is checked, the Y coordinates of the tree nodes are shifted. Otherwise, they are left as is.
+                /// </param>
+                ( "Y shift", "CheckBox:false"),
+                
+                /// <param name="Y attribute:">
+                /// This parameter determines the attribute used to shift the Y coordinate of the points.
+                /// </param>
+                ( "Y attribute:", "AttributeSelector:Length"),
+
+                /// <param name="Custom script:">
+                /// This script can be used to modify the coordinate values.
+                /// </param>
+                ( "Custom script:", "SourceCode:" + defaultSourceCode.ToString()),
                 
                 /// <param name="Apply">
                 /// This button applies changes to the other parameter values and signals that the tree needs to be redrawn.
@@ -113,7 +170,114 @@ namespace Radial_coordinates
 
             parametersToChange = new Dictionary<string, object>() { { "Apply", false } };
 
-            return (bool)currentParameterValues["Apply"];
+            if ((int)currentParameterValues["Coordinate shift:"] == 0)
+            {
+                controlStatus["X shift"] = ControlStatus.Hidden;
+                controlStatus["Y shift"] = ControlStatus.Hidden;
+            }
+            else
+            {
+                controlStatus["X shift"] = ControlStatus.Enabled;
+                controlStatus["Y shift"] = ControlStatus.Enabled;
+            }
+
+            if ((int)currentParameterValues["Coordinate shift:"] != 0 && (bool)currentParameterValues["X shift"])
+            {
+                controlStatus["X attribute:"] = ControlStatus.Enabled;
+
+                if (!(bool)previousParameterValues["X shift"] && (string)currentParameterValues["X attribute:"] == "Length")
+                {
+                    TreeNode treeNode = (TreeNode)tree;
+
+                    string bestAttribute = "Length";
+
+                    foreach (TreeNode leaf in treeNode.GetLeaves())
+                    {
+                        bool found = false;
+
+                        foreach (KeyValuePair<string, object> kvp in leaf.Attributes)
+                        {
+                            if (kvp.Value is double)
+                            {
+                                if (kvp.Key.Equals("X", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                    found = true;
+                                    break;
+                                }
+                                else if (kvp.Key.StartsWith("X", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (bestAttribute != "Length")
+                    {
+                        parametersToChange["X attribute:"] = bestAttribute;
+                    }
+                }
+            }
+            else
+            {
+                controlStatus["X attribute:"] = ControlStatus.Hidden;
+            }
+
+            if ((int)currentParameterValues["Coordinate shift:"] != 0 && (bool)currentParameterValues["Y shift"])
+            {
+                controlStatus["Y attribute:"] = ControlStatus.Enabled;
+
+                if (!(bool)previousParameterValues["Y shift"] && (string)currentParameterValues["Y attribute:"] == "Length")
+                {
+                    TreeNode treeNode = (TreeNode)tree;
+
+                    string bestAttribute = "Length";
+
+                    foreach (TreeNode leaf in treeNode.GetLeaves())
+                    {
+                        bool found = false;
+
+                        foreach (KeyValuePair<string, object> kvp in leaf.Attributes)
+                        {
+                            if (kvp.Value is double)
+                            {
+                                if (kvp.Key.Equals("Y", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                    found = true;
+                                    break;
+                                }
+                                else if (kvp.Key.StartsWith("Y", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (bestAttribute != "Length")
+                    {
+                        parametersToChange["Y attribute:"] = bestAttribute;
+                    }
+                }
+            }
+            else
+            {
+                controlStatus["Y attribute:"] = ControlStatus.Hidden;
+            }
+
+            return (bool)currentParameterValues["Apply"] || currentParameterValues["Custom script:"] != previousParameterValues["Custom script:"];
         }
 
         public static Dictionary<string, Point> GetCoordinates(TreeNode tree, Dictionary<string, object> parameterValues)
@@ -205,6 +369,14 @@ namespace Radial_coordinates
             double vFactor = maxY != minY ? ((maxY - minY) / height) : 1;
 
             bool preserveAspectRatio = (bool)parameterValues["Preserve aspect ratio"];
+
+            int coordinateShift = (int)parameterValues["Coordinate shift:"];
+            bool xShift = (bool)parameterValues["X shift"];
+            bool yShift = (bool)parameterValues["Y shift"];
+            string xShiftAttribute = (string)parameterValues["X attribute:"];
+            string yShiftAttribute = (string)parameterValues["Y attribute:"];
+
+            CompiledCode customScript = (CompiledCode)parameterValues["Custom script:"];
 
             if (preserveAspectRatio)
             {
@@ -303,6 +475,56 @@ namespace Radial_coordinates
             }
 
             storedPos[Id] = new Point(scaleFactor, 0);
+
+            if (coordinateShift > 0 && (xShift || yShift))
+            {
+                foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                {
+                    Point pt = storedPos[node.Id];
+
+                    double x = pt.X;
+                    double y = pt.Y;
+
+                    if (xShift)
+                    {
+                        if (node.Attributes.TryGetValue(xShiftAttribute, out object xAttribute) && xAttribute is double dX && !double.IsNaN(dX))
+                        {
+                            if (coordinateShift == 1)
+                            {
+                                x += dX;
+                            }
+                            else if (coordinateShift == 2)
+                            {
+                                x = dX;
+                            }
+                        }
+                    }
+
+                    if (yShift)
+                    {
+                        if (node.Attributes.TryGetValue(yShiftAttribute, out object yAttribute) && yAttribute is double dY && !double.IsNaN(dY))
+                        {
+                            if (coordinateShift == 1)
+                            {
+                                y += dY;
+                            }
+                            else if (coordinateShift == 2)
+                            {
+                                y = dY;
+                            }
+                        }
+                    }
+
+                    storedPos[node.Id] = new Point(x, y);
+                }
+            }
+
+            object[] args = new object[] { tree, storedPos };
+
+            Type customCoords = ModuleMetadata.GetTypeFromAssembly(customScript.CompiledAssembly, "CustomCoordinates");
+            customCoords.InvokeMember("GetCoordinates", System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.InvokeMethod, null, null, args);
+
+            storedPos = (Dictionary<string, Point>)args[1];
 
             return storedPos;
         }

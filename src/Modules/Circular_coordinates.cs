@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using PhyloTree;
@@ -46,7 +46,7 @@ namespace CircularCoordinates
         public const string Name = "Circular";
         public const string HelpText = "Computes the coordinates for a circular tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const string Id = "92aac276-3af7-4506-a263-7220e0df5797";
         public const ModuleTypes ModuleType = ModuleTypes.Coordinate;
 
@@ -54,6 +54,26 @@ namespace CircularCoordinates
         {
             double defaultRadius = tree.GetLeaves().Count * 20 / (2 * Math.PI);
             double innerRadius = double.IsNaN(tree.Length) ? defaultRadius * 0.1 : 0;
+
+            System.Text.StringBuilder defaultSourceCode = new System.Text.StringBuilder();
+
+            defaultSourceCode.AppendLine("using PhyloTree;");
+            defaultSourceCode.AppendLine("using System.Collections.Generic;");
+            defaultSourceCode.AppendLine("using TreeViewer;");
+            defaultSourceCode.AppendLine("using VectSharp;");
+            defaultSourceCode.AppendLine();
+            defaultSourceCode.AppendLine("namespace a" + Guid.NewGuid().ToString("N"));
+            defaultSourceCode.AppendLine("{");
+            defaultSourceCode.AppendLine("\t//Do not change class name");
+            defaultSourceCode.AppendLine("\tpublic static class CustomCoordinates");
+            defaultSourceCode.AppendLine("\t{");
+            defaultSourceCode.AppendLine("\t\t//Do not change method signature");
+            defaultSourceCode.AppendLine("\t\tpublic static void GetCoordinates(TreeNode tree, ref Dictionary<string, Point> coordinates)");
+            defaultSourceCode.AppendLine("\t\t{");
+            defaultSourceCode.AppendLine("\t\t\t//TODO: change the coordinate values contained in the coordinates dictionary");
+            defaultSourceCode.AppendLine("\t\t}");
+            defaultSourceCode.AppendLine("\t}");
+            defaultSourceCode.AppendLine("}");
 
             return new List<(string, string)>()
             {
@@ -84,6 +104,42 @@ namespace CircularCoordinates
                 /// These buttons can be used to set predefined values for the [Rotation](#rotation) of the tree.
                 /// </param>
                 ( "FixedRotations", "Buttons:[\"0°\",\"90°\",\"180°\",\"270°\"]" ),
+
+                 ( "Coordinate shift", "Group:5"),
+                
+                /// <param name="Coordinate shift:">
+                /// This parameter determines the kind of coordinate shift that is applied. If the value is `None`, no coordinate
+                /// shift is applied. If the value is `Relative`, the coordinates for each point are shifted by the amount specified
+                /// by the selected [X](#x-attribute) and [Y](#y-attribute) attributes, relative to their default position. If the value is
+                /// `Absolute`, the coordinates are set to the value specified by the selected [X](#x-attribute) and [Y](#y-attribute)
+                /// attributes, regardless of their default position.
+                /// </param>
+                ( "Coordinate shift:", "ComboBox:0[\"None\",\"Relative\",\"Absolute\"]" ),
+
+                /// <param name="X shift">
+                /// If this check box is checked, the X coordinates of the tree nodes are shifted. Otherwise, they are left as is.
+                /// </param>
+                ( "X shift", "CheckBox:false"),
+                
+                /// <param name="X attribute:">
+                /// This parameter determines the attribute used to shift the X coordinate of the points.
+                /// </param>
+                ( "X attribute:", "AttributeSelector:Length"),
+
+                /// <param name="Y shift">
+                /// If this check box is checked, the Y coordinates of the tree nodes are shifted. Otherwise, they are left as is.
+                /// </param>
+                ( "Y shift", "CheckBox:false"),
+                
+                /// <param name="Y attribute:">
+                /// This parameter determines the attribute used to shift the Y coordinate of the points.
+                /// </param>
+                ( "Y attribute:", "AttributeSelector:Length"),
+
+                /// <param name="Custom script:">
+                /// This script can be used to modify the coordinate values.
+                /// </param>
+                ( "Custom script:", "SourceCode:" + defaultSourceCode.ToString()),
                 
                 /// <param name="Apply">
                 /// This button applies the changes to the values of the other parameters and triggers a redraw of the tree.
@@ -103,17 +159,132 @@ namespace CircularCoordinates
 
             int fixRot = (int)currentParameterValues["FixedRotations"];
 
+            if ((int)currentParameterValues["Coordinate shift:"] == 0)
+            {
+                controlStatus["X shift"] = ControlStatus.Hidden;
+                controlStatus["Y shift"] = ControlStatus.Hidden;
+            }
+            else
+            {
+                controlStatus["X shift"] = ControlStatus.Enabled;
+                controlStatus["Y shift"] = ControlStatus.Enabled;
+            }
+
+            if ((int)currentParameterValues["Coordinate shift:"] != 0 && (bool)currentParameterValues["X shift"])
+            {
+                controlStatus["X attribute:"] = ControlStatus.Enabled;
+
+                if (!(bool)previousParameterValues["X shift"] && (string)currentParameterValues["X attribute:"] == "Length")
+                {
+                    TreeNode treeNode = (TreeNode)tree;
+
+                    string bestAttribute = "Length";
+
+                    foreach (TreeNode leaf in treeNode.GetLeaves())
+                    {
+                        bool found = false;
+
+                        foreach (KeyValuePair<string, object> kvp in leaf.Attributes)
+                        {
+                            if (kvp.Value is double)
+                            {
+                                if (kvp.Key.Equals("X", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                    found = true;
+                                    break;
+                                }
+                                else if (kvp.Key.StartsWith("X", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (bestAttribute != "Length")
+                    {
+                        parametersToChange["X attribute:"] = bestAttribute;
+                    }
+                }
+            }
+            else
+            {
+                controlStatus["X attribute:"] = ControlStatus.Hidden;
+            }
+
+            if ((int)currentParameterValues["Coordinate shift:"] != 0 && (bool)currentParameterValues["Y shift"])
+            {
+                controlStatus["Y attribute:"] = ControlStatus.Enabled;
+
+                if (!(bool)previousParameterValues["Y shift"] && (string)currentParameterValues["Y attribute:"] == "Length")
+                {
+                    TreeNode treeNode = (TreeNode)tree;
+
+                    string bestAttribute = "Length";
+
+                    foreach (TreeNode leaf in treeNode.GetLeaves())
+                    {
+                        bool found = false;
+
+                        foreach (KeyValuePair<string, object> kvp in leaf.Attributes)
+                        {
+                            if (kvp.Value is double)
+                            {
+                                if (kvp.Key.Equals("Y", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                    found = true;
+                                    break;
+                                }
+                                else if (kvp.Key.StartsWith("Y", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    bestAttribute = kvp.Key;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (bestAttribute != "Length")
+                    {
+                        parametersToChange["Y attribute:"] = bestAttribute;
+                    }
+                }
+            }
+            else
+            {
+                controlStatus["Y attribute:"] = ControlStatus.Hidden;
+            }
+
             if (fixRot >= 0)
             {
                 parametersToChange.Add("Rotation:", (double)(fixRot * 90));
                 return true;
             }
 
-            return (bool)currentParameterValues["Apply"];
+            return (bool)currentParameterValues["Apply"] || currentParameterValues["Custom script:"] != previousParameterValues["Custom script:"];
         }
 
         public static Dictionary<string, Point> GetCoordinates(TreeNode tree, Dictionary<string, object> parameterValues)
         {
+            int coordinateShift = (int)parameterValues["Coordinate shift:"];
+            bool xShift = (bool)parameterValues["X shift"];
+            bool yShift = (bool)parameterValues["Y shift"];
+            string xShiftAttribute = (string)parameterValues["X attribute:"];
+            string yShiftAttribute = (string)parameterValues["Y attribute:"];
+
+            CompiledCode customScript = (CompiledCode)parameterValues["Custom script:"];
+
             List<TreeNode> nodes = tree.GetChildrenRecursive();
 
             Dictionary<string, Point> storedPos = new Dictionary<string, Point>();
@@ -236,6 +407,56 @@ namespace CircularCoordinates
             storedPos["d0ab64ba-3bcd-443f-9150-48f6e85e97f3"] = new Point(scaleR, innerRadius);
 
             storedPos[Id] = new Point(0, 0);
+
+            if (coordinateShift > 0 && (xShift || yShift))
+            {
+                foreach (TreeNode node in tree.GetChildrenRecursiveLazy())
+                {
+                    Point pt = storedPos[node.Id];
+
+                    double x = pt.X;
+                    double y = pt.Y;
+
+                    if (xShift)
+                    {
+                        if (node.Attributes.TryGetValue(xShiftAttribute, out object xAttribute) && xAttribute is double dX && !double.IsNaN(dX))
+                        {
+                            if (coordinateShift == 1)
+                            {
+                                x += dX;
+                            }
+                            else if (coordinateShift == 2)
+                            {
+                                x = dX;
+                            }
+                        }
+                    }
+
+                    if (yShift)
+                    {
+                        if (node.Attributes.TryGetValue(yShiftAttribute, out object yAttribute) && yAttribute is double dY && !double.IsNaN(dY))
+                        {
+                            if (coordinateShift == 1)
+                            {
+                                y += dY;
+                            }
+                            else if (coordinateShift == 2)
+                            {
+                                y = dY;
+                            }
+                        }
+                    }
+
+                    storedPos[node.Id] = new Point(x, y);
+                }
+            }
+
+            object[] args = new object[] { tree, storedPos };
+
+            Type customCoords = ModuleMetadata.GetTypeFromAssembly(customScript.CompiledAssembly, "CustomCoordinates");
+            customCoords.InvokeMember("GetCoordinates", System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.InvokeMethod, null, null, args);
+
+            storedPos = (Dictionary<string, Point>)args[1];
 
             return storedPos;
         }
