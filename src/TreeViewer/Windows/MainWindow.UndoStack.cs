@@ -64,19 +64,23 @@ namespace TreeViewer
         {
             if (GlobalSettings.Settings.EnableUndoStack)
             {
-                if (LastComputedUndoFrame == null)
+                try
                 {
-                    LastComputedUndoFrame = new UndoFrame(this, CurrentFrameLevel.level, CurrentFrameLevel.moduleIndex, CurrentFrameLevel.plotLayersToUpdate);
-                    this.CurrentFrameLevel = (level, moduleIndex, plotLayersToUpdate);
-                }
-                else
-                {
-                    UpdateCurrentFrameLevel(level, moduleIndex);
-                }
+                    if (LastComputedUndoFrame == null)
+                    {
+                        LastComputedUndoFrame = new UndoFrame(this, CurrentFrameLevel.level, CurrentFrameLevel.moduleIndex, CurrentFrameLevel.plotLayersToUpdate);
+                        this.CurrentFrameLevel = (level, moduleIndex, plotLayersToUpdate);
+                    }
+                    else
+                    {
+                        UpdateCurrentFrameLevel(level, moduleIndex);
+                    }
 
-                this.RedoStack.Clear();
-                this.CanUndo = true;
-                this.CanRedo = false;
+                    this.RedoStack.Clear();
+                    this.CanUndo = true;
+                    this.CanRedo = false;
+                }
+                catch { }
             }
         }
 
