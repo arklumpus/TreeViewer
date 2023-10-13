@@ -126,8 +126,8 @@ namespace @NamespaceHere
         // but either this or PropertyAffectingEnabled must be defined (even though they may be null). This property should be
         // used when multiple properties on the parent window can cause the menu item to become enabled or disabled.
         // E.g.
-        //      new List<Avalonia.AvaloniaProperty>() { MainWindow.IsTreeOpened, MainWindow.IsSelectionAvailableProperty }
-        public static List<Avalonia.AvaloniaProperty> PropertiesAffectingEnabled { get; } = new List<Avalonia.AvaloniaProperty>() { MainWindow.IsTreeOpened, MainWindow.IsSelectionAvailableProperty };
+        //      new List<Avalonia.AvaloniaProperty>() { MainWindow.IsTreeOpenedProperty, MainWindow.IsSelectionAvailableProperty }
+        public static List<Avalonia.AvaloniaProperty> PropertiesAffectingEnabled { get; } = new List<Avalonia.AvaloniaProperty>() { MainWindow.IsTreeOpenedProperty, MainWindow.IsSelectionAvailableProperty };
 
         // An AvaloniaProperty on the MainWindow to which the menu item belongs, which affects whether the menu item
         // action is available or not. Set to null if not applicable. This property is optional, but either this
