@@ -34,7 +34,7 @@ namespace PruneNode
         public const string Name = "Prune node";
         public const string HelpText = "Prunes nodes off the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.3.0");
+        public static Version Version = new Version("1.3.1");
         public const string Id = "ffc97742-4cf5-44ef-81aa-d5b51708a003";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -107,7 +107,7 @@ namespace PruneNode
                 
                 /// <param name="Node:">
                 /// This parameter determines the node to prune off the tree. If only a
-                /// single node is selected, the that node is pruned. If more than one node is
+                /// single node is selected, then that node is pruned. If more than one node is
                 /// selected, the last common ancestor (LCA) of all of them is pruned. Nodes
                 /// are selected based on their `Name`.
                 /// </param>
