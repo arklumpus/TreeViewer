@@ -642,7 +642,7 @@ namespace TreeViewer
                     }
                     else if (ind == 2)
                     {
-                        SpreadsheetWindow editorWin = new SpreadsheetWindow(true, false, false);
+                        SpreadsheetWindow editorWin = new SpreadsheetWindow(true, false, false, true);
 
                         await editorWin.ShowDialog2(this);
 
@@ -749,7 +749,7 @@ namespace TreeViewer
                                             {
                                                 Attachment att = this.StateData.Attachments[attachmentName];
 
-                                                SpreadsheetWindow win = new SpreadsheetWindow(true, false, false);
+                                                SpreadsheetWindow win = new SpreadsheetWindow(true, false, false, true);
                                                 string text = att.GetText();
                                                 win.OriginalText = text;
                                                 win.Load(win.Spreadsheet, text, false);

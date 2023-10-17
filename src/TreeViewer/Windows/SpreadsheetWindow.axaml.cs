@@ -50,16 +50,16 @@ namespace TreeViewer
 
         public SpreadsheetWindow()
         {
-            InitializeComponent(0, true, true);
+            InitializeComponent(0, true, true, false);
         }
 
 
-        public SpreadsheetWindow(bool robotoMono, bool canOpenSave, bool canFormat)
+        public SpreadsheetWindow(bool robotoMono, bool canOpenSave, bool canFormat, bool showOKCancel)
         {
             CanOpenSave = canOpenSave;
             CanFormat = canFormat;
 
-            InitializeComponent(robotoMono ? 1 : 0, canOpenSave, canFormat);
+            InitializeComponent(robotoMono ? 1 : 0, canOpenSave, canFormat, showOKCancel);
         }
 
         public bool Result { get; private set; } = false;
@@ -70,7 +70,7 @@ namespace TreeViewer
         NumericUpDown fontSizeNud;
         bool programmaticChange;
 
-        private void InitializeComponent(int initialFontFamily, bool canOpenSave, bool canFormat)
+        private void InitializeComponent(int initialFontFamily, bool canOpenSave, bool canFormat, bool showOKCancel)
         {
             AvaloniaXamlLoader.Load(this);
 
@@ -81,17 +81,24 @@ namespace TreeViewer
                 isOpen = false;
             };
 
-            this.FindControl<Button>("OKButton").Click += (s, e) =>
+            if (showOKCancel)
             {
-                this.Result = true;
-                this.Close();
-            };
+                this.FindControl<Button>("OKButton").Click += (s, e) =>
+                {
+                    this.Result = true;
+                    this.Close();
+                };
 
-            this.FindControl<Button>("CancelButton").Click += (s, e) =>
+                this.FindControl<Button>("CancelButton").Click += (s, e) =>
+                {
+                    this.Result = false;
+                    this.Close();
+                };
+            }
+            else
             {
-                this.Result = false;
-                this.Close();
-            };
+                this.FindControl<Grid>("OKCancelGrid").IsVisible = false;
+            }
 
             Spreadsheet spreadsheet = this.FindControl<Spreadsheet>("spreadsheetControl");
 
