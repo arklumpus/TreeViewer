@@ -520,3 +520,8 @@ tr\Microsoft.CodeAnalysis.Scripting.resources.dll	35940646-9235-42e6-81e2-5def36
 zh-Hans\Microsoft.CodeAnalysis.Scripting.resources.dll	39473cab-ceb8-41ac-ba44-efb4a8836b16
 zh-Hant\Microsoft.CodeAnalysis.Scripting.resources.dll	02048333-229e-4a77-bb55-05ac75c15c68
 Licence.rtf	2b3a4cd8-fc0a-4f02-a128-43b349b1b245
+Fare.dll	ef2c009d-9e0a-4795-ace5-558101a55d71
+Fare.xml	4f8ce077-f0b7-48c2-9045-5968fdf075da
+mscordaccore_amd64_amd64_7.0.1123.42427.dll	c362ba11-3f96-46c8-ac2f-5374f2f13217
+Spreadalonia.dll	a5732db6-3fc3-468c-838c-840f1d6bb08e
+Spreadalonia.xml	554f6450-10a7-4945-ab4a-bfc5674f74e4
