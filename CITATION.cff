@@ -8,7 +8,7 @@ authors:
     given-names: "Patricia"
     orcid: "https://orcid.org/0000-0002-5216-2664"
 title: "TreeViewer - Cross-platform software to draw phylogenetic trees"
-version: 2.1.0
+version: 2.2.0
 doi: 10.5281/zenodo.7768344
 date-released: 2023-03-24
 url: "https://treeviewer.org"
