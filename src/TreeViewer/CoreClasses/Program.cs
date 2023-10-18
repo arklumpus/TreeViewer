@@ -85,7 +85,7 @@ namespace TreeViewer
             {
                 { "h|help", "Print this message and exit.", v => { showHelp = v != null; } },
                 { "rebuild-all-modules", "Recompile all installed modules from the stored source code.", v => { rebuildAllModules = v != null; } },
-                { "I|install-all=", "Uninstall all currently install modules, and install all the modules contained in the specified modules.tar.gz file. If no file is specified, the modules will be downloaded from the module repository.", v => { installAllModules = true;
+                { "I|install-all:", "Uninstall all currently install modules, and install all the modules contained in the specified modules.tar.gz file. If no file is specified, the modules will be downloaded from the module repository.", v => { installAllModules = true;
                     installAllModulesPath = v; } },
                 { "i|install=", "Install a module from a module.json.zip file and close the program (unless the -b/--boot option is also specified). This option can be specified multiple times.", v => { modulesToInstall.Add(v); } },
                 { "install-references", "When installing modules, also install the module's additional references, if available.",  v => { installReferences = v != null; } },
