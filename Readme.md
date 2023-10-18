@@ -22,7 +22,7 @@ If you use TreeViewer, please cite it as:
 
 ## Installing TreeViewer
 
-The easiest way to start using TreeViewer is to install the program using the installer for your operating system.
+The easiest way to start using TreeViewer is to install the program using the installer for your operating system. Alternatively, you may wish to install the program [manually](#manual-installation) or [on a headless server](#installing-on-a-headless-server-without-admin-privileges).
 
 ### Windows
 
@@ -101,6 +101,8 @@ After granting the file permission to load and compile the source code, you shou
 
 * On some Linux distributions, the file icons sometimes don't show up for some file types. This appears to be dependent on the file manager used by each distro, so unfortunately there is not much that we can do. Strangely enough, even though the custom icon is not shown, double clicking the files should still work and open them in TreeViewer.
 
+* On macOS laptops, you cannot zoom using a "pinch zoom" motion. To zoom in/out on the tree, move two fingers up and down on the trackpad, as if you were scrolling up and down.
+
 ## Manual installation
 
 If you wish to have more control over the installation process, you can manually install TreeViewer following these instructions.
@@ -164,6 +166,36 @@ xdg-icon-resource install --novendor --context apps --size 512 TreeViewer-Linux-
 
 xdg-desktop-menu install --novendor TreeViewer-Linux-x64/io.github.arklumpus.TreeViewer.desktop
 ```
+
+## Installing on a headless server without admin privileges
+
+In some instances, you may need to install TreeViewer on a headless server, possibly without admin privileges. To do this, you can start by following the instructions for [manual installation](#manual-installation) (which do not require admin privileges). By doing this, you will have access to the TreeViewer executables, but if you try launching `TreeViewerCommandline` and enter the command `module list available`, you will get the following error message:
+
+```
+An error occurred while executing command: module list available
+Error message:
+  Sequence contains no elements
+```
+
+This is because the modules for TreeViewer are installed the first time that the program is launched from the GUI; if you never launch the GUI (because you are on a headless server), you will not be able to install any modules.
+
+To install all modules from the online repository, you can run the following command:
+
+```
+TreeViewer -I
+```
+
+Alternatively, e.g. if you need to install the moduels on a computer that does not have internet access, you can transfer the [`modules.tar.gz`](https://github.com/arklumpus/TreeViewer/raw/main/Modules/modules.tar.gz) file to the computer, and then run (note the `=` sign):
+
+```
+TreeViewer -I=modules.tar.gz
+```
+
+This will install the modules from the specified file, without fetching them from the online repository.
+
+Finally, if you now open `TreeViewerCommandLine` and enter the `module list available` command, you should get a list of all the installed modules.
+
+Note that the installed modules and other TreeViewer settings (e.g. key pairs) are always stored in a user-specific directory. On Windows, this is `%LOCALAPPDATA%/TreeViewer`, while on Linux and macOS it is `$HOME/.local/share/TreeViewer`. Therefore, even if you install TreeViewer in such a location as to make it accessible to all users on the system, each user will have to run one of the commands above to install the TreeViewer modules.
 
 ## Compiling TreeViewer from source
 
