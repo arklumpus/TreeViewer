@@ -199,11 +199,13 @@ Note that the installed modules and other TreeViewer settings (e.g. key pairs) a
 
 ## Compiling TreeViewer from source
 
-To be able to compile TreeViewer from source, you will need to install the [.NET Core 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) for your operating system.
+To be able to compile TreeViewer from source, you will need to install the [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) for your operating system.
 
 You can use [Microsoft Visual Studio](https://visualstudio.microsoft.com/vs/) to compile the program. The following instructions will cover compiling TreeViewer from the command line, instead.
 
 To fully compile TreeViewer for Windows, macOS and Linux, you will need a computer with Windows 10 or 11 with the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) installed and a computer with a recent release of macOS.
+
+To create the Windows installer, you will need the [WiX toolset, v3.11.2](https://wixtoolset.org/docs/wix3/), the [scsigntool](https://www.mgtek.com/smartcard) software, the [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/) (which provides the `signtool` application), as well as a code signing certificate stored on a YubiKey (or another kind of smart card).
 
 First of all, you will need to download the TreeViewer source code: [TreeViewer-2.2.0.tar.gz](https://github.com/arklumpus/TreeViewer/archive/v2.2.0.tar.gz) and extract it somewhere on both the Windows machine and the macOS machine.
 
@@ -215,11 +217,11 @@ BuildRelease Linux-x64
 BuildRelease Mac-x64
 BuildRelease Mac-arm64
 
-BuildBinaries-Win-x64 "path/to/certificate.pfx" "certificate_password"
+BuildBinaries-Win-x64 "subject_name" "yubikey_pin"
 bash -c ./BuildBinaries-Linux-x64.sh
 ```
 
-These commands will compile TreeViewer for all three platforms and create the installers for Windows and Linux, which will be placed in the `Binary` folder. To build the binaries for Windows, it is necessary to supply a code-signing certificate in PFX or P12 format, together with the associated password. Such a certificate can be obtained (for a fee) from a [certificate authority](https://docs.microsoft.com/en-us/windows-hardware/drivers/dashboard/get-a-code-signing-certificate) or can be a self-signed certificate.
+These commands will compile TreeViewer for all three platforms and create the installers for Windows and Linux, which will be placed in the `Binary` folder. The arguments for the `BuildBinaries-Win-x64` script are the subject name of a code signing certificate and the PIN of the YubiKey/smart card where the certificate is stored. Such a certificate can be obtained (for a fee) from a [certificate authority](https://docs.microsoft.com/en-us/windows-hardware/drivers/dashboard/get-a-code-signing-certificate) or can be a self-signed certificate.
 
 Now you need to copy the `Release/Mac-x64` and `Release/Mac-arm64` folders to the corresponding folder on the macOS machine.
 
