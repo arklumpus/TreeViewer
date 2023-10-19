@@ -61,6 +61,11 @@ namespace @NamespaceHere
         // pixels icon. If this is false, the button will be "small", with an icon size of 16x16 device-independent pixels.
         public static bool IsLargeButton { get; } = true;
 
+
+        // If this is true, the button corresponding to this module will be enabled even when no tree has been loaded in
+        // the window yet. This property is optional; omitting it will have the same effect as it being set to false.
+        public static bool EnabledWithoutTree { get; } = false;
+
         // These variables hold a PNG icon at three resolutions (32x32px, 48x48px and 64x64px). The GetIcon method below
         // uses these to return the appropriate image based on the scaling value. You can replace these with your icon
         // or delete them and produce a vector icon.

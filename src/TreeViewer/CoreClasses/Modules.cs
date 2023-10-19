@@ -1232,6 +1232,7 @@ public static Colour? Format(object attribute)
         public bool IsLargeButton { get; set; }
         public double GroupIndex { get; set; }
         public List<(string, Func<double, Page>)> SubItems { get; set; }
+        public bool EnabledWithoutTree { get; set; }
         public ActionModule()
         {
 
@@ -1358,6 +1359,15 @@ public static Colour? Format(object attribute)
                     GroupName = (string)GetProperty(compiledModule, "GroupName"),
                     IsLargeButton = (bool)GetProperty(compiledModule, "IsLargeButton")
                 };
+
+                if (HasProperty(compiledModule, "EnabledWithoutTree"))
+                {
+                    mod.EnabledWithoutTree = (bool)GetProperty(compiledModule, "EnabledWithoutTree");
+                }
+                else
+                {
+                    mod.EnabledWithoutTree = false;
+                }
 
                 return mod;
             }

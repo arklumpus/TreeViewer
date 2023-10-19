@@ -500,7 +500,7 @@ namespace TreeViewer
 
         public void BuildRibbonActionPanel()
         {
-            Dictionary<string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)>> tempStructure = new Dictionary<string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)>>();
+            Dictionary<string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string, bool)>> tempStructure = new Dictionary<string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string, bool)>>();
 
             for (int i = 0; i < Modules.ActionModules.Count; i++)
             {
@@ -508,9 +508,9 @@ namespace TreeViewer
 
                 if (!string.IsNullOrEmpty(Modules.ActionModules[i].GroupName))
                 {
-                    if (!tempStructure.TryGetValue(Modules.ActionModules[i].GroupName, out List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)> buttonList))
+                    if (!tempStructure.TryGetValue(Modules.ActionModules[i].GroupName, out List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string, bool)> buttonList))
                     {
-                        buttonList = new List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)>();
+                        buttonList = new List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string, bool)>();
                         tempStructure[Modules.ActionModules[i].GroupName] = buttonList;
                     }
 
@@ -524,24 +524,24 @@ namespace TreeViewer
                         {
                             await new MessageBox("Attention!", "An error occurred while performing the action!\n" + ex.Message).ShowDialog2(this);
                         }
-                    }, Modules.ActionModules[i].HelpText));
+                    }, Modules.ActionModules[i].HelpText, Modules.ActionModules[i].EnabledWithoutTree));
                 }
             }
 
-            List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)>)> structure = (from el in tempStructure orderby (from el2 in el.Value select el2.Item6).Min() ascending select (el.Key, el.Value)).ToList();
+            List<(string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string, bool)>)> structure = (from el in tempStructure orderby (from el2 in el.Value select el2.Item6).Min() ascending select (el.Key, el.Value)).ToList();
 
-            foreach ((string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string)>) el in structure)
+            foreach ((string, List<(string, Control, string, List<(string, Control, string)>, bool, double, Action<int>, string, bool)>) el in structure)
             {
                 el.Item2.Sort((a, b) => a.Item6.CompareTo(b.Item6));
             }
 
-            RibbonTabContent actionTab = new RibbonTabContent(structure);
+            RibbonTabContent actionTab = new RibbonTabContent(structure.Select(x => (x.Item1, x.Item2.Select(y => (y.Item1, y.Item2, y.Item3, y.Item4, y.Item5, y.Item6, y.Item7, y.Item8)).ToList())).ToList());
 
             for (int i = 0; i < actionTab.RibbonButtons.Count; i++)
             {
                 for (int j = 0; j < actionTab.RibbonButtons[i].Count; j++)
                 {
-                    actionTab.RibbonButtons[i][j].IsEnabled = false;
+                    actionTab.RibbonButtons[i][j].IsEnabled = structure[i].Item2[j].Item9;
                 }
             }
 

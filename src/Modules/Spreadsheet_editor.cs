@@ -29,7 +29,7 @@ namespace aca8a7928100d4dcc873d31d7991976b9
         public const string Name = "Spreadsheet editor";
         public const string HelpText = "Opens a spreadsheet editor window.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.Action;
 
         public const string Id = "ca8a7928-100d-4dcc-873d-31d7991976b9";
@@ -49,6 +49,8 @@ namespace aca8a7928100d4dcc873d31d7991976b9
         public static string ButtonText { get; } = "Spread sheet";
 
         public static bool IsLargeButton { get; } = true;
+		
+		public static bool EnabledWithoutTree { get; } = true;
 
         private static string Icon32Base64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAE0SURBVFhH7ZVBroIwFEVbXYuLYKRO1cSxK3BoAmMj5o/+ABbxd2AiTmUnLgXvLS0xPxLBPnAgJ2nKK9B7+9oHqm8W+9MM7WxDpW3fCxRHdy0jlV1+1qteDRCYiNEdykhlY3vRKWEYzoIguKHpv99dPJluuHBmY9t5BiiOzqWdHNM0jbkd2IK8UwNPxA0wUOlqOCnstRhYma4TB3MYyJ3uyAwJ0kaciBpoK07EDLwjTkQMvCtOvA34iBO+XHvzFZi8KifM8/iFI0b81fzeGcDq+HMpIEYDx3K0mTipMpAkiRmoI4oi0z8+pwHE+WdbMnbbQfECcKwON5/EIaR4hjZn0HTlDpFDiLZCyxm3ESdeBpjm/9hbjfGqAgkkzoAXXlXwjLbPfTwDg4GhCoYqGAx8exUodQe08sQZmuOLygAAAABJRU5ErkJggg==";
         private static string Icon48Base64 = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiMAABYjAclRYGsAAAQWSURBVGhD7ZhvaBNnHMefu8tcYtOuVRhz1CJU3aaCFFzHUFRqZ01S01YQ3B9f6fqm4Iu20PrChlQQxLawF0XoC/8wBlsVa2Maq1ak1oo6upUymFFwG8VXglrbxsaYe/b93SWxrWl7ai6XSD7hx93z57jv957nued3ETjnLB1wNHV/h8MRxtm4IArNXrfzDNWnhQGI3w+pHTgV1BoSLjR6D+88mhYG7E2ejVB+EafZao2CjN9XYqSQktTW1pbW1NRYfc3OQYFxB0xMRJoIkYnC3pQ1UF9fv0sQBJ/ZbO5taGjI9jZXDHCZOdA0qfZgWA7sn5ScQiQeun7F6QdqDbsxNTVla29vn7A3XdiC0ehB3c0sKVgeWxRGMfsB1tXV2XE4h/hQqXjFNBOeIutE8G5n2+7nKWUAT96GchdOZ4uPMgATdjIRKWMhGEyV+3wuHTWIJ7MTkiSFsDZYLOyHug1bBBj+E19Kf/44Nja2HWJIvFltiUtvKBSqfJBbso4z8QrKeQhu2Ai8qficnJyqf5duXztNvIIxBrhwksSPj49/o0H8JRJ/O1z0RTjMZ4gnDDDATxWb/tiPJ1+KOX0eFfOJvwzxlSQes70P1y6J1MdIqgG8cE4XS8P78OS34cl3o2o+8VdgsPIOW/85nccTTyTPABd+s/qDingI0yK+wv/R5s94WOzDelkaqX+N5BiA+IAp+4eCgtsbIYzmvEVtiMt1URSr7ltLVi8kntDfAOd/Zfmnvi8a83wN8ZQCZKkNcRmAePtdy5aVYSZfXUg8oasBi/zsb5G9cHd27g5DmBVV0dwmHsou+0j6dIU5/Pi4FvFAEJCy6rmRPcFb5OPf2YYCr8vxYKE8x2Kx5GOUrqH8iVq9MLqOQH5+/qjL5XrJ5fDPjkOeg62trT4I/BZNIbWHwiCJdzgcW2FgGGXN4gndDEA8KywsHCw/2JOHxL0YW+8RfBo2trW1deEVugddyMSgyWSyVVdXrxkdHT0bCATmzIPmYsYUamlpURIkrSABi2WTca6lhuV2V/cmfL9Sbq8Q/Zalr61gMHirrKxsk9PpPIGmZWqP+aH70X2j6DmFRhAPBc52qEXA2YgsynlOt3cxRqLPZrOVDg0NedGiSXw89DTQGzkGuMCqufRyec9h53qfu6LR4ypf1dHRca+/v79rcnJSivR7K/Q0QP8isJ7mihqf2/mLz7WLUoKfEP9hGgz7/f5VsixTl3dCLwPPEE8RNFmvIp4gKJM8gChAJIwZBt5kAc9m1rU5CHolHkOUIBYhYiTwPjPfQumInmsgKaS9AT03sjmZvhnRNXStVpK5kSWFjAGjeb8MJHKDmY9E3iezkRlN2htI2EaG713lqIWU3MiiRpJNZg0YTcaA0WQ2MqNJcwOM/Q//cLy7ocxzawAAAABJRU5ErkJggg==";
