@@ -21,7 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.22" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.22" />
-    <PackageReference Include="CSharpEditor" Version="1.1.5" />
+    <PackageReference Include="CSharpEditor" Version="1.1.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TreeViewer\TreeViewer.csproj" />
