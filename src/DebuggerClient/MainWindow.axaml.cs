@@ -23,6 +23,7 @@ using Avalonia.Threading;
 using CSharpEditor;
 using System.Threading.Tasks;
 using System;
+using TreeViewer;
 
 namespace DebuggerClient
 {
@@ -36,11 +37,21 @@ namespace DebuggerClient
             InterprocessDebuggerClient client = new InterprocessDebuggerClient(Program.CallingArguments);
             this.Content = client;
 
-            client.BreakpointHit += (s, e) =>
+            client.BreakpointHit += async (s, e) =>
             {
                 this.Show();
                 this.WindowState = WindowState.Normal;
                 this.Activate();
+
+                // AvaloniaBugFixes:
+                // Fix issue on Linux that causes the debugger interface not to be updated until the user interacts with the window.
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
+                {
+                    await Task.Delay(100);
+                    this.Width++;
+                    await Task.Delay(100);
+                    this.Width--;
+                }
             };
 
             client.BreakpointResumed += (s, e) =>
