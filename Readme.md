@@ -53,7 +53,7 @@ TreeViewer has been tested on macOS Catalina (Intel x64), Big Sur (Intel x64), M
 
 ### Linux
 
-TreeViewer has been tested on Debian 11 (bullseye), Ubuntu 22.04.1, Linux Mint 21.1, openSUSE Leap 15.4, Fedora 37, Arch Linux (March 2023), and CentOS 7. It may work on other distributions as well.
+TreeViewer has been tested on Debian 12 (bookworm), Ubuntu 22.04.3, Linux Mint 21.2, openSUSE Leap 15.5, Fedora 38, Manjaro 23.0.4, and CentOS 7. It may work on other distributions as well.
 
 Open a terminal window and download the installer using `wget` or `curl` (whichever you prefer/have available):
 
