@@ -66,6 +66,7 @@ namespace TreeViewer
         public Spreadsheet Spreadsheet { get; private set; }
         private bool CanOpenSave { get; }
         private bool CanFormat { get; }
+        private bool TextClipboardAvailable = false;
 
         NumericUpDown fontSizeNud;
         bool programmaticChange;
@@ -1123,7 +1124,7 @@ namespace TreeViewer
                 }
             };
 
-            spreadsheet.PropertyChanged += async (s, e) =>
+            spreadsheet.PropertyChanged += (s, e) =>
             {
                 if (e.Property == Spreadsheet.SelectionProperty)
                 {
@@ -1164,11 +1165,11 @@ namespace TreeViewer
                         homeTab.RibbonGroups[2].RibbonButtons[1].IsEnabled = !spreadsheet.Selection.All(x => x.Left == 0 && x.Right == spreadsheet.MaxTableWidth);
                         homeTab.RibbonGroups[2].RibbonButtons[2].IsEnabled = true;
 
-                        homeTab.RibbonGroups[4].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && (await Application.Current.Clipboard.GetFormatsAsync()).Contains("Text");
+                        homeTab.RibbonGroups[4].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && TextClipboardAvailable;
                         homeTab.RibbonGroups[4].RibbonButtons[1].IsEnabled = true;
                         homeTab.RibbonGroups[4].RibbonButtons[2].IsEnabled = true;
 
-                        editTab.RibbonGroups[0].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && (await Application.Current.Clipboard.GetFormatsAsync()).Contains("Text");
+                        editTab.RibbonGroups[0].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && TextClipboardAvailable;
                         editTab.RibbonGroups[0].RibbonButtons[1].IsEnabled = true;
                         editTab.RibbonGroups[0].RibbonButtons[2].IsEnabled = true;
 
@@ -1263,7 +1264,9 @@ namespace TreeViewer
                     await Task.Delay(100);
                     await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        editTab.RibbonGroups[0].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && (await Application.Current.Clipboard.GetFormatsAsync()).Contains("Text");
+                        TextClipboardAvailable = (await Application.Current.Clipboard?.GetFormatsAsync())?.Contains("Text") == true;
+                        editTab.RibbonGroups[0].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && TextClipboardAvailable;
+                        homeTab.RibbonGroups[4].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && TextClipboardAvailable;
                     });
                 }
             });
