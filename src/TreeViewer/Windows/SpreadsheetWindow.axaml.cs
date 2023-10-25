@@ -1788,6 +1788,9 @@ namespace TreeViewer
                 }
             }
 
+            string colSep = new Xeger(Regex.Unescape(columnSeparator.ToString()), new Random(20230926)).Generate();
+            string rowSep = new Xeger(Regex.Unescape(rowSeparator.ToString()), new Random(20230926)).Generate();
+
             StringBuilder tbr = new StringBuilder();
 
             for (int y = 0; y < width; y++)
@@ -1809,13 +1812,13 @@ namespace TreeViewer
 
                     if (x < height - 1)
                     {
-                        tbr.Append(columnSeparator);
+                        tbr.Append(colSep);
                     }
                 }
 
                 if (y < width - 1)
                 {
-                    tbr.Append(rowSeparator);
+                    tbr.Append(rowSep);
                 }
             }
 
@@ -2236,12 +2239,15 @@ namespace TreeViewer
 
             StringBuilder data = new StringBuilder();
 
+            string rowSeparator = new Xeger(Regex.Unescape(spreadsheet.RowSeparator.ToString()), new Random(20230926)).Generate();
+
+
             while (i < lines.Length)
             {
                 if (!lines[i].StartsWith("----------") || i >= lines.Length - 1 || !lines[i + 1].StartsWith("## FORMAT"))
                 {
                     data.Append(lines[i]);
-                    data.Append(spreadsheet.RowSeparator);
+                    data.Append(rowSeparator);
 
                     i++;
                 }
@@ -2279,7 +2285,7 @@ namespace TreeViewer
 
 
                     format.Append(lines[j]);
-                    format.Append(spreadsheet.RowSeparator);
+                    format.Append(rowSeparator);
                 }
             }
 
