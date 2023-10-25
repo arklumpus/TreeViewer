@@ -36,6 +36,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Fare;
 
 namespace TreeViewer
 {
@@ -2504,6 +2505,9 @@ namespace TreeViewer
                                 }
                             }
 
+                            string colSep = new Xeger(Regex.Unescape(spreadsheet.ColumnSeparator.ToString()), new Random(20230926)).Generate();
+                            string rowSep = new Xeger(Regex.Unescape(spreadsheet.RowSeparator.ToString()), new Random(20230926)).Generate();
+
                             StringBuilder tbr = new StringBuilder();
 
                             for (int y = 0; y < matrix.GetLength(1); y++)
@@ -2525,13 +2529,13 @@ namespace TreeViewer
 
                                     if (x < matrix.GetLength(0) - 1)
                                     {
-                                        tbr.Append(spreadsheet.ColumnSeparator);
+                                        tbr.Append(colSep);
                                     }
                                 }
 
                                 if (y < matrix.GetLength(1) - 1)
                                 {
-                                    tbr.Append(spreadsheet.RowSeparator);
+                                    tbr.Append(rowSep);
                                 }
                             }
 
