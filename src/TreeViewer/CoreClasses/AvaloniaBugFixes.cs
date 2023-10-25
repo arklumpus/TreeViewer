@@ -53,6 +53,11 @@ namespace TreeViewer
         {
             if (owner.IsVisible)
             {
+                while (owner.OwnedWindows != null && owner.OwnedWindows.Count > 0)
+                {
+                    owner = owner.OwnedWindows[owner.OwnedWindows.Count - 1];
+                }
+
                 Dictionary<Control, object> toolTips = null;
 
                 if (Modules.IsMac)
