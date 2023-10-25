@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         mc:Ignorable="d" Width="425" SizeToContent="Height"
         x:Class="TreeViewer.ProgressWindow" CanResize="False"
         Title="Action in progress..." FontFamily="resm:TreeViewer.Fonts.?assembly=TreeViewer#Open Sans" FontSize="15" WindowStartupLocation="CenterOwner"
-        Opened="WindowOpened" ShowInTaskbar="False" HasControlBox="False">
+        Opened="WindowOpened" ShowInTaskbar="False" HasControlBox="False" ExtendClientAreaToDecorationsHint="true" ExtendClientAreaChromeHints="NoChrome">
     <local:ChildWindow.Content>
         <Grid Name="MainGrid">
             <Grid.RowDefinitions>
