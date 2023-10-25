@@ -1265,7 +1265,7 @@ namespace TreeViewer
                     await Task.Delay(100);
                     await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        TextClipboardAvailable = (await Application.Current.Clipboard?.GetFormatsAsync())?.Contains("Text") == true;
+                        TextClipboardAvailable = await Application.Current.Clipboard.ContainsText();
                         editTab.RibbonGroups[0].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && TextClipboardAvailable;
                         homeTab.RibbonGroups[4].RibbonButtons[0].IsEnabled = spreadsheet.Selection.Count == 1 && TextClipboardAvailable;
                     });

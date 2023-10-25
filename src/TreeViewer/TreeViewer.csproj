@@ -51,7 +51,7 @@
     <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="10.14.0" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.22" />
     <PackageReference Include="AvaloniaColorPicker" Version="1.3.4" />
-    <PackageReference Include="Spreadalonia" Version="1.0.3" />
+    <PackageReference Include="Spreadalonia" Version="1.0.4" />
     <PackageReference Include="CSharpEditor" Version="1.1.6" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="MDEdit" Version="1.0.3" />

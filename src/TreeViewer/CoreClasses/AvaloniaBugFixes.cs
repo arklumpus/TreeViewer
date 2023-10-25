@@ -17,7 +17,9 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.VisualTree;
+using PhyloTree.Extensions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -112,6 +114,20 @@ namespace TreeViewer
             else
             {
                 ToolTip.SetTip(control, new ToolTip() { Content = tip });
+            }
+        }
+
+        public static async Task<bool> ContainsText(this IClipboard clipboard)
+        {
+            string[] formats = await clipboard?.GetFormatsAsync();
+
+            if (formats != null)
+            {
+                return formats.ContainsAny(new string[] { "Text", "text", "public.text", "public.plain-text", "public.utf8-plain-text", "public.utf16-plain-text", "public.utf16-external-plain-text" });
+            }
+            else
+            {
+                return false;
             }
         }
     }
