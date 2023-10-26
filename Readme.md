@@ -49,11 +49,11 @@ Download [`TreeViewer-Mac-x64.pkg`](https://github.com/arklumpus/TreeViewer/rele
 
 Once the installer has finished, you can run TreeViewer by opening the App in your Applications folder. You can also run it from the command line by typing `TreeViewer` (or `TreeViewerCommandLine` for the command line version) in a terminal window.
 
-TreeViewer has been tested on macOS Catalina (Intel x64), Big Sur (Intel x64), Monterey (Apple Silicon arm64), and Ventura (Apple Silicon arm64).
+TreeViewer has been tested on macOS Catalina (Intel x64), Big Sur (Intel x64), Monterey (Intel x64 and M1 Apple Silicon arm64), Ventura (M1 Apple Silicon arm64), and Sonoma (M1 Apple Silicon arm64).
 
 ### Linux
 
-TreeViewer has been tested on Debian 12 (bookworm), Ubuntu 22.04.3, Linux Mint 21.2, openSUSE Leap 15.5, Fedora 38, Manjaro 23.0.4, and CentOS 7. It may work on other distributions as well.
+TreeViewer has been tested on Debian 12 (bookworm), MX Linux 23.1, Ubuntu 22.04.3, Linux Mint 21.2, openSUSE Leap 15.5, Fedora 38, Manjaro 23.0.4, and CentOS 7. It may work on other distributions as well.
 
 Open a terminal window and download the installer using `wget` or `curl` (whichever you prefer/have available):
 
@@ -99,9 +99,19 @@ After granting the file permission to load and compile the source code, you shou
 
 ## Troubleshooting and known issues
 
+This section details some known issues that occur on Linux and macOS. In the vast majority of cases, these should not significantly affect your enjoyment of TreeViewer.
+
+### Linux
+
 * On some Linux distributions, the file icons sometimes don't show up for some file types. This appears to be dependent on the file manager used by each distro, so unfortunately there is not much that we can do. Strangely enough, even though the custom icon is not shown, double clicking the files should still work and open them in TreeViewer.
 
+* For complicated reasons, TreeViewer converts text into paths when drawing them in the GUI on Linux (everything works normally when exporting SVG or PDF files). As a result, drawing trees with many thousands of text labels will use more RAM than would normally be needed (e.g., on the same machine using another OS). If you need to work with such a large tree, you may want to remove the tip labels (see the [tutorial on working with large trees](https://github.com/arklumpus/TreeViewer/wiki/Working-with-large-trees-from-the-command%E2%80%90line-interface#selecting-the-true-orthologs)) or to use a different OS.
+
+### macOS
+
 * On macOS laptops, you cannot zoom using a "pinch zoom" motion. To zoom in/out on the tree, move two fingers up and down on the trackpad, as if you were scrolling up and down.
+
+* On macOS Catalina, double-clicking on a tree file when TreeViewer is closed may not launch the application correctly. Everything works fine if TreeViewer is already open. The issue does not occur on later versions of macOS (and you should be upgrading anyways).
 
 ## Manual installation
 
