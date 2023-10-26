@@ -61,7 +61,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions timeline](b93f8a2b-8731-4658-92f5-bb80af7292a8)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Plots age distributions on a timeline.
 
@@ -146,7 +146,7 @@ Safe even when opening huge files.
 
 ### [Branches](7c767b07-71be-48b2-8753-b27f3e973570)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.2.1, by Giorgio Bianchini_
 
 **Description**: Plots tree branches as lines.
 
@@ -158,7 +158,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Branch extensions](fb385719-b376-49b0-8e99-aab7cf641966)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Extends terminal branches.
 
@@ -170,7 +170,7 @@ _Version 1.0.3, by Giorgio Bianchini_
 
 ### [Branch score style](10bbbbe1-c634-4582-9073-11f067a54081)
 
-_Version 1.1.2, by Giorgio Bianchini_
+_Version 1.1.3, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display node scores using the branch colours.
 
@@ -218,7 +218,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Circular](92aac276-3af7-4506-a263-7220e0df5797)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a circular tree.
 
@@ -230,7 +230,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Circular tree style](1f3e0b88-c42d-417c-ba14-ba228be086a7)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as a circular tree.
 
@@ -363,7 +363,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Custom action script](91b732fc-289b-4a91-84ef-b9ee3a89c86b)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Executes custom code.
 
@@ -413,7 +413,7 @@ If the input file is not in binary tree format, it will be converted to a tempor
 
 ### [Draw image](a26abc43-1b12-40c9-9e23-bd3de2718829)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Draws an image.
 
@@ -425,7 +425,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Export](d5d75840-4a71-4b81-bfc4-431736792abb)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Exports the tree plot as a PDF, SVG or PNG image.
 
@@ -497,7 +497,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Labels](ac496677-2650-4d92-8646-0812918bab03)
 
-_Version 1.3.0, by Giorgio Bianchini_
+_Version 1.4.1, by Giorgio Bianchini_
 
 **Description**: Draws labels on nodes, tips or branches.
 
@@ -582,7 +582,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Newick](79dfb9b2-ff10-4ed9-aa74-f7b3ae93c3d2)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.1, by Giorgio Bianchini_
 
 **Description**: Opens a file containing one or more trees in the Newick (-with-attributes) format.
 Safe even when opening huge files.
@@ -595,7 +595,7 @@ Safe even when opening huge files.
 
 ### [New tree](36a54db0-4e24-4786-8b84-ad4e188c3285)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.0.2, by Giorgio Bianchini_
 
 **Description**: Creates a new random tree or builds a tree from a sequence alignment.
 
@@ -620,7 +620,7 @@ Safe even when opening huge files.
 
 ### [Node bars](319e8f63-d6c9-4dac-9419-0b621dcd5f23)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Draws node bars.
 
@@ -632,7 +632,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Node shapes](7434420a-1afd-46ee-aeea-75ed8a5eeada)
 
-_Version 1.0.4, by Giorgio Bianchini_
+_Version 1.1.1, by Giorgio Bianchini_
 
 **Description**: Draws shapes on nodes, tips or branches.
 
@@ -644,7 +644,7 @@ _Version 1.0.4, by Giorgio Bianchini_
 
 ### [Node states](0512b822-044d-4c13-b3bb-bca494c51daa)
 
-_Version 1.2.5, by Giorgio Bianchini_
+_Version 1.3.0, by Giorgio Bianchini_
 
 **Description**: Draws node states based on attributes.
 
@@ -716,7 +716,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Age distributions](5dbe1f3c-dbea-49b3-8f04-f319aefca534)
 
-_Version 1.2.0, by Giorgio Bianchini_
+_Version 1.2.1, by Giorgio Bianchini_
 
 **Description**: Plots node age distributions.
 
@@ -728,7 +728,7 @@ _Version 1.2.0, by Giorgio Bianchini_
 
 ### [Plot alignment](ea7e246b-e93f-4d0d-a67a-88af05479b48)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Adds the plot of an alignment to the tree.
 
@@ -774,9 +774,21 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 <br />
 
+### [Prune and regraft](bab85a0b-90e0-4859-b031-40891293c7d7)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Prunes a subtree and grafts it in another position on the tree.
+
+**Module type**: FurtherTransformation
+
+**Module ID**: `bab85a0b-90e0-4859-b031-40891293c7d7`
+
+<br />
+
 ### [Prune node](ffc97742-4cf5-44ef-81aa-d5b51708a003)
 
-_Version 1.2.0, by Giorgio Bianchini_
+_Version 1.3.1, by Giorgio Bianchini_
 
 **Description**: Prunes nodes off the tree.
 
@@ -800,7 +812,7 @@ _Version 1.0.4, by Giorgio Bianchini_
 
 ### [Radial](95b61284-b870-48b9-b51c-3276f7d89df1)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a radial tree.
 
@@ -812,7 +824,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Rectangle](34e1a627-7b6a-4c0f-80d9-795eea245e1e)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Draws a rectangle on the plot.
 
@@ -824,7 +836,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Rectangular](68e25ec6-5911-4741-8547-317597e1b792)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a rectangular tree.
 
@@ -848,7 +860,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Replace attribute](f17160ad-0462-449a-8a57-e1af775c92ba)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Changes the value of an attribute of a node that matches a criterion.
 
@@ -921,7 +933,7 @@ Safe even when opening huge files.
 
 ### [Rooted tree style](e56b8297-4417-4494-9369-cbe9e5d25397)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as a rooted tree.
 
@@ -981,7 +993,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Search](5f3a7147-f706-43dc-9f57-18ade0c7b15d)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Searches nodes in the tree.
 
@@ -1063,9 +1075,21 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 <br />
 
+### [Spreadsheet editor](ca8a7928-100d-4dcc-873d-31d7991976b9)
+
+_Version 1.0.1, by Giorgio Bianchini_
+
+**Description**: Opens a spreadsheet editor window.
+
+**Module type**: Action
+
+**Module ID**: `ca8a7928-100d-4dcc-873d-31d7991976b9`
+
+<br />
+
 ### [Stochastic mapping branches](f7a20f2f-94b2-4331-8bbf-4e0087da6fba)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Plots branches with data from a stochastic mapping analysis.
 
@@ -1077,7 +1101,7 @@ _Version 1.0.3, by Giorgio Bianchini_
 
 ### [Stochastic map](e760952f-56c1-4192-8dfb-b5d6ec2692d2)
 
-_Version 1.1.2, by Giorgio Bianchini_
+_Version 1.1.4, by Giorgio Bianchini_
 
 **Description**: Opens a file containing one or more trees in the format produced by the write.simmap function of phytools (Revell 2012).
 Safe even when opening huge files.
@@ -1126,7 +1150,7 @@ _Version 1.0.2, by Giorgio Bianchini_
 
 ### [Text element](ebafe997-c220-425a-ae39-06e731de1a07)
 
-_Version 1.0.1, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Draws a text element on the plot.
 
@@ -1174,7 +1198,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Unrooted tree style](a99eb0c6-a69d-4785-961a-a0c247e9704d)
 
-_Version 1.0.3, by Giorgio Bianchini_
+_Version 1.0.4, by Giorgio Bianchini_
 
 **Description**: Sets the plot actions to display the tree as an unrooted tree.
 
