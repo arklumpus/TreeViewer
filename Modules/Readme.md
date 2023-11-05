@@ -957,7 +957,7 @@ _Version 1.2.0, by Giorgio Bianchini_
 
 ### [Scale axis](aeacf625-90cf-41a5-8d10-c37c75aaa2b1)
 
-_Version 1.2.0, by Giorgio Bianchini_
+_Version 1.2.1, by Giorgio Bianchini_
 
 **Description**: Draws a scale axis.
 

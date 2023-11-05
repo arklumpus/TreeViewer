@@ -35,7 +35,7 @@ namespace ScaleAxis
         public const string Name = "Scale axis";
         public const string HelpText = "Draws a scale axis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.0");
+        public static Version Version = new Version("1.2.1");
         public const string Id = "aeacf625-90cf-41a5-8d10-c37c75aaa2b1";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -307,6 +307,11 @@ namespace ScaleAxis
             if (start >= end)
             {
                 throw new Exception("The start of the axis must be smaller than the end!");
+            }
+
+            if (tickSpacing <= 0)
+            {
+                tickSpacing = end - start;
             }
 
             bool reverseAxis = (bool)parameterValues["Reverse axes"];
