@@ -35,7 +35,7 @@ namespace ScaleAxis
         public const string Name = "Scale axis";
         public const string HelpText = "Draws a scale axis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.2.0");
         public const string Id = "aeacf625-90cf-41a5-8d10-c37c75aaa2b1";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -93,7 +93,7 @@ namespace ScaleAxis
 
             return new List<(string, string)>()
             {
-                ( "Axes", "Group:8"),
+                ( "Axes", "Group:10"),
                 
                 /// <param name="Top axis">
                 /// This check box determines whether the axis is shown above the tree.
@@ -110,6 +110,11 @@ namespace ScaleAxis
                 /// the age of `0` will correspond to the root node.
                 /// </param>
                 ( "Reverse axes", "CheckBox:true"),
+                
+                /// <param name="Negative ages">
+                /// If this check box is checked, the units of the axes will be negative.
+                /// </param>
+                ( "Negative ages", "CheckBox:false"),
                 
                 /// <param name="Spacing">
                 /// This parameter determines the spacing between the tree and the axes.
@@ -135,6 +140,12 @@ namespace ScaleAxis
                 /// This parameter is used to determine the position of the measurement unit.
                 /// </param>
                 ( "Unit position:", "ComboBox:1[\"Root\",\"Both\",\"Tips\"]"),
+                
+                /// <param name="Offset:">
+                /// This parameter defines a value that is added to the ages shown on the scale axis.
+                /// This is useful, e.g., if you have a date for the most recent tip on the tree.
+                /// </param>
+                ( "Offset:", "NumericUpDown:0[\"-Infinity\",\"Infinity\",\"1\",\"0.###\"]"),
 
                 ( "Ticks", "Group:4"),
                 
@@ -299,6 +310,7 @@ namespace ScaleAxis
             }
 
             bool reverseAxis = (bool)parameterValues["Reverse axes"];
+            int ageSign = ((bool)parameterValues["Negative ages"] ? -1 : 1);
 
             Colour axisColour = (Colour)parameterValues["Axis colour:"];
             double lineWidth = (double)parameterValues["Line thickness:"];
@@ -314,6 +326,8 @@ namespace ScaleAxis
 
             string units = (string)parameterValues["Units:"];
             int unitPosition = (int)parameterValues["Unit position:"];
+
+            double offset = (double)parameterValues["Offset:"];
 
             double labelSpacing = (double)parameterValues["Label spacing:"];
 
@@ -453,7 +467,7 @@ namespace ScaleAxis
 
                         if (i % labelsEvery == 0)
                         {
-                            string text = (start + i * tickSpacing).ToString(digits);
+                            string text = (start + i * tickSpacing * ageSign + offset).ToString(digits);
 
                             if (i == 0)
                             {
@@ -498,19 +512,41 @@ namespace ScaleAxis
                             Point endPoint;
 
                             Size lastLabelSize = fnt.MeasureText(lastLabel);
+                            Size firstLabelSize = fnt.MeasureText(firstLabel);
 
-                            if (Math.Abs(angle) < Math.PI / 2)
+                            double sX = scaleNorm.X;
+                            double sY = scaleNorm.Y;
+                            double perpsX = perpScaleNorm.X;
+                            double perpsY = perpScaleNorm.Y;
+
+                            if (reverseAxis)
                             {
-                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * Math.Cos(angle) - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * Math.Sin(angle) - scaleNorm.Y * fnt.FontSize);
-                                candidatePoint = new Point(bottomAxis[1].X - scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[1].Y - scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * Math.Cos(angle) - sX * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * Math.Sin(angle) - sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[1].X - sX * fnt.FontSize + perpsX * tickSize, bottomAxis[1].Y - sY * fnt.FontSize + perpsY * tickSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * sX - sX * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * sY - sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[1].X - sX * fnt.FontSize + perpsX * tickSize, bottomAxis[1].Y - sY * fnt.FontSize + perpsY * tickSize);
+                                }
                             }
                             else
                             {
-                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
-                                candidatePoint = new Point(bottomAxis[1].X - scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[1].Y - scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(firstLabelPoint.X - firstLabelSize.Width * 0.5 * Math.Cos(angle) - sX * fnt.FontSize, firstLabelPoint.Y - firstLabelSize.Width * 0.5 * Math.Sin(angle) - sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[0].X - sX * fnt.FontSize + perpsX * tickSize, bottomAxis[0].Y - sY * fnt.FontSize + perpsY * tickSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(firstLabelPoint.X - firstLabelSize.Width * 0.5 * sX - sX * fnt.FontSize, firstLabelPoint.Y - firstLabelSize.Width * 0.5 * sY - sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[0].X - sX * fnt.FontSize + perpsX * tickSize, bottomAxis[0].Y - sY * fnt.FontSize + perpsY * tickSize);
+                                }
                             }
 
-                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+                            double diff = (endPoint.X - candidatePoint.X) * sX + (endPoint.Y - candidatePoint.Y) * sY;
 
                             if (diff > 0)
                             {
@@ -533,10 +569,10 @@ namespace ScaleAxis
 
                             graphics.Restore();
 
-                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X + labelSpacing * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + labelSpacing * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(labelSpacing * perpScaleNorm.X, labelSpacing * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point((labelSpacing + textSize.Height) * perpScaleNorm.X, (labelSpacing + textSize.Height) * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X + (labelSpacing + textSize.Height) * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + (labelSpacing + textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * sX + labelSpacing * perpsX, -textSize.Width * sY + labelSpacing * perpsY)));
+                            updateMaxMin(sumPoint(endPoint, new Point(labelSpacing * perpsX, labelSpacing * perpsY)));
+                            updateMaxMin(sumPoint(endPoint, new Point((labelSpacing + textSize.Height) * perpsX, (labelSpacing + textSize.Height) * perpsY)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * sX + (labelSpacing + textSize.Height) * perpsX, -textSize.Width * sY + (labelSpacing + textSize.Height) * perpsY)));
                         }
 
                         if (unitPosition == 2 || unitPosition == 1)
@@ -544,21 +580,42 @@ namespace ScaleAxis
                             Point candidatePoint;
                             Point endPoint;
 
-                            Size fistLabelSize = fnt.MeasureText(firstLabel);
+                            Size firstLabelSize = fnt.MeasureText(firstLabel);
+                            Size lastLabelSize = fnt.MeasureText(lastLabel);
 
-                            if (Math.Abs(angle) < Math.PI / 2)
+                            double sX = scaleNorm.X;
+                            double sY = scaleNorm.Y;
+                            double perpsX = perpScaleNorm.X;
+                            double perpsY = perpScaleNorm.Y;
+
+                            if (reverseAxis)
                             {
-                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * Math.Cos(angle) + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * Math.Sin(angle) + scaleNorm.Y * fnt.FontSize);
-                                candidatePoint = new Point(bottomAxis[0].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[0].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(firstLabelPoint.X + firstLabelSize.Width * 0.5 * Math.Cos(angle) + sX * fnt.FontSize, firstLabelPoint.Y + firstLabelSize.Width * 0.5 * Math.Sin(angle) + sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[0].X + sX * fnt.FontSize + perpsX * tickSize, bottomAxis[0].Y + sY * fnt.FontSize + perpsY * tickSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(firstLabelPoint.X + firstLabelSize.Width * 0.5 * sX + sX * fnt.FontSize, firstLabelPoint.Y + firstLabelSize.Width * 0.5 * sY + sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[0].X + sX * fnt.FontSize + perpsX * tickSize, bottomAxis[0].Y + sY * fnt.FontSize + perpsY * tickSize);
+                                }
                             }
                             else
                             {
-                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
-                                candidatePoint = new Point(bottomAxis[0].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[0].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(lastLabelPoint.X + lastLabelSize.Width * 0.5 * Math.Cos(angle) + sX * fnt.FontSize, lastLabelPoint.Y + lastLabelSize.Width * 0.5 * Math.Sin(angle) + sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[1].X + sX * fnt.FontSize + perpsX * tickSize, bottomAxis[1].Y + sY * fnt.FontSize + perpsY * tickSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(lastLabelPoint.X + lastLabelSize.Width * 0.5 * sX + sX * fnt.FontSize, lastLabelPoint.Y + lastLabelSize.Width * 0.5 * sY + sY * fnt.FontSize);
+                                    candidatePoint = new Point(bottomAxis[1].X + sX * fnt.FontSize + perpsX * tickSize, bottomAxis[1].Y + sY * fnt.FontSize + perpsY * tickSize);
+                                }
                             }
 
-
-                            double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
+                            double diff = (endPoint.X - candidatePoint.X) * sX + (endPoint.Y - candidatePoint.Y) * sY;
 
                             if (diff < 0)
                             {
@@ -581,10 +638,10 @@ namespace ScaleAxis
 
                             graphics.Restore();
 
-                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X + labelSpacing * perpScaleNorm.X, textSize.Width * scaleNorm.Y + labelSpacing * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(labelSpacing * perpScaleNorm.X, labelSpacing * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point((labelSpacing + textSize.Height) * perpScaleNorm.X, (labelSpacing + textSize.Height) * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X + (labelSpacing + textSize.Height) * perpScaleNorm.X, textSize.Width * scaleNorm.Y + (labelSpacing + textSize.Height) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * sX + labelSpacing * perpsX, textSize.Width * sY + labelSpacing * perpsY)));
+                            updateMaxMin(sumPoint(endPoint, new Point(labelSpacing * perpsX, labelSpacing * perpsY)));
+                            updateMaxMin(sumPoint(endPoint, new Point((labelSpacing + textSize.Height) * perpsX, (labelSpacing + textSize.Height) * perpsY)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * sX + (labelSpacing + textSize.Height) * perpsX, textSize.Width * sY + (labelSpacing + textSize.Height) * perpsY)));
                         }
                     }
                 }
@@ -614,7 +671,7 @@ namespace ScaleAxis
 
                         if (i % labelsEvery == 0)
                         {
-                            string text = (start + i * tickSpacing).ToString(digits);
+                            string text = (start + i * tickSpacing * ageSign + offset).ToString(digits);
 
                             if (i == 0)
                             {
@@ -655,18 +712,37 @@ namespace ScaleAxis
 
                         if (unitPosition == 0 || unitPosition == 1)
                         {
-                            Point candidatePoint = new Point(topAxis[1].X - scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[1].Y - scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+                            Point candidatePoint;
                             Point endPoint;
 
                             Size lastLabelSize = fnt.MeasureText(lastLabel);
+                            Size firstLabelSize = fnt.MeasureText(lastLabel);
 
-                            if (Math.Abs(angle) < Math.PI / 2)
+                            if (reverseAxis)
                             {
-                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * Math.Cos(angle) - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * Math.Sin(angle) - scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(topAxis[1].X - scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[1].Y - scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * Math.Cos(angle) - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * Math.Sin(angle) - scaleNorm.Y * fnt.FontSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
+                                }
                             }
                             else
                             {
-                                endPoint = new Point(lastLabelPoint.X - lastLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, lastLabelPoint.Y - lastLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(topAxis[0].X - scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[0].Y - scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(firstLabelPoint.X - firstLabelSize.Width * 0.5 * Math.Cos(angle) - scaleNorm.X * fnt.FontSize, firstLabelPoint.Y - firstLabelSize.Width * 0.5 * Math.Sin(angle) - scaleNorm.Y * fnt.FontSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(firstLabelPoint.X - firstLabelSize.Width * 0.5 * scaleNorm.X - scaleNorm.X * fnt.FontSize, firstLabelPoint.Y - firstLabelSize.Width * 0.5 * scaleNorm.Y - scaleNorm.Y * fnt.FontSize);
+                                }
                             }
 
                             double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
@@ -696,26 +772,45 @@ namespace ScaleAxis
 
                             graphics.Restore();
 
-                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - labelSpacing * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + (-labelSpacing) * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(-labelSpacing * perpScaleNorm.X, -labelSpacing * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(-(labelSpacing + top) * perpScaleNorm.X, -(labelSpacing + top) * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - (labelSpacing + top) * perpScaleNorm.X, -textSize.Width * scaleNorm.Y - (labelSpacing + top) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - labelSpacing * perpScaleNorm.X, -textSize.Width * scaleNorm.Y + (-labelSpacing) * perpScaleNorm.Y - metrics.Bottom * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-labelSpacing * perpScaleNorm.X, -labelSpacing * perpScaleNorm.Y - metrics.Bottom * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-(labelSpacing + top) * perpScaleNorm.X, -(labelSpacing + top) * perpScaleNorm.Y + metrics.Bottom * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-textSize.Width * scaleNorm.X - (labelSpacing + top) * perpScaleNorm.X, -textSize.Width * scaleNorm.Y - (labelSpacing + top) * perpScaleNorm.Y + metrics.Bottom * perpScaleNorm.Y)));
                         }
 
                         if (unitPosition == 2 || unitPosition == 1)
                         {
-                            Point candidatePoint = new Point(topAxis[0].X + scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[0].Y + scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+                            Point candidatePoint;
                             Point endPoint;
 
-                            Size fistLabelSize = fnt.MeasureText(firstLabel);
+                            Size firstLabelSize = fnt.MeasureText(firstLabel);
+                            Size lastLabelSize = fnt.MeasureText(lastLabel);
 
-                            if (Math.Abs(angle) < Math.PI / 2)
+                            if (reverseAxis)
                             {
-                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * Math.Cos(angle) + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * Math.Sin(angle) + scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(topAxis[0].X + scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[0].Y + scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(firstLabelPoint.X + firstLabelSize.Width * 0.5 * Math.Cos(angle) + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + firstLabelSize.Width * 0.5 * Math.Sin(angle) + scaleNorm.Y * fnt.FontSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(firstLabelPoint.X + firstLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + firstLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                }
                             }
                             else
                             {
-                                endPoint = new Point(firstLabelPoint.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                candidatePoint = new Point(topAxis[1].X + scaleNorm.X * fnt.FontSize - perpScaleNorm.X * tickSize, topAxis[1].Y + scaleNorm.Y * fnt.FontSize - perpScaleNorm.Y * tickSize);
+
+                                if (Math.Abs(angle) < Math.PI / 2)
+                                {
+                                    endPoint = new Point(lastLabelPoint.X + lastLabelSize.Width * 0.5 * Math.Cos(angle) + scaleNorm.X * fnt.FontSize, lastLabelPoint.Y + lastLabelSize.Width * 0.5 * Math.Sin(angle) + scaleNorm.Y * fnt.FontSize);
+                                }
+                                else
+                                {
+                                    endPoint = new Point(lastLabelPoint.X + lastLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, lastLabelPoint.Y + lastLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                }
                             }
 
                             double diff = (endPoint.X - candidatePoint.X) * scaleNorm.X + (endPoint.Y - candidatePoint.Y) * scaleNorm.Y;
@@ -729,7 +824,9 @@ namespace ScaleAxis
                             graphics.Translate(endPoint);
                             graphics.Rotate(angle);
 
-                            double top = fnt.MeasureTextAdvanced(units).Top;
+                            Font.DetailedFontMetrics metrics = fnt.MeasureTextAdvanced(units);
+
+                            double top = metrics.Top;
 
                             if (Math.Abs(angle) < Math.PI / 2)
                             {
@@ -743,10 +840,10 @@ namespace ScaleAxis
 
                             graphics.Restore();
 
-                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - labelSpacing * perpScaleNorm.X, textSize.Width * scaleNorm.Y - labelSpacing * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(-labelSpacing * perpScaleNorm.X, -labelSpacing * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(-(labelSpacing + top) * perpScaleNorm.X, -(labelSpacing + top) * perpScaleNorm.Y)));
-                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - (labelSpacing + top) * perpScaleNorm.X, textSize.Width * scaleNorm.Y - (labelSpacing + top) * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - labelSpacing * perpScaleNorm.X, textSize.Width * scaleNorm.Y - labelSpacing * perpScaleNorm.Y - metrics.Bottom * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-labelSpacing * perpScaleNorm.X, -labelSpacing * perpScaleNorm.Y - metrics.Bottom * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(-(labelSpacing + top) * perpScaleNorm.X, -(labelSpacing + top) * perpScaleNorm.Y + metrics.Bottom * perpScaleNorm.Y)));
+                            updateMaxMin(sumPoint(endPoint, new Point(textSize.Width * scaleNorm.X - (labelSpacing + top) * perpScaleNorm.X, textSize.Width * scaleNorm.Y - (labelSpacing + top) * perpScaleNorm.Y + metrics.Bottom * perpScaleNorm.Y)));
                         }
                     }
                 }
@@ -873,7 +970,7 @@ namespace ScaleAxis
 
                                 if (i % labelsEvery == 0)
                                 {
-                                    string text = (start + i * tickSpacing).ToString(digits);
+                                    string text = (start + i * tickSpacing * ageSign + offset).ToString(digits);
 
                                     if (reverseAxis)
                                     {
@@ -928,7 +1025,7 @@ namespace ScaleAxis
 
                                 if (i % labelsEvery == 0)
                                 {
-                                    string text = (start + i * tickSpacing).ToString(digits);
+                                    string text = (start + i * tickSpacing * ageSign + offset).ToString(digits);
 
                                     if (reverseAxis)
                                     {
@@ -1018,16 +1115,16 @@ namespace ScaleAxis
                                     Point candidatePoint;
                                     Point endPoint;
 
-                                    Size fistLabelSize = fnt.MeasureText(lastLabel2);
+                                    Size firstLabelSize = fnt.MeasureText(lastLabel2);
 
                                     if (reverseAxis)
                                     {
-                                        endPoint = new Point(lastLabelPoint2.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, lastLabelPoint2.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                        endPoint = new Point(lastLabelPoint2.X + firstLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, lastLabelPoint2.Y + firstLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
                                         candidatePoint = new Point(bottomAxis2[1].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis2[1].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
                                     }
                                     else
                                     {
-                                        endPoint = new Point(lastLabelPoint2.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, lastLabelPoint2.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                        endPoint = new Point(lastLabelPoint2.X + firstLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, lastLabelPoint2.Y + firstLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
                                         candidatePoint = new Point(bottomAxis2[0].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis2[0].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
                                     }
 
@@ -1058,16 +1155,16 @@ namespace ScaleAxis
                                     Point candidatePoint;
                                     Point endPoint;
 
-                                    Size fistLabelSize = fnt.MeasureText(firstLabel1);
+                                    Size firstLabelSize = fnt.MeasureText(firstLabel1);
 
                                     if (reverseAxis)
                                     {
-                                        endPoint = new Point(firstLabelPoint1.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint1.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                        endPoint = new Point(firstLabelPoint1.X + firstLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint1.Y + firstLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
                                         candidatePoint = new Point(bottomAxis[0].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[0].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
                                     }
                                     else
                                     {
-                                        endPoint = new Point(firstLabelPoint1.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint1.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                        endPoint = new Point(firstLabelPoint1.X + firstLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint1.Y + firstLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
                                         candidatePoint = new Point(bottomAxis[1].X + scaleNorm.X * fnt.FontSize + perpScaleNorm.X * tickSize, bottomAxis[1].Y + scaleNorm.Y * fnt.FontSize + perpScaleNorm.Y * tickSize);
                                     }
 
@@ -1185,7 +1282,7 @@ namespace ScaleAxis
 
                                 if (i % labelsEvery == 0)
                                 {
-                                    string text = (start + i * tickSpacing).ToString(digits);
+                                    string text = (start + i * tickSpacing * ageSign + offset).ToString(digits);
 
                                     if (reverseAxis)
                                     {
@@ -1240,7 +1337,7 @@ namespace ScaleAxis
 
                                 if (i % labelsEvery == 0)
                                 {
-                                    string text = (start + i * tickSpacing).ToString(digits);
+                                    string text = (start + i * tickSpacing * ageSign + offset).ToString(digits);
 
                                     if (reverseAxis)
                                     {
@@ -1332,9 +1429,9 @@ namespace ScaleAxis
                                     Point candidatePoint;
                                     Point endPoint;
 
-                                    Size fistLabelSize = fnt.MeasureText(lastLabel2);
+                                    Size firstLabelSize = fnt.MeasureText(lastLabel2);
 
-                                    endPoint = new Point(lastLabelPoint2.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, lastLabelPoint2.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                    endPoint = new Point(lastLabelPoint2.X + firstLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, lastLabelPoint2.Y + firstLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
 
                                     if (reverseAxis)
                                     {
@@ -1373,9 +1470,9 @@ namespace ScaleAxis
                                     Point candidatePoint;
                                     Point endPoint;
 
-                                    Size fistLabelSize = fnt.MeasureText(firstLabel1);
+                                    Size firstLabelSize = fnt.MeasureText(firstLabel1);
 
-                                    endPoint = new Point(firstLabelPoint1.X + fistLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint1.Y + fistLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
+                                    endPoint = new Point(firstLabelPoint1.X + firstLabelSize.Width * 0.5 * scaleNorm.X + scaleNorm.X * fnt.FontSize, firstLabelPoint1.Y + firstLabelSize.Width * 0.5 * scaleNorm.Y + scaleNorm.Y * fnt.FontSize);
 
                                     if (reverseAxis)
                                     {
