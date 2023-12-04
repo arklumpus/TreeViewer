@@ -44,7 +44,7 @@ namespace SetUpAgeDistributions
         public const string Name = "Set up age distributions";
         public const string HelpText = "Computes node age distributions.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const string Id = "a1ccf05a-cf3c-4ca4-83be-af56f501c2a6";
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
@@ -220,9 +220,17 @@ namespace SetUpAgeDistributions
 
             object progressLock = new object();
             object addLock = new object();
+			object collectionLock = new object();
 
-            System.Threading.Tasks.Parallel.ForEach(treeCollection, new ParallelOptions() { MaxDegreeOfParallelism = 6 }, sampledTree =>
+             System.Threading.Tasks.Parallel.For(0, treeCollection.Count, new ParallelOptions() { MaxDegreeOfParallelism = 6 }, i =>
               {
+                  TreeNode sampledTree;
+
+                  lock (collectionLock)
+                  {
+                      sampledTree = treeCollection[i];
+                  }
+				  
                   double treeHeight = -1;
 
                   if (!fromLeft)
