@@ -61,7 +61,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Age distributions timeline](b93f8a2b-8731-4658-92f5-bb80af7292a8)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Plots age distributions on a timeline.
 
@@ -716,7 +716,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Age distributions](5dbe1f3c-dbea-49b3-8f04-f319aefca534)
 
-_Version 1.2.1, by Giorgio Bianchini_
+_Version 1.2.2, by Giorgio Bianchini_
 
 **Description**: Plots node age distributions.
 
@@ -1017,7 +1017,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Set up age distributions](a1ccf05a-cf3c-4ca4-83be-af56f501c2a6)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Computes node age distributions.
 
