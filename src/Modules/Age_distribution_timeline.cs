@@ -52,7 +52,7 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
         public const string Name = "Age distributions timeline";
         public const string HelpText = "Plots age distributions on a timeline.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "b93f8a2b-8731-4658-92f5-bb80af7292a8";
@@ -480,6 +480,11 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
             static (int[], double[]) histogram(List<double> samples)
             {
+				if (samples.Count == 1)
+                {
+                    return (new int[] { 1 }, new double[] { samples[0], samples[0], samples[0] * 0.01 });
+                }
+				
                 samples.Sort();
                 double iqr = BayesStats.Quantile(samples, 0.75) - BayesStats.Quantile(samples, 0.25);
 
@@ -503,6 +508,11 @@ namespace ab93f8a2b8731465892f5bb80af7292a8
 
             static (int[], double[], double[]) histogramWithBinMeans(List<double> samples)
             {
+				if (samples.Count == 1)
+                {
+                    return (new int[] { 1 }, new double[] { samples[0], samples[0], samples[0] * 0.01 }, new double[] { samples[0] });
+                }
+				
                 samples.Sort();
                 double iqr = BayesStats.Quantile(samples, 0.75) - BayesStats.Quantile(samples, 0.25);
 

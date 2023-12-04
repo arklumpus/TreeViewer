@@ -37,7 +37,7 @@ namespace NodeAgeDistributions
         public const string Name = "Age distributions";
         public const string HelpText = "Plots node age distributions.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.1");
+        public static Version Version = new Version("1.2.2");
         public const string Id = "5dbe1f3c-dbea-49b3-8f04-f319aefca534";
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
@@ -337,6 +337,11 @@ namespace NodeAgeDistributions
 
             static (int[], double[]) histogram(List<double> samples)
             {
+				if (samples.Count == 1)
+                {
+                    return (new int[] { 1 }, new double[] { samples[0], samples[0], samples[0] * 0.01 });
+                }
+				
                 samples.Sort();
                 double iqr = BayesStats.Quantile(samples, 0.75) - BayesStats.Quantile(samples, 0.25);
 
@@ -368,6 +373,11 @@ namespace NodeAgeDistributions
 
             static (int[], double[], double[]) histogramWithBinMeans(List<double> samples)
             {
+				if (samples.Count == 1)
+                {
+                    return (new int[] { 1 }, new double[] { samples[0], samples[0], samples[0] * 0.01 }, new double[] { samples[0] });
+                }
+				
                 samples.Sort();
                 double iqr = BayesStats.Quantile(samples, 0.75) - BayesStats.Quantile(samples, 0.25);
 
