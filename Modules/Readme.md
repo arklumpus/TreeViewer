@@ -461,7 +461,7 @@ _Version 1.2.2, by Giorgio Bianchini_
 
 ### [Highlights](28e76a57-6930-4c49-974c-639c104dc4ba)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Highlights multiple nodes in a tree based on attribute values.
 
@@ -473,7 +473,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Highlight node](64769664-d163-4fce-b7ba-18fd9445fcfb)
 
-_Version 1.0.0, by Giorgio Bianchini_
+_Version 1.1.0, by Giorgio Bianchini_
 
 **Description**: Highlights a single node in the tree.
 
