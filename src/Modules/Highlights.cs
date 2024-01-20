@@ -21,6 +21,9 @@ using PhyloTree;
 using TreeViewer;
 using VectSharp;
 using System.Runtime.InteropServices;
+using System.Linq;
+using Accord.Statistics.Analysis;
+using Accord.Statistics.Models.Regression.Linear;
 
 namespace a28e76a5769304c49974c639c104dc4ba
 {
@@ -43,7 +46,7 @@ namespace a28e76a5769304c49974c639c104dc4ba
         public const string Name = "Highlights";
         public const string HelpText = "Highlights multiple nodes in a tree based on attribute values.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.1.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
         public const string Id = "28e76a57-6930-4c49-974c-639c104dc4ba";
 
@@ -99,7 +102,7 @@ namespace a28e76a5769304c49974c639c104dc4ba
 
             return new List<(string, string)>()
             {
-                ("Appearance", "Group:4"),
+                ("Appearance", "Group:6"),
 
                 /// <param name="Stroke colour:">
                 /// This colour is used to stroke the outline of the highlight.
@@ -116,10 +119,47 @@ namespace a28e76a5769304c49974c639c104dc4ba
                 /// </param>
                 ( "Line dash:", "Dash:[0,0,0]"),
                 
+                /// <param name="Fill type:">
+                /// This parameter determines whether the highlight is filled with a solid colour or with a gradient.
+                /// </param>
+                ( "Fill type:", "ComboBox:0[\"Solid colour\",\"Gradient\"]" ),
+                
                 /// <param name="Fill colour:">
-                /// This colour is used to fill the highlight.
+                /// This colour is used to fill the highlight with a solid colour.
                 /// </param>
                 ( "Fill colour:", "ColourByNode:[" + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToColour[0]) + ",\"Highlight\",\"String\",\"0\",\"0\",\"0\",\"0\",\"true\"]" ),
+
+                ("Gradient", "Group:5"),
+                
+                /// <param name="Start:">
+                /// This colour represents the starting colour in the gradient.
+                /// </param>
+                ( "Start:", "ColourByNode:[" + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToColour[0]) + ",\"HighlightStart\",\"String\",\"0\",\"0\",\"0\",\"0\",\"true\"]" ),
+                
+                /// <param name="End:">
+                /// This colour represents the final colour in the gradient.
+                /// </param>
+                ( "End:", "ColourByNode:[" + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToColour[0]) + ",\"Highlight\",\"String\",\"0\",\"0\",\"0\",\"0\",\"true\"]" ),
+                
+                /// <param name="Midpoint:">
+                /// This parameter determines where the midpoint of the gradient (i.e., the colour halfway through the [gradient Start](#start)
+                /// and the [gradient End](#end)) is located, relative to the gradient. `0` refers to the start of the gradient and `1` to its end.
+                /// </param>
+                ( "Midpoint:", "Slider:0.5[\"0\",\"1\"]" ),
+                
+                /// <param name="Direction:">
+                /// This parameter represents the direction of the gradient. `Root to leaves` means that the [gradient Start](#start) refers to
+                /// the most ancestral node in the selection, while the [gradient End](#end) refers the most distant leaf node, hence the 
+                /// gradient is parallel to the "growing direction" of the tree. `Leaf to leaf` means that the [Gradient Start](#start) refers
+                /// to the first selected leaf node, while the [gradient End](#end) refers to the last selected leaf node, hence the gradient
+                /// is perpendicular to the "growing direction" of the tree.
+                /// </param>
+                ( "Direction:", "ComboBox:0[\"Root to leaves\",\"Leaf to leaf\"]" ),
+
+                /// <param name="Gradient version:">
+                /// This hidden parameter is used internally to ensure forwards compatibility.
+                /// </param>
+                ( "Gradient version:", "TextBox:1.1.0"),
 
                 ( "Margins", "Group:4" ),
 
@@ -196,7 +236,7 @@ namespace a28e76a5769304c49974c639c104dc4ba
 
         public static bool OnParameterChange(object tree, Dictionary<string, object> previousParameterValues, Dictionary<string, object> currentParameterValues, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange)
         {
-            controlStatus = new Dictionary<string, ControlStatus>();
+            controlStatus = new Dictionary<string, ControlStatus>() { { "Gradient version:", ControlStatus.Hidden } };
             parametersToChange = new Dictionary<string, object>();
 
 
@@ -210,6 +250,18 @@ namespace a28e76a5769304c49974c639c104dc4ba
                 controlStatus["Margin:"] = ControlStatus.Enabled;
                 controlStatus["Margin balance:"] = ControlStatus.Enabled;
             }
+
+            if ((int)currentParameterValues["Fill type:"] == 1)
+            {
+                controlStatus["Fill colour:"] = ControlStatus.Hidden;
+                controlStatus["Gradient"] = ControlStatus.Enabled;
+            }
+            else
+            {
+                controlStatus["Fill colour:"] = ControlStatus.Enabled;
+                controlStatus["Gradient"] = ControlStatus.Hidden;
+            }
+
 
 
             return true;
@@ -237,6 +289,12 @@ namespace a28e76a5769304c49974c639c104dc4ba
             bool convexHull = (int)parameterValues["Mode:"] == 1;
             double margin = (double)parameterValues["Margin:"];
             double marginBalance = 1 - (double)parameterValues["Margin balance:"];
+
+            bool gradient = (int)parameterValues["Fill type:"] == 1;
+            ColourFormatterOptions gradientStartColourFO = (ColourFormatterOptions)parameterValues["Start:"];
+            ColourFormatterOptions gradientEndColourFO = (ColourFormatterOptions)parameterValues["End:"];
+            int gradientDirection = (int)parameterValues["Direction:"];
+            double gradientMidPoint = (double)parameterValues["Midpoint:"];
 
 
             double ptMinX = double.MaxValue;
@@ -279,9 +337,32 @@ namespace a28e76a5769304c49974c639c104dc4ba
                     lineWidth = lineWidthFO.Formatter(weightAttributeObject) ?? defaultLineWidth;
                 }
 
+                Colour gradientStartColour = gradientStartColourFO.DefaultColour;
+
+                if (node.Attributes.TryGetValue(gradientStartColourFO.AttributeName, out object gradientStartAttributeObject) && gradientStartAttributeObject != null)
+                {
+                    gradientStartColour = gradientStartColourFO.Formatter(gradientStartAttributeObject) ?? gradientStartColourFO.DefaultColour;
+                }
+
+                Colour gradientEndColour = gradientEndColourFO.DefaultColour;
+
+                if (node.Attributes.TryGetValue(gradientEndColourFO.AttributeName, out object gradientEndAttributeObject) && gradientEndAttributeObject != null)
+                {
+                    gradientEndColour = gradientEndColourFO.Formatter(gradientEndAttributeObject) ?? gradientEndColourFO.DefaultColour;
+                }
+
+                (double L1, double a1, double b1) = gradientStartColour.ToLab();
+                (double L2, double a2, double b2) = gradientEndColour.ToLab();
+
+                Colour midpointColour = Colour.FromLab((L1 + L2) * 0.5, (a1 + a2) * 0.5, (b1 + b2) * 0.5).WithAlpha((gradientStartColour.A + gradientEndColour.A) * 0.5);
+
+                GradientStops gradientStops = new GradientStops(new VectSharp.GradientStop(gradientStartColour, 0), new VectSharp.GradientStop(midpointColour, gradientMidPoint), new VectSharp.GradientStop(gradientEndColour, 1));
+
+                Brush gradientFill = null;
+
                 GraphicsPath pth = new GraphicsPath();
 
-                if (fill.A > 0 || (stroke.A > 0 && lineWidth > 0))
+                if ((fill.A > 0 || (gradient && (gradientStartColour.A > 0 || gradientEndColour.A > 0))) || (stroke.A > 0 && lineWidth > 0))
                 {
 
                     if (coordinates.TryGetValue("95b61284-b870-48b9-b51c-3276f7d89df1", out Point scale))
@@ -292,6 +373,41 @@ namespace a28e76a5769304c49974c639c104dc4ba
                         {
                             pth.Arc(coordinates[node.Id], margin, 0, 2 * Math.PI);
                             pth.Close();
+
+                            if (gradient)
+                            {
+                                Point nodePt = coordinates[node.Id];
+
+                                Point parentPt;
+
+                                if (node.Parent != null)
+                                {
+                                    parentPt = coordinates[node.Parent.Id];
+                                }
+                                else
+                                {
+                                    parentPt = coordinates[Modules.RootNodeId];
+                                }
+
+                                double angle = Math.Atan2(nodePt.Y - parentPt.Y, nodePt.X - parentPt.X);
+
+                                Point p1 = new Point();
+                                Point p2 = new Point();
+
+                                if (gradientDirection == 0)
+                                {
+                                    p1 = new Point(nodePt.X - margin * Math.Cos(angle), nodePt.Y - margin * Math.Sin(angle));
+                                    p2 = new Point(nodePt.X + margin * Math.Cos(angle), nodePt.Y + margin * Math.Sin(angle));
+                                }
+                                else if (gradientDirection == 1)
+                                {
+                                    p1 = new Point(nodePt.X - margin * Math.Cos(angle + Math.PI / 2), nodePt.Y - margin * Math.Sin(angle + Math.PI / 2));
+                                    p2 = new Point(nodePt.X + margin * Math.Cos(angle + Math.PI / 2), nodePt.Y + margin * Math.Sin(angle + Math.PI / 2));
+                                }
+
+                                gradientFill = new LinearGradientBrush(p1, p2, gradientStops);
+
+                            }
                         }
                         else
                         {
@@ -322,6 +438,8 @@ namespace a28e76a5769304c49974c639c104dc4ba
                                     points.Add(coordinates[leaf.Id]);
                                 }
                             }
+
+                            double[][] finalPoints = null;
 
                             if (margin > 0)
                             {
@@ -401,6 +519,11 @@ namespace a28e76a5769304c49974c639c104dc4ba
                                         updateMaxMin(vertex);
                                     }
                                 }
+
+                                if (gradient)
+                                {
+                                    finalPoints = pathWithMargin.Select(x => new double[] { x.X, x.Y }).ToArray();
+                                }
                             }
                             else
                             {
@@ -409,8 +532,151 @@ namespace a28e76a5769304c49974c639c104dc4ba
                                     pth.LineTo(points[i]);
                                     updateMaxMin(points[i]);
                                 }
+
+                                if (gradient)
+                                {
+                                    finalPoints = points.Select(x => new double[] { x.X, x.Y }).ToArray();
+                                }
                             }
                             pth.Close();
+
+                            if (gradient)
+                            {
+                                PrincipalComponentAnalysis pca = new PrincipalComponentAnalysis();
+                                MultivariateLinearRegression transform = pca.Learn(finalPoints);
+                                MultivariateLinearRegression inverseTransform = transform.Inverse();
+
+                                GraphicsPath transformedPth = pth.Transform(x =>
+                                {
+                                    double[] d = transform.Transform(new double[] { x.X, x.Y });
+                                    return new Point(d[0], d[1]);
+                                });
+
+                                Rectangle bounds = transformedPth.GetBounds();
+
+                                double[] p1D = inverseTransform.Transform(new double[] { bounds.Location.X, bounds.Location.Y + bounds.Size.Height * 0.5 });
+                                double[] p2D = inverseTransform.Transform(new double[] { bounds.Location.X + bounds.Size.Width, bounds.Location.Y + bounds.Size.Height * 0.5 });
+
+                                double[] p3D = inverseTransform.Transform(new double[] { bounds.Location.X + bounds.Size.Width * 0.5, bounds.Location.Y });
+                                double[] p4D = inverseTransform.Transform(new double[] { bounds.Location.X + bounds.Size.Width * 0.5, bounds.Location.Y + bounds.Size.Height });
+
+                                Point p1 = new Point(p1D[0], p1D[1]);
+                                Point p2 = new Point(p2D[0], p2D[1]);
+                                Point p3 = new Point(p3D[0], p3D[1]);
+                                Point p4 = new Point(p4D[0], p4D[1]);
+
+                                Point nodePt = coordinates[node.Id];
+
+                                Point parentPt;
+
+                                if (node.Parent != null)
+                                {
+                                    parentPt = coordinates[node.Parent.Id];
+                                }
+                                else
+                                {
+                                    parentPt = coordinates[Modules.RootNodeId];
+                                }
+
+                                double[] transfParentPt = transform.Transform(new double[] { parentPt.X, parentPt.Y });
+                                double[] transfNodePt = transform.Transform(new double[] { nodePt.X, nodePt.Y });
+
+                                Font fnt = new Font(FontFamily.ResolveFontFamily(FontFamily.StandardFontFamilies.Helvetica), 8);
+
+                                if (Math.Abs(transfNodePt[0] - transfParentPt[0]) >= Math.Abs(transfNodePt[1] - transfParentPt[1]))
+                                {
+                                    if (gradientDirection == 0)
+                                    {
+                                        if (transfNodePt[0] - transfParentPt[0] > 0)
+                                        {
+                                            gradientFill = new LinearGradientBrush(p1, p2, gradientStops);
+                                        }
+                                        else
+                                        {
+                                            gradientFill = new LinearGradientBrush(p2, p1, gradientStops);
+                                        }
+                                    }
+                                    else if (gradientDirection == 1)
+                                    {
+                                        Point M1;
+                                        Point M2;
+
+                                        if (transfNodePt[0] - transfParentPt[0] > 0)
+                                        {
+                                            M1 = p1;
+                                            M2 = p2;
+                                        }
+                                        else
+                                        {
+                                            M1 = p2;
+                                            M2 = p1;
+                                        }
+
+                                        Point m1;
+                                        Point m2;
+
+                                        if ((p4.X - p3.X) * (M2.Y - M1.Y) - (p4.Y - p3.Y) * (M2.X - M1.X) < 0)
+                                        {
+                                            m1 = p3;
+                                            m2 = p4;
+                                        }
+                                        else
+                                        {
+                                            m1 = p4;
+                                            m2 = p3;
+                                        }
+
+                                        gradientFill = new LinearGradientBrush(m1, m2, gradientStops);
+                                    }
+                                }
+                                else
+                                {
+                                    if (gradientDirection == 0)
+                                    {
+                                        if (transfNodePt[1] - transfParentPt[1] > 0)
+                                        {
+                                            gradientFill = new LinearGradientBrush(p3, p4, gradientStops);
+                                        }
+                                        else
+                                        {
+                                            gradientFill = new LinearGradientBrush(p4, p3, gradientStops);
+                                        }
+                                    }
+                                    else if (gradientDirection == 1)
+                                    {
+                                        Point M1;
+                                        Point M2;
+
+                                        if (transfNodePt[1] - transfParentPt[1] > 0)
+                                        {
+                                            M1 = p3;
+                                            M2 = p4;
+                                        }
+                                        else
+                                        {
+                                            M1 = p4;
+                                            M2 = p3;
+                                        }
+
+                                        Point m1;
+                                        Point m2;
+
+                                        if ((p2.X - p1.X) * (M2.Y - M1.Y) - (p2.Y - p1.Y) * (M2.X - M1.X) < 0)
+                                        {
+                                            m1 = p1;
+                                            m2 = p2;
+                                        }
+                                        else
+                                        {
+                                            m1 = p2;
+                                            m2 = p1;
+                                        }
+
+                                        gradientFill = new LinearGradientBrush(m1, m2, gradientStops);
+
+                                    }
+                                }
+                            }
                         }
                     }
                     else if (coordinates.TryGetValue("68e25ec6-5911-4741-8547-317597e1b792", out scale))
@@ -449,6 +715,25 @@ namespace a28e76a5769304c49974c639c104dc4ba
                         pth.LineTo(nodePoint.X + maxX * scale.X + maxY * perpScale.X, nodePoint.Y + maxX * scale.Y + maxY * perpScale.Y);
                         pth.LineTo(nodePoint.X + minX * scale.X + maxY * perpScale.X, nodePoint.Y + minX * scale.Y + maxY * perpScale.Y);
                         pth.Close();
+
+                        if (gradient)
+                        {
+                            Point p1 = new Point();
+                            Point p2 = new Point();
+
+                            if (gradientDirection == 0)
+                            {
+                                p1 = new Point(nodePoint.X + minX * scale.X + (minY + maxY) * 0.5 * perpScale.X, nodePoint.Y + minX * scale.Y + (minY + maxY) * 0.5 * perpScale.Y);
+                                p2 = new Point(nodePoint.X + maxX * scale.X + (minY + maxY) * 0.5 * perpScale.X, nodePoint.Y + maxX * scale.Y + (minY + maxY) * 0.5 * perpScale.Y);
+                            }
+                            else if (gradientDirection == 1)
+                            {
+                                p1 = new Point(nodePoint.X + (minX + maxX) * 0.5 * scale.X + minY * perpScale.X, nodePoint.Y + (minX + maxX) * 0.5 * scale.Y + minY * perpScale.Y);
+                                p2 = new Point(nodePoint.X + (minX + maxX) * 0.5 * scale.X + maxY * perpScale.X, nodePoint.Y + (minX + maxX) * 0.5 * scale.Y + maxY * perpScale.Y);
+                            }
+
+                            gradientFill = new LinearGradientBrush(p1, p2, gradientStops);
+                        }
 
                         updateMaxMin(new Point(nodePoint.X + minX * scale.X + minY * perpScale.X, nodePoint.Y + minX * scale.Y + minY * perpScale.Y));
                         updateMaxMin(new Point(nodePoint.X + maxX * scale.X + minY * perpScale.X, nodePoint.Y + maxX * scale.Y + minY * perpScale.Y));
@@ -512,15 +797,34 @@ namespace a28e76a5769304c49974c639c104dc4ba
                         pth.Arc(new Point(0, 0), maxR, d2, d1);
                         pth.Close();
 
+                        if (gradient)
+                        {
+                            if (gradientDirection == 0 && maxR > 0)
+                            {
+                                gradientFill = new RadialGradientBrush(new Point(0, 0), new Point(0, 0), maxR, new VectSharp.GradientStop(gradientStartColour, 0), new VectSharp.GradientStop(gradientStartColour, minR / maxR), new VectSharp.GradientStop(midpointColour, minR / maxR + (1 - minR / maxR) * gradientMidPoint), new VectSharp.GradientStop(gradientEndColour, 1));
+                            }
+                            else if (gradientDirection == 1)
+                            {
+                                Point gp1 = new Point((minR + maxR) * 0.5 * Math.Cos(d1), (minR + maxR) * 0.5 * Math.Sin(d1));
+                                Point gp2 = new Point((minR + maxR) * 0.5 * Math.Cos(d2), (minR + maxR) * 0.5 * Math.Sin(d2));
+
+                                gradientFill = new LinearGradientBrush(gp1, gp2, gradientStops);
+                            }
+                        }
+
                         updateMaxMin(new Point(minR * Math.Cos(d1), minR * Math.Sin(d1)));
                         updateMaxMin(new Point(maxR * Math.Cos(d1), maxR * Math.Sin(d1)));
                         updateMaxMin(new Point(maxR * Math.Cos(d2), maxR * Math.Sin(d2)));
                         updateMaxMin(new Point(minR * Math.Cos(d2), minR * Math.Sin(d2)));
                     }
 
-                    if (fill.A > 0)
+                    if (!gradient && fill.A > 0)
                     {
                         graphics.FillPath(pth, fill, tag: node.Id);
+                    }
+                    else if (gradient && (gradientStartColour.A > 0 || gradientEndColour.A > 0) && gradientFill != null)
+                    {
+                        graphics.FillPath(pth, gradientFill, tag: node.Id);
                     }
 
                     if (stroke.A > 0 && lineWidth > 0)
@@ -612,4 +916,3 @@ namespace a28e76a5769304c49974c639c104dc4ba
         }
     }
 }
-
