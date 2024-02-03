@@ -23,8 +23,8 @@ If you use TreeViewer, please cite it as:
 > Ecology and Evolution, 14, e10873. [https://doi.org/10.1002/ece3.10873](https://doi.org/10.1002/ece3.10873)
 
 | Download citation: | | | | |
-|---|---|---|---|---|
-| [RIS (ProCite, Reference Manager)](Citations/Bianchini_et_al_2024_TreeViewer.ris) | [EndNote](Citations/Bianchini_et_al_2024_TreeViewer.enw) | [BibTex](Citations/Bianchini_et_al_2024_TreeViewer.bib) | [Medlars](Citations/Bianchini_et_al_2024_TreeViewer_Medlars.txt) | [Plain text](Citations/Bianchini_et_al_2024_TreeViewer_plain.txt) |
+|:---|---|---|---|---|
+| [RIS (ProCite, Reference Manager)](https://treeviewer.org/assets/data/Bianchini_et_al_2024_TreeViewer.ris) | [EndNote](https://treeviewer.org/assets/data/Bianchini_et_al_2024_TreeViewer.enw) | [BibTex](https://treeviewer.org/assets/data/Bianchini_et_al_2024_TreeViewer.bib) | [Medlars](https://treeviewer.org/assets/data/Bianchini_et_al_2024_TreeViewer_Medlars.txt) | [Plain text](https://treeviewer.org/assets/data/Bianchini_et_al_2024_TreeViewer_plain.txt) |
 
 ## Installing TreeViewer
 
