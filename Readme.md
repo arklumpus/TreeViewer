@@ -18,7 +18,13 @@ TreeViewer is written using C# .NET 7 and is available for Windows, macOS (Intel
 
 If you use TreeViewer, please cite it as:
 
-> _Bianchini, G., & Sánchez-Baracaldo, P._ (2023). **TreeViewer - Cross-platform software to draw phylogenetic trees** [Computer software]. https://doi.org/10.5281/zenodo.7768343
+> _Bianchini, G., & Sánchez-Baracaldo, P._ (2024). \
+> **TreeViewer: Flexible, modular software to visualise and manipulate phylogenetic trees** \
+> Ecology and Evolution, 14, e10873. [https://doi.org/10.1002/ece3.10873](https://doi.org/10.1002/ece3.10873)
+
+| Download citation: | | | | |
+|---|---|---|---|---|
+| [RIS (ProCite, Reference Manager)](Citations/Bianchini_et_al_2024_TreeViewer.ris) | [EndNote](Citations/Bianchini_et_al_2024_TreeViewer.enw) | [BibTex](Citations/Bianchini_et_al_2024_TreeViewer.bib) | [Medlars](Citations/Bianchini_et_al_2024_TreeViewer_Medlars.txt) | [Plain text](Citations/Bianchini_et_al_2024_TreeViewer_plain.txt) |
 
 ## Installing TreeViewer
 
