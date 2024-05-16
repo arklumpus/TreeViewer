@@ -1,6 +1,7 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
-    Copyright (C) 2023  Giorgio Bianchini, University of Bristol
+    Copyright (C) 2023-2024  Giorgio Bianchini, University of Bristol
  
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +46,7 @@ namespace ExportPDF
         public const string Name = "Export";
         public const string HelpText = "Exports the tree plot as a PDF, SVG or PNG image.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.1");
+        public static Version Version = new Version("1.1.2");
         public const string Id = "d5d75840-4a71-4b81-bfc4-431736792abb";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -910,6 +911,19 @@ namespace ExportPDF
                             System.IO.File.Delete(result);
                         }
 
+                        if (VectSharp.FontFamily.DefaultFontLibrary is SimpleFontLibrary library)
+                        {
+                            foreach (KeyValuePair<string, Attachment> att in parent.StateData.Attachments)
+                            {
+                                AttachmentFontFamily fntF = att.Value.GetFontFamily();
+
+                                if (fntF != null)
+                                {
+                                    library.Add(fntF);
+                                }
+                            }
+                        }
+
                         VectSharp.Page pag = parent.RenderPlotToPage();
 
                         if (cropRegionBox.SelectedIndex > 0)
@@ -1187,6 +1201,19 @@ namespace ExportPDF
                         if (System.IO.File.Exists(result))
                         {
                             System.IO.File.Delete(result);
+                        }
+
+                        if (VectSharp.FontFamily.DefaultFontLibrary is SimpleFontLibrary library)
+                        {
+                            foreach (KeyValuePair<string, Attachment> att in parent.StateData.Attachments)
+                            {
+                                AttachmentFontFamily fntF = att.Value.GetFontFamily();
+
+                                if (fntF != null)
+                                {
+                                    library.Add(fntF);
+                                }
+                            }
                         }
 
                         VectSharp.Page pag = parent.RenderPlotToPage();
@@ -1905,6 +1932,19 @@ namespace ExportPDF
                                 System.IO.File.Delete(result);
                             }
 
+                            if (VectSharp.FontFamily.DefaultFontLibrary is SimpleFontLibrary library)
+                            {
+                                foreach (KeyValuePair<string, Attachment> att in parent.StateData.Attachments)
+                                {
+                                    AttachmentFontFamily fntF = att.Value.GetFontFamily();
+
+                                    if (fntF != null)
+                                    {
+                                        library.Add(fntF);
+                                    }
+                                }
+                            }
+
                             VectSharp.Page pag = parent.RenderPlotToPage();
 
                             if (cropRegionBox.SelectedIndex > 0)
@@ -1987,6 +2027,19 @@ namespace ExportPDF
                             if (System.IO.File.Exists(result))
                             {
                                 System.IO.File.Delete(result);
+                            }
+
+                            if (VectSharp.FontFamily.DefaultFontLibrary is SimpleFontLibrary library)
+                            {
+                                foreach (KeyValuePair<string, Attachment> att in parent.StateData.Attachments)
+                                {
+                                    AttachmentFontFamily fntF = att.Value.GetFontFamily();
+
+                                    if (fntF != null)
+                                    {
+                                        library.Add(fntF);
+                                    }
+                                }
                             }
 
                             VectSharp.Page pag = parent.RenderPlotToPage();
