@@ -425,7 +425,7 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 ### [Export](d5d75840-4a71-4b81-bfc4-431736792abb)
 
-_Version 1.1.1, by Giorgio Bianchini_
+_Version 1.1.2, by Giorgio Bianchini_
 
 **Description**: Exports the tree plot as a PDF, SVG or PNG image.
 
