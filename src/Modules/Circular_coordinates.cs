@@ -1,6 +1,7 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
-    Copyright (C) 2023  Giorgio Bianchini, University of Bristol
+    Copyright (C) 2023,2024  Giorgio Bianchini, University of Bristol
  
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +47,7 @@ namespace CircularCoordinates
         public const string Name = "Circular";
         public const string HelpText = "Computes the coordinates for a circular tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.0");
+        public static Version Version = new Version("1.2.0");
         public const string Id = "92aac276-3af7-4506-a263-7220e0df5797";
         public const ModuleTypes ModuleType = ModuleTypes.Coordinate;
 
@@ -108,7 +109,12 @@ namespace CircularCoordinates
                 /// </param>
                 ( "FixedRotations", "Buttons:[\"0°\",\"90°\",\"180°\",\"270°\"]" ),
 
-                 ( "Coordinate shift", "Group:5"),
+                /// <param name="Sweep angle:">
+                /// The angular width of the tree plot.
+                /// </param>
+                ( "Sweep angle:", "Slider:360[\"1\",\"360\",\"0°\"]" ),
+
+                ( "Coordinate shift", "Group:5"),
                 
                 /// <param name="Coordinate shift:">
                 /// This parameter determines the kind of coordinate shift that is applied. If the value is `None`, no coordinate
@@ -285,6 +291,7 @@ namespace CircularCoordinates
             bool yShift = (bool)parameterValues["Y shift"];
             string xShiftAttribute = (string)parameterValues["X attribute:"];
             string yShiftAttribute = (string)parameterValues["Y attribute:"];
+            double sweepAngle = (double)parameterValues["Sweep angle:"] * Math.PI / 180;
 
             CompiledCode customScript = (CompiledCode)parameterValues["Custom script:"];
 
@@ -383,7 +390,7 @@ namespace CircularCoordinates
             for (int i = 0; i < nodes.Count; i++)
             {
                 double r = upstreamLengths[nodes[i].Id] / totalLength * (outerRadius - innerRadius) + innerRadius;
-                double theta = getYMultiplier(nodes[i]) * 2 * Math.PI + rotation;
+                double theta = getYMultiplier(nodes[i]) * sweepAngle + rotation;
 
                 double x = r * Math.Cos(theta);
                 double y = r * Math.Sin(theta);
@@ -394,7 +401,7 @@ namespace CircularCoordinates
             if (!double.IsNaN(tree.Length))
             {
                 double r = innerRadius;
-                double theta = getYMultiplier(tree) * 2 * Math.PI + rotation;
+                double theta = getYMultiplier(tree) * sweepAngle + rotation;
 
                 double x = r * Math.Cos(theta);
                 double y = r * Math.Sin(theta);
@@ -465,3 +472,4 @@ namespace CircularCoordinates
         }
     }
 }
+

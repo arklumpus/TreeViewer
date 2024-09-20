@@ -218,7 +218,7 @@ _Version 1.0.1, by Giorgio Bianchini_
 
 ### [Circular](92aac276-3af7-4506-a263-7220e0df5797)
 
-_Version 1.1.0, by Giorgio Bianchini_
+_Version 1.2.0, by Giorgio Bianchini_
 
 **Description**: Computes the coordinates for a circular tree.
 
