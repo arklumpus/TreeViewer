@@ -40,7 +40,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
         public const string Name = "Plot alignment";
         public const string HelpText = "Adds the plot of an alignment to the tree.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.2");
+        public static Version Version = new Version("1.1.3");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "ea7e246b-e93f-4d0d-a67a-88af05479b48";
@@ -180,7 +180,7 @@ namespace aea7e246be93f4d0da67a88af05479b48
                 /// </param>
                 ("Position:","Point:[0,0]"),
 
-                ("Orientation", "Group:3"),
+                ("Orientation", "Group:2"),
 
                 /// <param name="Orientation:">
                 /// This parameter determines the orientation of the sequence with respect to the [Reference](#reference), in degrees. If this is `0°`, the sequence is parallel to the reference (e.g. the branch), if it is `90°` it is perpendicular to the branch and so on.
@@ -534,7 +534,16 @@ namespace aea7e246be93f4d0da67a88af05479b48
             {
                 Attachment attachment = (Attachment)currentParameterValues["FASTA alignment:"];
 
-                Dictionary<string, string> fasta = ReadFasta(attachment);
+                Dictionary<string, string> fasta;
+
+                try
+                {
+                    fasta = ReadFasta(attachment);
+                }
+                catch
+                {
+                    fasta = new Dictionary<string, string>();
+                }
 
                 if (fasta.Count > 0)
                 {
