@@ -728,7 +728,7 @@ _Version 1.2.2, by Giorgio Bianchini_
 
 ### [Plot alignment](ea7e246b-e93f-4d0d-a67a-88af05479b48)
 
-_Version 1.1.2, by Giorgio Bianchini_
+_Version 1.1.3, by Giorgio Bianchini_
 
 **Description**: Adds the plot of an alignment to the tree.
 
