@@ -1,4 +1,3 @@
-
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -22,12 +21,12 @@ using PhyloTree;
 using TreeViewer;
 using VectSharp;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace a7ef1591643834ee7b4bdbd44a7be1849
 {
     /// <summary>
-    /// This module is used to highlight monophyletic groups by adding "bars" with labels next to the tree. It can only be used with _Rectangular_ or _Circular_ coordinates (module Ids `68e25ec6-5911-4741-8547-317597e1b792` and
-    /// `92aac276-3af7-4506-a263-7220e0df5797`), respectively.
+    /// This module is used to highlight monophyletic groups by adding "bars" with labels next to the tree.
     /// </summary>
     /// 
     /// <description>
@@ -55,7 +54,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.3.0");
+        public static Version Version = new Version("1.4.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
@@ -163,7 +162,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 ( "Prevent overlap", "CheckBox:true"),
                 
                 /// <param name="Row margin:">
-                /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines the margin betwee consecutive rows of labels.
+                /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines the margin between consecutive rows of labels.
                 /// </param>
                 ( "Row margin:", "NumericUpDown:5[\"-Infinity\",\"Infinity\"]" ),
 
@@ -194,7 +193,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// </param>
                 ( "Stroke thickness:", "NumericUpDownByNode:0[\"0\",\"Infinity\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToDouble[1]) + ",\"LabelThickness\",\"Number\",\"true\"]" ),
 
-                ( "Text options", "Group:4" ),
+                ( "Text options", "Group:5" ),
                 
                 /// <param name="Font:">
                 /// This parameter determines the font used to draw the labels.
@@ -215,6 +214,13 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// This parameter determines the margin between the edge of the label and the start of the text.
                 /// </param>
                 ( "Margin: ", "NumericUpDown:0[\"-Infinity\",\"Infinity\"]" ),
+
+                /// <param name="Overflow:">
+                /// This parameter determines what to do when the the label text is larger than the group that should be highlighted. If this is `Expand label`
+                /// (the default), the label is enlarged so that all the text can fit in it. If this is `Clip`, the excess text is clipped (hidden). If this is
+                /// `Compress text`, the text is scaled horizontally so that it fits completely within the label.
+                /// </param>
+                ( "Overflow:", "ComboBox:0[\"Expand label\",\"Clip\",\"Compress text\"]")
             };
         }
 
@@ -326,6 +332,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
             Font labelFont = (Font)parameterValues["Font:"];
 
+            int overflowMode = (int)parameterValues["Overflow:"];
+
             bool preventOverlap = (bool)parameterValues["Prevent overlap"];
             double rowMargin = (double)parameterValues["Row margin:"];
             int gravity = (int)parameterValues["Gravity"];
@@ -422,21 +430,25 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                         double textWidth = labelFont.MeasureText(attributeValue).Width + textMargin * 2;
 
+
                         if (textWidth > d2 - d1)
                         {
-                            if (textAlignment == 0)
+                            if (overflowMode == 0)
                             {
-                                d2 = d1 + textWidth;
-                            }
-                            else if (textAlignment == 1)
-                            {
-                                double center = (d1 + d2) * 0.5;
-                                d1 = center - textWidth * 0.5;
-                                d2 = center + textWidth * 0.5;
-                            }
-                            else if (textAlignment == 2)
-                            {
-                                d1 = d2 - textWidth;
+                                if (textAlignment == 0)
+                                {
+                                    d2 = d1 + textWidth;
+                                }
+                                else if (textAlignment == 1)
+                                {
+                                    double center = (d1 + d2) * 0.5;
+                                    d1 = center - textWidth * 0.5;
+                                    d2 = center + textWidth * 0.5;
+                                }
+                                else if (textAlignment == 2)
+                                {
+                                    d1 = d2 - textWidth;
+                                }
                             }
                         }
 
@@ -445,8 +457,6 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                         {
                             textColour = textColourFormatter(textColourAttributeObject) ?? defaultTextColour;
                         }
-
-
 
                         labels.Add((d1, d2, fill, stroke, strokeThickness, textColour, attributeValue, nodeIndex));
                     }
@@ -506,24 +516,44 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             if (labelFont.FontSize > 0)
                             {
+                                double textWidth = labelFont.MeasureText(attributeValue).Width + textMargin * 2;
+
+                                double xScale = 1;
+
+                                if (textWidth > d2 - d1)
+                                {
+                                    if (overflowMode == 1)
+                                    {
+                                        graphics.SetClippingPath(background);
+                                    }
+                                    else if (overflowMode == 2)
+                                    {
+                                        xScale = (d2 - d1) / textWidth;
+                                    }
+                                }
+
+
                                 if (angle > 0 && angle < Math.PI)
                                 {
                                     if (textAlignment == 0)
                                     {
                                         graphics.Translate((c1.X + c2.X) * 0.5, (c1.Y + c2.Y) * 0.5);
                                         graphics.Rotate(perpAngle + Math.PI);
+                                        graphics.Scale(xScale, 1);
                                         graphics.FillText(-textMargin - labelFont.MeasureText(attributeValue).Width, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
                                     }
                                     else if (textAlignment == 1)
                                     {
                                         graphics.Translate((c1.X + c3.X) * 0.5, (c1.Y + c3.Y) * 0.5);
                                         graphics.Rotate(perpAngle + Math.PI);
+                                        graphics.Scale(xScale, 1);
                                         graphics.FillText(-labelFont.MeasureText(attributeValue).Width * 0.5, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
                                     }
                                     else if (textAlignment == 2)
                                     {
                                         graphics.Translate((c3.X + c4.X) * 0.5, (c3.Y + c4.Y) * 0.5);
                                         graphics.Rotate(perpAngle + Math.PI);
+                                        graphics.Scale(xScale, 1);
                                         graphics.FillText(textMargin, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
                                     }
                                 }
@@ -533,18 +563,21 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                                     {
                                         graphics.Translate((c1.X + c2.X) * 0.5, (c1.Y + c2.Y) * 0.5);
                                         graphics.Rotate(perpAngle);
+                                        graphics.Scale(xScale, 1);
                                         graphics.FillText(textMargin, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
                                     }
                                     else if (textAlignment == 1)
                                     {
                                         graphics.Translate((c1.X + c3.X) * 0.5, (c1.Y + c3.Y) * 0.5);
                                         graphics.Rotate(perpAngle);
+                                        graphics.Scale(xScale, 1);
                                         graphics.FillText(-labelFont.MeasureText(attributeValue).Width * 0.5, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
                                     }
                                     else if (textAlignment == 2)
                                     {
                                         graphics.Translate((c3.X + c4.X) * 0.5, (c3.Y + c4.Y) * 0.5);
                                         graphics.Rotate(perpAngle);
+                                        graphics.Scale(xScale, 1);
                                         graphics.FillText(-textMargin - labelFont.MeasureText(attributeValue).Width, 0, attributeValue, labelFont, labelColour, TextBaselines.Middle, tag: nodeId);
                                     }
                                 }
@@ -647,19 +680,22 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                         if (textWidth > d2 - d1)
                         {
-                            if (textAlignment == 0)
+                            if (overflowMode == 0)
                             {
-                                d2 = d1 + textWidth;
-                            }
-                            else if (textAlignment == 1)
-                            {
-                                double center = (d1 + d2) * 0.5;
-                                d1 = center - textWidth * 0.5;
-                                d2 = center + textWidth * 0.5;
-                            }
-                            else if (textAlignment == 2)
-                            {
-                                d1 = d2 - textWidth;
+                                if (textAlignment == 0)
+                                {
+                                    d2 = d1 + textWidth;
+                                }
+                                else if (textAlignment == 1)
+                                {
+                                    double center = (d1 + d2) * 0.5;
+                                    d1 = center - textWidth * 0.5;
+                                    d2 = center + textWidth * 0.5;
+                                }
+                                else if (textAlignment == 2)
+                                {
+                                    d1 = d2 - textWidth;
+                                }
                             }
                         }
 
@@ -709,21 +745,30 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                         double textWidth = (labelFont.MeasureText(attributeValue).Width + textMargin * 2) / (radius + height * 0.5);
 
+                        bool shouldClip = false;
+
                         if (textWidth > d2 - d1)
                         {
-                            if (textAlignment == 0)
+                            if (overflowMode == 0)
                             {
-                                d2 = d1 + textWidth;
+                                if (textAlignment == 0)
+                                {
+                                    d2 = d1 + textWidth;
+                                }
+                                else if (textAlignment == 1)
+                                {
+                                    double center = (d1 + d2) * 0.5;
+                                    d1 = center - textWidth * 0.5;
+                                    d2 = center + textWidth * 0.5;
+                                }
+                                else if (textAlignment == 2)
+                                {
+                                    d1 = d2 - textWidth;
+                                }
                             }
-                            else if (textAlignment == 1)
+                            else
                             {
-                                double center = (d1 + d2) * 0.5;
-                                d1 = center - textWidth * 0.5;
-                                d2 = center + textWidth * 0.5;
-                            }
-                            else if (textAlignment == 2)
-                            {
-                                d1 = d2 - textWidth;
+                                shouldClip = true;
                             }
                         }
 
@@ -789,8 +834,15 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             angle = angle % (2 * Math.PI);
 
+                            graphics.Save();
+
                             if (labelFont.FontSize > 0)
                             {
+                                if (shouldClip)
+                                {
+                                    graphics.SetClippingPath(background);
+                                }
+
                                 if (angle > 0 && angle < Math.PI)
                                 {
                                     GraphicsPath arc = new GraphicsPath().Arc(0, 0, radius + height * 0.5, d2, d1);
@@ -826,6 +878,9 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                                     }
                                 }
                             }
+
+
+                            graphics.Restore();
                         }
                     }
                 }
@@ -929,22 +984,30 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                         double origD2 = d2;
 
                         double textWidth = (labelFont.MeasureText(attributeValue).Width + textMargin * 2) / radius;
+                        bool shouldClip = false;
 
                         if (textWidth > d2 - d1)
                         {
-                            if (textAlignment == 0)
+                            if (overflowMode == 0)
                             {
-                                d2 = d1 + textWidth;
+                                if (textAlignment == 0)
+                                {
+                                    d2 = d1 + textWidth;
+                                }
+                                else if (textAlignment == 1)
+                                {
+                                    double center = (d1 + d2) * 0.5;
+                                    d1 = center - textWidth * 0.5;
+                                    d2 = center + textWidth * 0.5;
+                                }
+                                else if (textAlignment == 2)
+                                {
+                                    d1 = d2 - textWidth;
+                                }
                             }
-                            else if (textAlignment == 1)
+                            else
                             {
-                                double center = (d1 + d2) * 0.5;
-                                d1 = center - textWidth * 0.5;
-                                d2 = center + textWidth * 0.5;
-                            }
-                            else if (textAlignment == 2)
-                            {
-                                d1 = d2 - textWidth;
+                                shouldClip = true;
                             }
                         }
 
@@ -1018,8 +1081,15 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             angle = angle % (2 * Math.PI);
 
+                            graphics.Save();
+
                             if (labelFont.FontSize > 0)
                             {
+                                if (shouldClip)
+                                {
+                                    graphics.SetClippingPath(background);
+                                }
+
                                 if (angle > 0 && angle < Math.PI)
                                 {
                                     GraphicsPath arc = new GraphicsPath().Arc(parentPoint, radius + height * 0.5, d2, d1);
@@ -1055,6 +1125,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                                     }
                                 }
                             }
+
+                            graphics.Restore();
                         }
                     }
                 }
@@ -1071,14 +1143,24 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
             if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
             {
+                StringBuilder warningMessage = new StringBuilder();
+
+                if (!coordinates.ContainsKey("68e25ec6-5911-4741-8547-317597e1b792") && overflowMode == 2)
+                {
+                    warningMessage.AppendLine("Label text can only be compressed when using Rectangular coordinates.");
+                }
+
                 if (coordinates.ContainsKey("95b61284-b870-48b9-b51c-3276f7d89df1") && preventOverlap)
                 {
-                    setWarning("Group label overlap cannot be prevented when using radial coordinates.", Id);
+                    if (warningMessage.Length > 0)
+                    {
+                        warningMessage.AppendLine();
+                    }
+
+                    warningMessage.AppendLine("Group label overlap cannot be prevented when using Radial coordinates.");
                 }
-                else
-                {
-                    setWarning("", Id);
-                }
+
+                setWarning(warningMessage.ToString(), Id);
             }
 
             return new Point[] { topLeft, bottomRight };
