@@ -449,7 +449,7 @@ _Version 1.0.0, by Giorgio Bianchini_
 
 ### [Group labels](7ef15916-4383-4ee7-b4bd-bd44a7be1849)
 
-_Version 1.3.0, by Giorgio Bianchini_
+_Version 1.4.0, by Giorgio Bianchini_
 
 **Description**: Highlights monophyletic groups with a label.
 
