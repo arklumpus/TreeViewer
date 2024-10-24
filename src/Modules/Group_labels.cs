@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -54,7 +55,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.2.2");
+        public static Version Version = new Version("1.3.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
@@ -136,7 +137,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// </param>
                 ( "Only on last ancestor", "CheckBox:false" ),
 
-                ( "Layout", "Group:5" ),
+                ( "Layout", "Group:7" ),
                 
                 /// <param name="Distance:">
                 /// If the tree is drawn using _Rectangular_ coordinates, this determines the distance of the line containing labels from the root node. If the tree is drawn using _Circular_ coordinates, this determines
@@ -165,6 +166,16 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines the margin betwee consecutive rows of labels.
                 /// </param>
                 ( "Row margin:", "NumericUpDown:5[\"-Infinity\",\"Infinity\"]" ),
+
+                /// <param name="Gravity">
+                /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines whether the labels are clustered towards the top or the bottom.
+                /// </param>
+                ( "Gravity", "ComboBox:0[\"Bottom\",\"Top\"]" ),
+                
+                /// <param name="Invert arrangement">
+                /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines whether larger labels are closest or farthest from the tree.
+                /// </param>
+                ( "Invert arrangement", "CheckBox:false" ),
 
                 ( "Background options", "Group:3" ),
                 
@@ -222,44 +233,48 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 {
                     parametersToChange.Add("Attribute type:", attrType);
 
-					if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                    if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
                     {
-						if (attrType == "String")
-						{
-							parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
-						}
-						else if (attrType == "Number")
-						{
-							parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
-						}
-					}
+                        if (attrType == "String")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
+                        }
+                        else if (attrType == "Number")
+                        {
+                            parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
+                        }
+                    }
                 }
             }
 
             if ((string)previousParameterValues["Attribute type:"] != (string)currentParameterValues["Attribute type:"])
             {
                 string attrType = (string)currentParameterValues["Attribute type:"];
-				
-				if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
-				{
-					if (attrType == "String")
-					{
-						parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
-					}
-					else if (attrType == "Number")
-					{
-						parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
-					}
-				}
+
+                if (previousParameterValues["Attribute format..."] == currentParameterValues["Attribute format..."])
+                {
+                    if (attrType == "String")
+                    {
+                        parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[0]) { Parameters = new object[] { Modules.DefaultAttributeConverters[0], true } });
+                    }
+                    else if (attrType == "Number")
+                    {
+                        parametersToChange.Add("Attribute format...", new FormatterOptions(Modules.DefaultAttributeConverters[1]) { Parameters = new object[] { 0, 2.0, 0.0, 0.0, false, true, Modules.DefaultAttributeConverters[1], true } });
+                    }
+                }
             }
 
             if ((bool)currentParameterValues["Prevent overlap"])
             {
                 controlStatus["Row margin:"] = ControlStatus.Enabled;
+                controlStatus["Gravity"] = ControlStatus.Enabled;
+                controlStatus["Invert arrangement"] = ControlStatus.Enabled;
             }
             else
             {
                 controlStatus["Row margin:"] = ControlStatus.Hidden;
+                controlStatus["Gravity"] = ControlStatus.Hidden;
+                controlStatus["Invert arrangement"] = ControlStatus.Hidden;
             }
 
             return true;
@@ -313,6 +328,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
             bool preventOverlap = (bool)parameterValues["Prevent overlap"];
             double rowMargin = (double)parameterValues["Row margin:"];
+            int gravity = (int)parameterValues["Gravity"];
+            bool invertArrangement = (bool)parameterValues["Invert arrangement"];
 
             List<TreeNode> nodes = tree.GetChildrenRecursive();
 
@@ -439,7 +456,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                 if (preventOverlap)
                 {
-                    sortedLabels = SortLabels(labels);
+                    sortedLabels = SortLabels(labels, gravity, invertArrangement);
                 }
                 else
                 {
@@ -669,7 +686,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                 if (preventOverlap)
                 {
-                    sortedLabels = SortLabels(labels);
+                    sortedLabels = SortLabels(labels, gravity, invertArrangement);
                 }
                 else
                 {
@@ -1052,6 +1069,18 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 topLeft = bottomRight = new Point();
             }
 
+            if (parameterValues.TryGetValue(Modules.WarningMessageControlID, out object action) && action is Action<string, string> setWarning)
+            {
+                if (coordinates.ContainsKey("95b61284-b870-48b9-b51c-3276f7d89df1") && preventOverlap)
+                {
+                    setWarning("Group label overlap cannot be prevented when using radial coordinates.", Id);
+                }
+                else
+                {
+                    setWarning("", Id);
+                }
+            }
+
             return new Point[] { topLeft, bottomRight };
         }
 
@@ -1113,7 +1142,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             return false;
         }
 
-        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)> labels)
+        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)> labels, int gravity, bool invertArrangement)
         {
             List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>>();
 
@@ -1172,38 +1201,76 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 return Math.Sign(totA - totB);
             });
 
-            for (int i = 1; i < sortedLabels.Count; i++)
+            if (gravity == 0)
             {
-                for (int j = 0; j < sortedLabels[i].Count; j++)
+                for (int i = 1; i < sortedLabels.Count; i++)
                 {
-                    for (int k = 0; k < i; k++)
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
                     {
-                        bool overlapping = false;
-
-                        for (int l = 0; l < sortedLabels[k].Count; l++)
+                        for (int k = 0; k < i; k++)
                         {
-                            if (Overlap(sortedLabels[i][j], sortedLabels[k][l]))
+                            bool overlapping = false;
+
+                            for (int l = 0; l < sortedLabels[k].Count; l++)
                             {
-                                overlapping = true;
+                                if (Overlap(sortedLabels[i][j], sortedLabels[k][l]))
+                                {
+                                    overlapping = true;
+                                    break;
+                                }
+                            }
+
+                            if (!overlapping)
+                            {
+                                sortedLabels[k].Add(sortedLabels[i][j]);
+                                sortedLabels[i].RemoveAt(j);
+                                j--;
                                 break;
                             }
                         }
-
-                        if (!overlapping)
+                    }
+                }
+            }
+            else if (gravity == 1)
+            {
+                for (int i = 0; i < sortedLabels.Count; i++)
+                {
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
+                    {
+                        for (int k = i + 1; k < sortedLabels.Count; k++)
                         {
-                            sortedLabels[k].Add(sortedLabels[i][j]);
-                            sortedLabels[i].RemoveAt(j);
-                            j--;
-                            break;
+                            bool overlapping = false;
+
+                            for (int l = 0; l < sortedLabels[k].Count; l++)
+                            {
+                                if (Overlap(sortedLabels[i][j], sortedLabels[k][l]))
+                                {
+                                    overlapping = true;
+                                    break;
+                                }
+                            }
+
+                            if (!overlapping)
+                            {
+                                sortedLabels[k].Add(sortedLabels[i][j]);
+                                sortedLabels[i].RemoveAt(j);
+                                j--;
+                                break;
+                            }
                         }
                     }
                 }
             }
 
+            if (invertArrangement)
+            {
+                sortedLabels.Reverse();
+            }
+
             return sortedLabels;
         }
 
-        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)> labels)
+        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)> labels, int gravity, bool invertArrangement)
         {
             List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>>();
 
@@ -1262,32 +1329,70 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 return Math.Sign(totA - totB);
             });
 
-            for (int i = 1; i < sortedLabels.Count; i++)
+            if (gravity == 0)
             {
-                for (int j = 0; j < sortedLabels[i].Count; j++)
+                for (int i = 1; i < sortedLabels.Count; i++)
                 {
-                    for (int k = 0; k < i; k++)
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
                     {
-                        bool overlapping = false;
-
-                        for (int l = 0; l < sortedLabels[k].Count; l++)
+                        for (int k = 0; k < i; k++)
                         {
-                            if (Overlap(sortedLabels[i][j], sortedLabels[k][l]))
+                            bool overlapping = false;
+
+                            for (int l = 0; l < sortedLabels[k].Count; l++)
                             {
-                                overlapping = true;
+                                if (Overlap(sortedLabels[i][j], sortedLabels[k][l]))
+                                {
+                                    overlapping = true;
+                                    break;
+                                }
+                            }
+
+                            if (!overlapping)
+                            {
+                                sortedLabels[k].Add(sortedLabels[i][j]);
+                                sortedLabels[i].RemoveAt(j);
+                                j--;
                                 break;
                             }
                         }
-
-                        if (!overlapping)
+                    }
+                }
+            }
+            else if (gravity == 1)
+            {
+                for (int i = 0; i < sortedLabels.Count; i++)
+                {
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
+                    {
+                        for (int k = i + 1; k < sortedLabels.Count; k++)
                         {
-                            sortedLabels[k].Add(sortedLabels[i][j]);
-                            sortedLabels[i].RemoveAt(j);
-                            j--;
-                            break;
+                            bool overlapping = false;
+
+                            for (int l = 0; l < sortedLabels[k].Count; l++)
+                            {
+                                if (Overlap(sortedLabels[i][j], sortedLabels[k][l]))
+                                {
+                                    overlapping = true;
+                                    break;
+                                }
+                            }
+
+                            if (!overlapping)
+                            {
+                                sortedLabels[k].Add(sortedLabels[i][j]);
+                                sortedLabels[i].RemoveAt(j);
+                                j--;
+                                break;
+                            }
                         }
                     }
                 }
+            }
+
+            if (invertArrangement)
+            {
+                sortedLabels.Reverse();
             }
 
             return sortedLabels;
