@@ -22,6 +22,7 @@ using TreeViewer;
 using VectSharp;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Linq;
 
 namespace a7ef1591643834ee7b4bdbd44a7be1849
 {
@@ -37,6 +38,9 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
     /// not doing anything; if this is the case, please try increasing the [Font](#font) size or the other parameters.
     /// 
     /// Multiple instances of this module can be used to obtain various effects; e.g. one instance could be used to draw the labels, while another can be used to draw coloured bars.
+    /// 
+    /// If the [Prevent overlap](#prevent-overlap) option is enabled, the labels are arranged on multiple rows in order to prevent overlapping. The [Manual label rows](#manual-label-rows) option can be used to manually
+    /// "override" the automatic row assignment.
     /// 
     /// Here are two examples of this module in action on a tree with _Rectangular_ and _Circular_ coordinates, respectively:
     /// 
@@ -54,7 +58,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.4.0");
+        public static Version Version = new Version("1.5.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
@@ -136,7 +140,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// </param>
                 ( "Only on last ancestor", "CheckBox:false" ),
 
-                ( "Layout", "Group:7" ),
+                ( "Layout", "Group:4" ),
                 
                 /// <param name="Distance:">
                 /// If the tree is drawn using _Rectangular_ coordinates, this determines the distance of the line containing labels from the root node. If the tree is drawn using _Circular_ coordinates, this determines
@@ -154,22 +158,39 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// This parameter determines the height of the label.
                 /// </param>
                 ( "Height:", "NumericUpDown:20[\"0\",\"Infinity\"]" ),
+
+                ( "Label rows", "Group:7" ),
                 
                 /// <param name="Prevent overlap">
                 /// If this check box is checked, the module will make sure that no two labels overlap, by shifting some of the labels further away. This happens automatically; if you wish to have more control, disable this
                 /// option and enable multiple instances of the module using different attributes.
                 /// </param>
                 ( "Prevent overlap", "CheckBox:true"),
+
+                /// <param name="Preserve nesting">
+                /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines whether labels for descendant nodes are allowed to float above their ancestors.
+                /// </param>
+                ( "Preserve nesting", "CheckBox:false" ),
+
+                /// <param name="Gravity">
+                /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines whether the labels are clustered towards the top or the bottom.
+                /// </param>
+                ( "Gravity", "ComboBox:0[\"Bottom\",\"Top\",\"None\"]" ),
+                
+                /// <param name="Manual label rows">
+                /// If this option is enabled, label rows can be specified manually using an attribute.
+                /// </param>
+                ( "Manual label rows", "CheckBox:false"),
+                
+                /// <param name="Label rows:">
+                /// If [Manual label rows](#manual-label-rows) is enabled, this parameter can be used to manually specify label rows. Row 1 is closest to the tree and row numbers increase going further away from the tree (unless [Invert arrangement](#invert-arrangement) is enabled). Attribute values &lt; 1 are ignored.
+                /// </param>
+                ( "Label rows:", "NumericUpDownByNode:0[\"0\",\"Infinity\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToDouble[1]) + ",\"LabelRow\",\"Number\",\"true\"]" ),
                 
                 /// <param name="Row margin:">
                 /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines the margin between consecutive rows of labels.
                 /// </param>
                 ( "Row margin:", "NumericUpDown:5[\"-Infinity\",\"Infinity\"]" ),
-
-                /// <param name="Gravity">
-                /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines whether the labels are clustered towards the top or the bottom.
-                /// </param>
-                ( "Gravity", "ComboBox:0[\"Bottom\",\"Top\"]" ),
                 
                 /// <param name="Invert arrangement">
                 /// If [Prevent overlap](#prevent-overlap) is enabled, this parameter determines whether larger labels are closest or farthest from the tree.
@@ -270,16 +291,34 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 }
             }
 
+            if ((bool)currentParameterValues["Manual label rows"])
+            {
+                controlStatus["Label rows:"] = ControlStatus.Enabled;
+            }
+            else
+            {
+                controlStatus["Label rows:"] = ControlStatus.Hidden;
+            }
+
             if ((bool)currentParameterValues["Prevent overlap"])
             {
-                controlStatus["Row margin:"] = ControlStatus.Enabled;
                 controlStatus["Gravity"] = ControlStatus.Enabled;
+                controlStatus["Preserve nesting"] = ControlStatus.Enabled;
+            }
+            else
+            {
+                controlStatus["Gravity"] = ControlStatus.Hidden;
+                controlStatus["Preserve nesting"] = ControlStatus.Hidden;
+            }
+
+            if ((bool)currentParameterValues["Prevent overlap"] || (bool)currentParameterValues["Manual label rows"])
+            {
+                controlStatus["Row margin:"] = ControlStatus.Enabled;
                 controlStatus["Invert arrangement"] = ControlStatus.Enabled;
             }
             else
             {
                 controlStatus["Row margin:"] = ControlStatus.Hidden;
-                controlStatus["Gravity"] = ControlStatus.Hidden;
                 controlStatus["Invert arrangement"] = ControlStatus.Hidden;
             }
 
@@ -338,6 +377,9 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             double rowMargin = (double)parameterValues["Row margin:"];
             int gravity = (int)parameterValues["Gravity"];
             bool invertArrangement = (bool)parameterValues["Invert arrangement"];
+            bool preserveNesting = (bool)parameterValues["Preserve nesting"];
+            bool manualLabelRows = (bool)parameterValues["Manual label rows"];
+            NumberFormatterOptions labelRowFO = (NumberFormatterOptions)parameterValues["Label rows:"];
 
             List<TreeNode> nodes = tree.GetChildrenRecursive();
 
@@ -466,11 +508,57 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                 if (preventOverlap)
                 {
-                    sortedLabels = SortLabels(labels, gravity, invertArrangement);
+                    sortedLabels = SortLabels(labels, gravity, invertArrangement, preserveNesting, nodes, manualLabelRows ? labelRowFO : null);
                 }
                 else
                 {
                     sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> { labels };
+
+                    if (manualLabelRows)
+                    {
+                        for (int i = 0; i < sortedLabels.Count; i++)
+                        {
+                            for (int j = 0; j < sortedLabels[i].Count; j++)
+                            {
+                                double rowIndex = labelRowFO.DefaultValue;
+                                if (nodes[sortedLabels[i][j].nodeIndex].Attributes.TryGetValue(labelRowFO.AttributeName, out object rowAttributeObject) && rowAttributeObject != null)
+                                {
+                                    rowIndex = labelRowFO.Formatter(rowAttributeObject) ?? labelRowFO.DefaultValue;
+                                }
+
+                                if (rowIndex >= 1)
+                                {
+                                    int newIndex = (int)(rowIndex - 1);
+
+                                    if (newIndex != i)
+                                    {
+                                        while (newIndex >= sortedLabels.Count)
+                                        {
+                                            sortedLabels.Add(new List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>());
+                                        }
+
+                                        sortedLabels[newIndex].Add(sortedLabels[i][j]);
+                                        sortedLabels[i].RemoveAt(j);
+                                        j--;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (int i = 0; i < sortedLabels.Count; i++)
+                        {
+                            if (sortedLabels[i].Count == 0)
+                            {
+                                sortedLabels.RemoveAt(i);
+                                i--;
+                            }
+                        }
+
+                        if (invertArrangement)
+                        {
+                            sortedLabels.Reverse();
+                        }
+                    }
                 }
 
                 for (int i = 0; i < sortedLabels.Count; i++)
@@ -722,11 +810,57 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                 if (preventOverlap)
                 {
-                    sortedLabels = SortLabels(labels, gravity, invertArrangement);
+                    sortedLabels = SortLabels(labels, gravity, invertArrangement, preserveNesting, nodes, manualLabelRows ? labelRowFO : null);
                 }
                 else
                 {
                     sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> { labels };
+
+                    if (manualLabelRows)
+                    {
+                        for (int i = 0; i < sortedLabels.Count; i++)
+                        {
+                            for (int j = 0; j < sortedLabels[i].Count; j++)
+                            {
+                                double rowIndex = labelRowFO.DefaultValue;
+                                if (nodes[sortedLabels[i][j].nodeIndex].Attributes.TryGetValue(labelRowFO.AttributeName, out object rowAttributeObject) && rowAttributeObject != null)
+                                {
+                                    rowIndex = labelRowFO.Formatter(rowAttributeObject) ?? labelRowFO.DefaultValue;
+                                }
+
+                                if (rowIndex >= 1)
+                                {
+                                    int newIndex = (int)(rowIndex - 1);
+
+                                    if (newIndex != i)
+                                    {
+                                        while (newIndex >= sortedLabels.Count)
+                                        {
+                                            sortedLabels.Add(new List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>());
+                                        }
+
+                                        sortedLabels[newIndex].Add(sortedLabels[i][j]);
+                                        sortedLabels[i].RemoveAt(j);
+                                        j--;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (int i = 0; i < sortedLabels.Count; i++)
+                        {
+                            if (sortedLabels[i].Count == 0)
+                            {
+                                sortedLabels.RemoveAt(i);
+                                i--;
+                            }
+                        }
+
+                        if (invertArrangement)
+                        {
+                            sortedLabels.Reverse();
+                        }
+                    }
                 }
 
                 updateMaxMin(new Point(-distance - height - (height + rowMargin) * (sortedLabels.Count - 1), -distance - height - (height + rowMargin) * (sortedLabels.Count - 1)));
@@ -824,6 +958,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                                 startAngle = d2 - (textMargin / distance);
                                 endAngle = d2 - ((textMargin + labelFont.MeasureText(attributeValue).Width) / distance);
                             }
+
+
 
                             double angle = (startAngle + endAngle) * 0.5;
 
@@ -1160,6 +1296,16 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                     warningMessage.AppendLine("Group label overlap cannot be prevented when using Radial coordinates.");
                 }
 
+                if (coordinates.ContainsKey("95b61284-b870-48b9-b51c-3276f7d89df1") && manualLabelRows)
+                {
+                    if (warningMessage.Length > 0)
+                    {
+                        warningMessage.AppendLine();
+                    }
+
+                    warningMessage.AppendLine("Label rows are ignored when using Radial coordinates.");
+                }
+
                 setWarning(warningMessage.ToString(), Id);
             }
 
@@ -1203,8 +1349,6 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             bsn = bsn % (2 * Math.PI);
             ben = ben % (2 * Math.PI);
 
-            //return a.start <= b.end && b.start <= a.end;
-
             return Intersect(bsn, asn, aen) || Intersect(ben, asn, aen) || Intersect(asn, bsn, ben) || Intersect(aen, bsn, ben);
         }
 
@@ -1224,20 +1368,75 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             return false;
         }
 
-        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)> labels, int gravity, bool invertArrangement)
+        static bool DescendsFrom(this TreeNode a, TreeNode b)
+        {
+            TreeNode currParent = a;
+
+            while (currParent != null)
+            {
+                if (currParent == b)
+                {
+                    return true;
+                }
+                currParent = currParent.Parent;
+            }
+
+            return false;
+        }
+
+        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)> labels, int gravity, bool invertArrangement, bool preserveNesting, List<TreeNode> nodes, NumberFormatterOptions manualRows)
         {
             List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>>();
 
-            labels.Sort((a, b) =>
+            if (preserveNesting)
             {
-                return Math.Sign(a.start - b.start);
-            });
+                labels.Sort((a, b) =>
+                {
+                    if (a.nodeIndex != b.nodeIndex && nodes[a.nodeIndex].DescendsFrom(nodes[b.nodeIndex]))
+                    {
+                        return 1;
+                    }
+                    else if (a.nodeIndex != b.nodeIndex && nodes[b.nodeIndex].DescendsFrom(nodes[a.nodeIndex]))
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        return Math.Sign(a.start - b.start);
+                    }
+                });
+            }
+            else
+            {
+                labels.Sort((a, b) =>
+                {
+                    return Math.Sign(a.start - b.start);
+                });
+            }
+
+            Dictionary<string, int> labelLevels = new Dictionary<string, int>();
 
             for (int i = 0; i < labels.Count; i++)
             {
                 bool found = false;
 
-                for (int j = 0; j < sortedLabels.Count; j++)
+                int minJ = 0;
+                if (preserveNesting)
+                {
+                    TreeNode parent = nodes[labels[i].nodeIndex].Parent;
+
+                    while (parent != null)
+                    {
+                        if (labelLevels.TryGetValue(parent.Id, out int lev))
+                        {
+                            minJ = Math.Max(minJ, lev);
+                            break;
+                        }
+                        parent = parent.Parent;
+                    }
+                }
+
+                for (int j = minJ; j < sortedLabels.Count; j++)
                 {
                     bool overlapping = false;
 
@@ -1253,6 +1452,12 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                     if (!overlapping)
                     {
                         sortedLabels[j].Add(labels[i]);
+                        if (preserveNesting)
+                        {
+                            string id = nodes[labels[i].nodeIndex].Id;
+                            labelLevels.TryGetValue(id, out int prevLevel);
+                            labelLevels[id] = Math.Max(j, prevLevel);
+                        }
                         found = true;
                         break;
                     }
@@ -1263,25 +1468,80 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                     List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)> newRow = new List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>() { labels[i] };
 
                     sortedLabels.Add(newRow);
+
+                    if (preserveNesting)
+                    {
+                        string id = nodes[labels[i].nodeIndex].Id;
+                        labelLevels.TryGetValue(id, out int prevLevel);
+                        labelLevels[id] = Math.Max(sortedLabels.Count - 1, prevLevel);
+                    }
                 }
             }
 
-            sortedLabels.Sort((a, b) =>
+            if (preserveNesting)
             {
-                double totA = 0;
-                for (int i = 0; i < a.Count; i++)
+                sortedLabels.Sort((a, b) =>
                 {
-                    totA += a[i].end - a[i].start;
-                }
+                    double totA = 0;
+                    for (int i = 0; i < a.Count; i++)
+                    {
+                        totA += a[i].end - a[i].start;
 
-                double totB = 0;
-                for (int i = 0; i < b.Count; i++)
+                        for (int j = 0; j < b.Count; j++)
+                        {
+                            if (nodes[a[i].nodeIndex].DescendsFrom(nodes[b[j].nodeIndex]))
+                            {
+                                return -1;
+                            }
+                        }
+                    }
+
+                    double totB = 0;
+                    for (int i = 0; i < b.Count; i++)
+                    {
+                        totB += b[i].end - b[i].start;
+
+                        for (int j = 0; j < a.Count; j++)
+                        {
+                            if (nodes[b[i].nodeIndex].DescendsFrom(nodes[a[j].nodeIndex]))
+                            {
+                                return 1;
+                            }
+                        }
+                    }
+
+                    return Math.Sign(totA - totB);
+                });
+
+                labelLevels.Clear();
+
+                for (int i = 0; i < sortedLabels.Count; i++)
                 {
-                    totB += b[i].end - b[i].start;
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
+                    {
+                        labelLevels[nodes[sortedLabels[i][j].nodeIndex].Id] = i;
+                    }
                 }
+            }
+            else
+            {
+                sortedLabels.Sort((a, b) =>
+                {
+                    double totA = 0;
+                    for (int i = 0; i < a.Count; i++)
+                    {
+                        totA += a[i].end - a[i].start;
+                    }
 
-                return Math.Sign(totA - totB);
-            });
+                    double totB = 0;
+                    for (int i = 0; i < b.Count; i++)
+                    {
+                        totB += b[i].end - b[i].start;
+                    }
+
+                    return Math.Sign(totA - totB);
+                });
+            }
 
             if (gravity == 0)
             {
@@ -1289,7 +1549,23 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 {
                     for (int j = 0; j < sortedLabels[i].Count; j++)
                     {
-                        for (int k = 0; k < i; k++)
+                        int maxK = i;
+                        if (preserveNesting)
+                        {
+                            TreeNode parent = nodes[sortedLabels[i][j].nodeIndex].Parent;
+
+                            while (parent != null)
+                            {
+                                if (labelLevels.TryGetValue(parent.Id, out int lev))
+                                {
+                                    maxK = Math.Min(maxK, lev);
+                                    break;
+                                }
+                                parent = parent.Parent;
+                            }
+                        }
+
+                        for (int k = 0; k < maxK; k++)
                         {
                             bool overlapping = false;
 
@@ -1304,6 +1580,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             if (!overlapping)
                             {
+                                labelLevels[nodes[sortedLabels[i][j].nodeIndex].Id] = k;
                                 sortedLabels[k].Add(sortedLabels[i][j]);
                                 sortedLabels[i].RemoveAt(j);
                                 j--;
@@ -1319,7 +1596,23 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 {
                     for (int j = 0; j < sortedLabels[i].Count; j++)
                     {
-                        for (int k = i + 1; k < sortedLabels.Count; k++)
+                        int maxK = sortedLabels.Count;
+                        if (preserveNesting)
+                        {
+                            TreeNode parent = nodes[sortedLabels[i][j].nodeIndex].Parent;
+
+                            while (parent != null)
+                            {
+                                if (labelLevels.TryGetValue(parent.Id, out int lev))
+                                {
+                                    maxK = Math.Min(maxK, lev);
+                                    break;
+                                }
+                                parent = parent.Parent;
+                            }
+                        }
+
+                        for (int k = i + 1; k < maxK; k++)
                         {
                             bool overlapping = false;
 
@@ -1334,12 +1627,63 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             if (!overlapping)
                             {
+                                labelLevels[nodes[sortedLabels[i][j].nodeIndex].Id] = k;
                                 sortedLabels[k].Add(sortedLabels[i][j]);
                                 sortedLabels[i].RemoveAt(j);
                                 j--;
                                 break;
                             }
                         }
+                    }
+                }
+            }
+
+            for (int i = 0; i < sortedLabels.Count; i++)
+            {
+                if (sortedLabels[i].Count == 0)
+                {
+                    sortedLabels.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            if (manualRows != null)
+            {
+                for (int i = 0; i < sortedLabels.Count; i++)
+                {
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
+                    {
+                        double rowIndex = manualRows.DefaultValue;
+                        if (nodes[sortedLabels[i][j].nodeIndex].Attributes.TryGetValue(manualRows.AttributeName, out object rowAttributeObject) && rowAttributeObject != null)
+                        {
+                            rowIndex = manualRows.Formatter(rowAttributeObject) ?? manualRows.DefaultValue;
+                        }
+
+                        if (rowIndex >= 1)
+                        {
+                            int newIndex = (int)(rowIndex - 1);
+
+                            if (newIndex != i)
+                            {
+                                while (newIndex >= sortedLabels.Count)
+                                {
+                                    sortedLabels.Add(new List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>());
+                                }
+
+                                sortedLabels[newIndex].Add(sortedLabels[i][j]);
+                                sortedLabels[i].RemoveAt(j);
+                                j--;
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < sortedLabels.Count; i++)
+                {
+                    if (sortedLabels[i].Count == 0)
+                    {
+                        sortedLabels.RemoveAt(i);
+                        i--;
                     }
                 }
             }
@@ -1352,20 +1696,59 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             return sortedLabels;
         }
 
-        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)> labels, int gravity, bool invertArrangement)
+        static List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> SortLabels(List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)> labels, int gravity, bool invertArrangement, bool preserveNesting, List<TreeNode> nodes, NumberFormatterOptions manualRows)
         {
             List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>>();
 
-            labels.Sort((a, b) =>
+            if (preserveNesting)
             {
-                return Math.Sign(a.start - b.start);
-            });
+                labels.Sort((a, b) =>
+                {
+                    if (a.nodeIndex != b.nodeIndex && nodes[a.nodeIndex].DescendsFrom(nodes[b.nodeIndex]))
+                    {
+                        return 1;
+                    }
+                    else if (a.nodeIndex != b.nodeIndex && nodes[b.nodeIndex].DescendsFrom(nodes[a.nodeIndex]))
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        return Math.Sign(a.start - b.start);
+                    }
+                });
+            }
+            else
+            {
+                labels.Sort((a, b) =>
+                {
+                    return Math.Sign(a.start - b.start);
+                });
+            }
+
+            Dictionary<string, int> labelLevels = new Dictionary<string, int>();
 
             for (int i = 0; i < labels.Count; i++)
             {
                 bool found = false;
 
-                for (int j = 0; j < sortedLabels.Count; j++)
+                int minJ = 0;
+                if (preserveNesting)
+                {
+                    TreeNode parent = nodes[labels[i].nodeIndex].Parent;
+
+                    while (parent != null)
+                    {
+                        if (labelLevels.TryGetValue(parent.Id, out int lev))
+                        {
+                            minJ = Math.Max(minJ, lev);
+                            break;
+                        }
+                        parent = parent.Parent;
+                    }
+                }
+
+                for (int j = minJ; j < sortedLabels.Count; j++)
                 {
                     bool overlapping = false;
 
@@ -1381,6 +1764,12 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                     if (!overlapping)
                     {
                         sortedLabels[j].Add(labels[i]);
+                        if (preserveNesting)
+                        {
+                            string id = nodes[labels[i].nodeIndex].Id;
+                            labelLevels.TryGetValue(id, out int prevLevel);
+                            labelLevels[id] = Math.Max(j, prevLevel);
+                        }
                         found = true;
                         break;
                     }
@@ -1391,25 +1780,80 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                     List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)> newRow = new List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>() { labels[i] };
 
                     sortedLabels.Add(newRow);
+
+                    if (preserveNesting)
+                    {
+                        string id = nodes[labels[i].nodeIndex].Id;
+                        labelLevels.TryGetValue(id, out int prevLevel);
+                        labelLevels[id] = Math.Max(sortedLabels.Count - 1, prevLevel);
+                    }
                 }
             }
 
-            sortedLabels.Sort((a, b) =>
+            if (preserveNesting)
             {
-                double totA = 0;
-                for (int i = 0; i < a.Count; i++)
+                sortedLabels.Sort((a, b) =>
                 {
-                    totA += a[i].end - a[i].start;
-                }
+                    double totA = 0;
+                    for (int i = 0; i < a.Count; i++)
+                    {
+                        totA += a[i].end - a[i].start;
 
-                double totB = 0;
-                for (int i = 0; i < b.Count; i++)
+                        for (int j = 0; j < b.Count; j++)
+                        {
+                            if (nodes[a[i].nodeIndex].DescendsFrom(nodes[b[j].nodeIndex]))
+                            {
+                                return -1;
+                            }
+                        }
+                    }
+
+                    double totB = 0;
+                    for (int i = 0; i < b.Count; i++)
+                    {
+                        totB += b[i].end - b[i].start;
+
+                        for (int j = 0; j < a.Count; j++)
+                        {
+                            if (nodes[b[i].nodeIndex].DescendsFrom(nodes[a[j].nodeIndex]))
+                            {
+                                return 1;
+                            }
+                        }
+                    }
+
+                    return Math.Sign(totA - totB);
+                });
+
+                labelLevels.Clear();
+
+                for (int i = 0; i < sortedLabels.Count; i++)
                 {
-                    totB += b[i].end - b[i].start;
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
+                    {
+                        labelLevels[nodes[sortedLabels[i][j].nodeIndex].Id] = i;
+                    }
                 }
+            }
+            else
+            {
+                sortedLabels.Sort((a, b) =>
+                {
+                    double totA = 0;
+                    for (int i = 0; i < a.Count; i++)
+                    {
+                        totA += a[i].end - a[i].start;
+                    }
 
-                return Math.Sign(totA - totB);
-            });
+                    double totB = 0;
+                    for (int i = 0; i < b.Count; i++)
+                    {
+                        totB += b[i].end - b[i].start;
+                    }
+
+                    return Math.Sign(totA - totB);
+                });
+            }
 
             if (gravity == 0)
             {
@@ -1417,7 +1861,23 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 {
                     for (int j = 0; j < sortedLabels[i].Count; j++)
                     {
-                        for (int k = 0; k < i; k++)
+                        int maxK = i;
+                        if (preserveNesting)
+                        {
+                            TreeNode parent = nodes[sortedLabels[i][j].nodeIndex].Parent;
+
+                            while (parent != null)
+                            {
+                                if (labelLevels.TryGetValue(parent.Id, out int lev))
+                                {
+                                    maxK = Math.Min(maxK, lev);
+                                    break;
+                                }
+                                parent = parent.Parent;
+                            }
+                        }
+
+                        for (int k = 0; k < maxK; k++)
                         {
                             bool overlapping = false;
 
@@ -1432,6 +1892,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             if (!overlapping)
                             {
+                                labelLevels[nodes[sortedLabels[i][j].nodeIndex].Id] = k;
                                 sortedLabels[k].Add(sortedLabels[i][j]);
                                 sortedLabels[i].RemoveAt(j);
                                 j--;
@@ -1447,7 +1908,23 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 {
                     for (int j = 0; j < sortedLabels[i].Count; j++)
                     {
-                        for (int k = i + 1; k < sortedLabels.Count; k++)
+                        int maxK = sortedLabels.Count;
+                        if (preserveNesting)
+                        {
+                            TreeNode parent = nodes[sortedLabels[i][j].nodeIndex].Parent;
+
+                            while (parent != null)
+                            {
+                                if (labelLevels.TryGetValue(parent.Id, out int lev))
+                                {
+                                    maxK = Math.Min(maxK, lev);
+                                    break;
+                                }
+                                parent = parent.Parent;
+                            }
+                        }
+
+                        for (int k = i + 1; k < maxK; k++)
                         {
                             bool overlapping = false;
 
@@ -1462,12 +1939,63 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             if (!overlapping)
                             {
+                                labelLevels[nodes[sortedLabels[i][j].nodeIndex].Id] = k;
                                 sortedLabels[k].Add(sortedLabels[i][j]);
                                 sortedLabels[i].RemoveAt(j);
                                 j--;
                                 break;
                             }
                         }
+                    }
+                }
+            }
+
+            for (int i = 0; i < sortedLabels.Count; i++)
+            {
+                if (sortedLabels[i].Count == 0)
+                {
+                    sortedLabels.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            if (manualRows != null)
+            {
+                for (int i = 0; i < sortedLabels.Count; i++)
+                {
+                    for (int j = 0; j < sortedLabels[i].Count; j++)
+                    {
+                        double rowIndex = manualRows.DefaultValue;
+                        if (nodes[sortedLabels[i][j].nodeIndex].Attributes.TryGetValue(manualRows.AttributeName, out object rowAttributeObject) && rowAttributeObject != null)
+                        {
+                            rowIndex = manualRows.Formatter(rowAttributeObject) ?? manualRows.DefaultValue;
+                        }
+
+                        if (rowIndex >= 1)
+                        {
+                            int newIndex = (int)(rowIndex - 1);
+
+                            if (newIndex != i)
+                            {
+                                while (newIndex >= sortedLabels.Count)
+                                {
+                                    sortedLabels.Add(new List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>());
+                                }
+
+                                sortedLabels[newIndex].Add(sortedLabels[i][j]);
+                                sortedLabels[i].RemoveAt(j);
+                                j--;
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < sortedLabels.Count; i++)
+                {
+                    if (sortedLabels[i].Count == 0)
+                    {
+                        sortedLabels.RemoveAt(i);
+                        i--;
                     }
                 }
             }
