@@ -1,3 +1,4 @@
+
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023  Giorgio Bianchini, University of Bristol
@@ -58,7 +59,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         public const string Name = "Group labels";
         public const string HelpText = "Highlights monophyletic groups with a label.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.5.0");
+        public static Version Version = new Version("1.6.0");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
 
         public const string Id = "7ef15916-4383-4ee7-b4bd-bd44a7be1849";
@@ -140,13 +141,24 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 /// </param>
                 ( "Only on last ancestor", "CheckBox:false" ),
 
-                ( "Layout", "Group:4" ),
+                ( "Layout", "Group:6" ),
+
+                /// <param name="Anchor:">
+                /// This parameter determines the point from which the [distance](#distance) is computed. If this is set to `Default`, distances are computed from the root node for _Rectangular_ coordinates, and from the
+                /// centre of the circle for _Circular_ coordinates. If this is set to `Farthest leaf`, distances are computed from the position of the farthest leaf descending from each node (excluding any tip labels).
+                /// This parameter has no effect for _Radial_ coordinates (in this case, the reference point is always the farthest leaf). If this parameter is set to `Farthest leaf`, the row overlap options cannot be used.
+                /// </param>
+                ( "Anchor:", "ComboBox:0[\"Default\",\"Farthest leaf\"]"),
                 
-                /// <param name="Distance:">
-                /// If the tree is drawn using _Rectangular_ coordinates, this determines the distance of the line containing labels from the root node. If the tree is drawn using _Circular_ coordinates, this determines
-                /// the radius of the circle containing the labels.
+                /// <param name="Distance:" display="">
+                /// This parameter determines the distance from the [anchor](#anchor) at which the labels are drawn.
                 /// </param>
                 ( "Distance:", "NumericUpDown:100[\"-Infinity\", \"Infinity\"]" ),
+                
+                /// <param name="Distance: ">
+                /// This parameter determines the distance from the [anchor](#anchor) at which the labels are drawn.
+                /// </param>
+                ( "Distance: ", "NumericUpDownByNode:100[\"-Infinity\", \"Infinity\"," + System.Text.Json.JsonSerializer.Serialize(Modules.DefaultAttributeConvertersToDouble[1]) + ",\"LabelDistance\",\"Number\",\"true\"]" ),
                 
                 /// <param name="Margin:">
                 /// This parameter determines the margin to use when drawing the label. If this is greater than 0, the label is larger than the leaves that belong to it, while if it is lower than 0, the label is smaller
@@ -250,6 +262,22 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             controlStatus = new Dictionary<string, ControlStatus>();
             parametersToChange = new Dictionary<string, object>();
 
+            double currDist = (double)currentParameterValues["Distance:"];
+            NumberFormatterOptions currDistFO = (NumberFormatterOptions)currentParameterValues["Distance: "];
+
+            if (currDist != currDistFO.DefaultValue)
+            {
+                if (currDist != (double)previousParameterValues["Distance:"] && currDistFO.DefaultValue == ((NumberFormatterOptions)previousParameterValues["Distance: "]).DefaultValue)
+                {
+                    currDistFO.DefaultValue = currDist;
+                    parametersToChange["Distance: "] = currDistFO;
+                }
+                else if (currDist == (double)previousParameterValues["Distance:"])
+                {
+                    parametersToChange["Distance:"] = currDistFO.DefaultValue;
+                }
+            }
+
             if ((string)previousParameterValues["Attribute:"] != (string)currentParameterValues["Attribute:"])
             {
                 string attributeName = (string)currentParameterValues["Attribute:"];
@@ -291,35 +319,52 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 }
             }
 
-            if ((bool)currentParameterValues["Manual label rows"])
+            if ((int)currentParameterValues["Anchor:"] == 0)
             {
-                controlStatus["Label rows:"] = ControlStatus.Enabled;
-            }
-            else
-            {
-                controlStatus["Label rows:"] = ControlStatus.Hidden;
-            }
+                controlStatus["Label rows"] = ControlStatus.Enabled;
 
-            if ((bool)currentParameterValues["Prevent overlap"])
-            {
-                controlStatus["Gravity"] = ControlStatus.Enabled;
-                controlStatus["Preserve nesting"] = ControlStatus.Enabled;
-            }
-            else
-            {
-                controlStatus["Gravity"] = ControlStatus.Hidden;
-                controlStatus["Preserve nesting"] = ControlStatus.Hidden;
-            }
+                if ((bool)currentParameterValues["Manual label rows"])
+                {
+                    controlStatus["Label rows:"] = ControlStatus.Enabled;
+                }
+                else
+                {
+                    controlStatus["Label rows:"] = ControlStatus.Hidden;
+                }
 
-            if ((bool)currentParameterValues["Prevent overlap"] || (bool)currentParameterValues["Manual label rows"])
-            {
-                controlStatus["Row margin:"] = ControlStatus.Enabled;
-                controlStatus["Invert arrangement"] = ControlStatus.Enabled;
+                if ((bool)currentParameterValues["Prevent overlap"])
+                {
+                    controlStatus["Gravity"] = ControlStatus.Enabled;
+                    controlStatus["Preserve nesting"] = ControlStatus.Enabled;
+                }
+                else
+                {
+                    controlStatus["Gravity"] = ControlStatus.Hidden;
+                    controlStatus["Preserve nesting"] = ControlStatus.Hidden;
+                }
+
+                if ((bool)currentParameterValues["Prevent overlap"] || (bool)currentParameterValues["Manual label rows"])
+                {
+                    controlStatus["Row margin:"] = ControlStatus.Enabled;
+                    controlStatus["Invert arrangement"] = ControlStatus.Enabled;
+
+                    controlStatus["Distance:"] = ControlStatus.Enabled;
+                    controlStatus["Distance: "] = ControlStatus.Hidden;
+                }
+                else
+                {
+                    controlStatus["Row margin:"] = ControlStatus.Hidden;
+                    controlStatus["Invert arrangement"] = ControlStatus.Hidden;
+
+                    controlStatus["Distance:"] = ControlStatus.Hidden;
+                    controlStatus["Distance: "] = ControlStatus.Enabled;
+                }
             }
             else
             {
-                controlStatus["Row margin:"] = ControlStatus.Hidden;
-                controlStatus["Invert arrangement"] = ControlStatus.Hidden;
+                controlStatus["Label rows"] = ControlStatus.Hidden;
+                controlStatus["Distance:"] = ControlStatus.Hidden;
+                controlStatus["Distance: "] = ControlStatus.Enabled;
             }
 
             return true;
@@ -343,7 +388,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             string attributeType = (string)parameterValues["Attribute type:"];
             Func<object, string> attributeFormatter = ((FormatterOptions)parameterValues["Attribute format..."]).Formatter;
 
-            double distance = (double)parameterValues["Distance:"];
+            NumberFormatterOptions distanceFO = (NumberFormatterOptions)parameterValues["Distance: "];
+            double fixedDistance = (double)parameterValues["Distance:"];
 
             int textAlignment = (int)parameterValues["Alignment:"];
             double margin = (double)parameterValues["Margin:"];
@@ -380,6 +426,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
             bool preserveNesting = (bool)parameterValues["Preserve nesting"];
             bool manualLabelRows = (bool)parameterValues["Manual label rows"];
             NumberFormatterOptions labelRowFO = (NumberFormatterOptions)parameterValues["Label rows:"];
+
+            int anchor = (int)parameterValues["Anchor:"];
 
             List<TreeNode> nodes = tree.GetChildrenRecursive();
 
@@ -506,7 +554,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                 List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> sortedLabels;
 
-                if (preventOverlap)
+                if (preventOverlap && anchor == 0)
                 {
                     sortedLabels = SortLabels(labels, gravity, invertArrangement, preserveNesting, nodes, manualLabelRows ? labelRowFO : null);
                 }
@@ -514,7 +562,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 {
                     sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex)>> { labels };
 
-                    if (manualLabelRows)
+                    if (manualLabelRows && anchor == 0)
                     {
                         for (int i = 0; i < sortedLabels.Count; i++)
                         {
@@ -576,12 +624,42 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                         Colour strokeColour = sortedLabels[i][j].stroke;
                         double backgroundStrokeThickness = sortedLabels[i][j].strokeThickness;
                         Colour labelColour = sortedLabels[i][j].textColour;
+
                         if (backgroundColor.A > 0 || (strokeColour.A > 0 && backgroundStrokeThickness > 0) || (labelColour.A > 0 && labelFont.FontSize > 0))
                         {
-                            Point c1 = new Point(rootPoint.X + (distance + levelDepth) * coordinateReference.X + d1 * perpReference.X, rootPoint.Y + (distance + levelDepth) * coordinateReference.Y + d1 * perpReference.Y);
-                            Point c2 = new Point(rootPoint.X + (distance + height + levelDepth) * coordinateReference.X + d1 * perpReference.X, rootPoint.Y + (distance + height + levelDepth) * coordinateReference.Y + d1 * perpReference.Y);
-                            Point c3 = new Point(rootPoint.X + (distance + height + levelDepth) * coordinateReference.X + d2 * perpReference.X, rootPoint.Y + (distance + height + levelDepth) * coordinateReference.Y + d2 * perpReference.Y);
-                            Point c4 = new Point(rootPoint.X + (distance + levelDepth) * coordinateReference.X + d2 * perpReference.X, rootPoint.Y + (distance + levelDepth) * coordinateReference.Y + d2 * perpReference.Y);
+                            double dist;
+
+                            if ((preventOverlap || manualLabelRows) && anchor == 0)
+                            {
+                                dist = fixedDistance;
+                            }
+                            else
+                            {
+                                dist = distanceFO.DefaultValue;
+
+                                if (nodes[sortedLabels[i][j].nodeIndex].Attributes.TryGetValue(distanceFO.AttributeName, out object distanceAttrObject) && distanceAttrObject != null)
+                                {
+                                    dist = distanceFO.Formatter(distanceAttrObject) ?? distanceFO.DefaultValue;
+                                }
+                            }
+
+                            if (anchor == 1)
+                            {
+                                double ptDist = ((coordinates[nodeId].X - rootPoint.X) * coordinateReference.X + (coordinates[nodeId].Y - rootPoint.Y) * coordinateReference.Y);
+
+                                foreach (TreeNode leaf in nodes[sortedLabels[i][j].nodeIndex].GetLeaves())
+                                {
+                                    ptDist = Math.Max(ptDist, ((coordinates[leaf.Id].X - rootPoint.X) * coordinateReference.X + (coordinates[leaf.Id].Y - rootPoint.Y) * coordinateReference.Y));
+                                }
+
+                                dist = dist + ptDist;
+                            }
+
+
+                            Point c1 = new Point(rootPoint.X + (dist + levelDepth) * coordinateReference.X + d1 * perpReference.X, rootPoint.Y + (dist + levelDepth) * coordinateReference.Y + d1 * perpReference.Y);
+                            Point c2 = new Point(rootPoint.X + (dist + height + levelDepth) * coordinateReference.X + d1 * perpReference.X, rootPoint.Y + (dist + height + levelDepth) * coordinateReference.Y + d1 * perpReference.Y);
+                            Point c3 = new Point(rootPoint.X + (dist + height + levelDepth) * coordinateReference.X + d2 * perpReference.X, rootPoint.Y + (dist + height + levelDepth) * coordinateReference.Y + d2 * perpReference.Y);
+                            Point c4 = new Point(rootPoint.X + (dist + levelDepth) * coordinateReference.X + d2 * perpReference.X, rootPoint.Y + (dist + levelDepth) * coordinateReference.Y + d2 * perpReference.Y);
 
                             updateMaxMin(c1);
                             updateMaxMin(c2);
@@ -714,6 +792,33 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                             strokeThickness = thicknessFormatter(thicknessAttributeObject) ?? defaultThickness;
                         }
 
+                        double dist;
+
+                        if ((preventOverlap || manualLabelRows) && anchor == 0)
+                        {
+                            dist = fixedDistance;
+                        }
+                        else
+                        {
+                            dist = distanceFO.DefaultValue;
+
+                            if (nodes[nodeIndex].Attributes.TryGetValue(distanceFO.AttributeName, out object distanceAttrObject) && distanceAttrObject != null)
+                            {
+                                dist = distanceFO.Formatter(distanceAttrObject) ?? distanceFO.DefaultValue;
+                            }
+                        }
+
+                        if (anchor == 1)
+                        {
+                            double ptDist = coordinates[nodes[nodeIndex].Id].Modulus();
+
+                            foreach (TreeNode leaf in nodes[nodeIndex].GetLeaves())
+                            {
+                                ptDist = Math.Max(ptDist, coordinates[leaf.Id].Modulus());
+                            }
+
+                            dist = dist + ptDist;
+                        }
 
                         List<TreeNode> leaves = nodes[nodeIndex].GetLeaves();
 
@@ -728,8 +833,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                             d2 += 2 * Math.PI;
                         }
 
-                        d1 -= margin / (distance + height * 0.5);
-                        d2 += margin / (distance + height * 0.5);
+                        d1 -= margin / (dist + height * 0.5);
+                        d2 += margin / (dist + height * 0.5);
 
                         while (d1 < 0)
                         {
@@ -764,7 +869,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                         double origD1 = d1;
                         double origD2 = d2;
 
-                        double textWidth = (labelFont.MeasureText(attributeValue).Width + textMargin * 2) / (distance + height * 0.5);
+                        double textWidth = (labelFont.MeasureText(attributeValue).Width + textMargin * 2) / (dist + height * 0.5);
 
                         if (textWidth > d2 - d1)
                         {
@@ -808,7 +913,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                 List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> sortedLabels;
 
-                if (preventOverlap)
+                if (preventOverlap && anchor == 0)
                 {
                     sortedLabels = SortLabels(labels, gravity, invertArrangement, preserveNesting, nodes, manualLabelRows ? labelRowFO : null);
                 }
@@ -816,7 +921,7 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                 {
                     sortedLabels = new List<List<(double start, double end, Colour background, Colour stroke, double strokeThickness, Colour textColour, string text, int nodeIndex, double originalStart, double originalEnd)>> { labels };
 
-                    if (manualLabelRows)
+                    if (manualLabelRows && anchor == 0)
                     {
                         for (int i = 0; i < sortedLabels.Count; i++)
                         {
@@ -863,15 +968,47 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                     }
                 }
 
-                updateMaxMin(new Point(-distance - height - (height + rowMargin) * (sortedLabels.Count - 1), -distance - height - (height + rowMargin) * (sortedLabels.Count - 1)));
-                updateMaxMin(new Point(distance + height + (height + rowMargin) * (sortedLabels.Count - 1), distance + height + (height + rowMargin) * (sortedLabels.Count - 1)));
+                if ((preventOverlap || manualLabelRows) && anchor == 0)
+                {
+                    updateMaxMin(new Point(-fixedDistance - height - (height + rowMargin) * (sortedLabels.Count - 1), -fixedDistance - height - (height + rowMargin) * (sortedLabels.Count - 1)));
+                    updateMaxMin(new Point(fixedDistance + height + (height + rowMargin) * (sortedLabels.Count - 1), fixedDistance + height + (height + rowMargin) * (sortedLabels.Count - 1)));
+                }
 
                 for (int i = 0; i < sortedLabels.Count; i++)
                 {
-                    double radius = distance + (height + rowMargin) * i;
-
                     for (int j = 0; j < sortedLabels[i].Count; j++)
                     {
+                        double dist;
+
+                        if ((preventOverlap || manualLabelRows) && anchor == 0)
+                        {
+                            dist = fixedDistance;
+                        }
+                        else
+                        {
+                            dist = distanceFO.DefaultValue;
+
+                            if (nodes[sortedLabels[i][j].nodeIndex].Attributes.TryGetValue(distanceFO.AttributeName, out object distanceAttrObject) && distanceAttrObject != null)
+                            {
+                                dist = distanceFO.Formatter(distanceAttrObject) ?? distanceFO.DefaultValue;
+                            }
+                        }
+
+                        if (anchor == 1)
+                        {
+                            double ptDist = coordinates[nodes[sortedLabels[i][j].nodeIndex].Id].Modulus();
+
+                            foreach (TreeNode leaf in nodes[sortedLabels[i][j].nodeIndex].GetLeaves())
+                            {
+                                ptDist = Math.Max(ptDist, coordinates[leaf.Id].Modulus());
+                            }
+
+                            dist = dist + ptDist;
+                        }
+
+
+                        double radius = dist + (height + rowMargin) * i;
+
                         string nodeId = nodes[sortedLabels[i][j].nodeIndex].Id;
                         double d1 = sortedLabels[i][j].originalStart;
                         double d2 = sortedLabels[i][j].originalEnd;
@@ -946,8 +1083,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                             if (textAlignment == 0)
                             {
-                                startAngle = d1 + (textMargin / distance);
-                                endAngle = d1 + ((textMargin + labelFont.MeasureText(attributeValue).Width) / distance);
+                                startAngle = d1 + (textMargin / dist);
+                                endAngle = d1 + ((textMargin + labelFont.MeasureText(attributeValue).Width) / dist);
                             }
                             else if (textAlignment == 1)
                             {
@@ -955,8 +1092,8 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
                             }
                             else if (textAlignment == 2)
                             {
-                                startAngle = d2 - (textMargin / distance);
-                                endAngle = d2 - ((textMargin + labelFont.MeasureText(attributeValue).Width) / distance);
+                                startAngle = d2 - (textMargin / dist);
+                                endAngle = d2 - ((textMargin + labelFont.MeasureText(attributeValue).Width) / dist);
                             }
 
 
@@ -1063,6 +1200,13 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
 
                         double d1 = double.MaxValue;
                         double d2 = double.MinValue;
+
+                        double distance = distanceFO.DefaultValue;
+
+                        if (nodes[nodeIndex].Attributes.TryGetValue(distanceFO.AttributeName, out object distanceAttributeObject) && distanceAttributeObject != null)
+                        {
+                            distance = distanceFO.Formatter(distanceAttributeObject) ?? distanceFO.DefaultValue;
+                        }
 
                         double radius = distance + height * 0.5;
 
@@ -2009,3 +2153,4 @@ namespace a7ef1591643834ee7b4bdbd44a7be1849
         }
     }
 }
+
