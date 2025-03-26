@@ -8,7 +8,7 @@
 
 ## Introduction
 
-**TreeViewer** is a cross-platform program to draw phylogenetic trees. It is based on a "modular" approach, in which small _modules_ are used to perform individual actions (such as computing the coordinates of the nodes of the tree, or drawing the tree branches) that together contribute to the final plot.
+**TreeViewer** is a cross-platform program to draw [phylogenetic trees](https://en.wikipedia.org/wiki/Phylogenetic_tree). It is based on a "modular" approach, in which small _modules_ are used to perform individual actions (such as computing the coordinates of the nodes of the tree, or drawing the tree branches) that together contribute to the final plot.
 
 Each TreeViewer module has a user manual, and these can be displayed in TreeViewer by opening the `Module Manager` window (from the `Edit` menu) or by clicking on the various question mark (`?`) icons that are shown throughout the program when appropriate.
 
@@ -43,7 +43,7 @@ Of course, 3 and 4 are optional, and you can decide to skip these steps during t
 
 You can now run TreeViewer using the shortcut that has been created. Alternatively, you can invoke the program from the command line by typing `TreeViewer` in the command prompt (which you can open by pressing `Win+R` on your keyboard, typing `cmd` and pressing Enter). You can also run the command-line version by typing `TreeViewerCommandLine`.
 
-TreeViewer has been test on Windows 10 and Windows 11 on Intel x64 processors. It seems to work OK on Windows 11 for ARM running in an emulator, but this has not been tested extensively.
+TreeViewer has been tested on Windows 10 and 11 on Intel x64 processors. It seems to work OK on Windows 11 for ARM running in an emulator, but this has not been tested extensively.
 
 ### macOS
 
