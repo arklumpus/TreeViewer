@@ -423,6 +423,18 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 <br />
 
+### [Node images](86fab195-2863-43ed-bbf5-ed12a3cc3994)
+
+_Version 1.0.0, by Giorgio Bianchini_
+
+**Description**: Draws images at multiple nodes.
+
+**Module type**: Plotting
+
+**Module ID**: `86fab195-2863-43ed-bbf5-ed12a3cc3994`
+
+<br />
+
 ### [Export](d5d75840-4a71-4b81-bfc4-431736792abb)
 
 _Version 1.1.2, by Giorgio Bianchini_
