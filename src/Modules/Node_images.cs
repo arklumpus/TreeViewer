@@ -34,7 +34,7 @@ namespace a86fab195286343edbbf5ed12a3cc3994
         public const string Name = "Node images";
         public const string HelpText = "Draws images at multiple nodes.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.0");
+        public static Version Version = new Version("1.0.1");
         public const ModuleTypes ModuleType = ModuleTypes.Plotting;
         public const string Id = "86fab195-2863-43ed-bbf5-ed12a3cc3994";
 
@@ -276,9 +276,6 @@ namespace a86fab195286343edbbf5ed12a3cc3994
             Point rootPoint = coordinates[Modules.RootNodeId];
             coordinates.TryGetValue("92aac276-3af7-4506-a263-7220e0df5797", out Point circularCenter);
 
-
-            List<string> paramVals = parameterValues.Keys.ToList();
-
             // Annoying issue: while for ZIP archives we can just request a file from its name, tar(.gz) archives are sequential.
             // Hence, we first need to figure out all the images that need to be extracted, and then extract them.
             Dictionary<string, List<TreeNode>> imageNames = new Dictionary<string, List<TreeNode>>();
@@ -312,8 +309,6 @@ namespace a86fab195286343edbbf5ed12a3cc3994
             }
 
             (Dictionary<string, Page> loadedImages, bool unknownFormat) = CreateImageCache(attachment, imageNames, imageFormat, scaleFactor, stateData);
-
-            Dictionary<string, Page> cachedImages2 = CachedImages;
 
             double minX = double.MaxValue;
             double maxX = double.MinValue;
@@ -734,8 +729,6 @@ namespace a86fab195286343edbbf5ed12a3cc3994
                     imagesToSeek.Remove(kvp.Key);
                 }
 
-                Dictionary<string, Page> cachedImages2 = CachedImages;
-
                 Stream attachmentStream = attachment.Stream;
                 attachmentStream.Seek(attachment.StreamStart, SeekOrigin.Begin);
 
@@ -905,13 +898,17 @@ namespace a86fab195286343edbbf5ed12a3cc3994
             }
             else
             {
+                using MemoryStream copiedStream = new MemoryStream();
+                imageStream.CopyTo(copiedStream);
+                copiedStream.Seek(0, SeekOrigin.Begin);
+
                 MuPDFCore.InputFileTypes imageType = (MuPDFCore.InputFileTypes)(imageFormat - 1);
 
                 VectSharp.MuPDFUtils.RasterImageStream rasterImageStream;
 
                 try
                 {
-                    rasterImageStream = new VectSharp.MuPDFUtils.RasterImageStream(imageStream, imageType, scale: scaleFactor);
+                    rasterImageStream = new VectSharp.MuPDFUtils.RasterImageStream(copiedStream, imageType, scale: scaleFactor);
                 }
                 catch (Exception ex)
                 {
