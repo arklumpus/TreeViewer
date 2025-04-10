@@ -423,21 +423,9 @@ _Version 1.1.0, by Giorgio Bianchini_
 
 <br />
 
-### [Node images](86fab195-2863-43ed-bbf5-ed12a3cc3994)
-
-_Version 1.0.0, by Giorgio Bianchini_
-
-**Description**: Draws images at multiple nodes.
-
-**Module type**: Plotting
-
-**Module ID**: `86fab195-2863-43ed-bbf5-ed12a3cc3994`
-
-<br />
-
 ### [Export](d5d75840-4a71-4b81-bfc4-431736792abb)
 
-_Version 1.1.2, by Giorgio Bianchini_
+_Version 1.1.3, by Giorgio Bianchini_
 
 **Description**: Exports the tree plot as a PDF, SVG or PNG image.
 
@@ -639,6 +627,18 @@ _Version 1.0.4, by Giorgio Bianchini_
 **Module type**: Plotting
 
 **Module ID**: `319e8f63-d6c9-4dac-9419-0b621dcd5f23`
+
+<br />
+
+### [Node images](86fab195-2863-43ed-bbf5-ed12a3cc3994)
+
+_Version 1.0.1, by Giorgio Bianchini_
+
+**Description**: Draws images at multiple nodes.
+
+**Module type**: Plotting
+
+**Module ID**: `86fab195-2863-43ed-bbf5-ed12a3cc3994`
 
 <br />
 
