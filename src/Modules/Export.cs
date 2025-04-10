@@ -1,4 +1,3 @@
-
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
     Copyright (C) 2023-2024  Giorgio Bianchini, University of Bristol
@@ -34,6 +33,7 @@ using VectSharp.SVG;
 using VectSharp.Raster.ImageSharp;
 using VectSharp.Raster;
 using System.Runtime.InteropServices;
+using System.Collections;
 
 namespace ExportPDF
 {
@@ -46,7 +46,7 @@ namespace ExportPDF
         public const string Name = "Export";
         public const string HelpText = "Exports the tree plot as a PDF, SVG or PNG image.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.1.2");
+        public static Version Version = new Version("1.1.3");
         public const string Id = "d5d75840-4a71-4b81-bfc4-431736792abb";
         public const ModuleTypes ModuleType = ModuleTypes.MenuAction;
 
@@ -1223,6 +1223,8 @@ namespace ExportPDF
                             pag = ApplyCrop(pag, cropRegionRects[cropRegionBox.SelectedIndex - 1], parent.PlotOrigin);
                         }
 
+                        PreflightCheckRasterImages(pag);
+
                         pag.SaveAsSVG(result, textOptionBox.SelectedIndex == 0 ? SVGContextInterpreter.TextOptions.EmbedFonts : textOptionBox.SelectedIndex == 1 ? SVGContextInterpreter.TextOptions.SubsetFonts : textOptionBox.SelectedIndex == 2 ? SVGContextInterpreter.TextOptions.ConvertIntoPaths : SVGContextInterpreter.TextOptions.ConvertIntoPathsUsingGlyphs);
 
                         this.FindAncestorOfType<RibbonFilePage>().Close();
@@ -1235,6 +1237,31 @@ namespace ExportPDF
             };
 
             return mainContainer;
+        }
+
+        private static void PreflightCheckRasterImages(Page pag)
+        {
+            IEnumerable actions = (IEnumerable)typeof(Graphics).GetField("Actions", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(pag.Graphics);
+
+            foreach (object action in actions)
+            {
+                if (action.GetType().FullName == "VectSharp.RasterImageAction")
+                {
+                    RasterImage image = (RasterImage)action.GetType().GetProperty("Image", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic).GetValue(action);
+
+                    try
+                    {
+                        if (!image.PNGStream.CanRead)
+                        {
+                            image.ClearPNGCache();
+                        }
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        image.ClearPNGCache();
+                    }
+                }
+            }
         }
 
         private static Page ApplyCrop(Page pag, Rectangle cropRegion, VectSharp.Point origin)
