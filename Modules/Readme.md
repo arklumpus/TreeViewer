@@ -1053,7 +1053,7 @@ _Version 1.2.0, by Giorgio Bianchini_
 
 ### [Set up stochastic map](32858c9d-0247-497f-aeee-03f7bfe24158)
 
-_Version 1.0.2, by Giorgio Bianchini_
+_Version 1.0.3, by Giorgio Bianchini_
 
 **Description**: Parses the information from a stochastic mapping analysis.
 

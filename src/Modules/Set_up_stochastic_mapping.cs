@@ -1,7 +1,7 @@
 /*
     TreeViewer - Cross-platform software to draw phylogenetic trees
-    Copyright (C) 2023  Giorgio Bianchini, University of Bristol
- 
+    Copyright (C) 2023,2025  Giorgio Bianchini, University of Bristol
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, version 3.
@@ -51,13 +51,13 @@ namespace a32858c9d0247497faeee03f7bfe24158
     /// 
     /// ]]>
     /// </description>
-    
+
     public static class MyModule
     {
         public const string Name = "Set up stochastic map";
         public const string HelpText = "Parses the information from a stochastic mapping analysis.";
         public const string Author = "Giorgio Bianchini";
-        public static Version Version = new Version("1.0.2");
+        public static Version Version = new Version("1.0.3");
         public const ModuleTypes ModuleType = ModuleTypes.FurtherTransformation;
 
         public const string Id = "32858c9d-0247-497f-aeee-03f7bfe24158";
@@ -354,18 +354,45 @@ namespace a32858c9d0247497faeee03f7bfe24158
                     for (int i = 0; i < Math.Ceiling(Math.Abs(right - left) / actualResolution) + 1; i++)
                     {
                         double samplingTime;
+                        double perc;
                         if (!isClockLike)
                         {
-                            samplingTime = Math.Min(left + actualResolution * i, right);
+                            samplingTime = left + actualResolution * i;
+
+                            if (samplingTime > right - 0.01 * actualResolution)
+                            {
+                                samplingTime = right - 0.01 * actualResolution;
+                                perc = 1;
+                            }
+                            else if (samplingTime < left + actualResolution * 0.01)
+                            {
+                                samplingTime = left + actualResolution * 0.01;
+                                perc = 0;
+                            }
+                            else
+                            {
+                                perc = (samplingTime - left) / (right - left);
+                            }
                         }
                         else
                         {
-                            samplingTime = Math.Max(left - actualResolution * i, right);
+                            samplingTime = left - actualResolution * i;
+
+                            if (samplingTime > left - actualResolution * 0.01)
+                            {
+                                samplingTime = left - actualResolution * 0.01;
+                                perc = 0;
+                            }
+                            else if (samplingTime < right + 0.01 * actualResolution)
+                            {
+                                samplingTime = right + 0.01 * actualResolution;
+                                perc = 1;
+                            }
+                            else
+                            {
+                                perc = (samplingTime - left) / (right - left);
+                            }
                         }
-
-                        double perc = (samplingTime - left) / (right - left);
-
-
 
                         int[] counts = new int[allPossibleStates.Count];
 
