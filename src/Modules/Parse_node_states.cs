@@ -209,8 +209,9 @@ namespace ParseTipStates
                 /// * `\t` matches a tabulation
                 /// * `\s` matches a whitespace character (e.g. a space or a tabulation)
                 /// 
-                /// Note that, since empty elements are discarded anyways, it is not a problem if multiple instances of the separator
-                /// occur in sequence (e.g. `A     B` is parsed just as well as `A B`).
+                /// By default, empty elements are discarded, so multiple instances of the separator can occur in sequence (e.g.
+                /// `A     B` is parsed just as well as `A B`). Enable [Preserve empty values](#preserve-empty-values) when empty
+                /// fields represent columns and must remain in their original positions.
                 /// </param>
                 ("Separator:", "TextBox:\\s"),
                 
@@ -220,6 +221,13 @@ namespace ParseTipStates
                 /// could be used to parse a file in which the states are separated by spaces, commas and/or semicolons).
                 /// </param>
                 ("Regex", "CheckBox:true"),
+
+                /// <param name="Preserve empty values">
+                /// If this check box is checked, empty fields are kept instead of being discarded. Use this when a delimiter-separated
+                /// file contains blank cells that must not shift the values in later columns. Leave it unchecked to retain the existing
+                /// behaviour, including collapsing repeated whitespace separators.
+                /// </param>
+                ("Preserve empty values", "CheckBox:false"),
 
                 ("Matching", "Group:3"),
 
@@ -290,6 +298,12 @@ namespace ParseTipStates
             };
         }
 
+        private static string[] SplitValues(string line, Regex separator, bool preserveEmptyValues)
+        {
+            string[] values = separator.Split(line);
+            return preserveEmptyValues ? values : values.Where(value => !string.IsNullOrEmpty(value)).ToArray();
+        }
+
         public static bool OnParameterChange(object tree, Dictionary<string, object> previousParameterValues, Dictionary<string, object> currentParameterValues, out Dictionary<string, ControlStatus> controlStatus, out Dictionary<string, object> parametersToChange)
         {
             controlStatus = new Dictionary<string, ControlStatus>() { { "Attribute(s):", ControlStatus.Hidden } };
@@ -343,6 +357,7 @@ namespace ParseTipStates
                     int skipLines = (int)(double)parameterValues["Lines to skip:"];
                     string separatorString = (string)parameterValues["Separator:"];
                     bool separatorRegex = (bool)parameterValues["Regex"];
+                    bool preserveEmptyValues = (bool)parameterValues["Preserve empty values"];
 
                     int attributeType = (int)parameterValues["Attribute type: "];
 
@@ -377,8 +392,7 @@ namespace ParseTipStates
                         {
                             try
                             {
-                                string[] splitLine = (from el in separator.Split(lines[skipLines]) where !string.IsNullOrEmpty(el) select el).ToArray();
-                                attributeNames = splitLine;
+                                attributeNames = SplitValues(lines[skipLines], separator, preserveEmptyValues);
                             }
                             catch
                             {
@@ -387,14 +401,14 @@ namespace ParseTipStates
                         }
                         else
                         {
-                            attributeNames = (from el in separator.Split(Regex.Unescape(attributeName)) where !string.IsNullOrEmpty(el) select el.Trim()).ToArray();
+                            attributeNames = SplitValues(Regex.Unescape(attributeName), separator, preserveEmptyValues).Select(value => value.Trim()).ToArray();
                         }
 
                         for (int i = skipLines + (useHeaderRow ? 1 : 0); i < lines.Length; i++)
                         {
                             if (!string.IsNullOrEmpty(lines[i]))
                             {
-                                string[] splitLine = (from el in separator.Split(lines[i]) where !string.IsNullOrEmpty(el) select el).ToArray();
+                                string[] splitLine = SplitValues(lines[i], separator, preserveEmptyValues);
                                 if (splitLine.Length > matchColumn)
                                 {
                                     object[] attribute = new object[splitLine.Length];
@@ -652,6 +666,7 @@ namespace ParseTipStates
             int skipLines = (int)(double)parameterValues["Lines to skip:"];
             string separatorString = (string)parameterValues["Separator:"];
             bool separatorRegex = (bool)parameterValues["Regex"];
+            bool preserveEmptyValues = (bool)parameterValues["Preserve empty values"];
 
             int attributeType = (int)parameterValues["Attribute type: "];
 
@@ -685,8 +700,7 @@ namespace ParseTipStates
                 {
                     try
                     {
-                        string[] splitLine = (from el in separator.Split(lines[skipLines]) where !string.IsNullOrEmpty(el) select el).ToArray();
-                        attributeNames = splitLine;
+                        attributeNames = SplitValues(lines[skipLines], separator, preserveEmptyValues);
                     }
                     catch
                     {
@@ -695,14 +709,14 @@ namespace ParseTipStates
                 }
                 else
                 {
-                    attributeNames = (from el in separator.Split(Regex.Unescape(attributeName)) where !string.IsNullOrEmpty(el) select el.Trim()).ToArray();
+                    attributeNames = SplitValues(Regex.Unescape(attributeName), separator, preserveEmptyValues).Select(value => value.Trim()).ToArray();
                 }
 
                 for (int i = skipLines + (useHeaderRow ? 1 : 0); i < lines.Length; i++)
                 {
                     if (!string.IsNullOrEmpty(lines[i]))
                     {
-                        string[] splitLine = (from el in separator.Split(lines[i]) where !string.IsNullOrEmpty(el) select el).ToArray();
+                        string[] splitLine = SplitValues(lines[i], separator, preserveEmptyValues);
                         if (splitLine.Length > matchColumn)
                         {
                             object[] attribute = new object[splitLine.Length];
@@ -777,7 +791,10 @@ namespace ParseTipStates
                                             attributeIndex--;
                                         }
 
-                                        nodes[i].Attributes[attributeNames[attributeIndex]] = attribute[j];
+                                        if (attributeIndex < attributeNames.Length && !string.IsNullOrEmpty(attributeNames[attributeIndex]))
+                                        {
+                                            nodes[i].Attributes[attributeNames[attributeIndex]] = attribute[j];
+                                        }
                                     }
                                 }
                             }
@@ -800,7 +817,7 @@ namespace ParseTipStates
                                             attributeIndex--;
                                         }
 
-                                        if (attributeIndex < attributeNames.Length)
+                                        if (attributeIndex < attributeNames.Length && !string.IsNullOrEmpty(attributeNames[attributeIndex]))
                                         {
                                             nodes[i].Attributes[attributeNames[attributeIndex]] = attribute[j];
                                         }
